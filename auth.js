@@ -17,7 +17,7 @@ router.post('/register', async (req, res, next) => {
 		password: Joi.string().required(),
 	});
 
-	const {error, value } = schema.validate(req.body);
+	const { error, value } = schema.validate(req.body);
 
 	if (error) {
 		return next(Boom.badRequest(error.details[0].message));
@@ -43,7 +43,7 @@ router.post('/register', async (req, res, next) => {
 			email,
 		});
 	} catch (e) {
-		return next(Boom.badImplementation('unable to check for duplicates'));
+		return next(Boom.badImplementation('Unable to check for duplicates'));
 	}
 
 	if (hasura_data.users.length !== 0) {
@@ -77,7 +77,7 @@ router.post('/register', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.badImplementation('unable to create user'));
+		return next(Boom.badImplementation('Unable to create user'));
 	}
 
 	res.send('OK');
@@ -90,7 +90,7 @@ router.get('/activate-account', async (req, res, next) => {
 		email_token: Joi.string().uuid({version: ['uuidv4']}).required(),
 	});
 
-	const {error, value } = schema.validate(req.query);
+	const { error, value } = schema.validate(req.query);
 
 	if (error) {
 		return next(Boom.badRequest(error.details[0].message));
@@ -133,7 +133,7 @@ router.get('/activate-account', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.unauthorized('unable to activate account'));
+		return next(Boom.unauthorized('Unable to activate account'));
 	}
 
 	res.send('OK');
@@ -147,7 +147,7 @@ router.post('/new-password', async (req, res, next) => {
 		password: Joi.string().required(),
 	});
 
-	const {error, value } = schema.validate(req.body);
+	const { error, value } = schema.validate(req.body);
 
 	if (error) {
 		return next(Boom.badRequest(error.details[0].message));
@@ -185,7 +185,7 @@ router.post('/new-password', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.unauthorized('email token not valid'));
+		return next(Boom.unauthorized('Email token not valid'));
 	}
 
 	// update password and email activation token
@@ -224,7 +224,7 @@ router.post('/new-password', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.unauthorized('unable to update password'));
+		return next(Boom.unauthorized('Unable to update password'));
 	}
 
 	// return 200 OK
@@ -240,7 +240,7 @@ router.post('/sign-in', async (req, res, next) => {
 		password: Joi.string().required(),
 	});
 
-	const {error, value } = schema.validate(req.body);
+	const { error, value } = schema.validate(req.body);
 
 	if (error) {
 		return next(Boom.badRequest(error.details[0].message));
@@ -309,7 +309,7 @@ router.post('/sign-in', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.badImplementation('could not update refetch token for user'));
+		return next(Boom.badImplementation('Could not update refetch token for user'));
 	}
 
 	res.cookie('jwt_token', jwt_token, {
@@ -335,7 +335,7 @@ router.post('/refetch-token', async (req, res, next) => {
 		refetch_token: Joi.string().required(),
 	});
 
-	const {error, value } = schema.validate(req.body);
+	const { error, value } = schema.validate(req.body);
 
 	if (error) {
 		return next(Boom.badRequest(error.details[0].message));
@@ -344,13 +344,19 @@ router.post('/refetch-token', async (req, res, next) => {
 	const { refetch_token, user_id } = req.body;
 
 	let query = `
-	query get_refetch_token($refetch_token: String!, $user_id: Int!) {
+	query get_refetch_token(
+		$refetch_token: uuid!,
+		$user_id: Int!
+		$min_added_at: timestamptz!,
+	) {
 		refetch_tokens (
 			where: {
 				_and: [{
 					refetch_token: { _eq: $refetch_token }
 				}, {
 					user_id: { _eq: $user_id }
+				}, {
+					added_at: { _gte: $min_added_at }
 				}]
 			}
 		) {
@@ -365,9 +371,13 @@ router.post('/refetch-token', async (req, res, next) => {
 
 	let hasura_data;
 	try {
+
+		const
+
 		hasura_data = await graphql_client.request(query, {
 			refetch_token,
 			user_id,
+			min_added_at: new Date(new Date().getTime() + (config.REFTECH_TOKEN_EXPIRES*1000)),
 		});
 	} catch (e) {
 		return next(Boom.unauthorized('Invalid refetch_token or user_id'));
@@ -428,7 +438,6 @@ router.post('/refetch-token', async (req, res, next) => {
 		domain: DOMAIN,
 		expires: new Date(Date.now() + (15*60*1000)),
 	});
-
 
 	res.json({
 		jwt_token,
