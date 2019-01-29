@@ -4,7 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
-// const auth = require('./auth');
+const auth = require('./auth');
 const storage = require('./storage');
 // const functions = require('./functions');
 
@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.disable('x-powered-by');
 
 // routes
-// app.use('/auth', auth);
+app.use('/auth', auth);
 app.use('/storage', storage);
 // app.use('/functions', functions);
 
