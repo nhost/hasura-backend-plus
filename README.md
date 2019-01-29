@@ -1,11 +1,11 @@
 # hasura-backend-plus
 Auth, Storage and Server-Side Functions for Hasura
 
-# Deploy
+## Deploy
 
 *Work in progress*
 
-# Configuration
+## Configuration
 
 
 Copy `config-example.js` to `config.js`.
@@ -15,11 +15,11 @@ Edit `config.js`.
 
 Create  appropriate storage rules in file `storage-tools.js` in the `validateInteraction` function.
 
-## Auth
+# Auth
 
 *Work in progress...*
 
-## Storage
+# Storage
 
 Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permissions.
 
@@ -41,6 +41,6 @@ Security rules are placed in `storage-tools.js` in the function `validateInterac
 
 `claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['x-hasura-user-id']`.
 
-## Functions
+# Functions
 
 *Work in progress...*
