@@ -371,9 +371,6 @@ router.post('/refetch-token', async (req, res, next) => {
 
 	let hasura_data;
 	try {
-
-		const
-
 		hasura_data = await graphql_client.request(query, {
 			refetch_token,
 			user_id,
