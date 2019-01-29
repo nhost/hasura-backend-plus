@@ -1,6 +1,19 @@
 # hasura-backend-plus
 Auth, Storage and Server-Side Functions for Hasura
 
+# Deploy
+
+*Work in progress*
+
+# Configuration
+
+
+Copy `config-example.js` to `config.js`.
+`cp config-example.js config.js`
+Edit `config.js`.
+`vim config.js`
+
+Create  appropriate storage rules in file `storage-tools.js` in the `validateInteraction` function.
 
 ## Auth
 
@@ -22,6 +35,9 @@ Get files at `/storage/file/{key}`.
 
 Security rules are placed in `storage-tools.js` in the function `validateInteraction`.
 
+`key` = Interacted file. Ex: `/companies/2/customer/3/report.pdf`.
+`type` = Operation type. Can be one of: `read`, `write`.
+`claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['x-hasura-user-id']`.
 
 ## Functions
 
