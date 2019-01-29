@@ -36,7 +36,9 @@ Get files at `/storage/file/{key}`.
 Security rules are placed in `storage-tools.js` in the function `validateInteraction`.
 
 `key` = Interacted file. Ex: `/companies/2/customer/3/report.pdf`.
+
 `type` = Operation type. Can be one of: `read`, `write`.
+
 `claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['x-hasura-user-id']`.
 
 ## Functions
