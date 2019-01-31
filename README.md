@@ -12,6 +12,7 @@ Auth, Storage and Server-Side Functions for Hasura
 
 ENV VARIABLES:
 ```
+USER_FIELDS: 'company_id,name'
 GRAPHQL_ENDPOINT: hasura-end-point
 HASURA_ACCESS_KEY: hasura-access-key
 JWT_SECRET: jwt-secret
