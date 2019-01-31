@@ -6,7 +6,9 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('./graphql-client');
 
-const { JWT_SECRET, DOMAIN } = require('./config');
+const { DOMAIN, USER_FIELDS } = require('./config');
+
+const auth_tools = require('./auth-tools');
 
 var router = express.Router();
 
@@ -177,7 +179,6 @@ router.post('/new-password', async (req, res, next) => {
 	}
 	`;
 
-	console.log(email, email_token);
 	try {
 		var hasura_data = await graphql_client.request(query, {
 			email,
@@ -258,6 +259,7 @@ router.post('/sign-in', async (req, res, next) => {
 			id
 			password_hash
 			role
+			${USER_FIELDS.join('\n')}
 		}
 	}
 	`;
@@ -285,7 +287,7 @@ router.post('/sign-in', async (req, res, next) => {
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
 
-	const jwt_token = generateJwtToken(user);
+	const jwt_token = auth_tools.generateJwtToken(user);
 
 	// generate refetch token and put in database
 	query = `
@@ -364,6 +366,7 @@ router.post('/refetch-token', async (req, res, next) => {
 				id
 				company_id
 				role
+				${USER_FIELDS.join('\n')}
 			}
 		}
 	}
@@ -429,7 +432,7 @@ router.post('/refetch-token', async (req, res, next) => {
 	}
 
 	// generate new jwt token
-	const jwt_token = generateJwtToken(user);
+	const jwt_token = auth_tools.generateJwtToken(user);
 
 	res.cookie('jwt_token', jwt_token, {
 		domain: DOMAIN,
@@ -442,17 +445,5 @@ router.post('/refetch-token', async (req, res, next) => {
 		user_id,
 	});
 });
-
-function generateJwtToken(user) {
-	return jwt.sign({
-		'https://hasura.io/jwt/claims': {
-			'x-hasura-allowed-roles': [user.role],
-			'x-hasura-default-role': user.role,
-			'x-hasura-user-id': user.id.toString(),
-		},
-	}, JWT_SECRET, {
-		expiresIn: '15m',
-	});
-}
 
 module.exports = router;

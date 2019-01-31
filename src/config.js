@@ -1,3 +1,4 @@
+exports.USER_FIELDS = process.env.USER_FIELDS ? process.env.USER_FIELDS.split(',') : [];
 exports.GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'https://hasura.your-app.com/v1alpha1/graphql';
 exports.HASURA_ACCESS_KEY = process.env.HASURA_ACCESS_KEY || 'hasura-access-key';
 exports.JWT_SECRET = process.env.JWT_SECRET || 'jwt-secret'; // same jwt secret as HASURA_GRAPHQL_JWT_SECRET
