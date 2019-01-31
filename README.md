@@ -3,8 +3,8 @@
 This is
 
 - [x] Auth
-- [x] S3 block storage
-- [ ] Server-Side functions
+- [x] S3-compatible Object Storage
+- [ ] Server-Side Functions
 
 for Hasura
 
