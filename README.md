@@ -1,5 +1,8 @@
 # hasura-backend-plus
+
 Auth, Storage and Server-Side Functions for Hasura
+
+** This repo is under heavy development right now! :D **
 
 ## Deploy
 
@@ -7,25 +10,30 @@ Auth, Storage and Server-Side Functions for Hasura
 
 ## Configuration
 
-
-Copy `config-example.js` to `config.js`.
-`cp config-example.js config.js`
-Edit `config.js`.
-`vim config.js`
-
-Create  appropriate storage rules in file `storage-tools.js` in the `validateInteraction` function.
+ENV VARIABLES:
+```
+GRAPHQL_ENDPOINT: hasura-end-point
+HASURA_ACCESS_KEY: hasura-access-key
+JWT_SECRET: jwt-secret
+S3_ACCESS_KEY_ID: access-key-id
+S3_SECRET_ACCESS_KEY: secret-access-key
+S3_ENDPOINT: ams3.digitaloceanspaces.com
+S3_BUCKET: bucketname
+DOMAIN: your-app.com
+ALLOWED_ORIGIN: https://your-app.com
+```
 
 # Auth
 
-*Work in progress...*
+Working.
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permissions.
+Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permission.
 
 ### Uploads
 
-Uploads to `/storage/upload`. Will return `key`, `originalname` and `mimetype`. You are able to upload multiple files at the same time.
+Uploads to `/storage/upload`. Will return `key`, `originalname` and `mimetype`. You are able to upload multiple (50) files at the same time.
 
 ### Download (get)
 

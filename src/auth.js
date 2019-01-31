@@ -2,11 +2,11 @@ const express = require('express');
 const Joi = require('joi');
 const Boom = require('boom');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('./graphql-client');
 
-const { JWT_SECRET } = require('./config');
+const { JWT_SECRET, DOMAIN } = require('./config');
 
 var router = express.Router();
 
@@ -374,7 +374,7 @@ router.post('/refetch-token', async (req, res, next) => {
 		hasura_data = await graphql_client.request(query, {
 			refetch_token,
 			user_id,
-			min_added_at: new Date(new Date().getTime() + (config.REFTECH_TOKEN_EXPIRES*1000)),
+			min_added_at: new Date(new Date().getTime() + (config.REFETCH_TOKEN_EXPIRES*1000)),
 		});
 	} catch (e) {
 		return next(Boom.unauthorized('Invalid refetch_token or user_id'));

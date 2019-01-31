@@ -21,9 +21,6 @@ const storage_tools = require('./storage-tools');
 
 const router = express.Router();
 
-// Use our env vars for setting credentials
-// const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-// const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
 AWS.config.update({
 	accessKeyId: S3_ACCESS_KEY_ID,
 	secretAccessKey: S3_SECRET_ACCESS_KEY,

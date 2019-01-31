@@ -19,7 +19,7 @@
   "dependencies": {
     "aws-sdk": "^2.362.0",
     "aws-serverless-express": "^3.3.5",
-    "bcrypt": "^3.0.2",
+    "bcryptjs": "^2.4.3",
     "boom": "^7.2.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.5",

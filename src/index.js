@@ -11,7 +11,7 @@ const storage = require('./storage');
 const app = express();
 
 const {
-	ALLOWED_ORIGINS,
+	ALLOWED_ORIGIN,
 } = require('./config');
 
 // middleware
@@ -22,7 +22,7 @@ app.use(cors({
 		// allow requests with no origin
 		// (like mobile apps or curl requests)
 		if(!origin) return cb(null, true);
-		if(ALLOWED_ORIGINS.indexOf(origin) === -1){
+		if(ALLOWED_ORIGIN !== origin){
 			return cb(Boom.badRequest('CORS not OK'));
 		}
 		return cb(null, true);
@@ -46,7 +46,7 @@ app.use((err, req, res, next) => {
 	}
 });
 
-const port = process.env.PORT || 3010;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
 });
