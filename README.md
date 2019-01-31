@@ -1,12 +1,16 @@
 # hasura-backend-plus
 
-Auth, Storage and Server-Side Functions for Hasura
+This is
+
+[x] Auth
+[x] S3 block storage
+[ ] Server-Side functions
+
+for Hasura
 
 ** This repo is under heavy development right now! :D **
 
 ## Deploy
-
-*Work in progress*
 
 Add to docker-compose.yaml
 
