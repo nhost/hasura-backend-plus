@@ -8,6 +8,42 @@ Auth, Storage and Server-Side Functions for Hasura
 
 *Work in progress*
 
+Add to docker-compose.yaml
+
+```
+hasura-backend-plus:
+  image: elitan/hasura-backend-plus
+  environment:
+    USER_FIELDS: '<user_fields>'
+    GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
+    HASURA_ACCESS_KEY: <hasura-access-key>
+    JWT_SECRET: <jwt secret>
+    S3_ACCESS_KEY_ID: <access>
+    S3_SECRET_ACCESS_KEY: <secret>
+    S3_ENDPOINT: <endpoint>
+    S3_BUCKET: <bucket>
+    DOMAIN: <domain-running-this-service>
+    ALLOWED_ORIGIN: http://<your-app.com>
+    REFETCH_TOKEN_EXPIRES: 54000
+caddy:
+  ....
+  depends_on:
+  - graphql-engine
+  - hasura-backend-plus
+```
+
+Add this to your caddy file
+
+```
+<domain-running-this-service> {
+    proxy / hasura-backend-plus:3000
+}
+```
+
+Restart your docker containers
+
+`docker-compose up -d`
+
 ## Configuration
 
 ENV VARIABLES:
@@ -23,6 +59,8 @@ S3_BUCKET: bucketname
 DOMAIN: your-app.com
 ALLOWED_ORIGIN: https://your-app.com
 ```
+
+TODO: Explain env variables
 
 # Auth
 
