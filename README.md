@@ -2,9 +2,9 @@
 
 This is
 
-[x] Auth
-[x] S3 block storage
-[ ] Server-Side functions
+- [x] Auth
+- [x] S3 block storage
+- [ ] Server-Side functions
 
 for Hasura
 
