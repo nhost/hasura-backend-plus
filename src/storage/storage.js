@@ -7,7 +7,7 @@ var multer = require('multer');
 var multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
 
-const { graphql_client } = require('./graphql-client');
+const { graphql_client } = require('../graphql-client');
 
 const {
 	JWT_SECRET,
@@ -15,7 +15,7 @@ const {
 	S3_SECRET_ACCESS_KEY,
 	S3_ENDPOINT,
 	S3_BUCKET,
-} = require('./config');
+} = require('../config');
 
 const storage_tools = require('./storage-tools');
 
@@ -52,7 +52,7 @@ router.get('/file/*', (req, res, next) => {
 	// check access of key for jwt token claims
 	if (!storage_tools.validateInteraction(key, 'read', claims)) {
 		console.log('not allowed to read');
-		return next(Boom.unauthorized('you are not allowed to read this file'));
+		return next(Boom.unauthorized('You are not allowed to read this file'));
 	}
 
 	const params = {
@@ -63,17 +63,19 @@ router.get('/file/*', (req, res, next) => {
 	s3.headObject(params, function (err, data) {
 
 		if (err) {
-			// an error occurred
 			console.error(err);
-			return next();
+			if (err.code === 'NotFound') {
+				return next(Boom.notFound());
+			}
+			return next(Boom.badImplementation('Unable to retreive file'));
 		}
 
 		const stream = s3.getObject(params).createReadStream();
 
 		// forward errors
 		stream.on('error', function error(err) {
-			//continue to the next middlewares
-			return next();
+			console.error(err);
+			return next(Boom.badImplementation());
 		});
 
 		//Add the content type to the response (it's not propagated from the S3 SDK)

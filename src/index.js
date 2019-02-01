@@ -1,32 +1,19 @@
 const express = require('express');
-const Boom = require('boom');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
-const auth = require('./auth');
-const storage = require('./storage');
+const auth = require('./auth/auth');
+const storage = require('./storage/storage');
 // const functions = require('./functions');
 
 const app = express();
-
-const {
-	ALLOWED_ORIGIN,
-} = require('./config');
 
 // middleware
 app.use(express.json());
 app.use(cors({
 	credentials: true,
-	origin: function(origin, cb){
-		// allow requests with no origin
-		// (like mobile apps or curl requests)
-		if(!origin) return cb(null, true);
-		if(ALLOWED_ORIGIN !== origin){
-			return cb(Boom.badRequest('CORS not OK'));
-		}
-		return cb(null, true);
-	},
+	origin: true,
 }));
 app.use(morgan('tiny'));
 app.use(cookieParser());

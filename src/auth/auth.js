@@ -4,9 +4,9 @@ const Boom = require('boom');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
-const { graphql_client } = require('./graphql-client');
+const { graphql_client } = require('../graphql-client');
 
-const { DOMAIN, USER_FIELDS } = require('./config');
+const { DOMAIN, USER_FIELDS } = require('../config');
 
 const auth_tools = require('./auth-tools');
 

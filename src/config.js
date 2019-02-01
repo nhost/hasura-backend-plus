@@ -7,4 +7,4 @@ exports.S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY || 's3-secret-ac
 exports.S3_ENDPOINT = process.env.S3_ENDPOINT || 's3-endpoint';
 exports.S3_BUCKET = process.env.S3_BUCKET || 's3-bucketname';
 exports.DOMAIN = process.env.DOMAIN || 'localhost'; // or your backend host. Ex: backend.your-app.com
-exports.ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:3000'; // ex: your-app.com
+// exports.ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:3000'; // ex: your-app.com

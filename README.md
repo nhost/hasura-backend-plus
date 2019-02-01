@@ -27,7 +27,6 @@ hasura-backend-plus:
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
     DOMAIN: <domain-running-this-service>
-    ALLOWED_ORIGIN: http://<your-app.com>
     REFETCH_TOKEN_EXPIRES: 54000
 caddy:
   ....
@@ -52,23 +51,30 @@ Restart your docker containers
 
 ENV VARIABLES:
 ```
-USER_FIELDS: 'company_id,name'
-GRAPHQL_ENDPOINT: hasura-end-point
-HASURA_ACCESS_KEY: hasura-access-key
-JWT_SECRET: jwt-secret
-S3_ACCESS_KEY_ID: access-key-id
-S3_SECRET_ACCESS_KEY: secret-access-key
-S3_ENDPOINT: ams3.digitaloceanspaces.com
-S3_BUCKET: bucketname
-DOMAIN: your-app.com
-ALLOWED_ORIGIN: https://your-app.com
+USER_FIELDS: '<user_fields>'
+GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
+HASURA_ACCESS_KEY: <hasura-access-key>
+JWT_SECRET: <jwt secret>
+S3_ACCESS_KEY_ID: <access>
+S3_SECRET_ACCESS_KEY: <secret>
+S3_ENDPOINT: <endpoint>
+S3_BUCKET: <bucket>
+DOMAIN: <domain-running-this-service>
+REFETCH_TOKEN_EXPIRES: 54000
 ```
 
 TODO: Explain env variables
 
 # Auth
 
-Working.
+```
+/register
+/activate-account
+/sign-in
+/refetch-token
+/new-password
+```
+
 
 # Storage
 
