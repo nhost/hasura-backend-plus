@@ -3,25 +3,22 @@
 This is
 
 - [x] Auth
-- [x] S3-compatible Object Storage
-- [ ] Server-Side Functions
+- [x] Files (S3-compatible Object Storage)
 
 for Hasura
 
-** This repo is under heavy development right now! :D **
-
 ## Deploy
 
-Add to docker-compose.yaml
+Add to `docker-compose.yaml`:
 
 ```
 hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
     USER_FIELDS: '<user_fields>'
-    GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
-    HASURA_ACCESS_KEY: <hasura-access-key>
-    JWT_SECRET: <jwt secret>
+    HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
+    HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
+    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
     S3_ACCESS_KEY_ID: <access>
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
@@ -52,9 +49,9 @@ Restart your docker containers
 ENV VARIABLES:
 ```
 USER_FIELDS: '<user_fields>'
-GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
-HASURA_ACCESS_KEY: <hasura-access-key>
-JWT_SECRET: <jwt secret>
+HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
+HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
+HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
 S3_ACCESS_KEY_ID: <access>
 S3_SECRET_ACCESS_KEY: <secret>
 S3_ENDPOINT: <endpoint>
