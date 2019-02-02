@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 
 const auth = require('./auth/auth');
 const storage = require('./storage/storage');
-// const functions = require('./functions');
 
 const app = express();
 
@@ -22,7 +21,6 @@ app.disable('x-powered-by');
 // routes
 app.use('/auth', auth);
 app.use('/storage', storage);
-// app.use('/functions', functions);
 
 // error handler
 app.use((err, req, res, next) => {
