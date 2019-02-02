@@ -1,9 +1,9 @@
 const { GraphQLClient } = require('graphql-request');
-const { GRAPHQL_ENDPOINT, HASURA_ACCESS_KEY } = require('./config');
+const { HASURA_GRAPHQL_ENDPOINT, HASURA_GRAPHQL_ACCESS_KEY } = require('./config');
 
-exports.graphql_client = new GraphQLClient(GRAPHQL_ENDPOINT, {
+exports.graphql_client = new GraphQLClient(HASURA_GRAPHQL_ENDPOINT, {
 	headers: {
 		'Content-Type': 'application/json',
-		'X-Hasura-Access-Key': HASURA_ACCESS_KEY,
+		'X-Hasura-Access-Key': HASURA_GRAPHQL_ACCESS_KEY,
 	},
 });

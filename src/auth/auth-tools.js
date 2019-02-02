@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET, USER_FIELDS  } = require('../config');
+const { HASURA_GRAPHQL_JWT_SECRET, USER_FIELDS  } = require('../config');
 
 module.exports = {
 	generateJwtToken: function(user) {
@@ -17,7 +17,8 @@ module.exports = {
 				'x-hasura-user-id': user.id.toString(),
 				...custom_claims,
 			},
-		}, JWT_SECRET, {
+		}, HASURA_GRAPHQL_JWT_SECRET.key, {
+			algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
 			expiresIn: '15m',
 		});
 	},

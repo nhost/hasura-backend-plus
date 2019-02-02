@@ -10,7 +10,7 @@ const AWS = require('aws-sdk');
 const { graphql_client } = require('../graphql-client');
 
 const {
-	JWT_SECRET,
+	HASURA_GRAPHQL_JWT_SECRET,
 	S3_ACCESS_KEY_ID,
 	S3_SECRET_ACCESS_KEY,
 	S3_ENDPOINT,
@@ -41,7 +41,7 @@ router.get('/file/*', (req, res, next) => {
 	if (jwt_token) {
 		// check jwt token if it exists
 		try {
-			const decoded = jwt.verify(jwt_token, JWT_SECRET);
+			const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
 			claims = decoded['https://hasura.io/jwt/claims'];
 		} catch (e) {
 			console.error(e);
@@ -127,12 +127,17 @@ const upload = multer({
 
 const upload_auth = (req, res, next) => {
 
+	console.log({S3_ACCESS_KEY_ID});
+	console.log({S3_SECRET_ACCESS_KEY});
+	console.log({S3_ENDPOINT});
+	console.log({S3_BUCKET});
+
 	const jwt_token = req.cookies.jwt_token;
 
 	let claims;
 	if (jwt_token) {
 		try {
-			const decoded = jwt.verify(jwt_token, JWT_SECRET);
+			const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
 			claims = decoded['https://hasura.io/jwt/claims'];
 		} catch (e) {
 			return next(Boom.unauthorized('Incorrect JWT Token'));
