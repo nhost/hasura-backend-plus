@@ -15,7 +15,7 @@ Add to `docker-compose.yaml`:
 hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
-    USER_FIELDS: '<user_fields>'
+    USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
     HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
     HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
     HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
@@ -48,7 +48,7 @@ Restart your docker containers
 
 ENV VARIABLES:
 ```
-USER_FIELDS: '<user_fields>'
+USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
 HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
 HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
 HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
@@ -75,7 +75,7 @@ TODO: Explain env variables
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permission.
+Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permission. Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
 
 ### Uploads
 
@@ -94,7 +94,3 @@ Security rules are placed in `storage-tools.js` in the function `validateInterac
 `type` = Operation type. Can be one of: `read`, `write`.
 
 `claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['x-hasura-user-id']`.
-
-# Functions
-
-*Work in progress...*
