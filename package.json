@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect=9222 index.js"
+    "start": "nodemon --inspect=9222 ./src/index.js"
   },
   "repository": {
     "type": "git",
