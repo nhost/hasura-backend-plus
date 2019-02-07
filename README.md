@@ -46,7 +46,7 @@ Restart your docker containers
 
 ## Configuration
 
-ENV VARIABLES:
+### ENV VARIABLES:
 ```
 USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
 HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
@@ -61,6 +61,45 @@ REFETCH_TOKEN_EXPIRES: 54000
 ```
 
 TODO: Explain env variables
+
+#### USER_FIELDS
+
+If you have some specific fields on your users that you also want to have as a JWT claim you can specify those user fields in the `USER_FIELDS` env var.
+
+So lets say you have a user table like:
+
+* id
+* email
+* password
+* role
+* company_id
+
+and you want to include the `company_id` as a JWT claim. You can specify `USER_FIELDS=company_id`.
+
+Then you will have a JWT a little something like this:
+
+```
+{
+  "https://hasura.io/jwt/claims": {
+    "x-hasura-allowed-roles": [
+      "company_admin"
+    ],
+    "x-hasura-default-role": "company_admin",
+    "x-hasura-user-id": "3",
+    "x-hasura-company-id": "1" <------ THERE WE GO :)
+  },
+  "iat": 1549526843,
+  "exp": 1549527743
+}
+```
+This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console. Like this: `{"seller_company_id":{"_eq":"X-HASURA-COMPANY-ID"}}`
+
+It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
+https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-tools.js#L16
+
+#### HASURA_GRAPHQL_ENDPOINT
+
+* more explanations coming soon *
 
 # Auth
 
