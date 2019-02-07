@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
 
-const { DOMAIN, USER_FIELDS } = require('../config');
+const { DOMAIN, USER_FIELDS, REFETCH_TOKEN_EXPIRES } = require('../config');
 
 const auth_tools = require('./auth-tools');
 
@@ -270,7 +270,7 @@ router.post('/sign-in', async (req, res, next) => {
 			email,
 		});
 	} catch (e) {
-		console.error('Unable get user from Hasura');
+		console.error('Error connection to GraphQL');
 		console.error(e);
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
@@ -348,7 +348,7 @@ router.post('/refetch-token', async (req, res, next) => {
 		return next(Boom.badRequest(error.details[0].message));
 	}
 
-	const { refetch_token, user_id } = req.body;
+	const { refetch_token, user_id } = value;
 
 	let query = `
 	query get_refetch_token(
@@ -369,7 +369,6 @@ router.post('/refetch-token', async (req, res, next) => {
 		) {
 			usersByuserId {
 				id
-				company_id
 				role
 				${USER_FIELDS.join('\n')}
 			}
@@ -379,17 +378,22 @@ router.post('/refetch-token', async (req, res, next) => {
 
 	let hasura_data;
 	try {
+		const used_vars = {
+		};
 		hasura_data = await graphql_client.request(query, {
 			refetch_token,
 			user_id,
-			min_added_at: new Date(new Date().getTime() + (config.REFETCH_TOKEN_EXPIRES*1000)),
+			min_added_at: new Date(new Date().getTime() - (REFETCH_TOKEN_EXPIRES * 1000)),
 		});
 	} catch (e) {
+		console.error('Error connection to GraphQL');
+		console.error(e);
 		return next(Boom.unauthorized('Invalid refetch_token or user_id'));
 	}
 
 	if (hasura_data.refetch_tokens.length === 0) {
-		return next(Boom.unauthorized('Invalid refetch_token or username'));
+		console.error('Incorrect user id or refetch token');
+		return next(Boom.unauthorized('Invalid refetch_token or user_id'));
 	}
 
 	const user = hasura_data.refetch_tokens[0].usersByuserId;
@@ -399,8 +403,8 @@ router.post('/refetch-token', async (req, res, next) => {
 	// two mutations as transaction
 	query = `
 	mutation new_refetch_token(
-		$old_refetch_token: String!,
-		$new_refetch_token: String!,
+		$old_refetch_token: uuid!,
+		$new_refetch_token: uuid!,
 		$user_id: Int!
 	) {
 		delete_refetch_tokens (
@@ -433,6 +437,8 @@ router.post('/refetch-token', async (req, res, next) => {
 			user_id,
 		});
 	} catch (e) {
+		console.error('unable to create new refetch token and delete old');
+		console.log(e);
 		return next(Boom.unauthorized('Invalid refetch_token or user_id'));
 	}
 
