@@ -60,8 +60,6 @@ DOMAIN: <domain-running-this-service>
 REFETCH_TOKEN_EXPIRES: 54000
 ```
 
-TODO: Explain env variables
-
 #### USER_FIELDS
 
 If you have some specific fields on your users that you also want to have as a JWT claim you can specify those user fields in the `USER_FIELDS` env var.
@@ -99,7 +97,7 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 #### HASURA_GRAPHQL_ENDPOINT
 
-* more explanations coming soon *
+*more explanations coming soon*
 
 # Auth
 
