@@ -164,7 +164,10 @@ router.post('/new-password', async (req, res, next) => {
 	// check email and emailActivationToken
 	// check for duplicates
 	var query = `
-	query check_email_and_token($email: String!, $email_token: String!) {
+	query check_email_and_token(
+		$email: String!,
+		$email_token: uuid!
+	) {
 		users (
 			where: {
 				_and: [{
@@ -186,14 +189,16 @@ router.post('/new-password', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return next(Boom.unauthorized('Email token not valid'));
+		console.error('email token not valid');
+		return next(Boom.unauthorized('email_token not valid'));
 	}
 
 	// update password and email activation token
-
 	try {
 		var password_hash = await bcrypt.hash(password, 10);
 	} catch(e) {
+		console.error(e);
+		console.error('Unable to generate password hash');
 		return next(Boom.badImplementation('Unable to generate password hash'));
 	}
 
@@ -201,7 +206,7 @@ router.post('/new-password', async (req, res, next) => {
 	mutation update_user_password (
 		$email: String!,
 		$password_hash: String!,
-		$email_token: String!
+		$email_token: uuid!
 	) {
 		update_users (
 			where: {
@@ -225,6 +230,7 @@ router.post('/new-password', async (req, res, next) => {
 		});
 	} catch (e) {
 		console.error(e);
+		console.log('unable to update password on GraphQL request');
 		return next(Boom.unauthorized('Unable to update password'));
 	}
 
@@ -289,7 +295,6 @@ router.post('/sign-in', async (req, res, next) => {
 
 	if (!match) {
 		console.error('Password does not match');
-		console.error(e);
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
 
