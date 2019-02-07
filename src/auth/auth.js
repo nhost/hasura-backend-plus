@@ -270,10 +270,14 @@ router.post('/sign-in', async (req, res, next) => {
 			email,
 		});
 	} catch (e) {
+		console.error('Unable get user from Hasura');
+		console.error(e);
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
 
 	if (hasura_data.users.length === 0) {
+		console.error('No user with that email');
+		console.error(e);
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
 
@@ -284,6 +288,8 @@ router.post('/sign-in', async (req, res, next) => {
 	const match = await bcrypt.compare(password, user.password_hash);
 
 	if (!match) {
+		console.error('Password does not match');
+		console.error(e);
 		return next(Boom.unauthorized('Invalid email or password'));
 	}
 
@@ -325,7 +331,6 @@ router.post('/sign-in', async (req, res, next) => {
 		jwt_token,
 		refetch_token,
 		user_id: user.id,
-		test: 'ok!',
 	});
 });
 
@@ -390,7 +395,7 @@ router.post('/refetch-token', async (req, res, next) => {
 	const user = hasura_data.refetch_tokens[0].usersByuserId;
 
 	// delete current refetch token and generate a new, and insert the
-	//new refetch_token in the database
+	// new refetch_token in the database
 	// two mutations as transaction
 	query = `
 	mutation new_refetch_token(
