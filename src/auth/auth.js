@@ -104,10 +104,10 @@ router.get('/activate-account', async (req, res, next) => {
 	} = value;
 
 	var query = `
-	mutation update_user_password (
+	mutation activate_account (
 		$email: String!,
-		$email_token: String!
-		$new_email_token: String!
+		$email_token: uuid!
+		$new_email_token: uuid!
 	) {
 		update_users (
 			where: {
@@ -118,7 +118,7 @@ router.get('/activate-account', async (req, res, next) => {
 				}]
 			}
 			_set: {
-				activated: true,
+				active: true,
 				email_token: $new_email_token,
 			}
 		) {
