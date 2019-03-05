@@ -16,15 +16,18 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
     USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
-    HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
-    HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
-    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
+    HASURA_GQE_ENDPOINT: https://<hasura-graphql-endpoint>
+    HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
+    HASURA_GQE_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
     S3_ACCESS_KEY_ID: <access>
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
     DOMAIN: <domain-running-this-service>
     REFETCH_TOKEN_EXPIRES: 54000
+  volumes:
+  ./storage-rules.js:/app/src/storage/storage-rules.js
+
 caddy:
   ....
   depends_on:
@@ -49,9 +52,9 @@ Restart your docker containers
 ### ENV VARIABLES:
 ```
 USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
-HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
-HASURA_GRAPHQL_ACCESS_KEY: <hasura-access-key>
-HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
+HASURA_GQE_ENDPOINT: https://<hasura-graphql-endpoint>
+HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
+HASURA_GQE_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
 S3_ACCESS_KEY_ID: <access>
 S3_SECRET_ACCESS_KEY: <secret>
 S3_ENDPOINT: <endpoint>
@@ -95,7 +98,7 @@ This enables you to make permissions using `x-hasura-company-id` for insert/sele
 It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
 https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-tools.js#L16
 
-#### HASURA_GRAPHQL_ENDPOINT
+#### HASURA_GQE_ENDPOINT
 
 *more explanations coming soon*
 
