@@ -1,4 +1,5 @@
 exports.USER_FIELDS = process.env.USER_FIELDS ? process.env.USER_FIELDS.split(',') : [];
+exports.USER_REGISTRATION_AUTO_ACTIVE = process.env.USER_REGISTRATION_AUTO_ACTIVE || false;
 exports.HASURA_GQE_ENDPOINT = process.env.HASURA_GQE_ENDPOINT || 'https://hasura.your-app.com/v1alpha1/graphql';
 exports.HASURA_GQE_ADMIN_SECRET = process.env.HASURA_GQE_ADMIN_SECRET || 'hasura-admin-secret';
 exports.HASURA_GQE_JWT_SECRET = process.env.HASURA_GQE_JWT_SECRET ? JSON.parse(process.env.HASURA_GQE_JWT_SECRET) : {'type':'HS256', 'key': 'secretkey'};

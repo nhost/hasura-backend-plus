@@ -6,7 +6,12 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
 
-const { DOMAIN, USER_FIELDS, REFETCH_TOKEN_EXPIRES } = require('../config');
+const {
+  DOMAIN,
+  USER_FIELDS,
+  REFETCH_TOKEN_EXPIRES,
+  USER_REGISTRATION_AUTO_ACTIVE,
+} = require('../config');
 
 const auth_tools = require('./auth-tools');
 
@@ -69,12 +74,14 @@ router.post('/register', async (req, res, next) => {
     }
   }
   `;
+
   try {
-    var hasura_data = await graphql_client.request(query, {
+    await graphql_client.request(query, {
       user: {
         email,
         password_hash,
         email_token: uuidv4(),
+        active: USER_REGISTRATION_AUTO_ACTIVE,
       },
     });
   } catch (e) {
@@ -103,9 +110,6 @@ router.get('/activate-account', async (req, res, next) => {
     email_token,
   } = value;
 
-
-  // TODO: Check if account is unactivated and ready to be activated
-
   var query = `
   mutation activate_account (
     $email: String!,
@@ -114,11 +118,15 @@ router.get('/activate-account', async (req, res, next) => {
   ) {
     update_users (
       where: {
-        _and: [{
-          email: { _eq: $email}
-        },{
-          email_token: { _eq: $email_token}
-        }]
+        _and: [
+          {
+            email: { _eq: $email}
+          },{
+            email_token: { _eq: $email_token}
+          },{
+            active: { _eq: false}
+          },
+        ]
       }
       _set: {
         active: true,
@@ -138,7 +146,12 @@ router.get('/activate-account', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Unable to activate account'));
+    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+  }
+
+  if (hasura_data.update_users.affected_rows === 0) {
+    console.error('Account already activated');
+    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
   }
 
   res.send('OK');
@@ -241,7 +254,7 @@ router.post('/new-password', async (req, res, next) => {
   res.send('OK');
 });
 
-router.post('/ign-in', async (req, res, next) => {
+router.post('/sign-in', async (req, res, next) => {
 
   // validate email and password
   const schema = Joi.object().keys({

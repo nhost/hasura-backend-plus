@@ -16,6 +16,7 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
     USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
+    USER_REGISTRATION_AUTO_ACTIVE: 'false' // or 'true'
     HASURA_GQE_ENDPOINT: https://<hasura-graphql-endpoint>
     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
     HASURA_GQE_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
