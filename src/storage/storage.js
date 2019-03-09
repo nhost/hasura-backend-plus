@@ -17,7 +17,7 @@ const {
   S3_BUCKET,
 } = require('../config');
 
-const storage_rules = require('./storage-rules');
+const { storagePermission } = require('./rules');
 
 const router = express.Router();
 
@@ -50,8 +50,8 @@ router.get('/file/*', (req, res, next) => {
   }
 
   // check access of key for jwt token claims
-  if (!storage_rules.validateInteraction(key, 'read', claims)) {
-    console.log('not allowed to read');
+  if (!storagePermission(key, 'read', claims)) {
+    console.error('not allowed to read');
     return next(Boom.unauthorized('You are not allowed to read this file'));
   }
 
@@ -152,7 +152,7 @@ const upload_auth = (req, res, next) => {
   // completed
   req.saved_files = [];
 
-  if (!storage_rules.validateInteraction(req.s3_key_prefix, 'write', claims)) {
+  if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
     return next(Boom.unauthorized('You are not allowed to write files here'));
   }
 
