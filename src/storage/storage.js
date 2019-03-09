@@ -127,11 +127,6 @@ const upload = multer({
 
 const upload_auth = (req, res, next) => {
 
-  console.log({S3_ACCESS_KEY_ID});
-  console.log({S3_SECRET_ACCESS_KEY});
-  console.log({S3_ENDPOINT});
-  console.log({S3_BUCKET});
-
   const jwt_token = req.cookies.jwt_token;
 
   let claims;
