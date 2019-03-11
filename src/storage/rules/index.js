@@ -1,12 +1,10 @@
 exports.storagePermission = (key, type, claims) => {
   let res;
 
-  console.log('checking access permission 2');
+  // remove first / in key, if any
+  key = key.replace(/^\/+/g, '');
 
-  // console.log({key});
-  // console.log({type});
-  // console.log({claims});
-
+  // match key with a hasura claim (company-id)
   res = key.match(/\/companies\/(?<company_id>\w*)\/customers\/(\d*)\/.*/);
   if (res) {
     if (claims['x-hasura-company-id'] === res.groups.company_id) {
@@ -16,7 +14,7 @@ exports.storagePermission = (key, type, claims) => {
   }
 
   // accept read to public directory
-  res = key.match(/\/public\/.*/);
+  res = key.match(/public\/.*/);
   if (res) {
     if (type === 'read') {
       return true;
