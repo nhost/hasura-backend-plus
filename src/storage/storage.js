@@ -21,14 +21,13 @@ const { storagePermission } = require('./rules');
 
 const router = express.Router();
 
-AWS.config.update({
+const s3  = new AWS.S3({
   accessKeyId: S3_ACCESS_KEY_ID,
   secretAccessKey: S3_SECRET_ACCESS_KEY,
+  endpoint: S3_ENDPOINT,
+  s3ForcePathStyle: true,
+  signatureVersion: 'v4',
 });
-
-// Create an S3 client setting the Endpoint to DigitalOcean Spaces
-const endpoint = new AWS.Endpoint(S3_ENDPOINT);
-const s3 = new AWS.S3({endpoint});
 
 router.get('/file/*', (req, res, next) => {
 
