@@ -139,7 +139,11 @@ const upload_auth = (req, res, next) => {
   }
 
   // path to where the file will be uploaded to
-  req.s3_key_prefix = req.headers['x-path'];
+  try {
+    req.s3_key_prefix = req.headers['x-path'].replace(/^\/+/g, '');
+  } catch (e) {
+    return next(Boom.badImplementation('x-path header incorrect'));
+  }
 
   // all uploaded files gets pushed in to this array
   // this array is returned back to the client once all uploads are
