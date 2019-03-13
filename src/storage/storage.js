@@ -7,8 +7,6 @@ var multer = require('multer');
 var multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
 
-const { graphql_client } = require('../graphql-client');
-
 const {
   HASURA_GQE_JWT_SECRET,
   S3_ACCESS_KEY_ID,
