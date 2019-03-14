@@ -76,7 +76,7 @@ So lets say you have a user table like:
 * email
 * password
 * role
-* company_id
+* **company_id**
 
 and you want to include the `company_id` as a JWT claim. You can specify `USER_FIELDS=company_id`.
 
@@ -118,7 +118,9 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permission. Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
+Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.  
+Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.  
+You can also use open source self hosted private cloud storage solutions like [Minio](https://minio.io/).
 
 ### Uploads
 
@@ -181,3 +183,36 @@ module.exports = {
 };
 
 ```
+
+### Using with Minio
+```
+hasura-backend-plus:
+   image: 'elitan/hasura-backend-plus'
+   restart: always
+   environment:
+     PORT: 3000
+     HASURA_GQE_ENDPOINT: 'https://<hasura-graphql-endpoint>'
+     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
+     HASURA_GQE_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
+     USER_FIELDS: ''
+     S3_ACCESS_KEY_ID: <access>
+     S3_SECRET_ACCESS_KEY: <secret>
+     S3_ENDPOINT: <endpoint>
+     S3_BUCKET: <bucket>
+     DOMAIN: <domain-running-this-service>
+     REFETCH_TOKEN_EXPIRES: 54000
+   volumes:
+     - './storage/rules:/app/src/storage/rules'
+ minio:
+   image: minio/minio
+   restart: always
+   volumes:
+     - '/mnt/minio_volume/123-176cb9a8/data:/export'
+     - '/mnt/minio_volume/123-176cb9a8/config:/root/.minio'
+   environment:
+     MINIO_ACCESS_KEY: <access>
+     MINIO_SECRET_KEY: <secret>
+   entrypoint: sh
+   command: '-c ''mkdir -p /export/nhost && /usr/bin/minio server /export'''
+```
+You can read more or ask question about integrate Minio with HB+ here: https://github.com/elitan/hasura-backend-plus/issues/9
