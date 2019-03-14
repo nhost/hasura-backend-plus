@@ -1,11 +1,13 @@
-# hasura-backend-plus
+<p align="center">
+  <a href="https://github.com/elitan/hasura-backend-plus">
+    <img src="logo.png" width="250px" alt="HB+" />
+  </a>
+</p>
 
-This is
+---
 
-- [x] Auth
-- [x] Files (S3-compatible Object Storage)
-
-for Hasura
+<h1 align="center">Hasura Backend Plus ( HB+ )</h1>
+<h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
 ## Deploy
 
