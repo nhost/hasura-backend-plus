@@ -28,4 +28,4 @@ const resolvers = {
 
 const schema = new ApolloServer({ typeDefs, resolvers });
 
-exports.schema = schema;
+module.exports = schema;
