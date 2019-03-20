@@ -191,13 +191,13 @@ hasura-backend-plus:
    restart: always
    environment:
      PORT: 3000
-     HASURA_GQE_ENDPOINT: 'https://<hasura-graphql-endpoint>'
+     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
      HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
      HASURA_GQE_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
      USER_FIELDS: ''
      S3_ACCESS_KEY_ID: <access>
      S3_SECRET_ACCESS_KEY: <secret>
-     S3_ENDPOINT: <endpoint>
+     S3_ENDPOINT: minio:9000
      S3_BUCKET: <bucket>
      DOMAIN: <domain-running-this-service>
      REFETCH_TOKEN_EXPIRES: 54000
@@ -209,6 +209,8 @@ hasura-backend-plus:
    volumes:
      - '/mnt/minio_volume/123-176cb9a8/data:/export'
      - '/mnt/minio_volume/123-176cb9a8/config:/root/.minio'
+   ports:
+   - 9000:9000
    environment:
      MINIO_ACCESS_KEY: <access>
      MINIO_SECRET_KEY: <secret>
