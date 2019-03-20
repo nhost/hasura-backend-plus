@@ -197,7 +197,7 @@ hasura-backend-plus:
      USER_FIELDS: ''
      S3_ACCESS_KEY_ID: <access-key-here>
      S3_SECRET_ACCESS_KEY: <secret-key-here>
-     S3_ENDPOINT: minio:9000 # Minio port expose below
+     S3_ENDPOINT: http://minio:9000 # Use http only for development
      S3_BUCKET: <projectname as bucket name>
      DOMAIN: <domain-running-this-service> ## HB+ URL without http and port number for example: localhost
      REFETCH_TOKEN_EXPIRES: 54000
