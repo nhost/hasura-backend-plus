@@ -6,6 +6,7 @@ const uuidv4 = require('uuid/v4');
 var multer = require('multer');
 var multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
+var mime = require('mime-types');
 
 const { graphql_client } = require('../graphql-client');
 
@@ -31,7 +32,7 @@ const s3  = new AWS.S3({
 
 router.get('/file/*', (req, res, next) => {
 
-  const key = `/${req.params[0]}`;
+  const key = `${req.params[0]}`;
 
   const jwt_token = req.cookies.jwt_token;
 
@@ -110,13 +111,15 @@ const upload = multer({
 
       // generate unique file names to be saved on the server
       const uuid = uuidv4();
-      const key = `${req.s3_key_prefix}${uuid}`;
+      const extension = mime.extension(file.mimetype);
+      const key = `${req.s3_key_prefix}${uuid}.${extension}`;
 
       req.saved_files.push({
         originalname: file.originalname,
         mimetype: file.mimetype,
         encoding: file.encoding,
         key,
+        extension,
       });
 
       cb(null, key);
