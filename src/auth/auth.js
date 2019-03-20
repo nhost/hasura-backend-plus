@@ -7,7 +7,6 @@ const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
 
 const {
-  DOMAIN,
   USER_FIELDS,
   REFETCH_TOKEN_EXPIRES,
   USER_REGISTRATION_AUTO_ACTIVE,
@@ -50,6 +49,7 @@ router.post('/register', async (req, res, next) => {
       email,
     });
   } catch (e) {
+    console.log(e);
     return next(Boom.badImplementation('Unable to check for duplicates'));
   }
 
@@ -298,7 +298,6 @@ router.post('/sign-in', async (req, res, next) => {
 
   if (hasura_data.users.length === 0) {
     console.error('No user with that email');
-    console.error(e);
     return next(Boom.unauthorized('Invalid email or password'));
   }
 
@@ -341,10 +340,9 @@ router.post('/sign-in', async (req, res, next) => {
   }
 
   res.cookie('jwt_token', jwt_token, {
-    domain: DOMAIN,
     expires: new Date(Date.now() + (15*60*1000)),
+    httpOnly: true,
   });
-
 
   // return jwt token and refetch token to client
   res.json({
@@ -466,8 +464,8 @@ router.post('/refetch-token', async (req, res, next) => {
   const jwt_token = auth_tools.generateJwtToken(user);
 
   res.cookie('jwt_token', jwt_token, {
-    domain: DOMAIN,
     expires: new Date(Date.now() + (15*60*1000)),
+    httpOnly: true,
   });
 
   res.json({
