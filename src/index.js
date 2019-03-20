@@ -7,6 +7,7 @@ const auth = require('./auth/auth');
 const storage = require('./storage/storage');
 
 const app = express();
+const schema = require('./graphql_wrapper/index');
 
 // middleware
 app.use(express.json());
@@ -34,4 +35,9 @@ app.use((err, req, res, next) => {
 const port = process.env.PORT || 3010;
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
+});
+
+
+schema.listen({ port: process.env.GRAPHQL_PORT || 4010 }).then(({ url }) => {
+  console.log(`schema ready at ${url}`);
 });
