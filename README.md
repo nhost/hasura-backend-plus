@@ -97,7 +97,7 @@ So lets say you have a user table like:
 * email
 * password
 * role
-* company_id
+* **company_id**
 
 and you want to include the `company_id` as a JWT claim. You can specify `USER_FIELDS=company_id`.
 
@@ -139,7 +139,9 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex AWS S3 or Digital Ocean Spaces). Can handle read, write and security permission. Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
+Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.  
+Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.  
+You can also use open source self hosted private cloud storage solutions like [Minio](https://minio.io/).
 
 ### Uploads
 
@@ -202,3 +204,5 @@ module.exports = {
 };
 
 ```
+
+You can see other examples [here](examples) in examples folder.
