@@ -195,26 +195,27 @@ hasura-backend-plus:
      HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
      HASURA_GQE_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
      USER_FIELDS: ''
-     S3_ACCESS_KEY_ID: <access>
-     S3_SECRET_ACCESS_KEY: <secret>
-     S3_ENDPOINT: minio:9000
-     S3_BUCKET: <bucket>
-     DOMAIN: <domain-running-this-service>
+     S3_ACCESS_KEY_ID: <access-key-here>
+     S3_SECRET_ACCESS_KEY: <secret-key-here>
+     S3_ENDPOINT: minio:9000 # Minio port expose below
+     S3_BUCKET: <projectname as bucket name>
+     DOMAIN: <domain-running-this-service> ## HB+ URL without http and port number for example: localhost
      REFETCH_TOKEN_EXPIRES: 54000
    volumes:
-     - './storage/rules:/app/src/storage/rules'
+     - './storage-rules:/app/src/storage/rules'
  minio:
    image: minio/minio
    restart: always
    volumes:
-     - '/mnt/minio_volume/123-176cb9a8/data:/export'
-     - '/mnt/minio_volume/123-176cb9a8/config:/root/.minio'
+     - './minio_volume/data:/export'
+     - './minio_volume/config:/root/.minio'
    ports:
    - 9000:9000
    environment:
-     MINIO_ACCESS_KEY: <access>
-     MINIO_SECRET_KEY: <secret>
+     MINIO_ACCESS_KEY: <access-key-here> ## min 8 character
+     MINIO_SECRET_KEY: <secret-key-here> ## min 8 character
+     S3_BUCKET: <projectname as bucket name>
    entrypoint: sh
-   command: '-c ''mkdir -p /export/nhost && /usr/bin/minio server /export'''
+   command: '-c ''mkdir -p /export/$${S3_bucket} && /usr/bin/minio server /export'''
 ```
 You can read more or ask question about integrate Minio with HB+ here: https://github.com/elitan/hasura-backend-plus/issues/9
