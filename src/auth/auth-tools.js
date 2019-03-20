@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
-const { HASURA_GQE_JWT_SECRET, USER_FIELDS  } = require('../config');
+const {
+  REFETCH_TOKEN_EXPIRES,
+  HASURA_GQE_JWT_SECRET,
+  USER_FIELDS,
+} = require('../config');
 
 module.exports = {
 	generateJwtToken: function(user) {
