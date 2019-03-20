@@ -340,7 +340,7 @@ router.post('/sign-in', async (req, res, next) => {
   }
 
   res.cookie('jwt_token', jwt_token, {
-    expires: new Date(Date.now() + (15*60*1000)),
+    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES*60*1000)),
     httpOnly: true,
   });
 
@@ -464,7 +464,7 @@ router.post('/refetch-token', async (req, res, next) => {
   const jwt_token = auth_tools.generateJwtToken(user);
 
   res.cookie('jwt_token', jwt_token, {
-    expires: new Date(Date.now() + (15*60*1000)),
+    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES*60*1000)),
     httpOnly: true,
   });
 
