@@ -19,7 +19,7 @@ module.exports = {
 			},
 		}, HASURA_GQE_JWT_SECRET.key, {
 			algorithm: HASURA_GQE_JWT_SECRET.type,
-			expiresIn: '15m',
+			expiresIn: `${REFETCH_TOKEN_EXPIRES}m`,
 		});
 	},
 };
