@@ -9,6 +9,27 @@
 <h1 align="center">Hasura Backend Plus ( HB+ )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
+## Pre Deploy
+You need to store user management data in some table we use this table structure:
+```
+CREATE TABLE IF NOT EXISTS users (
+  id bigserial primary key,
+  added_at timestamp with time zone DEFAULT now(),
+  email text not null UNIQUE,
+  password_hash text not null,
+  role text not null default 'user',
+  email_token uuid not null,
+  active boolean not null default false
+);
+
+CREATE TABLE IF NOT EXISTS refetch_tokens (
+  refetch_token uuid primary key,
+  user_id integer not null,
+  added_at timestamp with time zone DEFAULT now(),
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
+```
+
 ## Deploy
 
 Add to `docker-compose.yaml`:
