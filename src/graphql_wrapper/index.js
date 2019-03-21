@@ -8,21 +8,27 @@ const typeDefs = gql`
     name:     String!
     balance:  Int!
   }
+  
+  type Query {
+    dummy: String
+  }
 
   type Mutation {
-    register(email: String!, password: Int!): Boolean
+    register(email: String!, password: String!): Boolean
   }
 `;
 
 // replace with actual REST endpoint
-const restAPIEndpoint = 'https://localhost:3010';
+const restAPIEndpoint = 'http://localhost:3010';
 
 const resolvers = {
+    Query: {},
     Mutation: {
-        register: async (_, { username, password } ) => {
-            return await postData(restAPIEndpoint + '/auth/register', { username, password } );
+        register: async (_, { email, password } ) => {
+            const registerResponse = await postData(restAPIEndpoint + '/auth/register', { email, password } );
+            console.warn("++++++++" + registerResponse);
+            return true;
         }
-
     }
 };
 
