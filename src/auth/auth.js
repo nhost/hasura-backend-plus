@@ -10,6 +10,7 @@ const {
   USER_FIELDS,
   REFETCH_TOKEN_EXPIRES,
   USER_REGISTRATION_AUTO_ACTIVE,
+  USERNAME_FIELD_NAME
 } = require('../config');
 
 const auth_tools = require('./auth-tools');
@@ -17,26 +18,47 @@ const auth_tools = require('./auth-tools');
 var router = express.Router();
 
 router.post('/register', async (req, res, next) => {
+  let username = "";
+  let password = "";
 
-  const schema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  });
+  if (USERNAME_FIELD_NAME === "email") {
+    const email_schema = Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    });
 
-  const { error, value } = schema.validate(req.body);
+    const { error, value } = email_schema.validate(req.body);
+    username = value.email;
+    password = value.password;
 
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
+    if (error) {
+      return next(Boom.badRequest(error.details[0].message));
+    }
+  } else {
+    const username_schema = Joi.object().keys({
+      username: Joi.string().required(),
+      password: Joi.string().required(),
+    });
+
+    const { error, value } = username_schema.validate(req.body);
+    username = value.username;
+    password = value.password;
+
+    if (error) {
+      return next(Boom.badRequest(error.details[0].message));
+    }
   }
 
-  const { email, password } = value;
+
+
+
 
   // check for duplicates
   var query = `
-  query get_user($email: String!) {
+  query get_user($${USERNAME_FIELD_NAME}: String!) {
     users (
       where: {
-        email: { _eq: $email }
+        ${USERNAME_FIELD_NAME}: { _eq: $${USERNAME_FIELD_NAME} }
       }
     ) {
       id
@@ -46,7 +68,7 @@ router.post('/register', async (req, res, next) => {
 
   try {
     var hasura_data = await graphql_client.request(query, {
-      email,
+      [USERNAME_FIELD_NAME]: username,
     });
   } catch (e) {
     console.log(e);
@@ -54,7 +76,7 @@ router.post('/register', async (req, res, next) => {
   }
 
   if (hasura_data.users.length !== 0) {
-    return next(Boom.unauthorized('The email is already in use'));
+    return next(Boom.unauthorized(`The ${USERNAME_FIELD_NAME} is already in use`));
   }
 
   // generate password_hash
@@ -78,7 +100,7 @@ router.post('/register', async (req, res, next) => {
   try {
     await graphql_client.request(query, {
       user: {
-        email,
+        [USERNAME_FIELD_NAME]: username,
         password_hash,
         email_token: uuidv4(),
         active: USER_REGISTRATION_AUTO_ACTIVE,
