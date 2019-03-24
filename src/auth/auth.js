@@ -10,16 +10,19 @@ const {
   USER_FIELDS,
   REFETCH_TOKEN_EXPIRES,
   USER_REGISTRATION_AUTO_ACTIVE,
+  USER_MANAGEMENT_DATABASE_SCHEMA_NAME
 } = require('../config');
 
 const auth_tools = require('./auth-tools');
 
 var router = express.Router();
 
+const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === "public" ? "" :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + "_";
+
 router.post('/register', async (req, res, next) => {
 
   const schema = Joi.object().keys({
-    email: Joi.string().email().required(),
+    username: Joi.string().required(),
     password: Joi.string().required(),
   });
 
@@ -29,14 +32,14 @@ router.post('/register', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { email, password } = value;
+  const { username, password } = value;
 
   // check for duplicates
   var query = `
-  query get_user($email: String!) {
-    users (
+  query get_user($username: String!) {
+    ${schema_name}user (
       where: {
-        email: { _eq: $email }
+        username: { _eq: $username }
       }
     ) {
       id
@@ -46,15 +49,15 @@ router.post('/register', async (req, res, next) => {
 
   try {
     var hasura_data = await graphql_client.request(query, {
-      email,
+      username,
     });
   } catch (e) {
     console.log(e);
     return next(Boom.badImplementation('Unable to check for duplicates'));
   }
 
-  if (hasura_data.users.length !== 0) {
-    return next(Boom.unauthorized('The email is already in use'));
+  if (hasura_data[`${schema_name}user`].length !== 0) {
+    return next(Boom.unauthorized('The username is already in use'));
   }
 
   // generate password_hash
@@ -66,8 +69,8 @@ router.post('/register', async (req, res, next) => {
 
   // insert user
   var query = `
-  mutation insert_user($user: users_insert_input!) {
-    insert_users(
+  mutation insert_user($user: ${schema_name}user_insert_input!) {
+    insert_${schema_name}user(
       objects: [$user]
     ) {
       affected_rows
@@ -78,9 +81,9 @@ router.post('/register', async (req, res, next) => {
   try {
     await graphql_client.request(query, {
       user: {
-        email,
-        password_hash,
-        email_token: uuidv4(),
+        username,
+        password: password_hash,
+        activation_token: uuidv4(),
         active: USER_REGISTRATION_AUTO_ACTIVE,
       },
     });
@@ -95,8 +98,8 @@ router.post('/register', async (req, res, next) => {
 router.get('/activate-account', async (req, res, next) => {
 
   const schema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    email_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+    username: Joi.string().required(),
+    username_token: Joi.string().uuid({version: ['uuidv4']}).required(),
   });
 
   const { error, value } = schema.validate(req.query);
@@ -106,23 +109,23 @@ router.get('/activate-account', async (req, res, next) => {
   }
 
   const {
-    email,
-    email_token,
+    username,
+    username_token,
   } = value;
 
   var query = `
   mutation activate_account (
-    $email: String!,
-    $email_token: uuid!
-    $new_email_token: uuid!
+    $username: String!,
+    $username_token: uuid!
+    $new_username_token: uuid!
   ) {
     update_users (
       where: {
         _and: [
           {
-            email: { _eq: $email}
+            username: { _eq: $username}
           },{
-            email_token: { _eq: $email_token}
+            username_token: { _eq: $username_token}
           },{
             active: { _eq: false}
           },
@@ -130,7 +133,7 @@ router.get('/activate-account', async (req, res, next) => {
       }
       _set: {
         active: true,
-        email_token: $new_email_token,
+        username_token: $new_username_token,
       }
     ) {
       affected_rows
@@ -140,9 +143,9 @@ router.get('/activate-account', async (req, res, next) => {
 
   try {
     var hasura_data = await graphql_client.request(query, {
-      email,
-      email_token,
-      new_email_token: uuidv4(),
+      username,
+      username_token,
+      new_username_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
@@ -160,8 +163,8 @@ router.get('/activate-account', async (req, res, next) => {
 router.post('/new-password', async (req, res, next) => {
 
   const schema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    email_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+    username: Joi.string().required(),
+    username_token: Joi.string().uuid({version: ['uuidv4']}).required(),
     password: Joi.string().required(),
   });
 
@@ -172,24 +175,24 @@ router.post('/new-password', async (req, res, next) => {
   }
 
   const {
-    email,
-    email_token,
+    username,
+    username_token,
     password,
   } = value;
 
-  // check email and emailActivationToken
+  // check username and usernameActivationToken
   // check for duplicates
   var query = `
-  query check_email_and_token(
-    $email: String!,
-    $email_token: uuid!
+  query check_username_and_token(
+    $username: String!,
+    $username_token: uuid!
   ) {
     users (
       where: {
         _and: [{
-          email: { _eq: $email}
+          username: { _eq: $username}
         },{
-          email_token: { _eq: $email_token}
+          username_token: { _eq: $username_token}
         }]
       }
     ) {
@@ -200,16 +203,16 @@ router.post('/new-password', async (req, res, next) => {
 
   try {
     var hasura_data = await graphql_client.request(query, {
-      email,
-      email_token,
+      username,
+      username_token,
     });
   } catch (e) {
     console.error(e);
-    console.error('email token not valid');
-    return next(Boom.unauthorized('email_token not valid'));
+    console.error('username token not valid');
+    return next(Boom.unauthorized('username_token not valid'));
   }
 
-  // update password and email activation token
+  // update password and username activation token
   try {
     var password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
@@ -220,17 +223,17 @@ router.post('/new-password', async (req, res, next) => {
 
   var query = `
   mutation update_user_password (
-    $email: String!,
+    $username: String!,
     $password_hash: String!,
-    $email_token: uuid!
+    $username_token: uuid!
   ) {
     update_users (
       where: {
-        email: { _eq: $email }
+        username: { _eq: $username }
       }
       _set: {
         password_hash: $password_hash,
-        email_token: $email_token
+        username_token: $username_token
       }
     ) {
       affected_rows
@@ -240,9 +243,9 @@ router.post('/new-password', async (req, res, next) => {
 
   try {
     var hasura_data = await graphql_client.request(query, {
-      email,
+      username,
       password_hash,
-      email_token: uuidv4(),
+      username_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
@@ -254,11 +257,11 @@ router.post('/new-password', async (req, res, next) => {
   res.send('OK');
 });
 
-router.post('/sign-in', async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
 
-  // validate email and password
+  // validate username and password
   const schema = Joi.object().keys({
-    email: Joi.string().required(),
+    username: Joi.string().required(),
     password: Joi.string().required(),
   });
 
@@ -268,18 +271,22 @@ router.post('/sign-in', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { email, password } = value;
+  const { username, password } = value;
 
   let query = `
-  query get_user($email: String!) {
-    users (
+  query get_user($username: String!) {
+    ${schema_name}user (
       where: {
-        email: { _eq: $email }
+        username: { _eq: $username }
       }
     ) {
       id
-      password_hash
-      role
+      password
+      role: userRolesByuserId {
+        roleByroleId {
+          name
+        }
+      }
       ${USER_FIELDS.join('\n')}
     }
   }
@@ -288,38 +295,39 @@ router.post('/sign-in', async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
-      email,
+      username,
     });
   } catch (e) {
     console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid email or password'));
+    return next(Boom.unauthorized('Invalid username or password'));
   }
 
-  if (hasura_data.users.length === 0) {
-    console.error('No user with that email');
-    return next(Boom.unauthorized('Invalid email or password'));
+  if (hasura_data[`${schema_name}user`].length === 0) {
+    console.error('No user with that username');
+    return next(Boom.unauthorized('Invalid username or password'));
   }
 
   // check if we got any user back
-  const user = hasura_data.users[0];
+  const user = hasura_data[`${schema_name}user`][0];
 
   // see if password hashes matches
-  const match = await bcrypt.compare(password, user.password_hash);
+  const match = await bcrypt.compare(password, user.password);
 
   if (!match) {
     console.error('Password does not match');
-    return next(Boom.unauthorized('Invalid email or password'));
+    return next(Boom.unauthorized('Invalid username or password'));
   }
+  console.warn("user: " + JSON.stringify(user, null, 2));
 
   const jwt_token = auth_tools.generateJwtToken(user);
 
   // generate refetch token and put in database
   query = `
-  mutation insert_refetch_token($user_id: Int!, $refetch_token: uuid!) {
-    insert_refetch_tokens (
+  mutation insert_refetch_token($user_id: Int!, $token: uuid!) {
+    insert_${schema_name}refetch_token (
       objects: [{
-        refetch_token: $refetch_token,
+        token: $token,
         user_id: $user_id,
       }]
     ) {
@@ -332,7 +340,7 @@ router.post('/sign-in', async (req, res, next) => {
   try {
     hasura_data = await graphql_client.request(query, {
       user_id: user.id,
-      refetch_token,
+      token: refetch_token,
     });
   } catch (e) {
     console.error(e);
@@ -340,7 +348,7 @@ router.post('/sign-in', async (req, res, next) => {
   }
 
   res.cookie('jwt_token', jwt_token, {
-    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES*60*1000)),
+    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
     httpOnly: true,
   });
 
@@ -354,9 +362,9 @@ router.post('/sign-in', async (req, res, next) => {
 
 router.post('/refetch-token', async (req, res, next) => {
 
-  // validate email and password
+  // validate username and password
   const schema = Joi.object().keys({
-    user_id: Joi.number().required(),
+    user_id: Joi.string().required(),
     refetch_token: Joi.string().required(),
   });
 
@@ -372,22 +380,26 @@ router.post('/refetch-token', async (req, res, next) => {
   query get_refetch_token(
     $refetch_token: uuid!,
     $user_id: Int!
-    $min_added_at: timestamptz!,
+    $min_created_at: timestamptz!,
   ) {
-    refetch_tokens (
+    ${schema_name}refetch_token (
       where: {
         _and: [{
-          refetch_token: { _eq: $refetch_token }
+          token: { _eq: $refetch_token }
         }, {
           user_id: { _eq: $user_id }
         }, {
-          added_at: { _gte: $min_added_at }
+          created_at: { _gte: $min_created_at }
         }]
       }
     ) {
-      usersByuserId {
+      userByuserId {
         id
-        role
+        role: userRolesByuserId {
+          roleByroleId {
+            name
+          }
+        }
         ${USER_FIELDS.join('\n')}
       }
     }
@@ -401,7 +413,7 @@ router.post('/refetch-token', async (req, res, next) => {
     hasura_data = await graphql_client.request(query, {
       refetch_token,
       user_id,
-      min_added_at: new Date(new Date().getTime() - (REFETCH_TOKEN_EXPIRES * 1000)),
+      min_created_at: new Date(new Date().getTime() - (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
     });
   } catch (e) {
     console.error('Error connection to GraphQL');
@@ -409,12 +421,12 @@ router.post('/refetch-token', async (req, res, next) => {
     return next(Boom.unauthorized('Invalid refetch_token or user_id'));
   }
 
-  if (hasura_data.refetch_tokens.length === 0) {
+  if (hasura_data[`${schema_name}refetch_token`].length === 0) {
     console.error('Incorrect user id or refetch token');
     return next(Boom.unauthorized('Invalid refetch_token or user_id'));
   }
 
-  const user = hasura_data.refetch_tokens[0].usersByuserId;
+  const user = hasura_data[`${schema_name}refetch_token`][0].userByuserId;
 
   // delete current refetch token and generate a new, and insert the
   // new refetch_token in the database
@@ -425,10 +437,10 @@ router.post('/refetch-token', async (req, res, next) => {
     $new_refetch_token: uuid!,
     $user_id: Int!
   ) {
-    delete_refetch_tokens (
+    delete_${schema_name}refetch_token (
       where: {
         _and: [{
-          refetch_token: { _eq: $old_refetch_token }
+          token: { _eq: $old_refetch_token }
         }, {
           user_id: { _eq: $user_id }
         }]
@@ -436,9 +448,9 @@ router.post('/refetch-token', async (req, res, next) => {
     ) {
       affected_rows
     }
-    insert_refetch_tokens (
+    insert_${schema_name}refetch_token (
       objects: [{
-        refetch_token: $new_refetch_token,
+        token: $new_refetch_token,
         user_id: $user_id,
       }]
     ) {
