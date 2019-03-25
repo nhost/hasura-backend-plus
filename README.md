@@ -12,22 +12,115 @@
 ## Pre Deploy
 You need to store user management data in some table we use this table structure:
 ```
-CREATE TABLE IF NOT EXISTS users (
-  id bigserial primary key,
-  added_at timestamp with time zone DEFAULT now(),
-  email text not null UNIQUE,
-  password_hash text not null,
-  role text not null default 'user',
-  email_token uuid not null,
-  active boolean not null default false
-);
+-- SCHEMA: user_management
 
-CREATE TABLE IF NOT EXISTS refetch_tokens (
-  refetch_token uuid primary key,
-  user_id integer not null,
-  added_at timestamp with time zone DEFAULT now(),
-  FOREIGN KEY (user_id) REFERENCES users (id)
-);
+-- DROP SCHEMA user_management ;
+
+CREATE SCHEMA user_management
+    AUTHORIZATION postgres;
+
+
+
+-- Table: user_management."user"
+
+-- DROP TABLE user_management."user";
+
+CREATE TABLE user_management."user"
+(
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    username text COLLATE pg_catalog."default" NOT NULL,
+    password text COLLATE pg_catalog."default" NOT NULL,
+    active boolean NOT NULL,
+    activation_token uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT user_pkey PRIMARY KEY (id),
+    CONSTRAINT user_username_key UNIQUE (username)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE user_management."user"
+    OWNER to postgres;
+
+COMMENT ON COLUMN user_management."user".username
+    IS 'You can Also use email as username if you want.';
+
+
+
+-- Table: user_management.role
+
+-- DROP TABLE user_management.role;
+
+CREATE TABLE user_management.role
+(
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    name text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT role_pkey PRIMARY KEY (id),
+    CONSTRAINT role_name_key UNIQUE (name)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE user_management.role
+    OWNER to postgres;
+
+
+
+-- Table: user_management.user_role
+
+-- DROP TABLE user_management.user_role;
+
+CREATE TABLE user_management.user_role
+(
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    role_id uuid NOT NULL,
+    CONSTRAINT user_role_pkey PRIMARY KEY (id),
+    CONSTRAINT user_role_role_id_fkey FOREIGN KEY (role_id)
+        REFERENCES user_management.role (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES user_management."user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE user_management.user_role
+    OWNER to postgres;
+
+
+
+-- Table: user_management.refetch_token
+
+-- DROP TABLE user_management.refetch_token;
+
+CREATE TABLE user_management.refetch_token
+(
+    token uuid NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT refetch_token_pkey PRIMARY KEY (token),
+    CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES user_management."user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE user_management.refetch_token
+    OWNER to postgres;
 ```
 
 ## Deploy
@@ -39,6 +132,7 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
     USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
+    USER_MANAGEMENT_DATABASE_SCHEMA_NAME: user_management; // you can use any schema name you want. Default value is "public"
     USER_REGISTRATION_AUTO_ACTIVE: 'false' // or 'true'
     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
