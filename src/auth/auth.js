@@ -25,11 +25,13 @@ router.post('/register', async (req, res, next) => {
   const schema = Joi.object().keys({
     username: Joi.string().required(),
     password: Joi.string().required(),
+    user_props: Joi.object().default({}),
   });
 
   const { error, value } = schema.validate(req.body);
 
   if (error) {
+    console.log(error);
     return next(Boom.badRequest(error.details[0].message));
   }
 
@@ -86,6 +88,7 @@ router.post('/register', async (req, res, next) => {
         password: password_hash,
         activation_token: uuidv4(),
         active: USER_REGISTRATION_AUTO_ACTIVE,
+        ...user_props,
       },
     });
   } catch (e) {
