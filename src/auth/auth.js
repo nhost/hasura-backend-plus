@@ -286,13 +286,7 @@ router.post('/login', async (req, res, next) => {
   query get_user($username: String!) {
     ${schema_name}user (
       where: {
-      _and: [
-          {
-            username: { _eq: $username}
-          },{
-            active: { _eq: true}
-          },
-        ]
+          username: { _eq: $username}
       }
     ) {
       id
@@ -325,6 +319,11 @@ router.post('/login', async (req, res, next) => {
 
   // check if we got any user back
   const user = hasura_data[`${schema_name}user`][0];
+
+  if (!user.activate) {
+    console.error('Username not activated');
+    return next(Boom.unauthorized('Username not activated'));
+  }
 
   // see if password hashes matches
   const match = await bcrypt.compare(password, user.password);
