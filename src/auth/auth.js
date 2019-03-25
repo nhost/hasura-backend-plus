@@ -21,15 +21,17 @@ router.post('/register', async (req, res, next) => {
   const schema = Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    user_props: Joi.object().default({}),
   });
 
   const { error, value } = schema.validate(req.body);
 
   if (error) {
+    console.log(error);
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { email, password } = value;
+  const { email, password, user_props } = value;
 
   // check for duplicates
   var query = `
@@ -82,6 +84,7 @@ router.post('/register', async (req, res, next) => {
         password_hash,
         email_token: uuidv4(),
         active: USER_REGISTRATION_AUTO_ACTIVE,
+        ...user_props,
       },
     });
   } catch (e) {
