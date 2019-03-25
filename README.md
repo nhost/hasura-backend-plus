@@ -12,20 +12,10 @@
 ## Pre Deploy
 You need to store user management data in some table we use this table structure:
 ```
--- SCHEMA: user_management
+-- Table: public."user"
+-- DROP TABLE public."user";
 
--- DROP SCHEMA user_management ;
-
-CREATE SCHEMA user_management
-    AUTHORIZATION postgres;
-
-
-
--- Table: user_management."user"
-
--- DROP TABLE user_management."user";
-
-CREATE TABLE user_management."user"
+CREATE TABLE public."user"
 (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     username text COLLATE pg_catalog."default" NOT NULL,
@@ -41,19 +31,17 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE user_management."user"
+ALTER TABLE public."user"
     OWNER to postgres;
 
-COMMENT ON COLUMN user_management."user".username
+COMMENT ON COLUMN public."user".username
     IS 'You can Also use email as username if you want.';
 
 
+-- Table: public.role
+-- DROP TABLE public.role;
 
--- Table: user_management.role
-
--- DROP TABLE user_management.role;
-
-CREATE TABLE user_management.role
+CREATE TABLE public.role
 (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     name text COLLATE pg_catalog."default" NOT NULL,
@@ -65,27 +53,25 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE user_management.role
+ALTER TABLE public.role
     OWNER to postgres;
 
 
+-- Table: public.user_role
+-- DROP TABLE public.user_role;
 
--- Table: user_management.user_role
-
--- DROP TABLE user_management.user_role;
-
-CREATE TABLE user_management.user_role
+CREATE TABLE public.user_role
 (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL,
     role_id uuid NOT NULL,
     CONSTRAINT user_role_pkey PRIMARY KEY (id),
     CONSTRAINT user_role_role_id_fkey FOREIGN KEY (role_id)
-        REFERENCES user_management.role (id) MATCH SIMPLE
+        REFERENCES public.role (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES user_management."user" (id) MATCH SIMPLE
+        REFERENCES public."user" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
@@ -94,33 +80,26 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE user_management.user_role
+ALTER TABLE public.user_role
     OWNER to postgres;
 
 
+-- Table: public.refetch_token
+-- DROP TABLE public.refetch_token;
 
--- Table: user_management.refetch_token
-
--- DROP TABLE user_management.refetch_token;
-
-CREATE TABLE user_management.refetch_token
+CREATE TABLE public.refetch_token
 (
     token uuid NOT NULL,
     user_id uuid NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT refetch_token_pkey PRIMARY KEY (token),
     CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES user_management."user" (id) MATCH SIMPLE
+        REFERENCES public."user" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
 WITH (
     OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE user_management.refetch_token
-    OWNER to postgres;
 ```
 
 ## Deploy
