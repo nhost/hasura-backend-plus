@@ -183,11 +183,11 @@ router.post('/new-password', async (req, res, next) => {
   // check username and ActivationToken
   // check for duplicates
   var query = `
-  query check_username_and_token(
+  query check_username_and_activation_token(
     $username: String!,
     $activation_token: uuid!
   ) {
-    users (
+    ${schema_name}user (
       where: {
         _and: [{
           username: { _eq: $username}
@@ -212,6 +212,11 @@ router.post('/new-password', async (req, res, next) => {
     return next(Boom.unauthorized('activation_token not valid'));
   }
 
+  if (hasura_data[`${schema_name}user`].length === 0) {
+    console.error('No user with that username');
+    return next(Boom.unauthorized('Invalid username'));
+  }
+
   // update password and username activation token
   try {
     var password_hash = await bcrypt.hash(password, 10);
@@ -225,15 +230,15 @@ router.post('/new-password', async (req, res, next) => {
   mutation update_user_password (
     $username: String!,
     $password_hash: String!,
-    $activation_token: uuid!
+    $new_activation_token: uuid!
   ) {
-    update_users (
+    update_${schema_name}user (
       where: {
         username: { _eq: $username }
       }
       _set: {
-        password_hash: $password_hash,
-        activation_token: $activation_token
+        password: $password_hash,
+        activation_token: $new_activation_token
       }
     ) {
       affected_rows
@@ -245,7 +250,7 @@ router.post('/new-password', async (req, res, next) => {
     var hasura_data = await graphql_client.request(query, {
       username,
       password_hash,
-      activation_token: uuidv4(),
+      new_activation_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
