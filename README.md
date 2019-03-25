@@ -15,8 +15,8 @@ You need to store user management data in some table we use this table structure
 CREATE TABLE IF NOT EXISTS "user" (
     id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     username text NOT NULL UNIQUE,
-    password text COLLATE pg_catalog."default" NOT NULL,
-    active boolean NOT NULL,
+    password text NOT NULL,
+    active boolean NOT NULL DEFAULT false,
     activation_token uuid NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now()
 );
