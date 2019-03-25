@@ -99,7 +99,7 @@ router.get('/activate-account', async (req, res, next) => {
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
-    username_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+    activation_token: Joi.string().uuid({version: ['uuidv4']}).required(),
   });
 
   const { error, value } = schema.validate(req.query);
@@ -110,22 +110,22 @@ router.get('/activate-account', async (req, res, next) => {
 
   const {
     username,
-    username_token,
+    activation_token,
   } = value;
 
   var query = `
   mutation activate_account (
     $username: String!,
-    $username_token: uuid!
-    $new_username_token: uuid!
+    $activation_token: uuid!
+    $new_activation_token: uuid!
   ) {
-    update_users (
+    update_${schema_name}user (
       where: {
         _and: [
           {
             username: { _eq: $username}
           },{
-            username_token: { _eq: $username_token}
+            activation_token: { _eq: $activation_token}
           },{
             active: { _eq: false}
           },
@@ -133,7 +133,7 @@ router.get('/activate-account', async (req, res, next) => {
       }
       _set: {
         active: true,
-        username_token: $new_username_token,
+        activation_token: $new_activation_token,
       }
     ) {
       affected_rows
@@ -144,15 +144,15 @@ router.get('/activate-account', async (req, res, next) => {
   try {
     var hasura_data = await graphql_client.request(query, {
       username,
-      username_token,
-      new_username_token: uuidv4(),
+      activation_token,
+      new_activation_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
     return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
   }
 
-  if (hasura_data.update_users.affected_rows === 0) {
+  if (hasura_data[`update_${schema_name}user`].affected_rows === 0) {
     console.error('Account already activated');
     return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
   }
@@ -164,7 +164,7 @@ router.post('/new-password', async (req, res, next) => {
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
-    username_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+    activation_token: Joi.string().uuid({version: ['uuidv4']}).required(),
     password: Joi.string().required(),
   });
 
@@ -176,23 +176,23 @@ router.post('/new-password', async (req, res, next) => {
 
   const {
     username,
-    username_token,
+    activation_token,
     password,
   } = value;
 
-  // check username and usernameActivationToken
+  // check username and ActivationToken
   // check for duplicates
   var query = `
   query check_username_and_token(
     $username: String!,
-    $username_token: uuid!
+    $activation_token: uuid!
   ) {
     users (
       where: {
         _and: [{
           username: { _eq: $username}
         },{
-          username_token: { _eq: $username_token}
+          activation_token: { _eq: $activation_token}
         }]
       }
     ) {
@@ -204,12 +204,12 @@ router.post('/new-password', async (req, res, next) => {
   try {
     var hasura_data = await graphql_client.request(query, {
       username,
-      username_token,
+      activation_token,
     });
   } catch (e) {
     console.error(e);
-    console.error('username token not valid');
-    return next(Boom.unauthorized('username_token not valid'));
+    console.error('activation token not valid');
+    return next(Boom.unauthorized('activation_token not valid'));
   }
 
   // update password and username activation token
@@ -225,7 +225,7 @@ router.post('/new-password', async (req, res, next) => {
   mutation update_user_password (
     $username: String!,
     $password_hash: String!,
-    $username_token: uuid!
+    $activation_token: uuid!
   ) {
     update_users (
       where: {
@@ -233,7 +233,7 @@ router.post('/new-password', async (req, res, next) => {
       }
       _set: {
         password_hash: $password_hash,
-        username_token: $username_token
+        activation_token: $activation_token
       }
     ) {
       affected_rows
@@ -245,7 +245,7 @@ router.post('/new-password', async (req, res, next) => {
     var hasura_data = await graphql_client.request(query, {
       username,
       password_hash,
-      username_token: uuidv4(),
+      activation_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
@@ -277,7 +277,13 @@ router.post('/login', async (req, res, next) => {
   query get_user($username: String!) {
     ${schema_name}user (
       where: {
-        username: { _eq: $username }
+      _and: [
+          {
+            username: { _eq: $username}
+          },{
+            active: { _eq: true}
+          },
+        ]
       }
     ) {
       id
