@@ -12,94 +12,37 @@
 ## Pre Deploy
 You need to store user management data in some table we use this table structure:
 ```
--- Table: public."user"
--- DROP TABLE public."user";
-
-CREATE TABLE public."user"
-(
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
-    username text COLLATE pg_catalog."default" NOT NULL,
+CREATE TABLE IF NOT EXISTS "user" (
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    username text NOT NULL UNIQUE,
     password text COLLATE pg_catalog."default" NOT NULL,
     active boolean NOT NULL,
     activation_token uuid NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT user_pkey PRIMARY KEY (id),
-    CONSTRAINT user_username_key UNIQUE (username)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
 
-ALTER TABLE public."user"
-    OWNER to postgres;
+CREATE TABLE IF NOT EXISTS role (
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    name text NOT NULL UNIQUE
+);
 
-COMMENT ON COLUMN public."user".username
-    IS 'You can Also use email as username if you want.';
-
-
--- Table: public.role
--- DROP TABLE public.role;
-
-CREATE TABLE public.role
-(
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
-    name text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT role_pkey PRIMARY KEY (id),
-    CONSTRAINT role_name_key UNIQUE (name)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.role
-    OWNER to postgres;
-
-
--- Table: public.user_role
--- DROP TABLE public.user_role;
-
-CREATE TABLE public.user_role
-(
-    id uuid NOT NULL DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS user_role (
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id uuid NOT NULL,
     role_id uuid NOT NULL,
-    CONSTRAINT user_role_pkey PRIMARY KEY (id),
     CONSTRAINT user_role_role_id_fkey FOREIGN KEY (role_id)
-        REFERENCES public.role (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        REFERENCES role (id) MATCH SIMPLE,
     CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
+        REFERENCES "user" (id) MATCH SIMPLE
+);
 
-ALTER TABLE public.user_role
-    OWNER to postgres;
-
-
--- Table: public.refetch_token
--- DROP TABLE public.refetch_token;
-
-CREATE TABLE public.refetch_token
-(
-    token uuid NOT NULL,
+CREATE TABLE IF NOT EXISTS refetch_token (
+    token uuid NOT NULL PRIMARY KEY,
     user_id uuid NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT refetch_token_pkey PRIMARY KEY (token),
     CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
-WITH (
-    OIDS = FALSE
+        REFERENCES "user" (id) MATCH SIMPLE
+);
 ```
 
 ## Deploy
