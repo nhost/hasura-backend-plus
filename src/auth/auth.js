@@ -1,7 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
 const Boom = require('boom');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
@@ -15,11 +14,13 @@ const {
 
 const auth_tools = require('./auth-tools');
 
-var router = express.Router();
+let router = express.Router();
 
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === "public" ? "" :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + "_";
 
 router.post('/register', async (req, res, next) => {
+  let hasura_data;
+  let password_hash;
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
@@ -35,7 +36,7 @@ router.post('/register', async (req, res, next) => {
   const { username, password } = value;
 
   // check for duplicates
-  var query = `
+  let query = `
   query get_user($username: String!) {
     ${schema_name}user (
       where: {
@@ -48,7 +49,7 @@ router.post('/register', async (req, res, next) => {
   `;
 
   try {
-    var hasura_data = await graphql_client.request(query, {
+    hasura_data = await graphql_client.request(query, {
       username,
     });
   } catch (e) {
@@ -62,13 +63,13 @@ router.post('/register', async (req, res, next) => {
 
   // generate password_hash
   try {
-    var password_hash = await bcrypt.hash(password, 10);
+    password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
     return next(Boom.badImplementation('Unable to generate password hash'));
   }
 
   // insert user
-  var query = `
+  query = `
   mutation insert_user($user: ${schema_name}user_insert_input!) {
     insert_${schema_name}user(
       objects: [$user]
@@ -96,6 +97,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.get('/activate-account', async (req, res, next) => {
+  let hasura_data;
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
@@ -113,7 +115,7 @@ router.get('/activate-account', async (req, res, next) => {
     activation_token,
   } = value;
 
-  var query = `
+  const query = `
   mutation activate_account (
     $username: String!,
     $activation_token: uuid!
@@ -142,7 +144,7 @@ router.get('/activate-account', async (req, res, next) => {
   `;
 
   try {
-    var hasura_data = await graphql_client.request(query, {
+    hasura_data = await graphql_client.request(query, {
       username,
       activation_token,
       new_activation_token: uuidv4(),
@@ -161,6 +163,8 @@ router.get('/activate-account', async (req, res, next) => {
 });
 
 router.post('/new-password', async (req, res, next) => {
+  let hasura_data;
+  let password_hash;
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
@@ -182,7 +186,7 @@ router.post('/new-password', async (req, res, next) => {
 
   // check username and ActivationToken
   // check for duplicates
-  var query = `
+  let query = `
   query check_username_and_activation_token(
     $username: String!,
     $activation_token: uuid!
@@ -202,7 +206,7 @@ router.post('/new-password', async (req, res, next) => {
   `;
 
   try {
-    var hasura_data = await graphql_client.request(query, {
+    hasura_data = await graphql_client.request(query, {
       username,
       activation_token,
     });
@@ -219,14 +223,14 @@ router.post('/new-password', async (req, res, next) => {
 
   // update password and username activation token
   try {
-    var password_hash = await bcrypt.hash(password, 10);
+    password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
     console.error(e);
     console.error('Unable to generate password hash');
     return next(Boom.badImplementation('Unable to generate password hash'));
   }
 
-  var query = `
+  query = `
   mutation update_user_password (
     $username: String!,
     $password_hash: String!,
@@ -247,7 +251,7 @@ router.post('/new-password', async (req, res, next) => {
   `;
 
   try {
-    var hasura_data = await graphql_client.request(query, {
+    await graphql_client.request(query, {
       username,
       password_hash,
       new_activation_token: uuidv4(),
@@ -349,7 +353,7 @@ router.post('/login', async (req, res, next) => {
 
   const refetch_token = uuidv4();
   try {
-    hasura_data = await graphql_client.request(query, {
+    await graphql_client.request(query, {
       user_id: user.id,
       token: refetch_token,
     });
@@ -419,8 +423,6 @@ router.post('/refetch-token', async (req, res, next) => {
 
   let hasura_data;
   try {
-    const used_vars = {
-    };
     hasura_data = await graphql_client.request(query, {
       refetch_token,
       user_id,
@@ -472,7 +474,7 @@ router.post('/refetch-token', async (req, res, next) => {
 
   const new_refetch_token = uuidv4();
   try {
-    hasura_data = await graphql_client.request(query, {
+    await graphql_client.request(query, {
       old_refetch_token: refetch_token,
       new_refetch_token: new_refetch_token,
       user_id,
