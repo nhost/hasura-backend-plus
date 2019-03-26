@@ -16,8 +16,8 @@ module.exports = {
 
 		return jwt.sign({
 			'https://hasura.io/jwt/claims': {
-				'x-hasura-allowed-roles': [user.role],
-				'x-hasura-default-role': user.role,
+				'x-hasura-allowed-roles': [user.roles],
+				'x-hasura-default-role': user.default_role,
 				'x-hasura-user-id': user.id.toString(),
 				...custom_claims,
 			},

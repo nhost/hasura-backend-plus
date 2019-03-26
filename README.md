@@ -12,36 +12,36 @@
 ## Pre Deploy
 You need to store user management data in some table we use this table structure:
 ```
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS users (
     id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     username text NOT NULL UNIQUE,
     password text NOT NULL,
     active boolean NOT NULL DEFAULT false,
-    activation_token uuid NOT NULL,
+    super_token uuid NOT NULL,
+    default_role text NOT NULL DEFAULT 'user',
     created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS role (
-    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    name text NOT NULL UNIQUE
+CREATE TABLE IF NOT EXISTS roles (
+    name text NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS user_role (
+CREATE TABLE IF NOT EXISTS users_roles (
     id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id uuid NOT NULL,
-    role_id uuid NOT NULL,
-    CONSTRAINT user_role_role_id_fkey FOREIGN KEY (role_id)
-        REFERENCES role (id) MATCH SIMPLE,
-    CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES "user" (id) MATCH SIMPLE
+    role text NOT NULL,
+    CONSTRAINT users_roles_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES users (id) MATCH SIMPLE,
+    CONSTRAINT users_roles_role_fkey FOREIGN KEY (role)
+        REFERENCES roles (name) MATCH SIMPLE
 );
 
-CREATE TABLE IF NOT EXISTS refetch_token (
+CREATE TABLE IF NOT EXISTS refetch_tokens (
     token uuid NOT NULL PRIMARY KEY,
     user_id uuid NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES "user" (id) MATCH SIMPLE
+        REFERENCES users (id) MATCH SIMPLE
 );
 ```
 
