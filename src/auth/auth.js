@@ -298,6 +298,7 @@ router.post('/login', async (req, res, next) => {
       id
       password
       active
+      default_role
       roles: users_x_roles {
         role
       }
@@ -369,7 +370,7 @@ router.post('/login', async (req, res, next) => {
   }
 
   res.cookie('jwt_token', jwt_token, {
-    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000,
+    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
   });
 
@@ -385,7 +386,7 @@ router.post('/refetch-token', async (req, res, next) => {
 
   // validate username and password
   const schema = Joi.object().keys({
-    user_id: Joi.string().required(),
+    user_id: Joi.number().required(),
     refetch_token: Joi.string().required(),
   });
 
@@ -401,22 +402,22 @@ router.post('/refetch-token', async (req, res, next) => {
   query get_refetch_token(
     $refetch_token: uuid!,
     $user_id: Int!
-    $min_created_at: timestamptz!,
+    $current_timestampz: timestamptz!,
   ) {
     ${schema_name}refetch_tokens (
       where: {
         _and: [{
-          token: { _eq: $refetch_token }
+          refetch_token: { _eq: $refetch_token }
         }, {
           user_id: { _eq: $user_id }
         }, {
-          created_at: { _gte: $min_created_at }
+          expires_at: { _gte: $current_timestampz }
         }]
       }
     ) {
-      userByuserId {
+      user {
         id
-        roles: users_roles {
+        roles {
           roleByRole {
             name
           }
@@ -432,7 +433,7 @@ router.post('/refetch-token', async (req, res, next) => {
     hasura_data = await graphql_client.request(query, {
       refetch_token,
       user_id,
-      min_created_at: new Date(new Date().getTime() - (EFETCH_TOKEN_EXPIRES * 60 * 1000)),
+      current_timestampz: new Date(),
     });
   } catch (e) {
     console.error('Error connection to GraphQL');
@@ -445,15 +446,15 @@ router.post('/refetch-token', async (req, res, next) => {
     return next(Boom.unauthorized('Invalid refetch_token or user_id'));
   }
 
-  const user = hasura_data[`${schema_name}refetch_tokens`][0].userByuserId;
+  const user = hasura_data[`${schema_name}refetch_tokens`][0].user;
 
   // delete current refetch token and generate a new, and insert the
   // new refetch_token in the database
   // two mutations as transaction
   query = `
-  mutation new_refetch_token(
+  mutation (
     $old_refetch_token: uuid!,
-    $new_refetch_token: uuid!,
+    $new_refetch_token_data: refetch_tokens_insert_input!
     $user_id: Int!
   ) {
     delete_${schema_name}refetch_tokens (
@@ -468,10 +469,7 @@ router.post('/refetch-token', async (req, res, next) => {
       affected_rows
     }
     insert_${schema_name}refetch_tokens (
-      objects: [{
-        token: $new_refetch_token,
-        user_id: $user_id,
-      }]
+      objects: [$new_refetch_token_data]
     ) {
       affected_rows
     }
@@ -482,7 +480,11 @@ router.post('/refetch-token', async (req, res, next) => {
   try {
     await graphql_client.request(query, {
       old_refetch_token: refetch_token,
-      new_refetch_token: new_refetch_token,
+      refetch_token_data: {
+        user_id: user_id,
+        refetch_token: refetch_token,
+        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
+      },
       user_id,
     });
   } catch (e) {
