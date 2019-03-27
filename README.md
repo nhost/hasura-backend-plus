@@ -56,9 +56,8 @@ Add to `docker-compose.yaml`:
 hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
-    USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
-    USER_MANAGEMENT_DATABASE_SCHEMA_NAME: user_management; // you can use any schema name you want. Default value is "public"
-    USER_REGISTRATION_AUTO_ACTIVE: 'false' // or 'true'
+    USER_FIELDS: ''
+    USER_REGISTRATION_AUTO_ACTIVE: 'true'
     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
     HASURA_GQE_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
@@ -66,8 +65,8 @@ hasura-backend-plus:
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
-    DOMAIN: <domain-running-this-service>
-    REFETCH_TOKEN_EXPIRES: 54000
+    REFETCH_TOKEN_EXPIRES: 43200
+    JWT_TOKEN_EXPIRES: 15
   volumes:
   ./storage-rules.js:/app/src/storage/storage-rules.js
 
