@@ -360,7 +360,7 @@ router.post('/login', async (req, res, next) => {
       refetch_token_data: {
         user_id: user.id,
         refetch_token: refetch_token,
-        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
+        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
       },
     });
   } catch (e) {

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const {
-  REFETCH_TOKEN_EXPIRES,
+  JWT_TOKEN_EXPIRES,
   HASURA_GQE_JWT_SECRET,
   USER_FIELDS,
 } = require('../config');
@@ -23,7 +23,7 @@ module.exports = {
 			},
 		}, HASURA_GQE_JWT_SECRET.key, {
 			algorithm: HASURA_GQE_JWT_SECRET.type,
-			expiresIn: `${REFETCH_TOKEN_EXPIRES}m`,
+			expiresIn: `${JWT_TOKEN_EXPIRES}m`,
 		});
 	},
 };
