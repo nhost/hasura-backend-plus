@@ -190,10 +190,14 @@ router.post('/new-password', async (req, res, next) => {
     password,
   } = value;
 
+  console.log({username});
+  console.log({secret_token});
+  console.log({password});
+
   // check username and ActivationToken
   // check for duplicates
   let query = `
-  query check_username_and_super_token(
+  query (
     $username: String!,
     $secret_token: uuid!
   ) {
@@ -237,10 +241,10 @@ router.post('/new-password', async (req, res, next) => {
   }
 
   query = `
-  mutation update_user_password (
+  mutation  (
     $username: String!,
     $password_hash: String!,
-    $new_super_token: uuid!
+    $new_secret_token: uuid!
   ) {
     update_${schema_name}users (
       where: {
@@ -248,7 +252,7 @@ router.post('/new-password', async (req, res, next) => {
       }
       _set: {
         password: $password_hash,
-        secret_token: $new_super_token
+        secret_token: $new_secret_token
       }
     ) {
       affected_rows
@@ -260,11 +264,11 @@ router.post('/new-password', async (req, res, next) => {
     await graphql_client.request(query, {
       username,
       password_hash,
-      new_super_token: uuidv4(),
+      new_secret_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
-    console.log('unable to update password on GraphQL request');
+    console.log('Unable to update password on GraphQL request');
     return next(Boom.unauthorized('Unable to update password'));
   }
 
