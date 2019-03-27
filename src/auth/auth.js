@@ -411,16 +411,18 @@ router.post('/refetch-token', async (req, res, next) => {
         }, {
           user_id: { _eq: $user_id }
         }, {
+          user: { active: { _eq: true }}
+        }, {
           expires_at: { _gte: $current_timestampz }
         }]
       }
     ) {
       user {
         id
-        roles {
-          roleByRole {
-            name
-          }
+        active
+        default_role
+        roles: users_x_roles {
+          role
         }
         ${USER_FIELDS.join('\n')}
       }
@@ -460,7 +462,7 @@ router.post('/refetch-token', async (req, res, next) => {
     delete_${schema_name}refetch_tokens (
       where: {
         _and: [{
-          token: { _eq: $old_refetch_token }
+          refetch_token: { _eq: $old_refetch_token }
         }, {
           user_id: { _eq: $user_id }
         }]
@@ -480,9 +482,9 @@ router.post('/refetch-token', async (req, res, next) => {
   try {
     await graphql_client.request(query, {
       old_refetch_token: refetch_token,
-      refetch_token_data: {
+      new_refetch_token_data: {
         user_id: user_id,
-        refetch_token: refetch_token,
+        refetch_token: new_refetch_token,
         expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
       },
       user_id,
