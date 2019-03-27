@@ -9,41 +9,45 @@
 <h1 align="center">Hasura Backend Plus ( HB+ )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
-## Pre Deploy
+## Get your database ready
+
 You need to store user management data in some table we use this table structure:
+
 ```
-CREATE TABLE IF NOT EXISTS users (
-    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+CREATE TABLE users (
+    id bigserial PRIMARY KEY,
     username text NOT NULL UNIQUE,
     password text NOT NULL,
     active boolean NOT NULL DEFAULT false,
-    super_token uuid NOT NULL,
+    secret_token uuid NOT NULL,
     default_role text NOT NULL DEFAULT 'user',
     created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS roles (
+CREATE TABLE roles (
     name text NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS users_roles (
-    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id uuid NOT NULL,
+INSERT INTO roles (name) VALUES ('user');
+
+CREATE TABLE users_x_roles (
+    id bigserial PRIMARY KEY,
+    user_id int NOT NULL,
     role text NOT NULL,
-    CONSTRAINT users_roles_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES users (id) MATCH SIMPLE,
-    CONSTRAINT users_roles_role_fkey FOREIGN KEY (role)
-        REFERENCES roles (name) MATCH SIMPLE
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (role) REFERENCES roles (name)
 );
 
-CREATE TABLE IF NOT EXISTS refetch_tokens (
-    token uuid NOT NULL PRIMARY KEY,
-    user_id uuid NOT NULL,
+CREATE TABLE refetch_tokens (
+    id bigserial PRIMARY KEY,
+    refetch_token uuid NOT NULL,
+    user_id int NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES users (id) MATCH SIMPLE
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 ```
+
+// test DROP TABLE refetch_tokens, roles, users, users_x_roles CASCADE;
 
 ## Deploy
 
@@ -155,8 +159,8 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.  
-Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.  
+Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.
+Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
 You can also use open source self hosted private cloud storage solutions like [Minio](https://minio.io/).
 
 ### Uploads

@@ -38,7 +38,9 @@ router.post('/register', async (req, res, next) => {
 
   // check for duplicates
   let query = `
-  query get_user($username: String!) {
+  query (
+    $username: String!
+  ) {
     ${schema_name}users (
       where: {
         username: { _eq: $username }
@@ -286,19 +288,17 @@ router.post('/login', async (req, res, next) => {
   const { username, password } = value;
 
   let query = `
-  query get_user($username: String!) {
+  query (
+    $username: String!
+  ) {
     ${schema_name}users (
-      where: {
-          username: { _eq: $username}
-      }
+      where: { username: { _eq: $username }}
     ) {
       id
       password
       active
-      roles: users_roles {
-        roleByRole {
-          name
-        }
+      roles: users_x_roles {
+        role
       }
       ${USER_FIELDS.join('\n')}
     }
@@ -342,10 +342,13 @@ router.post('/login', async (req, res, next) => {
 
   // generate refetch token and put in database
   query = `
-  mutation insert_refetch_tokens($user_id: Int!, $token: uuid!) {
+  mutation (
+    $user_id: Int!,
+    $refetch_token: uuid!
+  ) {
     insert_${schema_name}refetch_tokens (
       objects: [{
-        token: $token,
+        refetch_token: $refetch_token,
         user_id: $user_id,
       }]
     ) {
@@ -358,7 +361,7 @@ router.post('/login', async (req, res, next) => {
   try {
     await graphql_client.request(query, {
       user_id: user.id,
-      token: refetch_token,
+      refetch_token: refetch_token,
     });
   } catch (e) {
     console.error(e);
