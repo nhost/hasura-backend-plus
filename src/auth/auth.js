@@ -294,12 +294,8 @@ router.post('/login', async (req, res, next) => {
   ) {
     ${schema_name}users (
       where: {
-        _and: [{
-          username: {_eq: $username}
-        }, {
-          active: {_eq: true}
-        }
-      ]}
+        username: { _eq: $username}
+      }
     ) {
       id
       password
@@ -333,8 +329,8 @@ router.post('/login', async (req, res, next) => {
   const user = hasura_data[`${schema_name}users`][0];
 
   if (!user.active) {
-    console.error('Username not activated');
-    return next(Boom.unauthorized('Username not activated'));
+    console.error('User not activated');
+    return next(Boom.unauthorized('User not activated'));
   }
 
   // see if password hashes matches
