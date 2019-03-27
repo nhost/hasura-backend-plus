@@ -48,8 +48,6 @@ CREATE TABLE refetch_tokens (
 );
 ```
 
-// test DROP TABLE refetch_tokens, roles, users, users_x_roles CASCADE;
-
 ## Deploy
 
 Add to `docker-compose.yaml`:
