@@ -293,7 +293,13 @@ router.post('/login', async (req, res, next) => {
     $username: String!
   ) {
     ${schema_name}users (
-      where: { username: { _eq: $username }}
+      where: {
+        _and: [{
+          username: {_eq: $username}
+        }, {
+          active: {_eq: true}
+        }
+      ]}
     ) {
       id
       password
