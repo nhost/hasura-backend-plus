@@ -1,4 +1,5 @@
 exports.USER_FIELDS = process.env.USER_FIELDS ? process.env.USER_FIELDS.split(',') : [];
+exports.USER_MANAGEMENT_DATABASE_SCHEMA_NAME = process.env.USER_MANAGEMENT_DATABASE_SCHEMA_NAME || "public";
 exports.USER_REGISTRATION_AUTO_ACTIVE = process.env.USER_REGISTRATION_AUTO_ACTIVE || false;
 exports.HASURA_GQE_ENDPOINT = process.env.HASURA_GQE_ENDPOINT || 'https://hasura.your-app.com/v1alpha1/graphql';
 exports.HASURA_GQE_ADMIN_SECRET = process.env.HASURA_GQE_ADMIN_SECRET || 'hasura-admin-secret';

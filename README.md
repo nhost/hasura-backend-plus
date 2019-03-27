@@ -13,20 +13,35 @@
 You need to store user management data in some table we use this table structure:
 ```
 CREATE TABLE IF NOT EXISTS users (
-  id bigserial primary key,
-  added_at timestamp with time zone DEFAULT now(),
-  email text not null UNIQUE,
-  password_hash text not null,
-  role text not null default 'user',
-  email_token uuid not null,
-  active boolean not null default false
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    username text NOT NULL UNIQUE,
+    password text NOT NULL,
+    active boolean NOT NULL DEFAULT false,
+    super_token uuid NOT NULL,
+    default_role text NOT NULL DEFAULT 'user',
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+    name text NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS users_roles (
+    id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id uuid NOT NULL,
+    role text NOT NULL,
+    CONSTRAINT users_roles_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES users (id) MATCH SIMPLE,
+    CONSTRAINT users_roles_role_fkey FOREIGN KEY (role)
+        REFERENCES roles (name) MATCH SIMPLE
 );
 
 CREATE TABLE IF NOT EXISTS refetch_tokens (
-  refetch_token uuid primary key,
-  user_id integer not null,
-  added_at timestamp with time zone DEFAULT now(),
-  FOREIGN KEY (user_id) REFERENCES users (id)
+    token uuid NOT NULL PRIMARY KEY,
+    user_id uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT refetch_token_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES users (id) MATCH SIMPLE
 );
 ```
 
@@ -39,6 +54,7 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
     USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
+    USER_MANAGEMENT_DATABASE_SCHEMA_NAME: user_management; // you can use any schema name you want. Default value is "public"
     USER_REGISTRATION_AUTO_ACTIVE: 'false' // or 'true'
     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
