@@ -42,6 +42,7 @@ CREATE TABLE refetch_tokens (
     id bigserial PRIMARY KEY,
     refetch_token uuid NOT NULL,
     user_id int NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );

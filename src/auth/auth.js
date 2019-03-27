@@ -7,9 +7,10 @@ const { graphql_client } = require('../graphql-client');
 
 const {
   USER_FIELDS,
-  REFETCH_TOKEN_EXPIRES,
   USER_REGISTRATION_AUTO_ACTIVE,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
+  REFETCH_TOKEN_EXPIRES,
+  JWT_TOKEN_EXPIRES,
 } = require('../config');
 
 const auth_tools = require('./auth-tools');
@@ -343,14 +344,10 @@ router.post('/login', async (req, res, next) => {
   // generate refetch token and put in database
   query = `
   mutation (
-    $user_id: Int!,
-    $refetch_token: uuid!
+    $refetch_token_data: refetch_tokens_insert_input!
   ) {
     insert_${schema_name}refetch_tokens (
-      objects: [{
-        refetch_token: $refetch_token,
-        user_id: $user_id,
-      }]
+      objects: [$refetch_token_data]
     ) {
       affected_rows
     }
@@ -360,8 +357,11 @@ router.post('/login', async (req, res, next) => {
   const refetch_token = uuidv4();
   try {
     await graphql_client.request(query, {
-      user_id: user.id,
-      refetch_token: refetch_token,
+      refetch_token_data: {
+        user_id: user.id,
+        refetch_token: refetch_token,
+        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
+      },
     });
   } catch (e) {
     console.error(e);
@@ -369,7 +369,7 @@ router.post('/login', async (req, res, next) => {
   }
 
   res.cookie('jwt_token', jwt_token, {
-    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
+    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000,
     httpOnly: true,
   });
 
@@ -432,7 +432,7 @@ router.post('/refetch-token', async (req, res, next) => {
     hasura_data = await graphql_client.request(query, {
       refetch_token,
       user_id,
-      min_created_at: new Date(new Date().getTime() - (REFETCH_TOKEN_EXPIRES * 60 * 1000)),
+      min_created_at: new Date(new Date().getTime() - (EFETCH_TOKEN_EXPIRES * 60 * 1000)),
     });
   } catch (e) {
     console.error('Error connection to GraphQL');
@@ -495,7 +495,7 @@ router.post('/refetch-token', async (req, res, next) => {
   const jwt_token = auth_tools.generateJwtToken(user);
 
   res.cookie('jwt_token', jwt_token, {
-    expires: new Date(Date.now() + (REFETCH_TOKEN_EXPIRES*60*1000)),
+    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000,
     httpOnly: true,
   });
 
