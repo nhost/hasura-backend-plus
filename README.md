@@ -139,6 +139,8 @@ S3_ENDPOINT: <endpoint>
 S3_BUCKET: <bucket>
 DOMAIN: <domain-running-this-service>
 REFETCH_TOKEN_EXPIRES: 54000
+JWT_TOKEN_EXPIRES: 15
+USER_MANAGEMENT_DATABASE_SCHEMA_NAME: 'user_management' // use this if you have all your user tables in another schema (not public)
 ```
 
 #### USER_FIELDS
