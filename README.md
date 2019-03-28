@@ -17,38 +17,38 @@ Create tables and initial state for your user mangagement.
 
 ```
 CREATE TABLE roles (
-    name text NOT NULL PRIMARY KEY
+  name text NOT NULL PRIMARY KEY
 );
 
 INSERT INTO roles (name) VALUES ('user');
 
 CREATE TABLE users (
-    id bigserial PRIMARY KEY,
-    username text NOT NULL UNIQUE,
-    password text NOT NULL,
-    active boolean NOT NULL DEFAULT false,
-    secret_token uuid NOT NULL,
-    default_role text NOT NULL DEFAULT 'user',
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    FOREIGN KEY (default_role) REFERENCES roles (name)
+  id bigserial PRIMARY KEY,
+  username text NOT NULL UNIQUE,
+  password text NOT NULL,
+  active boolean NOT NULL DEFAULT false,
+  secret_token uuid NOT NULL,
+  default_role text NOT NULL DEFAULT 'user',
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  FOREIGN KEY (default_role) REFERENCES roles (name)
 );
 
 CREATE TABLE users_x_roles (
-    id bigserial PRIMARY KEY,
-    user_id int NOT NULL,
-    role text NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (role) REFERENCES roles (name),
-    UNIQUE (user_id, role)
+  id bigserial PRIMARY KEY,
+  user_id int NOT NULL,
+  role text NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  FOREIGN KEY (role) REFERENCES roles (name),
+  UNIQUE (user_id, role)
 );
 
 CREATE TABLE refetch_tokens (
-    id bigserial PRIMARY KEY,
-    refetch_token uuid NOT NULL UNIQUE,
-    user_id int NOT NULL,
-    expires_at timestamp with time zone NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id bigserial PRIMARY KEY,
+  refetch_token uuid NOT NULL UNIQUE,
+  user_id int NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  FOREIGN KEY (user_id) REFERENCES users (id)
 );
 ```
 
@@ -111,12 +111,12 @@ Add this to your caddy file
 
 ```
 <domain-running-this-service> {
-    proxy / hasura-backend-plus:3000
+  proxy / hasura-backend-plus:3000
 }
 
 Ex:
 backend.myapp.io {
-    proxy / hasura-backend-plus:3000
+  proxy / hasura-backend-plus:3000
 }
 
 ```
@@ -163,6 +163,7 @@ Then you will have a JWT a little something like this:
 {
   "https://hasura.io/jwt/claims": {
     "x-hasura-allowed-roles": [
+      "user"
       "company_admin"
     ],
     "x-hasura-default-role": "company_admin",
@@ -228,37 +229,36 @@ Code:
 ```
 module.exports = {
 
-	// key - file path
-	// type - [ read, write ]
-	// claims - claims in JWT
-	// this is similar to Firebase Security Rules for files. but not as good looking
-	storagePermission: function(key, type, claims) {
-		let res;
+  // key - file path
+  // type - [ read, write ]
+  // claims - claims in JWT
+  // this is similar to Firebase Security Rules for files. but not as good looking
+  storagePermission: function(key, type, claims) {
+    let res;
 
-		// console.log({key});
-		// console.log({type});
-		// console.log({claims});
+    // console.log({key});
+    // console.log({type});
+    // console.log({claims});
 
-		res = key.match(/\/companies\/(?<company_id>\w*)\/customers\/(\d*)\/.*/);
-		if (res) {
-			if (claims['x-hasura-company-id'] === res.groups.company_id) {
-				return true;
-			}
-			return false;
-		}
+    res = key.match(/\/companies\/(?<company_id>\w*)\/customers\/(\d*)\/.*/);
+    if (res) {
+      if (claims['x-hasura-company-id'] === res.groups.company_id) {
+        return true;
+      }
+      return false;
+    }
 
-		// accept read to public directory
-		res = key.match(/\/public\/.*/);
-		if (res) {
-			if (type === 'read') {
-				return true;
-			}
-		}
+    // accept read to public directory
+    res = key.match(/\/public\/.*/);
+    if (res) {
+      if (type === 'read') {
+        return true;
+      }
+    }
 
-		return false;
-	},
+    return false;
+  },
 };
-
 ```
 
 You can see other examples [here](examples) in examples folder.
