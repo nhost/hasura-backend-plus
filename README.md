@@ -9,26 +9,73 @@
 <h1 align="center">Hasura Backend Plus ( HB+ )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
-## Pre Deploy
-You need to store user management data in some table we use this table structure:
+# Setup
+
+## Get your database ready
+
+Create tables and initial state for your user mangagement.
+
 ```
-CREATE TABLE IF NOT EXISTS users (
-  id bigserial primary key,
-  added_at timestamp with time zone DEFAULT now(),
-  email text not null UNIQUE,
-  password_hash text not null,
-  role text not null default 'user',
-  email_token uuid not null,
-  active boolean not null default false
+CREATE TABLE roles (
+    name text NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS refetch_tokens (
-  refetch_token uuid primary key,
-  user_id integer not null,
-  added_at timestamp with time zone DEFAULT now(),
-  FOREIGN KEY (user_id) REFERENCES users (id)
+INSERT INTO roles (name) VALUES ('user');
+
+CREATE TABLE users (
+    id bigserial PRIMARY KEY,
+    username text NOT NULL UNIQUE,
+    password text NOT NULL,
+    active boolean NOT NULL DEFAULT false,
+    secret_token uuid NOT NULL,
+    default_role text NOT NULL DEFAULT 'user',
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    FOREIGN KEY (default_role) REFERENCES roles (name)
+);
+
+CREATE TABLE users_x_roles (
+    id bigserial PRIMARY KEY,
+    user_id int NOT NULL,
+    role text NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (role) REFERENCES roles (name),
+    UNIQUE (user_id, role)
+);
+
+CREATE TABLE refetch_tokens (
+    id bigserial PRIMARY KEY,
+    refetch_token uuid NOT NULL UNIQUE,
+    user_id int NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 ```
+
+## Create minimal storage rules
+
+In the same directory where you have your `docker-compose.yaml` for your Hasura and HB+ project. Do the following:
+
+```
+mkdir storage-rules
+vim storage-rules/index.js
+
+add this:
+module.exports = {
+
+	// key - file path
+	// type - [ read, write ]
+	// claims - claims in JWT
+	// this is similar to Firebase Storage Security Rules.
+
+	storagePermission: function(key, type, claims) {
+    // UNSECURE! Allow read/write all files. Good to get started tho
+    return true;
+	},
+};
+
+```
+
 
 ## Deploy
 
@@ -38,8 +85,9 @@ Add to `docker-compose.yaml`:
 hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
-    USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
-    USER_REGISTRATION_AUTO_ACTIVE: 'false' // or 'true'
+    PORT: 3000
+    USER_FIELDS: ''
+    USER_REGISTRATION_AUTO_ACTIVE: 'true'
     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
     HASURA_GQE_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
@@ -47,10 +95,10 @@ hasura-backend-plus:
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
-    DOMAIN: <domain-running-this-service>
-    REFETCH_TOKEN_EXPIRES: 54000
+    REFETCH_TOKEN_EXPIRES: 43200
+    JWT_TOKEN_EXPIRES: 15
   volumes:
-  ./storage-rules.js:/app/src/storage/storage-rules.js
+  - ./storage-rules:/app/src/storage/rules
 
 caddy:
   ....
@@ -65,6 +113,12 @@ Add this to your caddy file
 <domain-running-this-service> {
     proxy / hasura-backend-plus:3000
 }
+
+Ex:
+backend.myapp.io {
+    proxy / hasura-backend-plus:3000
+}
+
 ```
 
 Restart your docker containers
@@ -85,6 +139,8 @@ S3_ENDPOINT: <endpoint>
 S3_BUCKET: <bucket>
 DOMAIN: <domain-running-this-service>
 REFETCH_TOKEN_EXPIRES: 54000
+JWT_TOKEN_EXPIRES: 15
+USER_MANAGEMENT_DATABASE_SCHEMA_NAME: 'user_management' // use this if you have all your user tables in another schema (not public)
 ```
 
 #### USER_FIELDS
@@ -139,8 +195,8 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 # Storage
 
-Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.  
-Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.  
+Will act as a proxy between your client and a S3 compatible block storage service (Ex: AWS S3, Digital Ocean Spaces, Minio). Can handle read, write and security permission.
+Digital Ocean offer S3-compatible object storage for $5/month with 250 GB of storage with 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
 You can also use open source self hosted private cloud storage solutions like [Minio](https://minio.io/).
 
 ### Uploads
@@ -176,7 +232,7 @@ module.exports = {
 	// type - [ read, write ]
 	// claims - claims in JWT
 	// this is similar to Firebase Security Rules for files. but not as good looking
-	validateInteraction: function(key, type, claims) {
+	storagePermission: function(key, type, claims) {
 		let res;
 
 		// console.log({key});
