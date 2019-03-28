@@ -9,9 +9,11 @@
 <h1 align="center">Hasura Backend Plus ( HB+ )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
+# Setup
+
 ## Get your database ready
 
-You need to store user management data in some table we use this table structure:
+Create tables and initial state for your user mangagement.
 
 ```
 CREATE TABLE roles (
@@ -49,6 +51,31 @@ CREATE TABLE refetch_tokens (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 ```
+
+## Create minimal storage rules
+
+In the same directory where you have your `docker-compose.yaml` for your Hasura and HB+ project. Do the following:
+
+```
+mkdir storage-rules
+vim storage-rules/index.js
+
+add this:
+module.exports = {
+
+	// key - file path
+	// type - [ read, write ]
+	// claims - claims in JWT
+	// this is similar to Firebase Storage Security Rules.
+
+	storagePermission: function(key, type, claims) {
+    // UNSECURE! Allow read/write all files. Good to get started tho
+    return true;
+	},
+};
+
+```
+
 
 ## Deploy
 
@@ -203,7 +230,7 @@ module.exports = {
 	// type - [ read, write ]
 	// claims - claims in JWT
 	// this is similar to Firebase Security Rules for files. but not as good looking
-	validateInteraction: function(key, type, claims) {
+	storagePermission: function(key, type, claims) {
 		let res;
 
 		// console.log({key});
