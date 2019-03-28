@@ -52,6 +52,10 @@ CREATE TABLE refetch_tokens (
 );
 ```
 
+## Track your tables and relations in Hasura
+
+Go to the Hasura console. Click the "Data" menu link and then click "Track all" under both "Untracked tables or views" and "Untracked foreign-key relations"
+
 ## Create minimal storage rules
 
 In the same directory where you have your `docker-compose.yaml` for your Hasura and HB+ project. Do the following:
