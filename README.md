@@ -192,7 +192,7 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 ```
 /register
 /activate-account
-/sign-in
+/login
 /refetch-token
 /new-password
 ```
