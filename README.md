@@ -14,6 +14,12 @@
 You need to store user management data in some table we use this table structure:
 
 ```
+CREATE TABLE roles (
+    name text NOT NULL PRIMARY KEY
+);
+
+INSERT INTO roles (name) VALUES ('user');
+
 CREATE TABLE users (
     id bigserial PRIMARY KEY,
     username text NOT NULL UNIQUE,
@@ -21,26 +27,22 @@ CREATE TABLE users (
     active boolean NOT NULL DEFAULT false,
     secret_token uuid NOT NULL,
     default_role text NOT NULL DEFAULT 'user',
-    created_at timestamp with time zone NOT NULL DEFAULT now()
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    FOREIGN KEY (default_role) REFERENCES roles (name)
 );
-
-CREATE TABLE roles (
-    name text NOT NULL PRIMARY KEY
-);
-
-INSERT INTO roles (name) VALUES ('user');
 
 CREATE TABLE users_x_roles (
     id bigserial PRIMARY KEY,
     user_id int NOT NULL,
     role text NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (role) REFERENCES roles (name)
+    FOREIGN KEY (role) REFERENCES roles (name),
+    UNIQUE (user_id, role)
 );
 
 CREATE TABLE refetch_tokens (
     id bigserial PRIMARY KEY,
-    refetch_token uuid NOT NULL,
+    refetch_token uuid NOT NULL UNIQUE,
     user_id int NOT NULL,
     expires_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -56,6 +58,7 @@ Add to `docker-compose.yaml`:
 hasura-backend-plus:
   image: elitan/hasura-backend-plus
   environment:
+    PORT: 3000
     USER_FIELDS: ''
     USER_REGISTRATION_AUTO_ACTIVE: 'true'
     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
@@ -68,7 +71,7 @@ hasura-backend-plus:
     REFETCH_TOKEN_EXPIRES: 43200
     JWT_TOKEN_EXPIRES: 15
   volumes:
-  ./storage-rules.js:/app/src/storage/storage-rules.js
+  - ./storage-rules:/app/src/storage/rules
 
 caddy:
   ....
@@ -83,6 +86,12 @@ Add this to your caddy file
 <domain-running-this-service> {
     proxy / hasura-backend-plus:3000
 }
+
+Ex:
+backend.myapp.io {
+    proxy / hasura-backend-plus:3000
+}
+
 ```
 
 Restart your docker containers
