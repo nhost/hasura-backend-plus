@@ -63,15 +63,15 @@ vim storage-rules/index.js
 add this:
 module.exports = {
 
-	// key - file path
-	// type - [ read, write ]
-	// claims - claims in JWT
-	// this is similar to Firebase Storage Security Rules.
+  // key - file path
+  // type - [ read, write ]
+  // claims - claims in JWT
+  // this is similar to Firebase Storage Security Rules.
 
-	storagePermission: function(key, type, claims) {
+  storagePermission: function(key, type, claims) {
     // UNSECURE! Allow read/write all files. Good to get started tho
     return true;
-	},
+  },
 };
 
 ```
