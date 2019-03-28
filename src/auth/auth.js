@@ -392,7 +392,7 @@ router.post('/refetch-token', async (req, res, next) => {
 
   // validate username and password
   const schema = Joi.object().keys({
-    user_id: Joi.number().required(),
+    user_id: Joi.required(),
     refetch_token: Joi.string().required(),
   });
 
