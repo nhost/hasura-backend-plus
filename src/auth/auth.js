@@ -157,7 +157,7 @@ router.get('/activate-account', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+    return next(Boom.unauthorized('Error connection to GraphQL'));
   }
 
   if (hasura_data[`update_${schema_name}users`].affected_rows === 0) {
@@ -321,7 +321,7 @@ router.post('/login', async (req, res, next) => {
   } catch (e) {
     console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized('Error connection to GraphQL'));
   }
 
   if (hasura_data[`${schema_name}users`].length === 0) {
@@ -351,7 +351,7 @@ router.post('/login', async (req, res, next) => {
   // generate refetch token and put in database
   query = `
   mutation (
-    $refetch_token_data: refetch_tokens_insert_input!
+    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
   ) {
     insert_${schema_name}refetch_tokens (
       objects: [$refetch_token_data]
