@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 var mime = require('mime-types');
 
 const {
-  HASURA_GQE_JWT_SECRET,
+  HASURA_GRAPHQL_JWT_SECRET,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
   S3_ENDPOINT,
@@ -39,7 +39,7 @@ router.get('/file/*', (req, res, next) => {
   if (jwt_token) {
     // check jwt token if it exists
     try {
-      const decoded = jwt.verify(jwt_token, HASURA_GQE_JWT_SECRET.key, {algorithms: HASURA_GQE_JWT_SECRET.type});
+      const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
       claims = decoded['https://hasura.io/jwt/claims'];
     } catch (e) {
       console.error(e);
@@ -132,7 +132,7 @@ const upload_auth = (req, res, next) => {
   let claims;
   if (jwt_token) {
     try {
-      const decoded = jwt.verify(jwt_token, HASURA_GQE_JWT_SECRET.key, {algorithms: HASURA_GQE_JWT_SECRET.type});
+      const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
       claims = decoded['https://hasura.io/jwt/claims'];
     } catch (e) {
       return next(Boom.unauthorized('Incorrect JWT Token'));
