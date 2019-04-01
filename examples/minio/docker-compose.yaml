@@ -43,9 +43,9 @@ services:
     environment:
 ##      USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
       USER_REGISTRATION_AUTO_ACTIVE: 'false'
-      HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
-      HASURA_GQE_ADMIN_SECRET: admin
-      HASURA_GQE_JWT_SECRET: '{"type":"RS256", "key":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA84lx+VqwXzRiMDxIHyfQ\ns5wtalu4FnxnFlht2GR4miParLsqjmQMCqtvxW8StSErYVJlRjwZUuIWsnDA31pG\nBwjpsAV56iyK4xdaHrIluaOBCMbUw1O6O2RAs6pGFvPGi3B2wat7dj6nT+03M+xH\nS+jPZXzXDoh9VgWJ7h9hDllEYedDRbleFwLC7prLLZQTK/lSAQTOn4aPo/3S9LPS\nLgPzoJGVej2OYPlyMzeU4oPxj56FX7dVqpsaQP3tLjrLcWm1l38dVSQhy0gexF+u\navn/gwDsFn4gBqQ7me6FPUkB8/K7pGWDjl1/sPF3vI1zg0/RB89bHv4PmX20bsj1\ncQIDAQAB\n-----END PUBLIC KEY-----\n"}'
+      HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
+      HASURA_GRAPHQL_ADMIN_SECRET: admin
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"RS256", "key":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA84lx+VqwXzRiMDxIHyfQ\ns5wtalu4FnxnFlht2GR4miParLsqjmQMCqtvxW8StSErYVJlRjwZUuIWsnDA31pG\nBwjpsAV56iyK4xdaHrIluaOBCMbUw1O6O2RAs6pGFvPGi3B2wat7dj6nT+03M+xH\nS+jPZXzXDoh9VgWJ7h9hDllEYedDRbleFwLC7prLLZQTK/lSAQTOn4aPo/3S9LPS\nLgPzoJGVej2OYPlyMzeU4oPxj56FX7dVqpsaQP3tLjrLcWm1l38dVSQhy0gexF+u\navn/gwDsFn4gBqQ7me6FPUkB8/K7pGWDjl1/sPF3vI1zg0/RB89bHv4PmX20bsj1\ncQIDAQAB\n-----END PUBLIC KEY-----\n"}'
       S3_ACCESS_KEY_ID: access-key-here
       S3_SECRET_ACCESS_KEY: secret-key-here
       S3_ENDPOINT: http://minio:9000
