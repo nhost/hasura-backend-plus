@@ -31,41 +31,8 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  US
 
 
 
-router.get('/2fa/generateTOTP', async (req, res, next) => {
-  let hasura_data;
+router.post('/2fa/generateTOTP', async (req, res, next) => {
 
-  const schema = Joi.object().keys({
-    username: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.query);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const { username } = value;
-
-  try {
-    const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
-    const token = totp.generate(secret);
-    // totp.check(...)
-    // totp.verify(...)
-    console.warn("2FA Token is (valid for 60 second): " + token);
-
-    // TODO: Later we need remove below code and send token just through SMS or Email
-    res.send(token);
-    res.send('OK');
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
-  }
-});
-
-
-router.post('/2fa/login', async (req, res, next) => {
-
-  // validate username and password
   const schema = Joi.object().keys({
     username: Joi.string().required(),
     password: Joi.string().required(),
@@ -133,12 +100,116 @@ router.post('/2fa/login', async (req, res, next) => {
   }
   console.warn('user: ' + JSON.stringify(user, null, 2));
 
+  try {
+    const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
+    const token = totp.generate(secret);
+    // totp.check(...)
+    // totp.verify(...)
+    console.warn("2FA Token is (valid for 60 second): " + token);
+
+    // TODO: Later we need remove below code and send token just through SMS or Email
+    res.send(token);
+    res.send('OK');
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+  }
+});
+
+
+router.post('/2fa/login', async (req, res, next) => {
+
+  // validate username and password
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required(),
+    totp_token: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  const { username, password, totp_token } = value;
+
+  let query = `
+  query (
+    $username: String!
+  ) {
+    ${schema_name}users (
+      where: {
+        username: { _eq: $username}
+      }
+    ) {
+      id
+      password
+      active
+      default_role
+      roles: users_x_roles {
+        role
+      }
+      ${USER_FIELDS.join('\n')}
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      username,
+    });
+  } catch (e) {
+    console.error('Error connection to GraphQL');
+    console.error(e);
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+
+  if (hasura_data[`${schema_name}users`].length === 0) {
+    console.error('No user with that username');
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+
+  // check if we got any user back
+  const user = hasura_data[`${schema_name}users`][0];
+
+  if (!user.active) {
+    console.error('User not activated');
+    return next(Boom.unauthorized('User not activated'));
+  }
+
+  // see if password hashes matches
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    console.error('Password does not match');
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+  console.warn('user: ' + JSON.stringify(user, null, 2));
+
+
+
+
+
+
+  const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
+  const isValid = totp.check(totp_token, secret);
+  if (!isValid) {
+    console.error('TOTP token not valid');
+    return next(Boom.unauthorized('TOTP token not valid'));
+  }
+
+
+
+
+
   const jwt_token = auth_tools.generateJwtToken(user);
 
   // generate refetch token and put in database
   query = `
   mutation (
-    $refetch_token_data: refetch_tokens_insert_input!
+    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
   ) {
     insert_${schema_name}refetch_tokens (
       objects: [$refetch_token_data]
