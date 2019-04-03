@@ -4,6 +4,13 @@ const Boom = require('boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
+const crypto = require('crypto');
+const totp = require('otplib/totp');
+
+totp.options = {
+  crypto: crypto,
+  step: 60
+};
 
 const {
   USER_FIELDS,
@@ -18,6 +25,178 @@ const auth_tools = require('./auth-tools');
 let router = express.Router();
 
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
+
+
+
+
+
+
+router.get('/2fa/generateTOTP', async (req, res, next) => {
+  let hasura_data;
+
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.query);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  const { username } = value;
+
+  try {
+    const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
+    const token = totp.generate(secret);
+    // totp.check(...)
+    // totp.verify(...)
+    console.warn("2FA Token is (valid for 60 second): " + token);
+
+    // TODO: Later we need remove below code and send token just through SMS or Email
+    res.send(token);
+    res.send('OK');
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+  }
+});
+
+
+router.post('/2fa/login', async (req, res, next) => {
+
+  // validate username and password
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  const { username, password } = value;
+
+  let query = `
+  query (
+    $username: String!
+  ) {
+    ${schema_name}users (
+      where: {
+        username: { _eq: $username}
+      }
+    ) {
+      id
+      password
+      active
+      default_role
+      roles: users_x_roles {
+        role
+      }
+      ${USER_FIELDS.join('\n')}
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      username,
+    });
+  } catch (e) {
+    console.error('Error connection to GraphQL');
+    console.error(e);
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+
+  if (hasura_data[`${schema_name}users`].length === 0) {
+    console.error('No user with that username');
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+
+  // check if we got any user back
+  const user = hasura_data[`${schema_name}users`][0];
+
+  if (!user.active) {
+    console.error('User not activated');
+    return next(Boom.unauthorized('User not activated'));
+  }
+
+  // see if password hashes matches
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    console.error('Password does not match');
+    return next(Boom.unauthorized('Invalid username or password'));
+  }
+  console.warn('user: ' + JSON.stringify(user, null, 2));
+
+  const jwt_token = auth_tools.generateJwtToken(user);
+
+  // generate refetch token and put in database
+  query = `
+  mutation (
+    $refetch_token_data: refetch_tokens_insert_input!
+  ) {
+    insert_${schema_name}refetch_tokens (
+      objects: [$refetch_token_data]
+    ) {
+      affected_rows
+    }
+  }
+  `;
+
+  const refetch_token = uuidv4();
+  try {
+    await graphql_client.request(query, {
+      refetch_token_data: {
+        user_id: user.id,
+        refetch_token: refetch_token,
+        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.badImplementation('Could not update refetch token for user'));
+  }
+
+  res.cookie('jwt_token', jwt_token, {
+    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+    httpOnly: true,
+  });
+
+  // return jwt token and refetch token to client
+  res.json({
+    jwt_token,
+    refetch_token,
+    user_id: user.id,
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post('/register', async (req, res, next) => {
 
