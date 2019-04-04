@@ -108,7 +108,7 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
     console.warn("2FA Token is (valid for 60 second): " + token);
 
     // TODO: Later we need remove below code and send token just through SMS or Email
-    res.send(token);
+    // res.send(token);
     res.send('OK');
   } catch (e) {
     console.error(e);
