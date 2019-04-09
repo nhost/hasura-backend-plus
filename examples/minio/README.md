@@ -9,9 +9,9 @@ hasura-backend-plus:
    restart: always
    environment:
      PORT: 3000
-     HASURA_GQE_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
-     HASURA_GQE_ADMIN_SECRET: <hasura-admin-secret>
-     HASURA_GQE_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
+     HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
+     HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
+     HASURA_GRAPHQL_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
      USER_FIELDS: ''
      S3_ACCESS_KEY_ID: <access-key-here>
      S3_SECRET_ACCESS_KEY: <secret-key-here>
