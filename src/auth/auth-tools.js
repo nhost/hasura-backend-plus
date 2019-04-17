@@ -1,17 +1,13 @@
 const jwt = require('jsonwebtoken');
-
 const Boom = require('boom');
-
 const { graphql_client } = require('../graphql-client');
-
 
 const {
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   USER_FIELDS,
-  HASURA_GQE_JWT_SECRET,
+  HASURA_GRAPHQL_JWT_SECRET,
   JWT_TOKEN_EXPIRES,
 } = require('../config');
-
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
 
@@ -90,8 +86,8 @@ module.exports = {
         'x-hasura-user-id': user.id.toString(),
         ...custom_claims,
       },
-    }, HASURA_GQE_JWT_SECRET.key, {
-      algorithm: HASURA_GQE_JWT_SECRET.type,
+    }, HASURA_GRAPHQL_JWT_SECRET.key, {
+      algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
       expiresIn: `${JWT_TOKEN_EXPIRES}m`,
     });
   },

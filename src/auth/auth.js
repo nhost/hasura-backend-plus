@@ -4,8 +4,6 @@ const Boom = require('boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
-const crypto = require('crypto');
-const totp = require('otplib/totp');
 
 const {
   USER_FIELDS,
@@ -14,149 +12,15 @@ const {
   REFETCH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   OTP_ENABLE,
-  OTP_STEP,
-  OTP_SECRET_SALT,
 } = require('../config');
-
-
-
-
-
 
 const auth_tools = require('./auth-tools');
 const otp_tools = require('./otp-tools');
+const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
 let router = express.Router();
 
-const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
-
-
-
-
-
-
-router.post('/2fa/generateTOTP', async (req, res, next) => {
-  if (!OTP_ENABLE) {
-    res.sendStatus(404);
-  }
-
-  const schema = Joi.object().keys({
-    username: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  try {
-    const { username } = value;
-    const user = await auth_tools.checkUserExistAndActivated(next, username);
-    console.warn('user: ' + JSON.stringify(user, null, 2));
-
-    const token = otp_tools.generateOTP(user.username);
-    otp_tools.sendOTP(user, token);
-
-    res.send('OK');
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
-  }
-});
-
-
-router.post('/2fa/login', async (req, res, next) => {
-  if (!OTP_ENABLE) {
-    res.sendStatus(404);
-  }
-
-  // validate username and password
-  const schema = Joi.object().keys({
-    username: Joi.string().required(),
-    otp: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const { username, otp } = value;
-  const user = await auth_tools.checkUserExistAndActivated(next, username);
-  console.warn('user: ' + JSON.stringify(user, null, 2));
-
-  if (!otp_tools.checkOTP(username, otp)) {
-    console.error('TOTP token not valid');
-    return next(Boom.unauthorized('TOTP token not valid'));
-  }
-
-  const jwt_token = auth_tools.generateJwtToken(user);
-
-  // generate refetch token and put in database
-  query = `
-  mutation (
-    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
-  ) {
-    insert_${schema_name}refetch_tokens (
-      objects: [$refetch_token_data]
-    ) {
-      affected_rows
-    }
-  }
-  `;
-
-  const refetch_token = uuidv4();
-  try {
-    await graphql_client.request(query, {
-      refetch_token_data: {
-        user_id: user.id,
-        refetch_token: refetch_token,
-        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
-      },
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.badImplementation('Could not update refetch token for user'));
-  }
-
-  res.cookie('jwt_token', jwt_token, {
-    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-    httpOnly: true,
-  });
-
-  // return jwt token and refetch token to client
-  res.json({
-    jwt_token,
-    refetch_token,
-    user_id: user.id,
-  });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.post('/register', async (req, res, next) => {
-
   let hasura_data;
   let password_hash;
 
@@ -193,19 +57,20 @@ router.post('/register', async (req, res, next) => {
       username,
     });
   } catch (e) {
-    console.log(e);
-    return next(Boom.badImplementation('Unable to check for duplicates'));
+    console.error(e);
+    return next(Boom.badImplementation("Unable to check for 'username' duplication"));
   }
 
   if (hasura_data[`${schema_name}users`].length !== 0) {
-    return next(Boom.unauthorized('The username is already in use'));
+    return next(Boom.unauthorized("The 'username' is already exist"));
   }
 
   // generate password_hash
   try {
     password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
-    return next(Boom.badImplementation('Unable to generate password hash'));
+    console.error(e);
+    return next(Boom.badImplementation("Unable to generate 'password hash'"));
   }
 
   // insert user
@@ -232,7 +97,7 @@ router.post('/register', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.badImplementation('Unable to create user'));
+    return next(Boom.badImplementation('Unable to create user.'));
   }
 
   res.send('OK');
@@ -293,12 +158,12 @@ router.get('/activate-account', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+    return next(Boom.unauthorized('Unable to find account for activation.'));
   }
 
   if (hasura_data[`update_${schema_name}users`].affected_rows === 0) {
-    console.error('Account already activated');
-    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+    // console.error('Account already activated');
+    return next(Boom.unauthorized('Account is already activated or there is no account.'));
   }
 
   res.send('OK');
@@ -358,13 +223,11 @@ router.post('/new-password', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    console.error('activation token not valid');
-    return next(Boom.unauthorized('secret_token not valid'));
+    return next(Boom.unauthorized('Unable to find user.'));
   }
 
   if (hasura_data[`${schema_name}users`].length === 0) {
-    console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid username'));
+    return next(Boom.unauthorized("Invalid 'username'. No user with that 'username'"));
   }
 
   // update password and username activation token
@@ -372,8 +235,7 @@ router.post('/new-password', async (req, res, next) => {
     password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
     console.error(e);
-    console.error('Unable to generate password hash');
-    return next(Boom.badImplementation('Unable to generate password hash'));
+    return next(Boom.badImplementation("Unable to generate 'password hash'"));
   }
 
   query = `
@@ -404,8 +266,8 @@ router.post('/new-password', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    console.log('Unable to update password on GraphQL request');
-    return next(Boom.unauthorized('Unable to update password'));
+    // console.log('Unable to update password on GraphQL request');
+    return next(Boom.unauthorized("Unable to update 'password'"));
   }
 
   // return 200 OK
@@ -458,22 +320,22 @@ router.post('/login', async (req, res, next) => {
       username,
     });
   } catch (e) {
-    console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid username or password'));
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized("Unable to find 'user'"));
   }
 
   if (hasura_data[`${schema_name}users`].length === 0) {
-    console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid username or password'));
+    // console.error("No user with this 'username'");
+    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
   }
 
   // check if we got any user back
   const user = hasura_data[`${schema_name}users`][0];
 
   if (!user.active) {
-    console.error('User not activated');
-    return next(Boom.unauthorized('User not activated'));
+    // console.error('User not activated');
+    return next(Boom.unauthorized('User not activated.'));
   }
 
   // see if password hashes matches
@@ -481,7 +343,7 @@ router.post('/login', async (req, res, next) => {
 
   if (!match) {
     console.error('Password does not match');
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
   }
   console.warn('user: ' + JSON.stringify(user, null, 2));
 
@@ -490,7 +352,7 @@ router.post('/login', async (req, res, next) => {
   // generate refetch token and put in database
   query = `
   mutation (
-    $refetch_token_data: refetch_tokens_insert_input!
+    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
   ) {
     insert_${schema_name}refetch_tokens (
       objects: [$refetch_token_data]
@@ -511,7 +373,7 @@ router.post('/login', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.badImplementation('Could not update refetch token for user'));
+    return next(Boom.badImplementation("Could not update 'refetch token' for user"));
   }
 
   res.cookie('jwt_token', jwt_token, {
@@ -583,14 +445,14 @@ router.post('/refetch-token', async (req, res, next) => {
       current_timestampz: new Date(),
     });
   } catch (e) {
-    console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid refetch_token or user_id'));
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
   }
 
   if (hasura_data[`${schema_name}refetch_tokens`].length === 0) {
-    console.error('Incorrect user id or refetch token');
-    return next(Boom.unauthorized('Invalid refetch_token or user_id'));
+    // console.error('Incorrect user id or refetch token');
+    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
   }
 
   const user = hasura_data[`${schema_name}refetch_tokens`][0].user;
@@ -635,9 +497,9 @@ router.post('/refetch-token', async (req, res, next) => {
       user_id,
     });
   } catch (e) {
-    console.error('unable to create new refetch token and delete old');
-    console.log(e);
-    return next(Boom.unauthorized('Invalid refetch_token or user_id'));
+    console.error(e);
+    // console.error('unable to create new refetch token and delete old');
+    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
   }
 
   // generate new jwt token
@@ -652,6 +514,103 @@ router.post('/refetch-token', async (req, res, next) => {
     jwt_token,
     refetch_token: new_refetch_token,
     user_id,
+  });
+});
+
+
+router.post('/2fa/generateOTP', async (req, res, next) => {
+  if (!OTP_ENABLE) {
+    res.sendStatus(404);
+  }
+
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  try {
+    const { username } = value;
+    const user = await auth_tools.checkUserExistAndActivated(next, username);
+    console.warn('user: ' + JSON.stringify(user, null, 2));
+
+    const token = otp_tools.generateOTP(user.username);
+    otp_tools.sendOTP(user, token);
+
+    res.send('OK');
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Account is already activated, there is no account or unable to activate account'));
+  }
+});
+
+router.post('/2fa/login', async (req, res, next) => {
+  if (!OTP_ENABLE) {
+    res.sendStatus(404);
+  }
+
+  // validate username and password
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+    otp: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  const { username, otp } = value;
+  const user = await auth_tools.checkUserExistAndActivated(next, username);
+  console.warn('user: ' + JSON.stringify(user, null, 2));
+
+  if (!otp_tools.checkOTP(username, otp)) {
+    console.error('OTP token not valid');
+    return next(Boom.unauthorized('OTP token not valid'));
+  }
+
+  const jwt_token = auth_tools.generateJwtToken(user);
+
+  // generate refetch token and put in database
+  query = `
+  mutation (
+    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
+  ) {
+    insert_${schema_name}refetch_tokens (
+      objects: [$refetch_token_data]
+    ) {
+      affected_rows
+    }
+  }
+  `;
+
+  const refetch_token = uuidv4();
+  try {
+    await graphql_client.request(query, {
+      refetch_token_data: {
+        user_id: user.id,
+        refetch_token: refetch_token,
+        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.badImplementation('Could not update refetch token for user'));
+  }
+
+  res.cookie('jwt_token', jwt_token, {
+    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+    httpOnly: true,
+  });
+
+  // return jwt token and refetch token to client
+  res.json({
+    jwt_token,
+    refetch_token,
+    user_id: user.id,
   });
 });
 
