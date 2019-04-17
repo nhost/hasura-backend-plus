@@ -24,6 +24,6 @@ module.exports = {
 
   // TODO: You must modify this function to send this OTP value through SMS, Email, Authentication app or anyway you want.
   sendOTP: function(user, otp) {
-    console.warn(`2FA Token is (valid for ${OTP_STEP} second): "${otp}" for "${user.username}"`);
+    console.warn(`OTP Token is (valid for ${OTP_STEP} second): "${otp}" for "${user.username}"`);
   },
 };

@@ -10,6 +10,6 @@ exports.S3_ENDPOINT = process.env.S3_ENDPOINT || 's3-endpoint';
 exports.S3_BUCKET = process.env.S3_BUCKET || 's3-bucketname';
 exports.REFETCH_TOKEN_EXPIRES = process.env.REFETCH_TOKEN_EXPIRES || (60*24*30); // expire after 30 days
 exports.JWT_TOKEN_EXPIRES = process.env.JWT_TOKEN_EXPIRES || 15; // expire after 15 minutes
-exports.OTP_ENABLE = process.env.OTP_ENABLE || false; // enable /2fa/generateOTP and /2fa/login and disable /login route
+exports.OTP_ENABLE = process.env.OTP_ENABLE || false; // enable /otp/generateOTP and /otp/login and disable /login route
 exports.OTP_STEP = process.env.OTP_STEP ? parseInt(process.env.OTP_STEP) : 60; // TOTP time step (seconds)
 exports.OTP_SECRET_SALT = process.env.OTP_SECRET_SALT || ''; // Use a strong and not predictable value here

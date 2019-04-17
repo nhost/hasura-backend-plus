@@ -518,7 +518,7 @@ router.post('/refetch-token', async (req, res, next) => {
 });
 
 
-router.post('/2fa/generateOTP', async (req, res, next) => {
+router.post('/otp/generateOTP', async (req, res, next) => {
   if (!OTP_ENABLE) {
     res.sendStatus(404);
   }
@@ -547,7 +547,7 @@ router.post('/2fa/generateOTP', async (req, res, next) => {
   }
 });
 
-router.post('/2fa/login', async (req, res, next) => {
+router.post('/otp/login', async (req, res, next) => {
   if (!OTP_ENABLE) {
     res.sendStatus(404);
   }
