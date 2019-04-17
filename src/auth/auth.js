@@ -19,10 +19,7 @@ const {
 } = require('../config');
 
 
-totp.options = {
-  crypto: crypto,
-  step: OTP_STEP
-};
+
 
 
 
@@ -48,69 +45,18 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
   });
 
   const { error, value } = schema.validate(req.body);
-
   if (error) {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username } = value;
-
-  let query = `
-  query (
-    $username: String!
-  ) {
-    ${schema_name}users (
-      where: {
-        username: { _eq: $username}
-      }
-    ) {
-      id
-      username
-      password
-      active
-      default_role
-      roles: users_x_roles {
-        role
-      }
-      ${USER_FIELDS.join('\n')}
-    }
-  }
-  `;
-
-  let hasura_data;
   try {
-    hasura_data = await graphql_client.request(query, {
-      username,
-    });
-  } catch (e) {
-    console.error('Error connection to GraphQL');
-    console.error(e);
-    return next(Boom.unauthorized('Invalid or blocked username'));
-  }
+    const { username } = value;
+    const user = await auth_tools.checkUserExistAndActivated(next, username);
+    console.warn('user: ' + JSON.stringify(user, null, 2));
 
-  if (hasura_data[`${schema_name}users`].length === 0) {
-    console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid or blocked username'));
-  }
-
-  // check if we got any user back
-  const user = hasura_data[`${schema_name}users`][0];
-
-  if (!user.active) {
-    console.error('User not activated');
-    return next(Boom.unauthorized('User not activated'));
-  }
-
-  console.warn('user: ' + JSON.stringify(user, null, 2));
-
-  try {
-    const secret = username + OTP_SECRET_SALT;
-    const token = totp.generate(secret);
-
+    const token = otp_tools.generateOTP(user.username);
     otp_tools.sendOTP(user, token);
 
-    // TODO: Later we need remove below code and send token just through SMS or Email
-    // res.send(token);
     res.send('OK');
   } catch (e) {
     console.error(e);
@@ -131,72 +77,18 @@ router.post('/2fa/login', async (req, res, next) => {
   });
 
   const { error, value } = schema.validate(req.body);
-
   if (error) {
     return next(Boom.badRequest(error.details[0].message));
   }
 
   const { username, otp } = value;
-
-  let query = `
-  query (
-    $username: String!
-  ) {
-    ${schema_name}users (
-      where: {
-        username: { _eq: $username}
-      }
-    ) {
-      id
-      password
-      active
-      default_role
-      roles: users_x_roles {
-        role
-      }
-      ${USER_FIELDS.join('\n')}
-    }
-  }
-  `;
-
-  let hasura_data;
-  try {
-    hasura_data = await graphql_client.request(query, {
-      username,
-    });
-  } catch (e) {
-    console.error('Error connection to GraphQL');
-    console.error(e);
-    return next(Boom.unauthorized('Invalid or blocked username'));
-  }
-
-  if (hasura_data[`${schema_name}users`].length === 0) {
-    console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid or blocked username'));
-  }
-
-  // check if we got any user back
-  const user = hasura_data[`${schema_name}users`][0];
-
-  if (!user.active) {
-    console.error('User not activated');
-    return next(Boom.unauthorized('User not activated'));
-  }
-
+  const user = await auth_tools.checkUserExistAndActivated(next, username);
   console.warn('user: ' + JSON.stringify(user, null, 2));
 
-
-
-  const secret = username + OTP_SECRET_SALT;
-  const isValid = totp.check(otp, secret);
-  if (!isValid) {
+  if (!otp_tools.checkOTP(username, otp)) {
     console.error('TOTP token not valid');
     return next(Boom.unauthorized('TOTP token not valid'));
   }
-
-
-
-
 
   const jwt_token = auth_tools.generateJwtToken(user);
 
