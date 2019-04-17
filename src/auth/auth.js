@@ -7,20 +7,27 @@ const { graphql_client } = require('../graphql-client');
 const crypto = require('crypto');
 const totp = require('otplib/totp');
 
-totp.options = {
-  crypto: crypto,
-  step: 60
-};
-
 const {
   USER_FIELDS,
   USER_REGISTRATION_AUTO_ACTIVE,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFETCH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
+  OTP_ENABLE,
+  OTP_STEP,
+  OTP_SECRET_SALT,
 } = require('../config');
 
+
+totp.options = {
+  crypto: crypto,
+  step: OTP_STEP
+};
+
+
+
 const auth_tools = require('./auth-tools');
+const otp_tools = require('./otp-tools');
 
 let router = express.Router();
 
@@ -32,10 +39,12 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  US
 
 
 router.post('/2fa/generateTOTP', async (req, res, next) => {
+  if (!OTP_ENABLE) {
+    res.sendStatus(404);
+  }
 
   const schema = Joi.object().keys({
     username: Joi.string().required(),
-    password: Joi.string().required(),
   });
 
   const { error, value } = schema.validate(req.body);
@@ -44,7 +53,7 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username, password } = value;
+  const { username } = value;
 
   let query = `
   query (
@@ -56,6 +65,7 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
       }
     ) {
       id
+      username
       password
       active
       default_role
@@ -75,12 +85,12 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
   } catch (e) {
     console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized('Invalid or blocked username'));
   }
 
   if (hasura_data[`${schema_name}users`].length === 0) {
     console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized('Invalid or blocked username'));
   }
 
   // check if we got any user back
@@ -91,21 +101,13 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
     return next(Boom.unauthorized('User not activated'));
   }
 
-  // see if password hashes matches
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    console.error('Password does not match');
-    return next(Boom.unauthorized('Invalid username or password'));
-  }
   console.warn('user: ' + JSON.stringify(user, null, 2));
 
   try {
-    const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
+    const secret = username + OTP_SECRET_SALT;
     const token = totp.generate(secret);
-    // totp.check(...)
-    // totp.verify(...)
-    console.warn("2FA Token is (valid for 60 second): " + token);
+
+    otp_tools.sendOTP(user, token);
 
     // TODO: Later we need remove below code and send token just through SMS or Email
     // res.send(token);
@@ -118,12 +120,14 @@ router.post('/2fa/generateTOTP', async (req, res, next) => {
 
 
 router.post('/2fa/login', async (req, res, next) => {
+  if (!OTP_ENABLE) {
+    res.sendStatus(404);
+  }
 
   // validate username and password
   const schema = Joi.object().keys({
     username: Joi.string().required(),
-    password: Joi.string().required(),
-    totp_token: Joi.string().required(),
+    otp: Joi.string().required(),
   });
 
   const { error, value } = schema.validate(req.body);
@@ -132,7 +136,7 @@ router.post('/2fa/login', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username, password, totp_token } = value;
+  const { username, otp } = value;
 
   let query = `
   query (
@@ -163,12 +167,12 @@ router.post('/2fa/login', async (req, res, next) => {
   } catch (e) {
     console.error('Error connection to GraphQL');
     console.error(e);
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized('Invalid or blocked username'));
   }
 
   if (hasura_data[`${schema_name}users`].length === 0) {
     console.error('No user with that username');
-    return next(Boom.unauthorized('Invalid username or password'));
+    return next(Boom.unauthorized('Invalid or blocked username'));
   }
 
   // check if we got any user back
@@ -179,22 +183,12 @@ router.post('/2fa/login', async (req, res, next) => {
     return next(Boom.unauthorized('User not activated'));
   }
 
-  // see if password hashes matches
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    console.error('Password does not match');
-    return next(Boom.unauthorized('Invalid username or password'));
-  }
   console.warn('user: ' + JSON.stringify(user, null, 2));
 
 
 
-
-
-
-  const secret = username + 'KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD';
-  const isValid = totp.check(totp_token, secret);
+  const secret = username + OTP_SECRET_SALT;
+  const isValid = totp.check(otp, secret);
   if (!isValid) {
     console.error('TOTP token not valid');
     return next(Boom.unauthorized('TOTP token not valid'));
@@ -527,6 +521,9 @@ router.post('/new-password', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
+  if (OTP_ENABLE) {
+    res.sendStatus(404);
+  }
 
   // validate username and password
   const schema = Joi.object().keys({
