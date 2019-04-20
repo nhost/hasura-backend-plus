@@ -28,12 +28,12 @@ const s3  = new AWS.S3({
   signatureVersion: 'v4',
 });
 
-const get_claims_middleware = (req, res, next) => {
+const get_claims_from_request = (req) => {
   const { jwt_token = '' } = req.cookies;
   const { authorization = '' } = req.headers;
 
   if (authorization === '' && jwt_token === '') {
-    return next(Boom.badRequest('Authorization header has not provided'));
+    return void 0;
   }
 
   const token = authorization !== '' ? authorization.replace('Bearer ', '') : jwt_token;
@@ -46,22 +46,24 @@ const get_claims_middleware = (req, res, next) => {
         algorithms: HASURA_GRAPHQL_JWT_SECRET.type
       }
     );
-    req.hasura_claims = decoded['https://hasura.io/jwt/claims'];
-    next(null);
+    return decoded['https://hasura.io/jwt/claims'];
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Incorrect JWT Token'));
+    return void 0;
   }
 };
 
-router.use(get_claims_middleware);
-
 router.get('/file/*', (req, res, next) => {
-
   const key = `${req.params[0]}`;
+
+  const claims = get_claims_from_request(req);
+
+  if (claims === undefined) {
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
   
   // check access of key for jwt token claims
-  if (!storagePermission(key, 'read', req.hasura_claims)) {
+  if (!storagePermission(key, 'read', claims)) {
     console.error('not allowed to read');
     return next(Boom.unauthorized('You are not allowed to read this file'));
   }
@@ -139,6 +141,13 @@ const upload = multer({
 });
 
 const upload_auth = (req, res, next) => {
+
+  const claims = get_claims_from_request(req);
+
+  if (claims === undefined) {
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
+
   // path to where the file will be uploaded to
   try {
     req.s3_key_prefix = req.headers['x-path'].replace(/^\/+/g, '');
@@ -146,7 +155,7 @@ const upload_auth = (req, res, next) => {
     return next(Boom.badImplementation('x-path header incorrect'));
   }
 
-  if (!storagePermission(req.s3_key_prefix, 'write', req.hasura_claims)) {
+  if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
     return next(Boom.unauthorized('You are not allowed to write files here'));
   }
 
