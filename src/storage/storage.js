@@ -28,27 +28,40 @@ const s3  = new AWS.S3({
   signatureVersion: 'v4',
 });
 
+const get_claims_middleware = (req, res, next) => {
+  const { jwt_token = '' } = req.cookies;
+  const { authorization = '' } = req.headers;
+
+  if (authorization === '' && jwt_token === '') {
+    return next(Boom.badRequest('Authorization header has not provided'));
+  }
+
+  const token = authorization !== '' ? authorization.replace('Bearer ', '') : jwt_token;
+
+  try {
+    const decoded = jwt.verify(
+      token, 
+      HASURA_GRAPHQL_JWT_SECRET.key,
+      {
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type
+      }
+    );
+    req.hasura_claims = decoded['https://hasura.io/jwt/claims'];
+    next(null);
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
+};
+
+router.use(get_claims_middleware);
+
 router.get('/file/*', (req, res, next) => {
 
   const key = `${req.params[0]}`;
-
-  const jwt_token = req.cookies.jwt_token;
-
-  let claims;
-
-  if (jwt_token) {
-    // check jwt token if it exists
-    try {
-      const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
-      claims = decoded['https://hasura.io/jwt/claims'];
-    } catch (e) {
-      console.error(e);
-      return next(Boom.unauthorized('Incorrect JWT Token'));
-    }
-  }
-
+  
   // check access of key for jwt token claims
-  if (!storagePermission(key, 'read', claims)) {
+  if (!storagePermission(key, 'read', req.hasura_claims)) {
     console.error('not allowed to read');
     return next(Boom.unauthorized('You are not allowed to read this file'));
   }
@@ -126,19 +139,6 @@ const upload = multer({
 });
 
 const upload_auth = (req, res, next) => {
-
-  const jwt_token = req.cookies.jwt_token;
-
-  let claims;
-  if (jwt_token) {
-    try {
-      const decoded = jwt.verify(jwt_token, HASURA_GRAPHQL_JWT_SECRET.key, {algorithms: HASURA_GRAPHQL_JWT_SECRET.type});
-      claims = decoded['https://hasura.io/jwt/claims'];
-    } catch (e) {
-      return next(Boom.unauthorized('Incorrect JWT Token'));
-    }
-  }
-
   // path to where the file will be uploaded to
   try {
     req.s3_key_prefix = req.headers['x-path'].replace(/^\/+/g, '');
@@ -146,15 +146,15 @@ const upload_auth = (req, res, next) => {
     return next(Boom.badImplementation('x-path header incorrect'));
   }
 
+  if (!storagePermission(req.s3_key_prefix, 'write', req.hasura_claims)) {
+    return next(Boom.unauthorized('You are not allowed to write files here'));
+  }
+
   // all uploaded files gets pushed in to this array
   // this array is returned back to the client once all uploads are
   // completed
   req.saved_files = [];
-
-  if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
-    return next(Boom.unauthorized('You are not allowed to write files here'));
-  }
-
+  
   // validation OK. Upload files
   next();
 };
