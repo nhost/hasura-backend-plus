@@ -106,7 +106,6 @@ router.get('/activate-account', async (req, res, next) => {
   let hasura_data;
 
   const schema = Joi.object().keys({
-    username: Joi.string().required(),
     secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
   });
 
@@ -117,22 +116,17 @@ router.get('/activate-account', async (req, res, next) => {
   }
 
   const {
-    username,
     secret_token,
   } = value;
 
   const query = `
   mutation activate_account (
-    $username: String!,
     $secret_token: uuid!
-    $new_super_token: uuid!
+    $new_secret_token: uuid!
   ) {
     update_${schema_name}users (
       where: {
         _and: [
-          {
-            username: { _eq: $username}
-          },{
             secret_token: { _eq: $secret_token}
           },{
             active: { _eq: false}
@@ -141,7 +135,7 @@ router.get('/activate-account', async (req, res, next) => {
       }
       _set: {
         active: true,
-        secret_token: $new_super_token,
+        secret_token: $new_secret_token,
       }
     ) {
       affected_rows
@@ -151,9 +145,8 @@ router.get('/activate-account', async (req, res, next) => {
 
   try {
     hasura_data = await graphql_client.request(query, {
-      username,
       secret_token,
-      new_super_token: uuidv4(),
+      new_secret_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
