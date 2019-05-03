@@ -128,10 +128,11 @@ router.post('/activate-account', async (req, res, next) => {
     update_${schema_name}users (
       where: {
         _and: [
+          {
             secret_token: { _eq: $secret_token}
           },{
             active: { _eq: false}
-          },
+          }
         ]
       }
       _set: {
