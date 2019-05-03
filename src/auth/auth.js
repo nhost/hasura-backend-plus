@@ -103,14 +103,14 @@ router.post('/register', async (req, res, next) => {
   res.send('OK');
 });
 
-router.get('/activate-account', async (req, res, next) => {
+router.post('/activate-account', async (req, res, next) => {
   let hasura_data;
 
   const schema = Joi.object().keys({
     secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
   });
 
-  const { error, value } = schema.validate(req.query);
+  const { error, value } = schema.validate(req.body);
 
   if (error) {
     return next(Boom.badRequest(error.details[0].message));
