@@ -191,7 +191,7 @@ router.post('/new-password', async (req, res, next) => {
     return next(Boom.badImplementation(`Unable to generate 'password_hash'`));
   }
 
-  query = `
+  const query = `
   mutation  (
     $secret_token: uuid!,
     $password_hash: String!,
@@ -212,14 +212,21 @@ router.post('/new-password', async (req, res, next) => {
   `;
 
   try {
-    await graphql_client.request(query, {
+    const new_secret_token = uuidv4();
+    hasura_data = await graphql_client.request(query, {
       secret_token,
       password_hash,
-      new_secret_token: uuidv4(),
+      new_secret_token,
     });
   } catch (e) {
     console.error(e);
     return next(Boom.unauthorized(`Unable to update 'password'`));
+  }
+
+
+  if (hasura.update_users.affected_rows === 0) {
+    console.log('0 affected rows');
+    return next(Boom.badImplementation(`Unable to update password for user`));
   }
 
   // return 200 OK
