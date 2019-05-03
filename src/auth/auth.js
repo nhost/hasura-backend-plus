@@ -168,7 +168,6 @@ router.post('/new-password', async (req, res, next) => {
   let password_hash;
 
   const schema = Joi.object().keys({
-    username: Joi.string().required(),
     secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
     password: Joi.string().required(),
   });
@@ -180,67 +179,27 @@ router.post('/new-password', async (req, res, next) => {
   }
 
   const {
-    username,
     secret_token,
     password,
   } = value;
-
-  console.log({username});
-  console.log({secret_token});
-  console.log({password});
-
-  // check username and ActivationToken
-  // check for duplicates
-  let query = `
-  query (
-    $username: String!,
-    $secret_token: uuid!
-  ) {
-    ${schema_name}users (
-      where: {
-        _and: [{
-          username: { _eq: $username}
-        },{
-          secret_token: { _eq: $secret_token}
-        }]
-      }
-    ) {
-      id
-    }
-  }
-  `;
-
-  try {
-    hasura_data = await graphql_client.request(query, {
-      username,
-      secret_token,
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized('Unable to find user.'));
-  }
-
-  if (hasura_data[`${schema_name}users`].length === 0) {
-    return next(Boom.unauthorized("Invalid 'username'. No user with that 'username'"));
-  }
 
   // update password and username activation token
   try {
     password_hash = await bcrypt.hash(password, 10);
   } catch(e) {
     console.error(e);
-    return next(Boom.badImplementation("Unable to generate 'password hash'"));
+    return next(Boom.badImplementation(`Unable to generate 'password_hash'`));
   }
 
   query = `
   mutation  (
-    $username: String!,
+    $secret_token: uuid!,
     $password_hash: String!,
     $new_secret_token: uuid!
   ) {
     update_${schema_name}users (
       where: {
-        username: { _eq: $username }
+        secret_token: { _eq: $secret_token}
       }
       _set: {
         password: $password_hash,
@@ -254,14 +213,13 @@ router.post('/new-password', async (req, res, next) => {
 
   try {
     await graphql_client.request(query, {
-      username,
+      secret_token,
       password_hash,
       new_secret_token: uuidv4(),
     });
   } catch (e) {
     console.error(e);
-    // console.log('Unable to update password on GraphQL request');
-    return next(Boom.unauthorized("Unable to update 'password'"));
+    return next(Boom.unauthorized(`Unable to update 'password'`));
   }
 
   // return 200 OK
