@@ -28,8 +28,10 @@ In the same directory where you have your `docker-compose.yaml` for your Hasura 
 ```
 mkdir storage-rules
 vim storage-rules/index.js
+```
 
-add this:
+Add this:
+```
 module.exports = {
 
   // key - file path
