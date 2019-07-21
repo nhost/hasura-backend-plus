@@ -157,13 +157,46 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 # Auth
 
 ```
-/register
-/activate-account
-/login
-/refetch-token
-/new-password
+/auth/register
+/auth/activate-account
+/auth/login
+/auth/refetch-token
+/auth/new-password
 ```
 
+
+## Register your first user
+```sh
+curl -X POST \
+  http://localhost:3000/auth/register \
+  -H 'Content-Type: application/json' \
+  -H 'cache-control: no-cache' \
+  -d '{
+	"username": "testuser",
+	"password": "test"
+}'
+```
+The response: `OK!`
+
+## Login using that user
+```sh
+curl -X POST \
+  http://localhost:3000/auth/login \
+  -H 'Content-Type: application/json' \
+  -H 'cache-control: no-cache' \
+  -d '{
+    "username": "testuser",
+    "password": "test"
+}'
+```
+This will have a valid token in the response:
+```json
+{
+    "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
+    "refetch_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
+    "user_id": 1
+}
+```
 
 # Storage
 
