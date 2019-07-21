@@ -40,10 +40,10 @@ const get_claims_from_request = (req) => {
 
   try {
     const decoded = jwt.verify(
-      token, 
+      token,
       HASURA_GRAPHQL_JWT_SECRET.key,
       {
-        algorithms: HASURA_GRAPHQL_JWT_SECRET.type
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
       }
     );
     return decoded['https://hasura.io/jwt/claims'];
@@ -61,7 +61,7 @@ router.get('/file/*', (req, res, next) => {
   if (claims === undefined) {
     return next(Boom.unauthorized('Incorrect JWT Token'));
   }
-  
+
   // check access of key for jwt token claims
   if (!storagePermission(key, 'read', claims)) {
     console.error('not allowed to read');
@@ -163,7 +163,7 @@ const upload_auth = (req, res, next) => {
   // this array is returned back to the client once all uploads are
   // completed
   req.saved_files = [];
-  
+
   // validation OK. Upload files
   next();
 };
