@@ -15,42 +15,7 @@
 
 Create tables and initial state for your user mangagement.
 
-```
-CREATE TABLE roles (
-  name text NOT NULL PRIMARY KEY
-);
-
-INSERT INTO roles (name) VALUES ('user');
-
-CREATE TABLE users (
-  id bigserial PRIMARY KEY,
-  username text NOT NULL UNIQUE,
-  password text NOT NULL,
-  active boolean NOT NULL DEFAULT false,
-  secret_token uuid NOT NULL,
-  default_role text NOT NULL DEFAULT 'user',
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  FOREIGN KEY (default_role) REFERENCES roles (name)
-);
-
-CREATE TABLE users_x_roles (
-  id bigserial PRIMARY KEY,
-  user_id int NOT NULL,
-  role text NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users (id),
-  FOREIGN KEY (role) REFERENCES roles (name),
-  UNIQUE (user_id, role)
-);
-
-CREATE TABLE refetch_tokens (
-  id bigserial PRIMARY KEY,
-  refetch_token uuid NOT NULL UNIQUE,
-  user_id int NOT NULL,
-  expires_at timestamp with time zone NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  FOREIGN KEY (user_id) REFERENCES users (id)
-);
-```
+Copy everything from the file `db-init.sql` and insert into the SQL tab in the Hasura Console.
 
 ## Track your tables and relations in Hasura
 
