@@ -111,7 +111,7 @@ Restart your docker containers
 
 ### ENV VARIABLES:
 | name | default | description |
-| :---         |     :---:      |          ---: |
+| :---         |     :---      |          :--- |
 | `PORT`   | `4000`     | Express server port |
 | `AUTH_ACTIVE`   | `true`     | Activate authentication    |
 | `STORAGE_ACTIVE`   | `true`     | Activate storage   |
