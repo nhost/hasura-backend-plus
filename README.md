@@ -6,7 +6,7 @@
 
 ---
 
-<h1 align="center">Hasura Backend Plus ( HB+ )</h1>
+<h1 align="center">Hasura Backend Plus ( HBP )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
 # nhost.io
