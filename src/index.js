@@ -6,6 +6,11 @@ const cookieParser = require('cookie-parser');
 const auth = require('./auth/auth');
 const storage = require('./storage/storage');
 
+const {
+  AUTH_ACTIVE,
+  STORAGE_ACTIVE,
+} = require('./config');
+
 const app = express();
 
 // middleware
@@ -19,8 +24,12 @@ app.use(cookieParser());
 app.disable('x-powered-by');
 
 // routes
-app.use('/auth', auth);
-app.use('/storage', storage);
+if (AUTH_ACTIVE) {
+  app.use('/auth', auth);
+}
+if (STORAGE_ACTIVE) {
+  app.use('/storage', storage);
+}
 
 // error handler
 app.use((err, req, res, next) => {

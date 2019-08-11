@@ -9,6 +9,14 @@
 <h1 align="center">Hasura Backend Plus ( HB+ )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
+# nhost.io
+
+Don't want to configure all this your self? Use our managed service [nhost.io](https://nhost.io) 🚀. nhost.io projects contains all open source projects to build real-time web apps fast.
+
+- PosgreSQL (Database)
+- Hasura (Real-Time GraphQL API)
+- Hasura Backend Plus (Auth and Storage)
+
 # Setup
 
 ## Get your database ready
@@ -54,12 +62,12 @@ Add to `docker-compose.yaml`:
 
 ```
 hasura-backend-plus:
-  image: elitan/hasura-backend-plus
+  image: elitan/hasura-backend-plus:latest
   environment:
     PORT: 3000
     USER_FIELDS: ''
     USER_REGISTRATION_AUTO_ACTIVE: 'true'
-    HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
+    HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1/graphql
     HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
     HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
     S3_ACCESS_KEY_ID: <access>
@@ -81,15 +89,18 @@ caddy:
 Add this to your caddy file
 
 ```
-<domain-running-this-service> {
-  proxy / hasura-backend-plus:3000
+hasura.myapp.io {
+  proxy / graphql-engine:8080 {
+    websocket
+    transparent
+  }
 }
 
-Ex:
 backend.myapp.io {
-  proxy / hasura-backend-plus:3000
+  proxy / hasura-backend-plus:3000 {
+    transparent
+  }
 }
-
 ```
 
 Restart your docker containers
@@ -99,20 +110,23 @@ Restart your docker containers
 ## Configuration
 
 ### ENV VARIABLES:
-```
-USER_FIELDS: '<user_fields>' // separate with comma. Ex: 'company_id,sub_org_id'
-HASURA_GRAPHQL_ENDPOINT: https://<hasura-graphql-endpoint>
-HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
-S3_ACCESS_KEY_ID: <access>
-S3_SECRET_ACCESS_KEY: <secret>
-S3_ENDPOINT: <endpoint>
-S3_BUCKET: <bucket>
-DOMAIN: <domain-running-this-service>
-REFETCH_TOKEN_EXPIRES: 54000
-JWT_TOKEN_EXPIRES: 15
-USER_MANAGEMENT_DATABASE_SCHEMA_NAME: 'user_management' // use this if you have all your user tables in another schema (not public)
-```
+| name | default | description |
+| :---         |     :---:      |          ---: |
+| `PORT`   | `4000`     | Express server port |
+| `AUTH_ACTIVE`   | `true`     | Activate authentication    |
+| `STORAGE_ACTIVE`   | `true`     | Activate storage   |
+| `USER_FIELDS`   | ``     | Specify user table fields that should be available as `x-hasura-` JWT claims.  |
+| `HASURA_GRAPHQL_ENDPOINT`   | `http://graphql-engine:8080/v1/graphql`     | Hasura GraphQL endpoint  |
+| `HASURA_GRAPHQL_ADMIN_SECRET`   | ``  | Hasura GraphQL admin secret |
+| `HASURA_GRAPHQL_JWT_SECRET`   | `{ 'type' : 'HS256', 'key': 'secretkey' }`  | Shared JWT secret. Must be same as Hasuras `HASURA_GRAPHQL_JWT_SECRET` |
+| `S3_ACCESS_KEY_ID`   | ``  | S3 access key id |
+| `S3_SECRET_ACCESS_KEY`   | ``  | S3 secret access key |
+| `S3_ENDPOINT`   | ``  | S3 endpoint |
+| `S3_BUCKET`   | ``  | S3 bucket name |
+| `REFETCH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refetch token expires |
+| `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
+| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
+
 
 #### USER_FIELDS
 
@@ -150,11 +164,9 @@ This enables you to make permissions using `x-hasura-company-id` for insert/sele
 It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
 https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-tools.js#L16
 
-#### HASURA_GRAPHQL_ENDPOINT
+# HASURA_GRAPHQL_ENDPOINT
 
-*more explanations coming soon*
-
-# Auth
+## Auth
 
 ```
 /auth/register
@@ -266,3 +278,7 @@ module.exports = {
 ```
 
 You can see other examples [here](examples) in examples folder.
+
+# nhost-js-sdk
+
+Use [nhost-js-sdk](https://www.npmjs.com/package/nhost-js-sdk) for client side interaction with Hasura Backend Plus.
