@@ -96,6 +96,7 @@ router.get('/file/*', (req, res, next) => {
     res.set('Content-Length', data.ContentLength);
     res.set('Last-Modified', data.LastModified);
     res.set('Content-Disposition', `inline; filename="${data.Metadata.originalname}"`);
+    res.set('Cache-Control', 'public, max-age=31557600');
     res.set('ETag', data.ETag);
 
     // stream.on('end', () => {
