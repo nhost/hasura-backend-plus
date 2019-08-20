@@ -62,7 +62,7 @@ router.post('/register', async (req, res, next) => {
   }
 
   if (hasura_data[`${schema_name}users`].length !== 0) {
-    return next(Boom.unauthorized("The 'username' is already exist"));
+    return next(Boom.unauthorized("The 'username' already exist"));
   }
 
   // generate password_hash
