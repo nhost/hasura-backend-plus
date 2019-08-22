@@ -64,3 +64,6 @@ typings/
 
 # Webstorm IDE directory
 .idea
+
+# ENV's
+.env*
