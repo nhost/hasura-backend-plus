@@ -52,13 +52,8 @@ const resolvers = {
       }
       `;
 
-      let user;
-      try {
-        const { users } = await graphql_client.request(userQuery, { username });
-        user = users[0];
-      } catch ( error ) {
-        throw new AuthenticationError(`Unable to find user ${username}`);
-      }
+
+      const { users: [ user ] } = await graphql_client.request(userQuery, { username });
 
       if (!user) {
         throw new AuthenticationError('Invalid username or password');
