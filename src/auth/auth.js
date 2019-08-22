@@ -474,4 +474,71 @@ router.post('/refetch-token', async (req, res, next) => {
   });
 });
 
+router.get('/user', async (req, res, next) => {
+
+  // validate username and password
+  const schema = Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+  
+  const { username, password } = value
+
+  let query = `
+  query (
+    $username: String!
+  ) {
+    ${schema_name}users(
+      where: {
+        username: {_eq: $username}
+      }
+    ) {
+      username
+      id
+      created_at
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      username,
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized("Unable to find 'user'"));
+  }
+
+  if (hasura_data[`${schema_name}users`].length === 0) {
+    console.error("No user with this 'username'");
+  }
+
+  // check if we got any user back
+  const user = hasura_data[`${schema_name}users`][0];
+
+  if (!user.active) {
+    return next(Boom.unauthorized('User not activated.'));
+  }
+
+  // see if password hashes matches
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    console.error('Password does not match');
+    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
+  }
+
+  // return user to client
+  res.json({
+    user: user,
+  });
+});
+
 module.exports = router;
