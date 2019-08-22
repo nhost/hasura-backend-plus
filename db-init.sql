@@ -31,7 +31,8 @@ CREATE TABLE users (
     active boolean DEFAULT false NOT NULL,
     secret_token uuid DEFAULT gen_random_uuid() NOT NULL,
     default_role text DEFAULT 'user'::text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    register_data jsonb
 );
 
 CREATE SEQUENCE users_id_seq
