@@ -3,6 +3,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
+const jwt = require('jsonwebtoken');
 const { graphql_client } = require('../graphql-client');
 
 const {
@@ -11,6 +12,7 @@ const {
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFETCH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
+  HASURA_GRAPHQL_JWT_SECRET,
 } = require('../config');
 
 const auth_tools = require('./auth-tools');
@@ -476,32 +478,52 @@ router.post('/refetch-token', async (req, res, next) => {
 
 router.get('/user', async (req, res, next) => {
 
-  // validate username and password
-  const schema = Joi.object().keys({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
+  // get jwt token
+  if (!req.headers.authorization) {
+    return next(Boom.badRequest('no authorization header'));
   }
-  
-  const { username, password } = value
 
+  const auth_split = req.headers.authorization.split(' ');
+
+  if (auth_split[0] !== 'Bearer' || !auth_split[1]) {
+    return next(Boom.badRequest('malformed authorization header'));
+  }
+
+  // get jwt token
+  const token = auth_split[1];
+
+  // verify jwt token is OK
+  let claims;
+  try {
+    claims = jwt.verify(
+      token,
+      HASURA_GRAPHQL_JWT_SECRET.key,
+      {
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
+
+  // get user_id from jwt claim
+  const user_id = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
+
+  // get user from hasura (include ${USER_FIELDS.join('\n')})
   let query = `
   query (
-    $username: String!
+    $id: Int!
   ) {
-    ${schema_name}users(
-      where: {
-        username: {_eq: $username}
-      }
-    ) {
-      username
+    user: ${schema_name}users_by_pk(id: $id) {
       id
-      created_at
+      username
+      active
+      default_role
+      roles: users_x_roles {
+        role
+      }
+      ${USER_FIELDS.join('\n')}
     }
   }
   `;
@@ -509,35 +531,16 @@ router.get('/user', async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
-      username,
+      id: user_id,
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized("Unable to find 'user'"));
+    return next(Boom.unauthorized("Unable to get 'user'"));
   }
 
-  if (hasura_data[`${schema_name}users`].length === 0) {
-    console.error("No user with this 'username'");
-  }
-
-  // check if we got any user back
-  const user = hasura_data[`${schema_name}users`][0];
-
-  if (!user.active) {
-    return next(Boom.unauthorized('User not activated.'));
-  }
-
-  // see if password hashes matches
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    console.error('Password does not match');
-    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
-  }
-
-  // return user to client
+  // return user as json response
   res.json({
-    user: user,
+    user: hasura_data.user,
   });
 });
 
