@@ -10,6 +10,7 @@ const typeDefs = gql`
   type Mutation {
     register(username: String!, password: String!, data: Json): Boolean!
     activate(token: String!): Boolean!
+    resetPassword(token: String!, password: String!): Boolean!
     login(username: String!, password: String!): AuthPayload!
     refetchToken(userId: Int!, refetchToken: String!): AuthPayload!
   }

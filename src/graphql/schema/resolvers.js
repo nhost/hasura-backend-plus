@@ -97,6 +97,40 @@ const resolvers = {
 
       return true;
     },
+    resetPassword: async ( parent, { token, password }, ctx, info ) => {
+      const passwordHash = await bcrypt.hash( password, 10 );
+
+      const updatePasswordMutation = `mutation (
+        $secret_token: uuid!,
+        $password_hash: String!,
+        $new_secret_token: uuid!
+      ) {
+        users: update_${schema_name}users (
+          where: {
+            secret_token: { _eq: $secret_token}
+          }
+          _set: {
+            password: $password_hash,
+            secret_token: $new_secret_token
+          }
+        ) {
+          affected_rows
+        }
+      }`;
+
+      const newSecretToken = uuidv4();
+      const { users: { affected_rows } } = await graphql_client.request(updatePasswordMutation, {
+        secret_token: token,
+        password_hash: passwordHash,
+        new_secret_token: newSecretToken,
+      } );
+
+      if (!affected_rows) {
+        throw new AuthenticationError('Unable to update password');
+      }
+
+      return true;
+    },
     login: async ( parent, { username, password }, ctx, info ) => {
       const userQuery = `query ($username: String!) {
         users: ${schema_name }users (
