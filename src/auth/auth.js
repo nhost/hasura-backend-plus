@@ -27,7 +27,7 @@ router.post('/register', async (req, res, next) => {
   const schema = Joi.object().keys({
     username: Joi.string().required(),
     password: Joi.string().required(),
-    register_data: Joi.object(),
+    register_data: Joi.object().allow(null),
   });
 
   const { error, value } = schema.validate(req.body);
