@@ -114,7 +114,7 @@ const resolvers = {
       try {
         passwordHash = await bcrypt.hash(password, 10);
       } catch (error) {
-        throw new Error('Unable to generate password hash')
+        throw new Error('Unable to generate password hash');
       }
 
       const updatePasswordMutation = `mutation (
