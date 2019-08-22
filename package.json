@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect=9222 ./src/index.js"
+    "start": "nodemon --exec 'node -r dotenv/config' --inspect=9222 ./src/index.js"
   },
   "repository": {
     "type": "git",
