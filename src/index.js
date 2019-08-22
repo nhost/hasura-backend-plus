@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 const auth = require('./auth/auth');
 const storage = require('./storage/storage');
+const graphql = require('./graphql/graphql');
 
 const {
   AUTH_ACTIVE,
@@ -22,6 +23,7 @@ app.use(cors({
 app.use(morgan('tiny'));
 app.use(cookieParser());
 app.disable('x-powered-by');
+graphql.applyMiddleware({ app });
 
 // routes
 if (AUTH_ACTIVE) {
@@ -42,5 +44,6 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3010;
 app.listen(port, () => {
-	console.log(`listening on port ${port}`);
+	console.log( `listening on port ${ port }` );
+	console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 });
