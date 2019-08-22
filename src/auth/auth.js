@@ -27,6 +27,7 @@ router.post('/register', async (req, res, next) => {
   const schema = Joi.object().keys({
     username: Joi.string().required(),
     password: Joi.string().required(),
+    register_data: Joi.object(),
   });
 
   const { error, value } = schema.validate(req.body);
@@ -35,7 +36,7 @@ router.post('/register', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username, password } = value;
+  const { username, password, register_data } = value;
 
   // check for duplicates
   let query = `
@@ -93,6 +94,7 @@ router.post('/register', async (req, res, next) => {
         password: password_hash,
         secret_token: uuidv4(),
         active: USER_REGISTRATION_AUTO_ACTIVE,
+        register_data,
       },
     });
   } catch (e) {
@@ -225,7 +227,7 @@ router.post('/new-password', async (req, res, next) => {
 
 
   if (hasura.update_users.affected_rows === 0) {
-    console.log('0 affected rows');
+    console.error('no user to update password for');
     return next(Boom.badImplementation(`Unable to update password for user`));
   }
 
@@ -301,7 +303,6 @@ router.post('/login', async (req, res, next) => {
     console.error('Password does not match');
     return next(Boom.unauthorized("Invalid 'username' or 'password'"));
   }
-  console.warn('user: ' + JSON.stringify(user, null, 2));
 
   const jwt_token = auth_tools.generateJwtToken(user);
 
