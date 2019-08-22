@@ -19,7 +19,7 @@ const resolvers = {
     hello: () => 'Hello world!',
   },
   Mutation: {
-    register: async ( parent, { username, password, data }, ctx, info ) => {
+    register: async (parent, { username, password, data }, ctx, info) => {
       const checkDuplicatesQuery = `query ($username: String!) {
         users: ${schema_name}users (
           where: {
@@ -30,10 +30,16 @@ const resolvers = {
         }
       }`;
 
-      const { users } = await graphql_client.request( checkDuplicatesQuery, { username } );
+      let users;
+      try {
+        const result = await graphql_client.request( checkDuplicatesQuery, { username } );
+        users = result.users;
+      } catch (error) {
+        throw new Error('Unable to check for username duplicate');
+      }
 
       if ( users.length ) {
-        throw new AuthenticationError( 'This username already exists' );
+        throw new AuthenticationError('This username already exists');
       }
 
       const passwordHash = await bcrypt.hash( password, 10 );
@@ -57,12 +63,12 @@ const resolvers = {
           },
         });
       } catch (error) {
-        throw new Error( 'Unable to create user' );
+        throw new Error('Unable to create user');
       }
 
       return true;
     },
-    activate: async ( parent, { token }, ctx, info ) => {
+    activate: async (parent, { token }, ctx, info) => {
       const activateAccountMutation = `mutation activate_account (
         $secret_token: uuid!
         $new_secret_token: uuid!
@@ -86,19 +92,30 @@ const resolvers = {
         }
       }`;
 
-      const { users: { affected_rows} } = await graphql_client.request(activateAccountMutation, {
-        secret_token: token,
-        new_secret_token: uuidv4(),
-      });
+      let affectedRows;
+      try {
+        const { users } = await graphql_client.request(activateAccountMutation, {
+          secret_token: token,
+          new_secret_token: uuidv4(),
+        } );
+        affectedRows = users.affected_rows;
+      } catch (error) {
+        throw new Error('Unable to activate this account');
+      }
 
-      if (!affected_rows) {
+      if (!affectedRows) {
         throw new AuthenticationError('Account is already activated');
       }
 
       return true;
     },
-    resetPassword: async ( parent, { token, password }, ctx, info ) => {
-      const passwordHash = await bcrypt.hash( password, 10 );
+    resetPassword: async (parent, { token, password }, ctx, info) => {
+      let passwordHash;
+      try {
+        passwordHash = await bcrypt.hash(password, 10);
+      } catch (error) {
+        throw new Error('Unable to generate password hash')
+      }
 
       const updatePasswordMutation = `mutation (
         $secret_token: uuid!,
@@ -119,13 +136,19 @@ const resolvers = {
       }`;
 
       const newSecretToken = uuidv4();
-      const { users: { affected_rows } } = await graphql_client.request(updatePasswordMutation, {
-        secret_token: token,
-        password_hash: passwordHash,
-        new_secret_token: newSecretToken,
-      } );
+      let affectedRows;
+      try {
+        const { users } = await graphql_client.request(updatePasswordMutation, {
+          secret_token: token,
+          password_hash: passwordHash,
+          new_secret_token: newSecretToken,
+        } );
+        affectedRows = users.affected_rows;
+      } catch (error) {
+        throw new Error('Unable to update password');
+      }
 
-      if (!affected_rows) {
+      if (!affectedRows) {
         throw new AuthenticationError('Unable to update password');
       }
 
@@ -150,23 +173,29 @@ const resolvers = {
       }
       `;
 
-      const { users: [user] } = await graphql_client.request( userQuery, { username } );
-
-      if ( !user ) {
-        throw new AuthenticationError( 'Invalid username or password' );
+      let user;
+      try {
+        const { users } = await graphql_client.request(userQuery, { username });
+        user = users[0];
+      } catch (error) {
+        throw new Error('Unable to find user');
       }
 
-      if ( !user.active ) {
-        throw new AuthenticationError( 'User is not activated' );
+      if (!user) {
+        throw new AuthenticationError('Invalid username or password');
       }
 
-      const match = await bcrypt.compare( password, user.password );
-
-      if ( !match ) {
-        throw new AuthenticationError( 'Invalid username or password' );
+      if (!user.active) {
+        throw new AuthenticationError('User is not activated');
       }
 
-      const jwtToken = generateJwtToken( user );
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+        throw new AuthenticationError('Invalid username or password');
+      }
+
+      const jwtToken = generateJwtToken(user);
       const refetchToken = uuidv4();
 
       const addRefetchTokenMutation = `mutation ($refetch_token_data: ${ schema_name }refetch_tokens_insert_input!) {
@@ -179,15 +208,15 @@ const resolvers = {
       `;
 
       try {
-        await graphql_client.request( addRefetchTokenMutation, {
+        await graphql_client.request(addRefetchTokenMutation, {
           refetch_token_data: {
             user_id: user.id,
             refetch_token: refetchToken,
             expires_at: new Date( new Date().getTime() + ( REFETCH_TOKEN_EXPIRES * 60 * 1000 ) ), // convert from minutes to milli seconds
           },
-        } );
-      } catch ( error ) {
-        throw new Error( 'Could not update refetch token for user' );
+        });
+      } catch (error) {
+        throw new Error('Could not update refetch token for user');
       }
 
       return {
@@ -228,14 +257,20 @@ const resolvers = {
       }
       `;
 
-      const { refetch_tokens: users } = await graphql_client.request(refetchTokensQuery, {
-        refetch_token: refetchToken,
-        user_id: userId,
-        current_timestampz: new Date(),
-      });
+      let users;
+      try {
+        const { refetch_tokens } = await graphql_client.request(refetchTokensQuery, {
+          refetch_token: refetchToken,
+          user_id: userId,
+          current_timestampz: new Date(),
+        });
+        users = refetch_tokens;
+      } catch (error) {
+        throw new Error('Invalid refetch token or user id');
+      }
 
       if (!users.length) {
-        throw new AuthenticationError( 'Invalid refetch token or user id' );
+        throw new AuthenticationError('Invalid refetch token or user id');
       }
 
       const [{user}] = users;
