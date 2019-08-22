@@ -62,6 +62,41 @@ const resolvers = {
 
       return true;
     },
+    activate: async ( parent, { token }, ctx, info ) => {
+      const activateAccountMutation = `mutation activate_account (
+        $secret_token: uuid!
+        $new_secret_token: uuid!
+      ) {
+        users: update_${schema_name}users (
+          where: {
+            _and: [
+              {
+                secret_token: { _eq: $secret_token}
+              },{
+                active: { _eq: false}
+              }
+            ]
+          }
+          _set: {
+            active: true,
+            secret_token: $new_secret_token,
+          }
+        ) {
+          affected_rows
+        }
+      }`;
+
+      const { users: { affected_rows} } = await graphql_client.request(activateAccountMutation, {
+        secret_token: token,
+        new_secret_token: uuidv4(),
+      });
+
+      if (!affected_rows) {
+        throw new AuthenticationError('Account is already activated');
+      }
+
+      return true;
+    },
     login: async ( parent, { username, password }, ctx, info ) => {
       const userQuery = `query ($username: String!) {
         users: ${schema_name }users (
