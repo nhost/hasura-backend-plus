@@ -3,6 +3,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
+const jwt = require('jsonwebtoken');
 const { graphql_client } = require('../graphql-client');
 
 const {
@@ -11,6 +12,7 @@ const {
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFETCH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
+  HASURA_GRAPHQL_JWT_SECRET,
 } = require('../config');
 
 const auth_tools = require('./auth-tools');
@@ -471,6 +473,74 @@ router.post('/refetch-token', async (req, res, next) => {
     jwt_token,
     refetch_token: new_refetch_token,
     user_id,
+  });
+});
+
+router.get('/user', async (req, res, next) => {
+
+  // get jwt token
+  if (!req.headers.authorization) {
+    return next(Boom.badRequest('no authorization header'));
+  }
+
+  const auth_split = req.headers.authorization.split(' ');
+
+  if (auth_split[0] !== 'Bearer' || !auth_split[1]) {
+    return next(Boom.badRequest('malformed authorization header'));
+  }
+
+  // get jwt token
+  const token = auth_split[1];
+
+  // verify jwt token is OK
+  let claims;
+  try {
+    claims = jwt.verify(
+      token,
+      HASURA_GRAPHQL_JWT_SECRET.key,
+      {
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
+
+  // get user_id from jwt claim
+  const user_id = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
+
+  // get user from hasura (include ${USER_FIELDS.join('\n')})
+  let query = `
+  query (
+    $id: Int!
+  ) {
+    user: ${schema_name}users_by_pk(id: $id) {
+      id
+      username
+      active
+      default_role
+      roles: users_x_roles {
+        role
+      }
+      ${USER_FIELDS.join('\n')}
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      id: user_id,
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized("Unable to get 'user'"));
+  }
+
+  // return user as json response
+  res.json({
+    user: hasura_data.user,
   });
 });
 
