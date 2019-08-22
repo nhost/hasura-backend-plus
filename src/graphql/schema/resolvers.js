@@ -19,6 +19,49 @@ const resolvers = {
     hello: () => 'Hello world!',
   },
   Mutation: {
+    register: async ( parent, { username, password, data }, ctx, info ) => {
+      const checkDuplicatesQuery = `query ($username: String!) {
+        users: ${schema_name}users (
+          where: {
+            username: { _eq: $username }
+          }
+        ) {
+          id
+        }
+      }`;
+
+      const { users } = await graphql_client.request( checkDuplicatesQuery, { username } );
+
+      if ( users.length ) {
+        throw new AuthenticationError( 'This username already exists' );
+      }
+
+      const passwordHash = await bcrypt.hash( password, 10 );
+
+      const insertUserMutation = `mutation ($user: ${schema_name}users_insert_input!) {
+        insert_${schema_name}users(
+          objects: [$user]
+        ) {
+          affected_rows
+        }
+      }`;
+
+      try {
+        await graphql_client.request(insertUserMutation, {
+          user: {
+            username,
+            password: passwordHash,
+            secret_token: uuidv4(),
+            active: USER_REGISTRATION_AUTO_ACTIVE,
+            register_data: data,
+          },
+        });
+      } catch (error) {
+        throw new Error( 'Unable to create user' );
+      }
+
+      return true;
+    },
     login: async ( parent, { username, password }, ctx, info ) => {
       const userQuery = `query ($username: String!) {
         users: ${schema_name }users (
