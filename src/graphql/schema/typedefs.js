@@ -5,6 +5,7 @@ const typeDefs = gql`
 
   type Query {
     hello: String
+    currentUser: User!
   }
 
   type Mutation {
@@ -19,6 +20,17 @@ const typeDefs = gql`
     jwtToken: String!
     refetchToken: String!
     userId: Int!
+  }
+
+  type User {
+    id: Int
+    username: String
+    active: Boolean
+    defaultRole: String
+    roles: [Role!]
+  }
+  type Role {
+    role: String!
   }
 `;
 
