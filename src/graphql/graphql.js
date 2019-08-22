@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require( 'apollo-server-express' );
+const { ApolloServer, gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   type Query {
@@ -12,6 +12,10 @@ const resolvers = {
   },
 };
 
-const graphql = new ApolloServer({ typeDefs, resolvers });
+const graphql = new ApolloServer({
+  typeDefs,
+  resolvers,
+  playground: process.env.NODE_ENV !== 'production',
+});
 
 module.exports = graphql;
