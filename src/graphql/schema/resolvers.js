@@ -1,6 +1,7 @@
 const { AuthenticationError } = require( 'apollo-server-express' );
 const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require( 'uuid/v4' );
+const jwt = require('jsonwebtoken');
 const { graphql_client } = require( '../../graphql-client' );
 const { generateJwtToken } = require('../../auth/auth-tools');
 
@@ -9,7 +10,7 @@ const {
   USER_REGISTRATION_AUTO_ACTIVE,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFETCH_TOKEN_EXPIRES,
-  JWT_TOKEN_EXPIRES,
+  HASURA_GRAPHQL_JWT_SECRET,
 } = require('../../config');
 
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' : USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
@@ -17,6 +18,44 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' : USE
 const resolvers = {
   Query: {
     hello: () => 'Hello world!',
+    currentUser: async (parent, args, { req }, info) => {
+      if ( !req.headers.authorization ) {
+        throw new AuthenticationError('No authorization header provided');
+      }
+      const token = req.headers.authorization.replace( 'Bearer', '' );
+
+      let claims;
+      try {
+        claims = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET.key, { algorithms: HASURA_GRAPHQL_JWT_SECRET.type });
+      } catch (error) {
+        throw new AuthenticationError('Incorrect JWT Token');
+      }
+
+      const userId = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
+
+      const userQuery = `query user ($id: Int!) {
+        user: ${schema_name}users_by_pk(id: $id) {
+          id
+          username
+          active
+          defaultRole: default_role
+          roles: users_x_roles {
+            role
+          }
+          ${USER_FIELDS.join('\n')}
+        }
+      }`;
+
+      let user;
+      try {
+        const result = await graphql_client.request(userQuery, { id: userId });
+        user = result.user;
+      } catch (error) {
+        throw new Error( 'Unable to get user' );
+      }
+
+      return user;
+    },
   },
   Mutation: {
     register: async (parent, { username, password, data }, ctx, info) => {
