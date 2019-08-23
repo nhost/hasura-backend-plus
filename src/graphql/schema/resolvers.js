@@ -17,7 +17,6 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' : USE
 
 const resolvers = {
   Query: {
-    hello: () => 'Hello world!',
     currentUser: async (parent, args, { req }, info) => {
       if ( !req.headers.authorization ) {
         throw new AuthenticationError('No authorization header provided');
