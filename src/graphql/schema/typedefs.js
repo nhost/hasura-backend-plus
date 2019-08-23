@@ -4,7 +4,6 @@ const typeDefs = gql`
   scalar Json
 
   type Query {
-    hello: String
     currentUser: User!
   }
 
