@@ -32,7 +32,7 @@ export default {
     authenticationType: '', // auth._token.local contains 'Bearer' prefix already
     clientConfigs: {
       default: {
-        httpEndpoint: 'https://hasura-xxxxxxxx.nhost.io/v1/graphql', // insert your own graphql link
+        httpEndpoint: '', // insert your own graphql link
         httpLinkOptions: {
           includeExtensions: true,
         },
@@ -45,13 +45,13 @@ export default {
       local: {
         endpoints: {
           login: {
-            url: 'https://backend-xxxxxxxx.nhost.io/auth/login',
+            url: '', // insert login link (https://backend-xxxxxxxx.nhost.io/auth/login)
             method: 'post',
             propertyName: 'jwt_token',
           },
           logout: false,
           user: {
-            url: 'https://backend-xxxxxxxx.nhost.io/auth/user',
+            url: 'https://backend-xxxxxxxx.nhost.io/auth/user', // insert user link (https://backend-xxxxxxxx.nhost.io/auth/user)
             method: 'get',
             propertyName: 'user',
           },
