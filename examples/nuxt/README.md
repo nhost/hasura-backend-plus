@@ -1,5 +1,9 @@
 # Using Hasura Backend Plus with Nuxt
 
+[![Edit Nuxt + HBP](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/codesandbox-nuxt-8zegn?fontsize=14)
+
+Use [nhost.io](https://nhost.io) for zero-config HBP!
+
 ## Dependencies
 
  - [`@nuxtjs/auth`](https://auth.nuxtjs.org)
@@ -69,3 +73,4 @@ export default {
   middleware: ['auth'],
 }
 ```
+
