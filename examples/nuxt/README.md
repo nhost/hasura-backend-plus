@@ -51,7 +51,7 @@ export default {
           },
           logout: false,
           user: {
-            url: 'https://backend-xxxxxxxx.nhost.io/auth/user', // insert user link (https://backend-xxxxxxxx.nhost.io/auth/user)
+            url: '', // insert user link (https://backend-xxxxxxxx.nhost.io/auth/user)
             method: 'get',
             propertyName: 'user',
           },
