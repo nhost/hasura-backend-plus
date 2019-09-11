@@ -133,3 +133,47 @@ export default {
 }
 </script>
 ```
+
+## Subscriptions
+
+In order to get subscriptions to work, you need to add a plugin, and slightly modify the `nuxt.config.js` file. This is because the Apollo module does not add the JWT by default.
+
+`/plugins/apollo.js`
+
+```js
+export default context => {
+  const client = context.app.apolloProvider.defaultClient
+  const token = context.app.$apolloHelpers.getToken()
+
+  client.wsClient.connectionParams = () => {
+    return {
+      headers: {
+        Authorization: token || '',
+      },
+    }
+  }
+}
+```
+
+Then add the following properties to `nuxt.config.js`, inserting the plugin and add the websocket URL to enable websockets:
+
+```js
+export default {
+  apollo: {
+    clientConfigs: {
+      default: {
+        wsEndpoint: '', // Generally same as the graphql link, with 'wss://' protocol
+      },
+    },
+  },
+  
+  plugins: [
+    {
+      src: '~plugins/apollo.js',
+      mode: 'client',
+    },
+  ],
+}
+```
+
+You can now use subscriptions as per [the subscription docs](https://vue-apollo.netlify.com/guide/apollo/subscriptions.html#simple-subscription).
