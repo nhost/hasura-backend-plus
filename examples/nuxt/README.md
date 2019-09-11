@@ -70,13 +70,7 @@ export default {
 }
 ```
 
-add the following to the default export on any page you wish to authenticate, as per [`@nuxtjs/auth` docs](https://auth.nuxtjs.org/guide/middleware.html):
-
-```js
-export default {
-  middleware: ['auth'],
-}
-```
+You will need to add `/store/index.js` (it can be a blank page) in order to activate the Vuex store. The auth module uses Vuex for storing tokens and user data.
 
 ## Logging In
 
