@@ -4,6 +4,8 @@
 
 Use [nhost.io](https://nhost.io) for zero-config HBP!
 
+> **Note:** The `@nuxtjs/auth` package does not currently support refresh/refetch tokens, which means you will have to keep logging in when the JWT token expires. This is being worked on by the Nuxt team ([Issue #361 on `nuxt-community/auth-module`](https://github.com/nuxt-community/auth-module/pull/361)).
+
 ## Dependencies
 
  - [`@nuxtjs/auth`](https://auth.nuxtjs.org)
