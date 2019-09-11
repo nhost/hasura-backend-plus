@@ -74,3 +74,64 @@ export default {
 }
 ```
 
+## Logging In
+
+In order to login, you will need to create a page as per the [instructions from the `@nuxtjs/auth` module](https://auth.nuxtjs.org/schemes/local.html#usage). Here is a minimal example:
+
+```html
+<!-- /pages/login.vue -->
+
+<template>
+  <div>
+    <p>
+      <input v-model="username" placeholder="Username" type="text">
+    </p>
+    <p>
+      <input v-model="password" placeholder="Password" type="password">
+    </p>
+    <p>
+      <button @click="login()">Login</button>
+    </p>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Login',
+  data() {
+    return {
+      username: '',
+      password: '',
+    }
+  },
+  methods: {
+    async login() {
+      try {
+        await this.$auth.loginWith('local', {
+          data: {
+            username: this.username,
+            password: this.password,
+          },
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+  },
+}
+</script>
+```
+
+## Authenticating Pages
+
+In order to make a page secure, you must add the [`auth` middleware](https://auth.nuxtjs.org/guide/middleware.html) to the default export.
+
+```html
+<script>
+export default {
+  // ...
+  
+  middleware: ['auth'], // You can also use `middlware: 'auth'`, but this way lets you add multiple middlwares.
+}
+</script>
+```
