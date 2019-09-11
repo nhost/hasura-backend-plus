@@ -1,6 +1,6 @@
 # Using Hasura Backend Plus with Nuxt
 
-[![Edit Nuxt + HBP](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/codesandbox-nuxt-8zegn?fontsize=14)
+[![Edit Nuxt + HBP](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/codesandbox-nuxt-hdm7q?fontsize=14&module=%2Fnuxt.config.js)
 
 Use [nhost.io](https://nhost.io) for zero-config HBP!
 
