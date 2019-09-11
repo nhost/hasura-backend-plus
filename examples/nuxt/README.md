@@ -1,8 +1,10 @@
 # Using Hasura Backend Plus with Nuxt
 
+See a working example on Codesandbox:
+
 [![Edit Nuxt + HBP](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/codesandbox-nuxt-hdm7q?fontsize=14&module=%2Fnuxt.config.js)
 
-Use [nhost.io](https://nhost.io) for zero-config HBP!
+**Use [nhost.io](https://nhost.io) for zero-config HBP!**
 
 > **Note:** The `@nuxtjs/auth` package does not currently support refresh/refetch tokens, which means you will have to keep logging in when the JWT token expires. This is being worked on by the Nuxt team ([Issue #361 on `nuxt-community/auth-module`](https://github.com/nuxt-community/auth-module/pull/361)).
 
@@ -133,7 +135,7 @@ In order to make a page secure, you must add the [`auth` middleware](https://aut
 export default {
   // ...
   
-  middleware: ['auth'], // You can also use `middlware: 'auth'`, but this way lets you add multiple middlwares.
+  middleware: ['auth'], // You can also use `middlware: 'auth'`, but this way lets you add multiple middlewares.
 }
 </script>
 ```
