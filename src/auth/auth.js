@@ -128,14 +128,17 @@ router.post('/activate-account', async (req, res, next) => {
   mutation activate_account (
     $secret_token: uuid!
     $new_secret_token: uuid!
+    $now: timestamptz!
   ) {
     update_${schema_name}users (
       where: {
         _and: [
           {
-            secret_token: { _eq: $secret_token}
+            secret_token: { _eq: $secret_token }
+          }, {
+            secret_token_expires_at: { _gt: $now }
           },{
-            active: { _eq: false}
+            active: { _eq: false }
           }
         ]
       }
@@ -153,6 +156,7 @@ router.post('/activate-account', async (req, res, next) => {
     hasura_data = await graphql_client.request(query, {
       secret_token,
       new_secret_token: uuidv4(),
+      now: new Date(),
     });
   } catch (e) {
     console.error(e);
@@ -161,7 +165,7 @@ router.post('/activate-account', async (req, res, next) => {
 
   if (hasura_data[`update_${schema_name}users`].affected_rows === 0) {
     // console.error('Account already activated');
-    return next(Boom.unauthorized('Account is already activated or there is no account.'));
+    return next(Boom.unauthorized('Account is already activated, the secret token has expired or there is no account.'));
   }
 
   res.send('OK');
@@ -200,10 +204,17 @@ router.post('/new-password', async (req, res, next) => {
     $secret_token: uuid!,
     $password_hash: String!,
     $new_secret_token: uuid!
+    $now: timestamptz!
   ) {
     update_${schema_name}users (
       where: {
-        secret_token: { _eq: $secret_token}
+        _and: [
+          {
+            secret_token: { _eq: $secret_token}
+          }, {
+            secret_token_expires_at: { _gt: $now }
+          }
+        ]
       }
       _set: {
         password: $password_hash,
@@ -221,16 +232,16 @@ router.post('/new-password', async (req, res, next) => {
       secret_token,
       password_hash,
       new_secret_token,
+      now: new Date(),
     });
   } catch (e) {
     console.error(e);
     return next(Boom.unauthorized(`Unable to update 'password'`));
   }
 
-
-  if (hasura.update_users.affected_rows === 0) {
-    console.error('no user to update password for');
-    return next(Boom.badImplementation(`Unable to update password for user`));
+  if (hasura_data.update_users.affected_rows === 0) {
+    console.error('No user to update password for. Also maybe the secret token has expired');
+    return next(Boom.badRequest(`Unable to update password for user`));
   }
 
   // return 200 OK
