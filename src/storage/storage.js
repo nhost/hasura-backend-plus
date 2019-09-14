@@ -10,6 +10,7 @@ var mime = require('mime-types');
 
 const {
   HASURA_GRAPHQL_JWT_SECRET,
+  HASURA_GRAPHQL_ADMIN_SECRET,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
   S3_ENDPOINT,
@@ -27,6 +28,11 @@ const s3  = new AWS.S3({
   s3ForcePathStyle: true,
   signatureVersion: 'v4',
 });
+
+const admin_secret_is_ok = (req) => {
+  const { headers } = req;
+  return 'x-hasura-admin-secret' in headers && headers['x-hasura-admin-secret'] == HASURA_GRAPHQL_ADMIN_SECRET;
+};
 
 const get_claims_from_request = (req) => {
   const { jwt_token = '' } = req.cookies;
@@ -56,16 +62,19 @@ const get_claims_from_request = (req) => {
 router.get('/file/*', (req, res, next) => {
   const key = `${req.params[0]}`;
 
-  const claims = get_claims_from_request(req);
+  // if not admin, do JWT checks
+  if (!admin_secret_is_ok(req)) {
 
-  if (claims === undefined) {
-    return next(Boom.unauthorized('Incorrect JWT Token'));
-  }
+    const claims = get_claims_from_request(req);
 
-  // check access of key for jwt token claims
-  if (!storagePermission(key, 'read', claims)) {
-    console.error('not allowed to read');
-    return next(Boom.unauthorized('You are not allowed to read this file'));
+    if (claims === undefined) {
+      return next(Boom.unauthorized('Incorrect JWT Token'));
+    }
+
+    // check access of key for jwt token claims
+    if (!storagePermission(key, 'read', claims)) {
+      return next(Boom.unauthorized('You are not allowed to read this file'));
+    }
   }
 
   const params = {
@@ -143,12 +152,6 @@ const upload = multer({
 
 const upload_auth = (req, res, next) => {
 
-  const claims = get_claims_from_request(req);
-
-  if (claims === undefined) {
-    return next(Boom.unauthorized('Incorrect JWT Token'));
-  }
-
   // path to where the file will be uploaded to
   try {
     req.s3_key_prefix = req.headers['x-path'].replace(/^\/+/g, '');
@@ -156,8 +159,18 @@ const upload_auth = (req, res, next) => {
     return next(Boom.badImplementation('x-path header incorrect'));
   }
 
-  if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
-    return next(Boom.unauthorized('You are not allowed to write files here'));
+  // if not admin, do JWT checks
+  if (!admin_secret_is_ok(req)) {
+
+    const claims = get_claims_from_request(req);
+
+    if (claims === undefined) {
+      return next(Boom.unauthorized('Incorrect JWT Token'));
+    }
+
+    if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
+      return next(Boom.unauthorized('You are not allowed to write files here'));
+    }
   }
 
   // all uploaded files gets pushed in to this array
