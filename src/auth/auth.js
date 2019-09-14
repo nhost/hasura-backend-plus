@@ -266,7 +266,7 @@ router.post('/login', async (req, res, next) => {
       password
       active
       default_role
-      roles: users_x_roles {
+      user_roles {
         role
       }
       ${USER_FIELDS.join('\n')}
@@ -367,7 +367,7 @@ router.post('/refetch-token', async (req, res, next) => {
   let query = `
   query get_refetch_token(
     $refetch_token: uuid!,
-    $user_id: Int!
+    $user_id: uuid!
     $current_timestampz: timestamptz!,
   ) {
     ${schema_name}refetch_tokens (
@@ -387,7 +387,7 @@ router.post('/refetch-token', async (req, res, next) => {
         id
         active
         default_role
-        roles: users_x_roles {
+        user_roles {
           role
         }
         ${USER_FIELDS.join('\n')}
@@ -423,7 +423,7 @@ router.post('/refetch-token', async (req, res, next) => {
   mutation (
     $old_refetch_token: uuid!,
     $new_refetch_token_data: refetch_tokens_insert_input!
-    $user_id: Int!
+    $user_id: uuid!
   ) {
     delete_${schema_name}refetch_tokens (
       where: {

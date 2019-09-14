@@ -1,3 +1,5 @@
+-- DEPRICATED, use new db-user-uuuid-init.sql instead
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE refetch_tokens (
