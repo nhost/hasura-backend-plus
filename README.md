@@ -176,6 +176,54 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 /auth/new-password
 ```
 
+Use HTTP POST method.
+
+### Register
+
+`/auth/register`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `username`   | `string`     | YES |
+| `password`   | `string`     | YES |
+| `register_data`   | `json object`     | NO |
+
+### activate Account
+
+`/auth/activate-account`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `secret_token`   | `uuid`     | YES |
+
+### Login
+
+`/auth/login`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `username`   | `string`     | YES |
+| `password`   | `string`     | YES |
+
+### Refetch Token
+
+`/auth/refetch-token`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `user_id`   | `uuid`     | YES |
+| `refetch_token`   | `uuid`     | YES |
+
+### New password
+
+`/auth/new-password`
+
+`POST`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `secret_token`   | `uuid`     | YES |
+| `password`   | `text`     | YES |
 
 ## Register your first user
 ```sh
