@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/elitan/hasura-backend-plus">
-    <img src="logo.png" width="250px" alt="HBP" />
+    <img src="https://github.com/elitan/hasura-backend-plus/raw/master/logo.png" width="250px" alt="HBP" />
   </a>
 </p>
 
