@@ -524,7 +524,7 @@ router.get('/user', async (req, res, next) => {
   // get user from hasura (include ${USER_FIELDS.join('\n')})
   let query = `
   query (
-    $id: Int!
+    $id: uuid!
   ) {
     user: ${schema_name}users_by_pk(id: $id) {
       id
