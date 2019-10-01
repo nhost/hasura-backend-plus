@@ -531,7 +531,7 @@ router.get('/user', async (req, res, next) => {
       username
       active
       default_role
-      roles: users_x_roles {
+      roles: user_roles {
         role
       }
       ${USER_FIELDS.join('\n')}
