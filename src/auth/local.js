@@ -336,7 +336,7 @@ router.post('/login', async (req, res, next) => {
   res.cookie('refresh_token', refresh_token, {
     maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
-    path: '/auth/refresh-token',
+    path: '/auth',
   });
 
   // return jwt token and refresh token to client
