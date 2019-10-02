@@ -6,13 +6,13 @@ See a working example on Codesandbox:
 
 **Use [nhost.io](https://nhost.io) for zero-config HBP!**
 
-> **Note:** The `@nuxtjs/auth` package does not currently support refresh/refetch tokens, which means you will have to keep logging in when the JWT token expires. This is being worked on by the Nuxt team ([Issue #361 on `nuxt-community/auth-module`](https://github.com/nuxt-community/auth-module/pull/361)).
+> **Note:** The `@nuxtjs/auth` package does not currently support refresh tokens, which means you will have to keep logging in when the JWT token expires. This is being worked on by the Nuxt team ([Issue #361 on `nuxt-community/auth-module`](https://github.com/nuxt-community/auth-module/pull/361)).
 
 ## Dependencies
 
  - [`@nuxtjs/auth`](https://auth.nuxtjs.org)
  - [`@nuxtjs/apollo`](https://github.com/nuxt-community/apollo-module)
- 
+
 **Install:**
 ```bash
 # npm
@@ -34,7 +34,7 @@ export default {
     '@nuxtjs/apollo',
     '@nuxtjs/auth',
   ],
-  
+
   apollo: {
     tokenName: 'auth._token.local', // set by @nuxtjs/auth module
     authenticationType: '', // auth._token.local contains 'Bearer' prefix already
@@ -128,7 +128,7 @@ In order to make a page secure, you must add the [`auth` middleware](https://aut
 <script>
 export default {
   // ...
-  
+
   middleware: ['auth'], // You can also use `middlware: 'auth'`, but this way lets you add multiple middlewares.
 }
 </script>
@@ -166,7 +166,7 @@ export default {
       },
     },
   },
-  
+
   plugins: [
     {
       src: '~plugins/apollo.js',

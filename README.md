@@ -74,7 +74,7 @@ hasura-backend-plus:
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
-    REFETCH_TOKEN_EXPIRES: 43200
+    REFRESH_TOKEN_EXPIRES: 43200
     JWT_TOKEN_EXPIRES: 15
   volumes:
   - ./storage-rules:/app/src/storage/rules
@@ -123,7 +123,7 @@ Restart your docker containers
 | `S3_SECRET_ACCESS_KEY`   | ``  | S3 secret access key |
 | `S3_ENDPOINT`   | ``  | S3 endpoint |
 | `S3_BUCKET`   | ``  | S3 bucket name |
-| `REFETCH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refetch token expires |
+| `REFRESH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refresh token expires |
 | `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
 | `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
 
@@ -167,20 +167,36 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 # HASURA_GRAPHQL_ENDPOINT
 
 ## Auth
+```
+/auth/refresh-token
+```
+
+### Refresh Token
+
+`/auth/refresh-token`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+
+### Refresh Token
+
+`/auth/user`
+
+
+## Auth Local
 
 ```
-/auth/register
-/auth/activate-account
-/auth/login
-/auth/refetch-token
-/auth/new-password
+/auth/local/register
+/auth/local/activate-account
+/auth/local/login
+/auth/local/new-password
 ```
 
 Use HTTP POST method.
 
 ### Register
 
-`/auth/register`
+`/auth/local/register`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
@@ -190,7 +206,7 @@ Use HTTP POST method.
 
 ### activate Account
 
-`/auth/activate-account`
+`/auth/local/activate-account`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
@@ -198,25 +214,16 @@ Use HTTP POST method.
 
 ### Login
 
-`/auth/login`
+`/auth/local/login`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
 | `username`   | `string`     | YES |
 | `password`   | `string`     | YES |
 
-### Refetch Token
-
-`/auth/refetch-token`
-
-| variable | type | required |
-| :---         |     :---      | :--- |
-| `user_id`   | `uuid`     | YES |
-| `refetch_token`   | `uuid`     | YES |
-
 ### New password
 
-`/auth/new-password`
+`/auth/local/new-password`
 
 `POST`
 
@@ -228,7 +235,7 @@ Use HTTP POST method.
 ## Register your first user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/register \
+  http://localhost:3000/auth/local/register \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
@@ -241,7 +248,7 @@ The response: `OK!`
 ## Login using that user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/login \
+  http://localhost:3000/auth/local/login \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
@@ -253,7 +260,7 @@ This will have a valid token in the response:
 ```json
 {
     "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
-    "refetch_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
+    "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
     "user_id": 1
 }
 ```

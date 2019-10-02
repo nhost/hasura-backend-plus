@@ -9,7 +9,7 @@ const AWS = require('aws-sdk');
 var mime = require('mime-types');
 
 const {
-  HASURA_GRAPHQL_JWT_SECRET,
+  STORAGE_JWT_SECRET,
   HASURA_GRAPHQL_ADMIN_SECRET,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
@@ -35,7 +35,7 @@ const admin_secret_is_ok = (req) => {
 };
 
 const get_claims_from_request = (req) => {
-  const { jwt_token = '' } = req.cookies;
+  const { storage_jwt_token = '' } = req.cookies;
   const { authorization = '' } = req.headers;
 
   if (authorization === '' && jwt_token === '') {
@@ -47,12 +47,12 @@ const get_claims_from_request = (req) => {
   try {
     const decoded = jwt.verify(
       token,
-      HASURA_GRAPHQL_JWT_SECRET.key,
+      STORAGE_JWT_SECRET.key,
       {
-        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
+        algorithms: STORAGE_JWT_SECRET.type,
       }
     );
-    return decoded['https://hasura.io/jwt/claims'];
+    return decoded['storage_claims'];
   } catch (e) {
     console.error(e);
     return void 0;
