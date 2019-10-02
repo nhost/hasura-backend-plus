@@ -152,7 +152,7 @@ router.post('/refresh-token', async (req, res, next) => {
   res.cookie('refresh_token', new_refresh_token, {
     maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
-    path: '/auth/refresh-token',
+    path: '/auth',
   });
 
   res.json({
@@ -170,7 +170,7 @@ router.post('/logout', async (req, res, next) => {
   res.cookie('refresh_token', '', {
     maxAge: 0,
     httpOnly: true,
-    path: '/auth/refresh-token',
+    path: '/auth',
   });
   res.send('OK');
 });
@@ -262,7 +262,7 @@ router.post('/logout-all', async (req, res, next) => {
   res.cookie('refresh_token', '', {
     maxAge: 0,
     httpOnly: true,
-    path: '/auth/refresh-token',
+    path: '/auth',
   });
   res.send('OK');
 });
