@@ -163,12 +163,12 @@ router.post('/refresh-token', async (req, res, next) => {
 router.post('/logout', async (req, res, next) => {
   // clear cookies
   res.cookie('storage_jwt_token', '', {
-    maxAge: new Date(0),
+    maxAge: 0,
     httpOnly: true,
     path: '/storage',
   });
   res.cookie('refresh_token', '', {
-    maxAge: new Date(0),
+    maxAge: 0,
     httpOnly: true,
     path: '/auth/refresh-token',
   });
@@ -255,12 +255,12 @@ router.post('/logout-all', async (req, res, next) => {
 
   // clear cookies
   res.cookie('storage_jwt_token', '', {
-    maxAge: new Date(0),
+    maxAge: 0,
     httpOnly: true,
     path: '/storage',
   });
   res.cookie('refresh_token', '', {
-    maxAge: new Date(0),
+    maxAge: 0,
     httpOnly: true,
     path: '/auth/refresh-token',
   });
