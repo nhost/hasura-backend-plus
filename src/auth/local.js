@@ -42,14 +42,8 @@ router.post('/register', async (req, res, next) => {
 
   const { email, username, password, register_data } = value;
 
-  console.log({email});
-  console.log({username});
-  console.log({password});
-  console.log({register_data});
-
-
   // create user account
-  query = `
+  const mutation  = `
   mutation (
     $user: ${schema_name}users_insert_input!
   ) {
@@ -61,8 +55,9 @@ router.post('/register', async (req, res, next) => {
   }
   `;
 
+  // create user and user_account in same mutation
   try {
-    await graphql_client.request(query, {
+    await graphql_client.request(mutation, {
       user: {
         display_name: username,
         email: email,
@@ -82,72 +77,6 @@ router.post('/register', async (req, res, next) => {
     console.error(e);
     return next(Boom.badImplementation('Unable to create user.'));
   }
-
-  // // create user
-  //
-  // // check for duplicates
-  // let query = `
-  // query (
-  //   $username: String!
-  // ) {
-  //   ${schema_name}users (
-  //     where: {
-  //       username: { _eq: $username }
-  //     }
-  //   ) {
-  //     id
-  //   }
-  // }
-  // `;
-  //
-  // try {
-  //   hasura_data = await graphql_client.request(query, {
-  //     username,
-  //   });
-  // } catch (e) {
-  //   console.error(e);
-  //   return next(Boom.badImplementation("Unable to check for 'username' duplication"));
-  // }
-  //
-  // if (hasura_data[`${schema_name}users`].length !== 0) {
-  //   return next(Boom.unauthorized("The 'username' already exist"));
-  // }
-  //
-  // // generate password_hash
-  // try {
-  //   password_hash = await bcrypt.hash(password, 10);
-  // } catch(e) {
-  //   console.error(e);
-  //   return next(Boom.badImplementation("Unable to generate 'password hash'"));
-  // }
-  //
-  // // insert user
-  // query = `
-  // mutation (
-  //   $user: ${schema_name}users_insert_input!
-  // ) {
-  //   insert_${schema_name}users(
-  //     objects: [$user]
-  //   ) {
-  //     affected_rows
-  //   }
-  // }
-  // `;
-  //
-  // try {
-  //   await graphql_client.request(query, {
-  //     user: {
-  //       username,
-  //       password: password_hash,
-  //       secret_token: uuidv4(),
-  //       active: USER_REGISTRATION_AUTO_ACTIVE,
-  //       register_data,
-  //     },
-  //   });
-  // } catch (e) {
-  //   console.error(e);
-  //   return next(Boom.badImplementation('Unable to create user.'));
-  // }
 
   res.send('OK');
 });
@@ -304,6 +233,7 @@ router.post('/login', async (req, res, next) => {
   const { error, value } = schema.validate(req.body);
 
   if (error) {
+    console.error(error);
     return next(Boom.badRequest(error.details[0].message));
   }
 
@@ -399,12 +329,14 @@ router.post('/login', async (req, res, next) => {
     res.cookie('storage_jwt_token', storage_jwt_token, {
       maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
       httpOnly: true,
+      path: '/storage',
     });
   }
 
   res.cookie('refresh_token', refresh_token, {
     maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
+    path: '/auth/refresh-token',
   });
 
   // return jwt token and refresh token to client
