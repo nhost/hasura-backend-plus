@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const jwt = require('jsonwebtoken');
 const { graphql_client } = require('../graphql-client');
+const auth_functions = require('./auth-functions');
 
 const {
   STORAGE_ACTIVE,
@@ -15,8 +16,6 @@ const {
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
 } = require('../config');
-
-const auth_functions = require('./auth-functions');
 
 let router = express.Router();
 
@@ -329,14 +328,16 @@ router.post('/login', async (req, res, next) => {
     res.cookie('storage_jwt_token', storage_jwt_token, {
       maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
       httpOnly: true,
-      path: '/storage',
     });
   }
 
   res.cookie('refresh_token', refresh_token, {
     maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
-    path: '/auth',
+  });
+  res.cookie('refresh_token', refresh_token, {
+    maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+    httpOnly: true,
   });
 
   // return jwt token and refresh token to client

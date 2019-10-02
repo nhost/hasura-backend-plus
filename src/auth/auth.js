@@ -80,16 +80,12 @@ router.post('/refresh-token', async (req, res, next) => {
     return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
-  console.log({hasura_data});
-
   if (hasura_data[`refresh_tokens`].length === 0) {
     // console.error('Incorrect user id or refresh token');
     return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
   const user = hasura_data[`refresh_tokens`][0].user;
-
-  console.log({user});
 
   // delete current refresh token and generate a new, and insert the
   // new refresh_token in the database
@@ -118,9 +114,6 @@ router.post('/refresh-token', async (req, res, next) => {
   // convert from minutes to milli seconds
   const new_refresh_token_expires_at = new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000));
 
-  console.log('user id:');
-  console.log(user.id);
-
   try {
     await graphql_client.request(query, {
       old_refresh_token: refresh_token,
@@ -145,14 +138,12 @@ router.post('/refresh-token', async (req, res, next) => {
     res.cookie('storage_jwt_token', storage_jwt_token, {
       maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
       httpOnly: true,
-      path: '/storage',
     });
   }
 
   res.cookie('refresh_token', new_refresh_token, {
     maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
     httpOnly: true,
-    path: '/auth',
   });
 
   res.json({
@@ -161,17 +152,17 @@ router.post('/refresh-token', async (req, res, next) => {
 });
 
 router.post('/logout', async (req, res, next) => {
+
   // clear cookies
   res.cookie('storage_jwt_token', '', {
-    maxAge: 0,
+    maxAge: 1,
     httpOnly: true,
-    path: '/storage',
   });
   res.cookie('refresh_token', '', {
-    maxAge: 0,
+    maxAge: 1,
     httpOnly: true,
-    path: '/auth',
   });
+
   res.send('OK');
 });
 
@@ -181,8 +172,6 @@ router.post('/logout-all', async (req, res, next) => {
   const schema = Joi.object().keys({
     refresh_token: Joi.string().uuid().required(),
   });
-
-  console.log(req.cookies.refresh_token);
 
   const { error, value } = schema.validate({
     refresh_token: req.cookies.refresh_token,
@@ -222,12 +211,8 @@ router.post('/logout-all', async (req, res, next) => {
     // console.error('Error connection to GraphQL');
     return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
-  console.log({hasura_data});
-  console.log(hasura_data.refresh_tokens);
-
   const { user } = hasura_data.refresh_tokens[0];
 
-  console.log({user});
   // delete all refresh tokens associated with the user id
   let mutation = `
   mutation (
@@ -257,12 +242,10 @@ router.post('/logout-all', async (req, res, next) => {
   res.cookie('storage_jwt_token', '', {
     maxAge: 0,
     httpOnly: true,
-    path: '/storage',
   });
   res.cookie('refresh_token', '', {
     maxAge: 0,
     httpOnly: true,
-    path: '/auth',
   });
   res.send('OK');
 });
@@ -311,7 +294,7 @@ router.get('/user', async (req, res, next) => {
       username
       active
       default_role
-      roles: users_x_roles {
+      user_roles {
         role
       }
       ${USER_FIELDS.join('\n')}

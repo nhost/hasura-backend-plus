@@ -1,12 +1,22 @@
 const express = require('express');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
+const uuidv4 = require('uuid/v4');
+const { graphql_client } = require('../graphql-client');
+const auth_functions = require('./auth-functions');
 
 const {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   GITHUB_CALLBACK_URL,
+  STORAGE_ACTIVE,
+  JWT_TOKEN_EXPIRES,
+  REFRESH_TOKEN_EXPIRES,
+  USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
+  USER_FIELDS,
 } = require('../config');
+
+const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
 let router = express.Router();
 
@@ -16,19 +26,102 @@ passport.use(new GitHubStrategy({
   callbackURL: GITHUB_CALLBACK_URL,
   scope: ['user:email'],
 },
-function(accessToken, refreshToken, profile, cb) {
-  console.log('---Strategy---');
-  console.log({accessToken});
-  console.log({refreshToken});
-  console.log({profile});
+async function(accessToken, refreshToken, profile, cb) {
 
   // find or create user
+  let query = `
+  query (
+    $profile_id: String!
+  ) {
+    user_providers: ${schema_name}user_providers (
+      where: {
+        _and: [{
+          provider: {_eq: "github"}
+        }, {
+          provider_user_id: { _eq: $profile_id }
+        }]
+      }
+    ) {
+      user {
+        id
+        active
+        default_role
+        user_roles {
+          role
+        }
+        ${USER_FIELDS.join('\n')}
+      }
+    }
+  }
+  `;
 
-  console.log(profile.id);
+  let hasura_data;
+  let user = null;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      profile_id: profile.id,
+    });
+  } catch (e) {
+    console.error(e);
+    // console.error('Error connection to GraphQL');
+    return cb(null, false, { message: 'unable to check if user exists' });
+  }
 
-  const err = null;
+  // if user not yet exists
+  if (hasura_data.user_providers.length == 0) {
 
-  return cb(err, profile);
+    // create the user
+    // create user account
+    const mutation  = `
+    mutation (
+      $user: ${schema_name}users_insert_input!
+    ) {
+      inserted_user: insert_${schema_name}users (
+        objects: [$user]
+      ) {
+        returning {
+          id
+          active
+          default_role
+          user_roles {
+            role
+          }
+          ${USER_FIELDS.join('\n')}
+        }
+      }
+    }
+    `;
+
+    // create user and user_account in same mutation
+    try {
+      hasura_data = await graphql_client.request(mutation, {
+        user: {
+          display_name: profile._json.name,
+          email: profile._json.email,
+          active: true,
+          avatar_url: profile._json.avatar_url,
+          user_providers: {
+            data: {
+              provider: 'github',
+              provider_user_id: profile.id,
+              token: accessToken,
+            },
+          },
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      return cb('error hasura data two 2');
+    }
+
+    user = hasura_data.inserted_user.returning[0];
+  } else {
+    // user exists
+    //get user
+    user = hasura_data.user_providers[0].user;
+  }
+
+  return cb(null, user);
 }));
 
 router.get('/',
@@ -39,15 +132,60 @@ router.get('/',
 
 router.get('/callback',
   passport.authenticate('github', {
-    failureRedirect: '/login',
+    failureRedirect: 'http://localhost:3000/FAIL',
     session: false,
    }),
-  function(req, res) {
+  async function(req, res) {
+
     // Successful authentication, redirect home.
-    console.log('---/callback---');
-    console.log(req.user);
-    console.log('successful authenticate, send OK');
-    // res.send('OK');
+    // generate tokens and redirect back home
+
+    const { user } = req;
+
+    const jwt_token = auth_functions.generateJwtToken(user);
+    const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
+
+    // generate refresh token and put in database
+    query = `
+    mutation (
+      $refresh_token_data: ${schema_name}refresh_tokens_insert_input!
+    ) {
+      insert_${schema_name}refresh_tokens (
+        objects: [$refresh_token_data]
+      ) {
+        affected_rows
+      }
+    }
+    `;
+
+    const refresh_token = uuidv4();
+    try {
+      await graphql_client.request(query, {
+        refresh_token_data: {
+          user_id: user.id,
+          refresh_token: refresh_token,
+          expires_at: new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      return next(Boom.badImplementation("Could not update 'refresh token' for user"));
+    }
+
+    // set JWT storage cookie to use for file upload/download
+    if (STORAGE_ACTIVE) {
+      res.cookie('storage_jwt_token', storage_jwt_token, {
+        maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+        httpOnly: true,
+      });
+    }
+
+    res.cookie('refresh_token', refresh_token, {
+      maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+      httpOnly: true,
+    });
+
+    // send user back
     res.redirect('http://localhost:3000');
   }
 );
