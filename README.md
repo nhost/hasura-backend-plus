@@ -21,9 +21,7 @@ Don't want to configure all this your self? Use our managed service [nhost.io](h
 
 ## Get your database ready
 
-Create tables and initial state for your user mangagement.
-
-Copy everything from the file `db-init.sql` and insert into the SQL tab in the Hasura Console.
+Create tables and initial state for your user mangagement by copy everything from the file `db-user-providers-init.sql` and insert into the SQL tab in the Hasura Console.
 
 ## Track your tables and relations in Hasura
 
@@ -179,19 +177,20 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 ## Auth
 ```
 /auth/refresh-token
+/auth/users
 ```
 
 ### Refresh Token
 
 `/auth/refresh-token`
 
-| variable | type | required |
-| :---         |     :---      | :--- |
+Returns a JWT token.
 
 ### Refresh Token
 
 `/auth/user`
 
+Returns the full User object
 
 ## Auth Local
 
@@ -208,11 +207,12 @@ Use HTTP POST method.
 
 `/auth/local/register`
 
-| variable | type | required |
+| variable | type | required | comment |
 | :---         |     :---      | :--- |
-| `username`   | `string`     | YES |
-| `password`   | `string`     | YES |
-| `register_data`   | `json object`     | NO |
+| `email`   | `string`     | YES | |
+| `username`   | `string`     | YES | can be same as email |
+| `password`   | `string`     | YES | |
+| `register_data`   | `json object`     | NO | |
 
 ### activate Account
 
