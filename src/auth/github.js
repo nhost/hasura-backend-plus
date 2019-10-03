@@ -6,9 +6,9 @@ const { graphql_client } = require('../graphql-client');
 const auth_functions = require('./auth-functions');
 
 const {
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
-  GITHUB_CALLBACK_URL,
+  AUTH_GITHUB_CLIENT_ID,
+  AUTH_GITHUB_CLIENT_SECRET,
+  AUTH_GITHUB_CALLBACK_URL,
   STORAGE_ACTIVE,
   JWT_TOKEN_EXPIRES,
   REFRESH_TOKEN_EXPIRES,
@@ -23,9 +23,9 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  US
 let router = express.Router();
 
 passport.use(new GitHubStrategy({
-  clientID: GITHUB_CLIENT_ID,
-  clientSecret: GITHUB_CLIENT_SECRET,
-  callbackURL: GITHUB_CALLBACK_URL,
+  clientID: AUTH_GITHUB_CLIENT_ID,
+  clientSecret: AUTH_GITHUB_CLIENT_SECRET,
+  callbackURL: AUTH_GITHUB_CALLBACK_URL,
   scope: ['user:email'],
 },
 async function(accessToken, refreshToken, profile, cb) {

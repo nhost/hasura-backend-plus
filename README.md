@@ -65,11 +65,13 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus:latest
   environment:
     PORT: 3000
+    AUTH_ACTIVE: 'true'
+    AUTH_LOCAL_ACTIVE: 'true'
     USER_FIELDS: ''
     USER_REGISTRATION_AUTO_ACTIVE: 'true'
     HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1/graphql
     HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
+    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "a_pretty_long_secret_key"}'
     S3_ACCESS_KEY_ID: <access>
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
@@ -114,8 +116,19 @@ Restart your docker containers
 | :---         |     :---      |          :--- |
 | `PORT`   | `4000`     | Express server port |
 | `AUTH_ACTIVE`   | `true`     | Activate authentication    |
-| `STORAGE_ACTIVE`   | `true`     | Activate storage   |
+| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
 | `USER_FIELDS`   | ``     | Specify user table fields that should be available as `x-hasura-` JWT claims.  |
+| `USER_REGISTRATION_AUTO_ACTIVE`   | `false`   | Weather new user account should automatically be activated. Account that are not active are unable to log in.  |
+| `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
+| `REFRESH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refresh token expires |
+| `AUTH_LOCAL_ACTIVE`   | `false`     | Activate authentication for local accounts    |
+| `PROVIDERS_SUCCESS_REDIRECT`   | ``     | The URL the user should be redirected to on successful signin/signup with a OAuth provider (ex Github).   |
+| `PROVIDERS_FAILURE_REDIRECT`   | ``     | The URL the user should be redirected to on failed signin/signup with a OAuth provider (ex Github).   |
+| `AUTH_GITHUB_ACTIVE`   | `false`     | Activate github as an OAuth provider.   |
+| `AUTH_GITHUB_CLIENT_ID`   | ``     | Github OAuth app Client ID.   |
+| `AUTH_GITHUB_CLIENT_SECRET`   | ``     | Github OAuth app Client Secret.   |
+| `AUTH_GITHUB_CALLBACK_URL`   | ``     | Github OAuth app Authorization callback URL.   |
+| `STORAGE_ACTIVE`   | `true`     | Activate storage   |
 | `HASURA_GRAPHQL_ENDPOINT`   | `http://graphql-engine:8080/v1/graphql`     | Hasura GraphQL endpoint  |
 | `HASURA_GRAPHQL_ADMIN_SECRET`   | ``  | Hasura GraphQL admin secret |
 | `HASURA_GRAPHQL_JWT_SECRET`   | `{ 'type' : 'HS256', 'key': 'secretkey' }`  | Shared JWT secret. Must be same as Hasuras `HASURA_GRAPHQL_JWT_SECRET` |
@@ -123,9 +136,6 @@ Restart your docker containers
 | `S3_SECRET_ACCESS_KEY`   | ``  | S3 secret access key |
 | `S3_ENDPOINT`   | ``  | S3 endpoint |
 | `S3_BUCKET`   | ``  | S3 bucket name |
-| `REFRESH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refresh token expires |
-| `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
-| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
 
 
 #### USER_FIELDS

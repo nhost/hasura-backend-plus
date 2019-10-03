@@ -20,9 +20,9 @@ exports.PROVIDERS_FAILURE_REDIRECT = process.env.PROVIDERS_FAILURE_REDIRECT || '
 
 // GITHUB
 exports.AUTH_GITHUB_ACTIVE = process.env.AUTH_GITHUB_ACTIVE ? process.env.AUTH_GITHUB_ACTIVE === 'true' : false;
-exports.GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || null;
-exports.GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || null;
-exports.GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || null;
+exports.AUTH_GITHUB_CLIENT_ID = process.env.AUTH_GITHUB_CLIENT_ID || '';
+exports.AUTH_GITHUB_CLIENT_SECRET = process.env.AUTH_GITHUB_CLIENT_SECRET || '';
+exports.AUTH_GITHUB_CALLBACK_URL = process.env.AUTH_GITHUB_CALLBACK_URL || '';
 
 // STORAGE
 exports.STORAGE_ACTIVE = process.env.STORAGE_ACTIVE ? process.env.STORAGE_ACTIVE === 'true' : true;
