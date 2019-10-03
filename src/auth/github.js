@@ -31,6 +31,8 @@ passport.use(new GitHubStrategy({
 async function(accessToken, refreshToken, profile, cb) {
 
   // find or create user
+
+  // see if the user already exists
   let query = `
   query (
     $profile_id: String!
@@ -64,8 +66,8 @@ async function(accessToken, refreshToken, profile, cb) {
       profile_id: profile.id,
     });
   } catch (e) {
-    console.error(e);
     // console.error('Error connection to GraphQL');
+    console.error(e);
     return cb(null, false, { message: 'unable to check if user exists' });
   }
 
@@ -113,13 +115,13 @@ async function(accessToken, refreshToken, profile, cb) {
       });
     } catch (e) {
       console.error(e);
-      return cb('error hasura data two 2');
+      return cb(null, false, { message: 'error hasura data two 2' });
     }
 
     user = hasura_data.inserted_user.returning[0];
   } else {
     // user exists
-    //get user
+    // get user
     user = hasura_data.user_providers[0].user;
   }
 
@@ -171,7 +173,7 @@ router.get('/callback',
       });
     } catch (e) {
       console.error(e);
-      return next(Boom.badImplementation("Could not update 'refresh token' for user"));
+      return res.send("Could not update 'refresh token' for user");
     }
 
     // set JWT storage cookie to use for file upload/download
