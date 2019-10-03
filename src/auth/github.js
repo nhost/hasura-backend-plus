@@ -14,6 +14,8 @@ const {
   REFRESH_TOKEN_EXPIRES,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   USER_FIELDS,
+  PROVIDERS_SUCCESS_REDIRECT,
+  PROVIDERS_FAILURE_REDIRECT,
 } = require('../config');
 
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
@@ -132,7 +134,7 @@ router.get('/',
 
 router.get('/callback',
   passport.authenticate('github', {
-    failureRedirect: 'http://localhost:3000/FAIL',
+    failureRedirect: PROVIDERS_FAILURE_REDIRECT,
     session: false,
    }),
   async function(req, res) {
@@ -186,7 +188,7 @@ router.get('/callback',
     });
 
     // send user back
-    res.redirect('http://localhost:3000');
+    res.redirect(PROVIDERS_SUCCESS_REDIRECT);
   }
 );
 

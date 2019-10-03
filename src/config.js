@@ -14,6 +14,10 @@ exports.USER_REGISTRATION_AUTO_ACTIVE = process.env.USER_REGISTRATION_AUTO_ACTIV
 // AUTH LOCAL
 exports.AUTH_LOCAL_ACTIVE = process.env.AUTH_LOCAL_ACTIVE ? process.env.AUTH_LOCAL_ACTIVE === 'true' : false;
 
+// PROVIDERS
+exports.PROVIDERS_SUCCESS_REDIRECT = process.env.PROVIDERS_SUCCESS_REDIRECT || '';
+exports.PROVIDERS_FAILURE_REDIRECT = process.env.PROVIDERS_FAILURE_REDIRECT || '';
+
 // GITHUB
 exports.AUTH_GITHUB_ACTIVE = process.env.AUTH_GITHUB_ACTIVE ? process.env.AUTH_GITHUB_ACTIVE === 'true' : false;
 exports.GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || null;
