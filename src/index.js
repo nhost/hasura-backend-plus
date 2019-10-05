@@ -8,6 +8,7 @@ const auth = require('./auth/auth');
 const auth_local = require('./auth/local');
 const auth_github = require('./auth/github');
 const auth_google = require('./auth/google');
+const auth_facebook = require('./auth/facebook');
 const storage = require('./storage/storage');
 
 const {
@@ -15,6 +16,7 @@ const {
   AUTH_LOCAL_ACTIVE,
   AUTH_GITHUB_ACTIVE,
   AUTH_GOOGLE_ACTIVE,
+  AUTH_FACEBOOK_ACTIVE,
   STORAGE_ACTIVE,
 } = require('./config');
 
@@ -49,6 +51,10 @@ if (AUTH_ACTIVE) {
   if (AUTH_GOOGLE_ACTIVE) {
     console.log('auth google active');
     app.use('/auth/google', auth_google);
+  }
+  if (AUTH_FACEBOOK_ACTIVE) {
+    console.log('auth facebook active');
+    app.use('/auth/facebook', auth_facebook);
   }
 }
 

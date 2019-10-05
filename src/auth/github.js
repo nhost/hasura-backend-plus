@@ -96,17 +96,31 @@ async function(accessToken, refreshToken, profile, cb) {
     }
     `;
 
+    let email;
+    try {
+      email = profile.emails[0].value;
+    } catch (e) {
+      email = '';
+    }
+
+    let avatar_url;
+    try {
+      avatar_url = profile.photos[0].value;
+    } catch (e) {
+      avatar_url = '';
+    }
+
     // create user and user_account in same mutation
     try {
       hasura_data = await graphql_client.request(mutation, {
         user: {
-          display_name: profile._json.name,
-          email: profile._json.email,
+          display_name: profile.displayName,
+          email: email,
           active: true,
-          avatar_url: profile._json.avatar_url,
+          avatar_url: avatar_url,
           user_providers: {
             data: {
-              provider: 'github',
+              provider: profile.provider,
               provider_user_id: profile.id,
               token: accessToken,
             },

@@ -130,6 +130,10 @@ Restart your docker containers
 | `AUTH_GOOGLE_CLIENT_ID`   | ``     | Google OAuth app Client ID.   |
 | `AUTH_GOOGLE_CLIENT_SECRET`   | ``     | Google OAuth app Client Secret.   |
 | `AUTH_GOOGLE_CALLBACK_URL`   | ``     | Google OAuth app authorization callback URL.   |
+| `AUTH_FACEBOOK_ACTIVE`   | `false`     | Activate Facebook as an OAuth provider.   |
+| `AUTH_FACEBOOK_CLIENT_ID`   | ``     | Facebook OAuth app Client ID.   |
+| `AUTH_FACEBOOK_CLIENT_SECRET`   | ``     | Facebook OAuth app Client Secret.   |
+| `AUTH_FACEBOOK_CALLBACK_URL`   | ``     | Facebook OAuth app authorization callback URL.   |
 | `STORAGE_ACTIVE`   | `true`     | Activate storage   |
 | `HASURA_GRAPHQL_ENDPOINT`   | `http://graphql-engine:8080/v1/graphql`     | Hasura GraphQL endpoint  |
 | `HASURA_GRAPHQL_ADMIN_SECRET`   | ``  | Hasura GraphQL admin secret |
@@ -277,6 +281,13 @@ This will have a valid token in the response:
     "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
     "user_id": 1
 }
+```
+
+## OAuth providers
+
+```
+/auth/github
+/auth/google
 ```
 
 # Storage
