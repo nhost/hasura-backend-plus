@@ -1,14 +1,14 @@
 const express = require('express');
 const passport = require('passport');
-const GitHubStrategy = require('passport-github').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const uuidv4 = require('uuid/v4');
 const { graphql_client } = require('../graphql-client');
 const auth_functions = require('./auth-functions');
 
 const {
-  AUTH_GITHUB_CLIENT_ID,
-  AUTH_GITHUB_CLIENT_SECRET,
-  AUTH_GITHUB_CALLBACK_URL,
+  AUTH_GOOGLE_CLIENT_ID,
+  AUTH_GOOGLE_CLIENT_SECRET,
+  AUTH_GOOGLE_CALLBACK_URL,
   STORAGE_ACTIVE,
   JWT_TOKEN_EXPIRES,
   REFRESH_TOKEN_EXPIRES,
@@ -22,13 +22,15 @@ const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  US
 
 let router = express.Router();
 
-passport.use(new GitHubStrategy({
-  clientID: AUTH_GITHUB_CLIENT_ID,
-  clientSecret: AUTH_GITHUB_CLIENT_SECRET,
-  callbackURL: AUTH_GITHUB_CALLBACK_URL,
-  scope: ['user:email'],
+passport.use(new GoogleStrategy({
+  clientID: AUTH_GOOGLE_CLIENT_ID,
+  clientSecret: AUTH_GOOGLE_CLIENT_SECRET,
+  callbackURL: AUTH_GOOGLE_CALLBACK_URL,
+  scope: ['profile', 'email'],
 },
 async function(accessToken, refreshToken, profile, cb) {
+
+  console.log({profile});
 
   // find or create user
 
@@ -40,7 +42,7 @@ async function(accessToken, refreshToken, profile, cb) {
     user_providers: ${schema_name}user_providers (
       where: {
         _and: [{
-          provider: {_eq: "github"}
+          provider: {_eq: "google"}
         }, {
           provider_user_id: { _eq: $profile_id }
         }]
@@ -103,10 +105,10 @@ async function(accessToken, refreshToken, profile, cb) {
           display_name: profile._json.name,
           email: profile._json.email,
           active: true,
-          avatar_url: profile._json.avatar_url,
+          avatar_url: profile._json.picture,
           user_providers: {
             data: {
-              provider: 'github',
+              provider: 'google',
               provider_user_id: profile.id,
               token: accessToken,
             },
@@ -129,13 +131,13 @@ async function(accessToken, refreshToken, profile, cb) {
 }));
 
 router.get('/',
-  passport.authenticate('github', {
+  passport.authenticate('google', {
     session: false,
   })
 );
 
 router.get('/callback',
-  passport.authenticate('github', {
+  passport.authenticate('google', {
     failureRedirect: PROVIDERS_FAILURE_REDIRECT,
     session: false,
    }),

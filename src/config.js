@@ -24,6 +24,12 @@ exports.AUTH_GITHUB_CLIENT_ID = process.env.AUTH_GITHUB_CLIENT_ID || '';
 exports.AUTH_GITHUB_CLIENT_SECRET = process.env.AUTH_GITHUB_CLIENT_SECRET || '';
 exports.AUTH_GITHUB_CALLBACK_URL = process.env.AUTH_GITHUB_CALLBACK_URL || '';
 
+// GOOGLE
+exports.AUTH_GOOGLE_ACTIVE = process.env.AUTH_GOOGLE_ACTIVE ? process.env.AUTH_GOOGLE_ACTIVE === 'true' : false;
+exports.AUTH_GOOGLE_CLIENT_ID = process.env.AUTH_GOOGLE_CLIENT_ID || '';
+exports.AUTH_GOOGLE_CLIENT_SECRET = process.env.AUTH_GOOGLE_CLIENT_SECRET || '';
+exports.AUTH_GOOGLE_CALLBACK_URL = process.env.AUTH_GOOGLE_CALLBACK_URL || '';
+
 // STORAGE
 exports.STORAGE_ACTIVE = process.env.STORAGE_ACTIVE ? process.env.STORAGE_ACTIVE === 'true' : true;
 exports.STORAGE_JWT_SECRET = process.env.STORAGE_JWT_SECRET ? JSON.parse(process.env.STORAGE_JWT_SECRET) : {'type':'HS256', 'key': 'storage_secretkey'};

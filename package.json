@@ -36,6 +36,7 @@
     "nodemon": "^1.18.9",
     "passport": "^0.4.0",
     "passport-github": "^1.1.0",
+    "passport-google-oauth20": "^2.0.0",
     "uuid": "^3.3.2"
   }
 }

@@ -7,12 +7,14 @@ const passport = require('passport');
 const auth = require('./auth/auth');
 const auth_local = require('./auth/local');
 const auth_github = require('./auth/github');
+const auth_google = require('./auth/google');
 const storage = require('./storage/storage');
 
 const {
   AUTH_ACTIVE,
   AUTH_LOCAL_ACTIVE,
   AUTH_GITHUB_ACTIVE,
+  AUTH_GOOGLE_ACTIVE,
   STORAGE_ACTIVE,
 } = require('./config');
 
@@ -43,6 +45,10 @@ if (AUTH_ACTIVE) {
   if (AUTH_GITHUB_ACTIVE) {
     console.log('auth github active');
     app.use('/auth/github', auth_github);
+  }
+  if (AUTH_GOOGLE_ACTIVE) {
+    console.log('auth google active');
+    app.use('/auth/google', auth_google);
   }
 }
 

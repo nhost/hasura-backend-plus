@@ -120,12 +120,16 @@ Restart your docker containers
 | `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
 | `REFRESH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refresh token expires |
 | `AUTH_LOCAL_ACTIVE`   | `false`     | Activate authentication for local accounts    |
-| `PROVIDERS_SUCCESS_REDIRECT`   | ``     | The URL the user should be redirected to on successful signin/signup with a OAuth provider (ex Github).   |
-| `PROVIDERS_FAILURE_REDIRECT`   | ``     | The URL the user should be redirected to on failed signin/signup with a OAuth provider (ex Github).   |
-| `AUTH_GITHUB_ACTIVE`   | `false`     | Activate github as an OAuth provider.   |
+| `PROVIDERS_SUCCESS_REDIRECT`   | ``     | The URL the user should be redirected to on successful signin/signup with a OAuth provider.   |
+| `PROVIDERS_FAILURE_REDIRECT`   | ``     | The URL the user should be redirected to on failed signin/signup with a OAuth provider.   |
+| `AUTH_GITHUB_ACTIVE`   | `false`     | Activate Github as an OAuth provider.   |
 | `AUTH_GITHUB_CLIENT_ID`   | ``     | Github OAuth app Client ID.   |
 | `AUTH_GITHUB_CLIENT_SECRET`   | ``     | Github OAuth app Client Secret.   |
-| `AUTH_GITHUB_CALLBACK_URL`   | ``     | Github OAuth app Authorization callback URL.   |
+| `AUTH_GITHUB_CALLBACK_URL`   | ``     | Github OAuth app authorization callback URL.   |
+| `AUTH_GOOGLE_ACTIVE`   | `false`     | Activate Google as an OAuth provider.   |
+| `AUTH_GOOGLE_CLIENT_ID`   | ``     | Google OAuth app Client ID.   |
+| `AUTH_GOOGLE_CLIENT_SECRET`   | ``     | Google OAuth app Client Secret.   |
+| `AUTH_GOOGLE_CALLBACK_URL`   | ``     | Google OAuth app authorization callback URL.   |
 | `STORAGE_ACTIVE`   | `true`     | Activate storage   |
 | `HASURA_GRAPHQL_ENDPOINT`   | `http://graphql-engine:8080/v1/graphql`     | Hasura GraphQL endpoint  |
 | `HASURA_GRAPHQL_ADMIN_SECRET`   | ``  | Hasura GraphQL admin secret |
