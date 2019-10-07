@@ -5,7 +5,7 @@
 </p>
 
 
-<h2 align="center">Hasura Backend Plus ( HBP )</h2>
+<h3 align="center">Hasura Backend Plus ( HBP )</h3>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
 ---
