@@ -21,9 +21,7 @@ Don't want to configure all this your self? Use our managed service [nhost.io](h
 
 ## Get your database ready
 
-Create tables and initial state for your user mangagement.
-
-Copy everything from the file `db-init.sql` and insert into the SQL tab in the Hasura Console.
+Create tables and initial state for your user mangagement by copy everything from the file `db-user-providers-init.sql` and insert into the SQL tab in the Hasura Console.
 
 ## Track your tables and relations in Hasura
 
@@ -65,16 +63,18 @@ hasura-backend-plus:
   image: elitan/hasura-backend-plus:latest
   environment:
     PORT: 3000
+    AUTH_ACTIVE: 'true'
+    AUTH_LOCAL_ACTIVE: 'true'
     USER_FIELDS: ''
     USER_REGISTRATION_AUTO_ACTIVE: 'true'
     HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1/graphql
     HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "secret_key"}'
+    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "a_pretty_long_secret_key"}'
     S3_ACCESS_KEY_ID: <access>
     S3_SECRET_ACCESS_KEY: <secret>
     S3_ENDPOINT: <endpoint>
     S3_BUCKET: <bucket>
-    REFETCH_TOKEN_EXPIRES: 43200
+    REFRESH_TOKEN_EXPIRES: 43200
     JWT_TOKEN_EXPIRES: 15
   volumes:
   - ./storage-rules:/app/src/storage/rules
@@ -114,8 +114,27 @@ Restart your docker containers
 | :---         |     :---      |          :--- |
 | `PORT`   | `4000`     | Express server port |
 | `AUTH_ACTIVE`   | `true`     | Activate authentication    |
-| `STORAGE_ACTIVE`   | `true`     | Activate storage   |
+| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
 | `USER_FIELDS`   | ``     | Specify user table fields that should be available as `x-hasura-` JWT claims.  |
+| `USER_REGISTRATION_AUTO_ACTIVE`   | `false`   | Weather new user account should automatically be activated. Account that are not active are unable to log in.  |
+| `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
+| `REFRESH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refresh token expires |
+| `AUTH_LOCAL_ACTIVE`   | `false`     | Activate authentication for local accounts    |
+| `PROVIDERS_SUCCESS_REDIRECT`   | ``     | The URL the user should be redirected to on successful signin/signup with a OAuth provider.   |
+| `PROVIDERS_FAILURE_REDIRECT`   | ``     | The URL the user should be redirected to on failed signin/signup with a OAuth provider.   |
+| `AUTH_GITHUB_ACTIVE`   | `false`     | Activate Github as an OAuth provider.   |
+| `AUTH_GITHUB_CLIENT_ID`   | ``     | Github OAuth app Client ID.   |
+| `AUTH_GITHUB_CLIENT_SECRET`   | ``     | Github OAuth app Client Secret.   |
+| `AUTH_GITHUB_CALLBACK_URL`   | ``     | Github OAuth app authorization callback URL.   |
+| `AUTH_GOOGLE_ACTIVE`   | `false`     | Activate Google as an OAuth provider.   |
+| `AUTH_GOOGLE_CLIENT_ID`   | ``     | Google OAuth app Client ID.   |
+| `AUTH_GOOGLE_CLIENT_SECRET`   | ``     | Google OAuth app Client Secret.   |
+| `AUTH_GOOGLE_CALLBACK_URL`   | ``     | Google OAuth app authorization callback URL.   |
+| `AUTH_FACEBOOK_ACTIVE`   | `false`     | Activate Facebook as an OAuth provider.   |
+| `AUTH_FACEBOOK_CLIENT_ID`   | ``     | Facebook OAuth app Client ID.   |
+| `AUTH_FACEBOOK_CLIENT_SECRET`   | ``     | Facebook OAuth app Client Secret.   |
+| `AUTH_FACEBOOK_CALLBACK_URL`   | ``     | Facebook OAuth app authorization callback URL.   |
+| `STORAGE_ACTIVE`   | `true`     | Activate storage   |
 | `HASURA_GRAPHQL_ENDPOINT`   | `http://graphql-engine:8080/v1/graphql`     | Hasura GraphQL endpoint  |
 | `HASURA_GRAPHQL_ADMIN_SECRET`   | ``  | Hasura GraphQL admin secret |
 | `HASURA_GRAPHQL_JWT_SECRET`   | `{ 'type' : 'HS256', 'key': 'secretkey' }`  | Shared JWT secret. Must be same as Hasuras `HASURA_GRAPHQL_JWT_SECRET` |
@@ -123,9 +142,6 @@ Restart your docker containers
 | `S3_SECRET_ACCESS_KEY`   | ``  | S3 secret access key |
 | `S3_ENDPOINT`   | ``  | S3 endpoint |
 | `S3_BUCKET`   | ``  | S3 bucket name |
-| `REFETCH_TOKEN_EXPIRES`   | `43200` (30 days)  | Minutes until refetch token expires |
-| `JWT_TOKEN_EXPIRES`   | `15` | Minutes until JWT token expires |
-| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME`   | `` | Database schema name of where the `users` table is located |
 
 
 #### USER_FIELDS
@@ -167,30 +183,48 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 # HASURA_GRAPHQL_ENDPOINT
 
 ## Auth
+```
+/auth/refresh-token
+/auth/users
+```
+
+### Refresh Token
+
+`/auth/refresh-token`
+
+Returns a JWT token.
+
+### Refresh Token
+
+`/auth/user`
+
+Returns the full User object
+
+## Auth Local
 
 ```
-/auth/register
-/auth/activate-account
-/auth/login
-/auth/refetch-token
-/auth/new-password
+/auth/local/register
+/auth/local/activate-account
+/auth/local/login
+/auth/local/new-password
 ```
 
 Use HTTP POST method.
 
 ### Register
 
-`/auth/register`
+`/auth/local/register`
 
-| variable | type | required |
+| variable | type | required | comment |
 | :---         |     :---      | :--- |
-| `username`   | `string`     | YES |
-| `password`   | `string`     | YES |
-| `register_data`   | `json object`     | NO |
+| `email`   | `string`     | YES | |
+| `username`   | `string`     | YES | can be same as email |
+| `password`   | `string`     | YES | |
+| `register_data`   | `json object`     | NO | |
 
 ### activate Account
 
-`/auth/activate-account`
+`/auth/local/activate-account`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
@@ -198,25 +232,16 @@ Use HTTP POST method.
 
 ### Login
 
-`/auth/login`
+`/auth/local/login`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
 | `username`   | `string`     | YES |
 | `password`   | `string`     | YES |
 
-### Refetch Token
-
-`/auth/refetch-token`
-
-| variable | type | required |
-| :---         |     :---      | :--- |
-| `user_id`   | `uuid`     | YES |
-| `refetch_token`   | `uuid`     | YES |
-
 ### New password
 
-`/auth/new-password`
+`/auth/local/new-password`
 
 `POST`
 
@@ -228,7 +253,7 @@ Use HTTP POST method.
 ## Register your first user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/register \
+  http://localhost:3000/auth/local/register \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
@@ -241,7 +266,7 @@ The response: `OK!`
 ## Login using that user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/login \
+  http://localhost:3000/auth/local/login \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
@@ -253,9 +278,16 @@ This will have a valid token in the response:
 ```json
 {
     "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
-    "refetch_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
+    "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
     "user_id": 1
 }
+```
+
+## OAuth providers
+
+```
+/auth/github
+/auth/google
 ```
 
 # Storage

@@ -10,79 +10,218 @@ const {
   USER_FIELDS,
   USER_REGISTRATION_AUTO_ACTIVE,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
-  REFETCH_TOKEN_EXPIRES,
+  REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
+  STORAGE_ACTIVE,
 } = require('../config');
 
-const auth_tools = require('./auth-tools');
+const auth_functions = require('./auth-functions');
 
 let router = express.Router();
 
 const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
-router.post('/register', async (req, res, next) => {
+router.post('/refresh-token', async (req, res, next) => {
 
-  let hasura_data;
-  let password_hash;
-
+  // validate username and password
   const schema = Joi.object().keys({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
-    register_data: Joi.object().allow(null),
+    refresh_token: Joi.string().required(),
   });
 
-  const { error, value } = schema.validate(req.body);
+  const { error, value } = schema.validate({
+    refresh_token: req.cookies.refresh_token,
+  });
 
   if (error) {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username, password, register_data } = value;
+  const { refresh_token } = value;
 
-  // check for duplicates
   let query = `
-  query (
-    $username: String!
+  query get_refresh_token(
+    $refresh_token: uuid!,
+    $current_timestampz: timestamptz!,
   ) {
-    ${schema_name}users (
+    refresh_tokens: ${schema_name}refresh_tokens (
       where: {
-        username: { _eq: $username }
+        _and: [{
+          refresh_token: { _eq: $refresh_token }
+        }, {
+          user: { active: { _eq: true }}
+        }, {
+          expires_at: { _gte: $current_timestampz }
+        }]
       }
     ) {
-      id
+      user {
+        id
+        active
+        default_role
+        user_roles {
+          role
+        }
+        ${USER_FIELDS.join('\n')}
+      }
     }
   }
   `;
 
+  let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
-      username,
+      refresh_token,
+      current_timestampz: new Date(),
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.badImplementation("Unable to check for 'username' duplication"));
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
-  if (hasura_data[`${schema_name}users`].length !== 0) {
-    return next(Boom.unauthorized("The 'username' already exist"));
+  if (hasura_data[`refresh_tokens`].length === 0) {
+    // console.error('Incorrect user id or refresh token');
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
-  // generate password_hash
-  try {
-    password_hash = await bcrypt.hash(password, 10);
-  } catch(e) {
-    console.error(e);
-    return next(Boom.badImplementation("Unable to generate 'password hash'"));
-  }
+  const user = hasura_data[`refresh_tokens`][0].user;
 
-  // insert user
+  // delete current refresh token and generate a new, and insert the
+  // new refresh_token in the database
+  // two mutations as transaction
   query = `
   mutation (
-    $user: ${schema_name}users_insert_input!
+    $old_refresh_token: uuid!,
+    $new_refresh_token_data: refresh_tokens_insert_input!
   ) {
-    insert_${schema_name}users(
-      objects: [$user]
+    delete_refresh_token: delete_${schema_name}refresh_tokens (
+      where: {
+        refresh_token: { _eq: $old_refresh_token }
+      }
+    ) {
+      affected_rows
+    }
+    insert_refresh_token: insert_${schema_name}refresh_tokens (
+      objects: [$new_refresh_token_data]
+    ) {
+      affected_rows
+    }
+  }
+  `;
+
+  const new_refresh_token = uuidv4();
+  // convert from minutes to milli seconds
+  const new_refresh_token_expires_at = new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000));
+
+  try {
+    await graphql_client.request(query, {
+      old_refresh_token: refresh_token,
+      new_refresh_token_data: {
+        user_id: user.id,
+        refresh_token: new_refresh_token,
+        expires_at: new_refresh_token_expires_at,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    // console.error('unable to create new refresh token and delete old');
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+  }
+
+  // generate new jwt token
+  const jwt_token = auth_functions.generateJwtToken(user);
+  const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
+
+  // set JWT storage cookie to use for file upload/download
+  if (STORAGE_ACTIVE) {
+    res.cookie('storage_jwt_token', storage_jwt_token, {
+      maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+      httpOnly: true,
+    });
+  }
+
+  res.cookie('refresh_token', new_refresh_token, {
+    maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
+    httpOnly: true,
+  });
+
+  res.json({
+    jwt_token,
+  });
+});
+
+router.post('/logout', async (req, res, next) => {
+
+  // clear cookies
+  res.cookie('storage_jwt_token', '', {
+    maxAge: 1,
+    httpOnly: true,
+  });
+  res.cookie('refresh_token', '', {
+    maxAge: 1,
+    httpOnly: true,
+  });
+
+  res.send('OK');
+});
+
+router.post('/logout-all', async (req, res, next) => {
+
+  // get refresh token
+  const schema = Joi.object().keys({
+    refresh_token: Joi.string().uuid().required(),
+  });
+
+  const { error, value } = schema.validate({
+    refresh_token: req.cookies.refresh_token,
+  });
+
+  const { refresh_token } = value;
+
+  let query = `
+  query (
+    $refresh_token: uuid!,
+    $current_timestampz: timestamptz!,
+  ) {
+    refresh_tokens: ${schema_name}refresh_tokens (
+      where: {
+        _and: [{
+          refresh_token: { _eq: $refresh_token }
+        }, {
+          expires_at: { _gte: $current_timestampz }
+        }]
+      }
+    ) {
+      user {
+        id
+      }
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      refresh_token,
+      current_timestampz: new Date(),
+    });
+  } catch (e) {
+    console.error(e);
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+  }
+  const { user } = hasura_data.refresh_tokens[0];
+
+  // delete all refresh tokens associated with the user id
+  let mutation = `
+  mutation (
+    $user_id: uuid!,
+  ) {
+    delete_refresh_token: delete_${schema_name}refresh_tokens (
+      where: {
+        user_id: { _eq: $user_id }
+      }
     ) {
       affected_rows
     }
@@ -90,21 +229,93 @@ router.post('/register', async (req, res, next) => {
   `;
 
   try {
-    await graphql_client.request(query, {
-      user: {
-        username,
-        password: password_hash,
-        secret_token: uuidv4(),
-        active: USER_REGISTRATION_AUTO_ACTIVE,
-        register_data,
-      },
+    hasura_data = await graphql_client.request(mutation, {
+      user_id: user.id,
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.badImplementation('Unable to create user.'));
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized('Unable to delete refresh tokens'));
   }
 
+  // clear cookies
+  res.cookie('storage_jwt_token', '', {
+    maxAge: 0,
+    httpOnly: true,
+  });
+  res.cookie('refresh_token', '', {
+    maxAge: 0,
+    httpOnly: true,
+  });
   res.send('OK');
+});
+
+router.get('/user', async (req, res, next) => {
+
+  // get jwt token
+  if (!req.headers.authorization) {
+    return next(Boom.badRequest('no authorization header'));
+  }
+
+  const auth_split = req.headers.authorization.split(' ');
+
+  if (auth_split[0] !== 'Bearer' || !auth_split[1]) {
+    return next(Boom.badRequest('malformed authorization header'));
+  }
+
+  // get jwt token
+  const token = auth_split[1];
+
+  // verify jwt token is OK
+  let claims;
+  try {
+    claims = jwt.verify(
+      token,
+      HASURA_GRAPHQL_JWT_SECRET.key,
+      {
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Incorrect JWT Token'));
+  }
+
+  // get user_id from jwt claim
+  const user_id = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
+
+  // get user from hasura (include ${USER_FIELDS.join('\n')})
+  let query = `
+  query (
+    $id: Int!
+  ) {
+    user: ${schema_name}users_by_pk(id: $id) {
+      id
+      username
+      active
+      default_role
+      user_roles {
+        role
+      }
+      ${USER_FIELDS.join('\n')}
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(query, {
+      id: user_id,
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized("Unable to get 'user'"));
+  }
+
+  // return user as json response
+  res.json({
+    user: hasura_data.user,
+  });
 });
 
 router.post('/activate-account', async (req, res, next) => {
@@ -130,7 +341,7 @@ router.post('/activate-account', async (req, res, next) => {
     $new_secret_token: uuid!
     $now: timestamptz!
   ) {
-    update_${schema_name}users (
+    update_users: update_${schema_name}users (
       where: {
         _and: [
           {
@@ -163,328 +374,12 @@ router.post('/activate-account', async (req, res, next) => {
     return next(Boom.unauthorized('Unable to find account for activation.'));
   }
 
-  if (hasura_data[`update_${schema_name}users`].affected_rows === 0) {
+  if (hasura_data[`update_users`].affected_rows === 0) {
     // console.error('Account already activated');
     return next(Boom.unauthorized('Account is already activated, the secret token has expired or there is no account.'));
   }
 
   res.send('OK');
-});
-
-router.post('/new-password', async (req, res, next) => {
-  let hasura_data;
-  let password_hash;
-
-  const schema = Joi.object().keys({
-    secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
-    password: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const {
-    secret_token,
-    password,
-  } = value;
-
-  // update password and username activation token
-  try {
-    password_hash = await bcrypt.hash(password, 10);
-  } catch(e) {
-    console.error(e);
-    return next(Boom.badImplementation(`Unable to generate 'password_hash'`));
-  }
-
-  const query = `
-  mutation  (
-    $secret_token: uuid!,
-    $password_hash: String!,
-    $new_secret_token: uuid!
-    $now: timestamptz!
-  ) {
-    update_${schema_name}users (
-      where: {
-        _and: [
-          {
-            secret_token: { _eq: $secret_token}
-          }, {
-            secret_token_expires_at: { _gt: $now }
-          }
-        ]
-      }
-      _set: {
-        password: $password_hash,
-        secret_token: $new_secret_token
-      }
-    ) {
-      affected_rows
-    }
-  }
-  `;
-
-  try {
-    const new_secret_token = uuidv4();
-    hasura_data = await graphql_client.request(query, {
-      secret_token,
-      password_hash,
-      new_secret_token,
-      now: new Date(),
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized(`Unable to update 'password'`));
-  }
-
-  if (hasura_data.update_users.affected_rows === 0) {
-    console.error('No user to update password for. Also maybe the secret token has expired');
-    return next(Boom.badRequest(`Unable to update password for user`));
-  }
-
-  // return 200 OK
-  res.send('OK');
-});
-
-router.post('/login', async (req, res, next) => {
-
-  // validate username and password
-  const schema = Joi.object().keys({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const { username, password } = value;
-
-  let query = `
-  query (
-    $username: String!
-  ) {
-    ${schema_name}users (
-      where: {
-        username: { _eq: $username}
-      }
-    ) {
-      id
-      password
-      active
-      default_role
-      user_roles {
-        role
-      }
-      ${USER_FIELDS.join('\n')}
-    }
-  }
-  `;
-
-  let hasura_data;
-  try {
-    hasura_data = await graphql_client.request(query, {
-      username,
-    });
-  } catch (e) {
-    console.error(e);
-    // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Unable to find 'user'"));
-  }
-
-  if (hasura_data[`${schema_name}users`].length === 0) {
-    // console.error("No user with this 'username'");
-    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
-  }
-
-  // check if we got any user back
-  const user = hasura_data[`${schema_name}users`][0];
-
-  if (!user.active) {
-    // console.error('User not activated');
-    return next(Boom.unauthorized('User not activated.'));
-  }
-
-  // see if password hashes matches
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    console.error('Password does not match');
-    return next(Boom.unauthorized("Invalid 'username' or 'password'"));
-  }
-
-  const jwt_token = auth_tools.generateJwtToken(user);
-
-  // generate refetch token and put in database
-  query = `
-  mutation (
-    $refetch_token_data: ${schema_name}refetch_tokens_insert_input!
-  ) {
-    insert_${schema_name}refetch_tokens (
-      objects: [$refetch_token_data]
-    ) {
-      affected_rows
-    }
-  }
-  `;
-
-  const refetch_token = uuidv4();
-  try {
-    await graphql_client.request(query, {
-      refetch_token_data: {
-        user_id: user.id,
-        refetch_token: refetch_token,
-        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
-      },
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.badImplementation("Could not update 'refetch token' for user"));
-  }
-
-  res.cookie('jwt_token', jwt_token, {
-    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-    httpOnly: true,
-  });
-
-  // return jwt token and refetch token to client
-  res.json({
-    jwt_token,
-    refetch_token,
-    user_id: user.id,
-  });
-});
-
-router.post('/refetch-token', async (req, res, next) => {
-
-  // validate username and password
-  const schema = Joi.object().keys({
-    user_id: Joi.required(),
-    refetch_token: Joi.string().required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const { refetch_token, user_id } = value;
-
-  let query = `
-  query get_refetch_token(
-    $refetch_token: uuid!,
-    $user_id: uuid!
-    $current_timestampz: timestamptz!,
-  ) {
-    ${schema_name}refetch_tokens (
-      where: {
-        _and: [{
-          refetch_token: { _eq: $refetch_token }
-        }, {
-          user_id: { _eq: $user_id }
-        }, {
-          user: { active: { _eq: true }}
-        }, {
-          expires_at: { _gte: $current_timestampz }
-        }]
-      }
-    ) {
-      user {
-        id
-        active
-        default_role
-        user_roles {
-          role
-        }
-        ${USER_FIELDS.join('\n')}
-      }
-    }
-  }
-  `;
-
-  let hasura_data;
-  try {
-    hasura_data = await graphql_client.request(query, {
-      refetch_token,
-      user_id,
-      current_timestampz: new Date(),
-    });
-  } catch (e) {
-    console.error(e);
-    // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
-  }
-
-  if (hasura_data[`${schema_name}refetch_tokens`].length === 0) {
-    // console.error('Incorrect user id or refetch token');
-    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
-  }
-
-  const user = hasura_data[`${schema_name}refetch_tokens`][0].user;
-
-  // delete current refetch token and generate a new, and insert the
-  // new refetch_token in the database
-  // two mutations as transaction
-  query = `
-  mutation (
-    $old_refetch_token: uuid!,
-    $new_refetch_token_data: refetch_tokens_insert_input!
-    $user_id: uuid!
-  ) {
-    delete_${schema_name}refetch_tokens (
-      where: {
-        _and: [{
-          refetch_token: { _eq: $old_refetch_token }
-        }, {
-          user_id: { _eq: $user_id }
-        }]
-      }
-    ) {
-      affected_rows
-    }
-    insert_${schema_name}refetch_tokens (
-      objects: [$new_refetch_token_data]
-    ) {
-      affected_rows
-    }
-  }
-  `;
-
-  const new_refetch_token = uuidv4();
-  try {
-    await graphql_client.request(query, {
-      old_refetch_token: refetch_token,
-      new_refetch_token_data: {
-        user_id: user_id,
-        refetch_token: new_refetch_token,
-        expires_at: new Date(new Date().getTime() + (REFETCH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
-      },
-      user_id,
-    });
-  } catch (e) {
-    console.error(e);
-    // console.error('unable to create new refetch token and delete old');
-    return next(Boom.unauthorized("Invalid 'refetch_token' or 'user_id'"));
-  }
-
-  // generate new jwt token
-  const jwt_token = auth_tools.generateJwtToken(user);
-
-  res.cookie('jwt_token', jwt_token, {
-    maxAge: JWT_TOKEN_EXPIRES * 60 * 1000,
-    httpOnly: true,
-  });
-
-  res.json({
-    jwt_token,
-    refetch_token: new_refetch_token,
-    user_id,
-  });
 });
 
 router.get('/user', async (req, res, next) => {
@@ -554,5 +449,7 @@ router.get('/user', async (req, res, next) => {
     user: hasura_data.user,
   });
 });
+
+
 
 module.exports = router;

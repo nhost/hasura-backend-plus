@@ -2,12 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 
 const auth = require('./auth/auth');
+const auth_local = require('./auth/local');
+const auth_github = require('./auth/github');
+const auth_google = require('./auth/google');
+const auth_facebook = require('./auth/facebook');
 const storage = require('./storage/storage');
 
 const {
   AUTH_ACTIVE,
+  AUTH_LOCAL_ACTIVE,
+  AUTH_GITHUB_ACTIVE,
+  AUTH_GOOGLE_ACTIVE,
+  AUTH_FACEBOOK_ACTIVE,
   STORAGE_ACTIVE,
 } = require('./config');
 
@@ -24,10 +33,33 @@ app.use(cookieParser());
 app.disable('x-powered-by');
 
 // routes
+app.use(passport.initialize());
+
 if (AUTH_ACTIVE) {
+  console.log('auth active');
   app.use('/auth', auth);
+
+  if (AUTH_LOCAL_ACTIVE) {
+    console.log('auth local active');
+    app.use('/auth/local', auth_local);
+  }
+
+  if (AUTH_GITHUB_ACTIVE) {
+    console.log('auth github active');
+    app.use('/auth/github', auth_github);
+  }
+  if (AUTH_GOOGLE_ACTIVE) {
+    console.log('auth google active');
+    app.use('/auth/google', auth_google);
+  }
+  if (AUTH_FACEBOOK_ACTIVE) {
+    console.log('auth facebook active');
+    app.use('/auth/facebook', auth_facebook);
+  }
 }
+
 if (STORAGE_ACTIVE) {
+  console.log('storage active');
   app.use('/storage', storage);
 }
 

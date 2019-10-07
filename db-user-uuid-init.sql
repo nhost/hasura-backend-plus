@@ -1,3 +1,5 @@
+-- DEPRICATED, use new db-user-providers-init.sql instead
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE FUNCTION set_current_timestamp_updated_at() RETURNS trigger
