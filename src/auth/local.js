@@ -61,12 +61,12 @@ router.post('/register', async (req, res, next) => {
         display_name: username,
         email: email,
         active: USER_REGISTRATION_AUTO_ACTIVE,
+        secret_token: uuidv4(),
         user_accounts: {
           data: {
             username: username,
             email: email,
             password: await bcrypt.hash(password, 10),
-            secret_token: uuidv4(),
             register_data,
           },
         },
@@ -80,69 +80,6 @@ router.post('/register', async (req, res, next) => {
   res.send('OK');
 });
 
-router.post('/activate-account', async (req, res, next) => {
-  let hasura_data;
-
-  const schema = Joi.object().keys({
-    secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
-  });
-
-  const { error, value } = schema.validate(req.body);
-
-  if (error) {
-    return next(Boom.badRequest(error.details[0].message));
-  }
-
-  const {
-    secret_token,
-  } = value;
-
-  const query = `
-  mutation activate_account (
-    $secret_token: uuid!
-    $new_secret_token: uuid!
-    $now: timestamptz!
-  ) {
-    update_${schema_name}users (
-      where: {
-        _and: [
-          {
-            secret_token: { _eq: $secret_token }
-          }, {
-            secret_token_expires_at: { _gt: $now }
-          },{
-            active: { _eq: false }
-          }
-        ]
-      }
-      _set: {
-        active: true,
-        secret_token: $new_secret_token,
-      }
-    ) {
-      affected_rows
-    }
-  }
-  `;
-
-  try {
-    hasura_data = await graphql_client.request(query, {
-      secret_token,
-      new_secret_token: uuidv4(),
-      now: new Date(),
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized('Unable to find account for activation.'));
-  }
-
-  if (hasura_data[`update_${schema_name}users`].affected_rows === 0) {
-    // console.error('Account already activated');
-    return next(Boom.unauthorized('Account is already activated, the secret token has expired or there is no account.'));
-  }
-
-  res.send('OK');
-});
 
 router.post('/new-password', async (req, res, next) => {
   let hasura_data;
@@ -173,13 +110,33 @@ router.post('/new-password', async (req, res, next) => {
   }
 
   const query = `
-  mutation  (
+  mutation (
     $secret_token: uuid!,
     $password_hash: String!,
     $new_secret_token: uuid!
     $now: timestamptz!
   ) {
-    update_${schema_name}users (
+    update_user_account_password: update_${schema_name}user_accounts (
+      where: {
+        _and: [
+          {
+            user: {
+              secret_token: { _eq: $secret_token}
+            },
+          }, {
+            user: {
+              secret_token_expires_at: { _gt: $now }
+            }
+          }
+        ]
+      }
+      _set: {
+        password: $password_hash,
+      }
+    ) {
+      affected_rows
+    }
+    update_secret_token: update_${schema_name}users (
       where: {
         _and: [
           {
@@ -190,8 +147,8 @@ router.post('/new-password', async (req, res, next) => {
         ]
       }
       _set: {
-        password: $password_hash,
         secret_token: $new_secret_token
+        secret_token_expires_at: $now
       }
     ) {
       affected_rows
@@ -212,7 +169,7 @@ router.post('/new-password', async (req, res, next) => {
     return next(Boom.unauthorized(`Unable to update 'password'`));
   }
 
-  if (hasura_data.update_users.affected_rows === 0) {
+  if (hasura_data.update_secret_token.affected_rows === 0) {
     console.error('No user to update password for. Also maybe the secret token has expired');
     return next(Boom.badRequest(`Unable to update password for user`));
   }

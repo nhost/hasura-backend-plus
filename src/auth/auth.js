@@ -318,6 +318,70 @@ router.get('/user', async (req, res, next) => {
   });
 });
 
+router.post('/activate-account', async (req, res, next) => {
+  let hasura_data;
+
+  const schema = Joi.object().keys({
+    secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
+  const {
+    secret_token,
+  } = value;
+
+  const query = `
+  mutation activate_account (
+    $secret_token: uuid!
+    $new_secret_token: uuid!
+    $now: timestamptz!
+  ) {
+    update_users: update_${schema_name}users (
+      where: {
+        _and: [
+          {
+            secret_token: { _eq: $secret_token }
+          }, {
+            secret_token_expires_at: { _gt: $now }
+          },{
+            active: { _eq: false }
+          }
+        ]
+      }
+      _set: {
+        active: true,
+        secret_token: $new_secret_token,
+      }
+    ) {
+      affected_rows
+    }
+  }
+  `;
+
+  try {
+    hasura_data = await graphql_client.request(query, {
+      secret_token,
+      new_secret_token: uuidv4(),
+      now: new Date(),
+    });
+  } catch (e) {
+    console.error(e);
+    return next(Boom.unauthorized('Unable to find account for activation.'));
+  }
+
+  if (hasura_data[`update_users`].affected_rows === 0) {
+    // console.error('Account already activated');
+    return next(Boom.unauthorized('Account is already activated, the secret token has expired or there is no account.'));
+  }
+
+  res.send('OK');
+});
+
 router.get('/user', async (req, res, next) => {
 
   // get jwt token
