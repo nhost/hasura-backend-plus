@@ -9,13 +9,17 @@
 <h1 align="center">Hasura Backend Plus ( HBP )</h1>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
-# nhost.io
+---
 
-Don't want to configure all this your self? Use our managed service [nhost.io](https://nhost.io) 🚀. nhost.io projects contains all open source projects to build real-time web apps fast.
+# Nhost
 
-- PosgreSQL (Database)
-- Hasura (Real-Time GraphQL API)
-- Hasura Backend Plus (Auth and Storage)
+The easiest way to deploy HBP is with out official [Nhost](https://nhost.io) managed service. Get your perfect configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save your self hours of maintenance per month.
+
+All [Nhost](https://nhost.io) projects contains all open source software to build realtime web and mobile apps fast 🚀.
+
+[https://nhost.io](https://nhost.io)
+
+---
 
 # Setup
 
