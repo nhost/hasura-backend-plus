@@ -185,6 +185,7 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 ## Auth
 ```
 /auth/refresh-token
+/auth/activate-account
 /auth/users
 ```
 
@@ -193,6 +194,14 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 `/auth/refresh-token`
 
 Returns a JWT token.
+
+### activate Account
+
+`/auth/local/activate-account`
+
+| variable | type | required |
+| :---         |     :---      | :--- |
+| `secret_token`   | `uuid`     | YES |
 
 ### Refresh Token
 
@@ -204,7 +213,6 @@ Returns the full User object
 
 ```
 /auth/local/register
-/auth/local/activate-account
 /auth/local/login
 /auth/local/new-password
 ```
@@ -221,14 +229,6 @@ Use HTTP POST method.
 | `username`   | `string`     | YES | can be same as email |
 | `password`   | `string`     | YES | |
 | `register_data`   | `json object`     | NO | |
-
-### activate Account
-
-`/auth/local/activate-account`
-
-| variable | type | required |
-| :---         |     :---      | :--- |
-| `secret_token`   | `uuid`     | YES |
 
 ### Login
 
