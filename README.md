@@ -24,7 +24,7 @@ All [Nhost](https://nhost.io) projects contains all open source software to buil
 
 ## Get your database ready
 
-Create tables and initial state for your user mangagement by copy everything from the file `db-user-providers-init.sql` and insert into the SQL tab in the Hasura Console.
+Create tables and initial state for your user mangagement by copy everything from the file `db-init.sql` and insert into the SQL tab in the Hasura Console.
 
 ## Track your tables and relations in Hasura
 
