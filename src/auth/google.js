@@ -40,9 +40,9 @@ async function(accessToken, refreshToken, profile, cb) {
     user_providers: ${schema_name}user_providers (
       where: {
         _and: [{
-          provider: {_eq: "google"}
+          auth_provider: {_eq: "google"}
         }, {
-          provider_user_id: { _eq: $profile_id }
+          auth_provider_unique_id: { _eq: $profile_id }
         }]
       }
     ) {
@@ -120,8 +120,8 @@ async function(accessToken, refreshToken, profile, cb) {
           avatar_url: avatar_url,
           user_providers: {
             data: {
-              provider: profile.provider,
-              provider_user_id: profile.id,
+              auth_provider: profile.provider,
+              auth_provider_unique_id: profile.id,
               token: accessToken,
             },
           },
