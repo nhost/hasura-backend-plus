@@ -4,12 +4,6 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
-const auth = require('./auth/auth');
-const auth_local = require('./auth/local');
-const auth_github = require('./auth/github');
-const auth_google = require('./auth/google');
-const auth_facebook = require('./auth/facebook');
-const storage = require('./storage/storage');
 
 const {
   AUTH_ACTIVE,
@@ -37,29 +31,35 @@ app.use(passport.initialize());
 
 if (AUTH_ACTIVE) {
   console.log('auth active');
+  const auth = require('./auth/auth');
   app.use('/auth', auth);
 
   if (AUTH_LOCAL_ACTIVE) {
     console.log('auth local active');
+    const auth_local = require('./auth/local');
     app.use('/auth/local', auth_local);
   }
 
   if (AUTH_GITHUB_ACTIVE) {
     console.log('auth github active');
+    const auth_github = require('./auth/github');
     app.use('/auth/github', auth_github);
   }
   if (AUTH_GOOGLE_ACTIVE) {
     console.log('auth google active');
+    const auth_google = require('./auth/google');
     app.use('/auth/google', auth_google);
   }
   if (AUTH_FACEBOOK_ACTIVE) {
     console.log('auth facebook active');
+    const auth_facebook = require('./auth/facebook');
     app.use('/auth/facebook', auth_facebook);
   }
 }
 
 if (STORAGE_ACTIVE) {
   console.log('storage active');
+  const storage = require('./storage/storage');
   app.use('/storage', storage);
 }
 
