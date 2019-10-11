@@ -29,9 +29,7 @@ router.post('/refresh-token', async (req, res, next) => {
     refresh_token: Joi.string().required(),
   });
 
-  const { error, value } = schema.validate({
-    refresh_token: req.cookies.refresh_token,
-  });
+  const { error, value } = schema.validate(req.body);
 
   if (error) {
     return next(Boom.badRequest(error.details[0].message));
@@ -133,36 +131,15 @@ router.post('/refresh-token', async (req, res, next) => {
   const jwt_token = auth_functions.generateJwtToken(user);
   const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
 
-  // set JWT storage cookie to use for file upload/download
-  if (STORAGE_ACTIVE) {
-    res.cookie('storage_jwt_token', storage_jwt_token, {
-      maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-      httpOnly: true,
-    });
-  }
-
-  res.cookie('refresh_token', new_refresh_token, {
-    maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-    httpOnly: true,
-  });
-
   res.json({
+    refresh_token: new_refresh_token,
+    storage_jwt_token,
     jwt_token,
   });
 });
 
 router.post('/logout', async (req, res, next) => {
-
-  // clear cookies
-  res.cookie('storage_jwt_token', '', {
-    maxAge: 1,
-    httpOnly: true,
-  });
-  res.cookie('refresh_token', '', {
-    maxAge: 1,
-    httpOnly: true,
-  });
-
+  // TODO: Remove current refresh token from DB
   res.send('OK');
 });
 
@@ -173,9 +150,7 @@ router.post('/logout-all', async (req, res, next) => {
     refresh_token: Joi.string().uuid().required(),
   });
 
-  const { error, value } = schema.validate({
-    refresh_token: req.cookies.refresh_token,
-  });
+  const { error, value } = schema.validate(req.body);
 
   const { refresh_token } = value;
 
@@ -247,75 +222,8 @@ router.post('/logout-all', async (req, res, next) => {
     maxAge: 0,
     httpOnly: true,
   });
+
   res.send('OK');
-});
-
-router.get('/user', async (req, res, next) => {
-
-  // get jwt token
-  if (!req.headers.authorization) {
-    return next(Boom.badRequest('no authorization header'));
-  }
-
-  const auth_split = req.headers.authorization.split(' ');
-
-  if (auth_split[0] !== 'Bearer' || !auth_split[1]) {
-    return next(Boom.badRequest('malformed authorization header'));
-  }
-
-  // get jwt token
-  const token = auth_split[1];
-
-  // verify jwt token is OK
-  let claims;
-  try {
-    claims = jwt.verify(
-      token,
-      HASURA_GRAPHQL_JWT_SECRET.key,
-      {
-        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
-      }
-    );
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized('Incorrect JWT Token'));
-  }
-
-  // get user_id from jwt claim
-  const user_id = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
-
-  // get user from hasura (include ${USER_FIELDS.join('\n')})
-  let query = `
-  query (
-    $id: Int!
-  ) {
-    user: ${schema_name}users_by_pk(id: $id) {
-      id
-      username
-      active
-      default_role
-      user_roles {
-        role
-      }
-      ${USER_FIELDS.join('\n')}
-    }
-  }
-  `;
-
-  let hasura_data;
-  try {
-    hasura_data = await graphql_client.request(query, {
-      id: user_id,
-    });
-  } catch (e) {
-    console.error(e);
-    return next(Boom.unauthorized("Unable to get 'user'"));
-  }
-
-  // return user as json response
-  res.json({
-    user: hasura_data.user,
-  });
 });
 
 router.post('/activate-account', async (req, res, next) => {
@@ -423,7 +331,9 @@ router.get('/user', async (req, res, next) => {
   ) {
     user: ${schema_name}users_by_pk(id: $id) {
       id
-      username
+      display_name
+      email
+      avatar_url
       active
       default_role
       roles: user_roles {

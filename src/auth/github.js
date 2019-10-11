@@ -177,12 +177,17 @@ router.get('/callback',
     `;
 
     const refresh_token = uuidv4();
+    let hasura_data;
     try {
-      await graphql_client.request(query, {
+
+      // only set 5 min exp time. Callback to app should make the app do a instant
+      // refresh of this particular token.
+
+      hasura_data = await graphql_client.request(query, {
         refresh_token_data: {
           user_id: user.id,
           refresh_token: refresh_token,
-          expires_at: new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000)), // convert from minutes to milli seconds
+          expires_at: new Date(new Date().getTime() + (2 * 60 * 1000)),
         },
       });
     } catch (e) {
@@ -190,21 +195,15 @@ router.get('/callback',
       return res.send("Could not update 'refresh token' for user");
     }
 
-    // set JWT storage cookie to use for file upload/download
-    if (STORAGE_ACTIVE) {
-      res.cookie('storage_jwt_token', storage_jwt_token, {
-        maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-        httpOnly: true,
-      });
+    // send user back
+    let callback_url = '';
+    if (PROVIDERS_SUCCESS_REDIRECT.indexOf('?') > 1) {
+      callback_url = `${PROVIDERS_SUCCESS_REDIRECT}&refresh_token=${refresh_token}`;
+    } else {
+      callback_url = `${PROVIDERS_SUCCESS_REDIRECT}?refresh_token=${refresh_token}`;
     }
 
-    res.cookie('refresh_token', refresh_token, {
-      maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-      httpOnly: true,
-    });
-
-    // send user back
-    res.redirect(PROVIDERS_SUCCESS_REDIRECT);
+    res.redirect(callback_url);
   }
 );
 

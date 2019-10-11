@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
-
 const {
   AUTH_ACTIVE,
   AUTH_LOCAL_ACTIVE,

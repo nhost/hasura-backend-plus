@@ -280,25 +280,10 @@ router.post('/login', async (req, res, next) => {
     return next(Boom.badImplementation("Could not update 'refresh token' for user"));
   }
 
-  // set JWT storage cookie to use for file upload/download
-  if (STORAGE_ACTIVE) {
-    res.cookie('storage_jwt_token', storage_jwt_token, {
-      maxAge: JWT_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-      httpOnly: true,
-    });
-  }
-
-  res.cookie('refresh_token', refresh_token, {
-    maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-    httpOnly: true,
-  });
-  res.cookie('refresh_token', refresh_token, {
-    maxAge: REFRESH_TOKEN_EXPIRES * 60 * 1000, // convert from minute to milliseconds
-    httpOnly: true,
-  });
-
   // return jwt token and refresh token to client
   res.json({
+    storage_jwt_token,
+    refresh_token,
     jwt_token,
   });
 });
