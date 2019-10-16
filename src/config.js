@@ -23,6 +23,9 @@ exports.AUTH_GITHUB_ACTIVE = process.env.AUTH_GITHUB_ACTIVE ? process.env.AUTH_G
 exports.AUTH_GITHUB_CLIENT_ID = process.env.AUTH_GITHUB_CLIENT_ID || '';
 exports.AUTH_GITHUB_CLIENT_SECRET = process.env.AUTH_GITHUB_CLIENT_SECRET || '';
 exports.AUTH_GITHUB_CALLBACK_URL = process.env.AUTH_GITHUB_CALLBACK_URL || '';
+exports.AUTH_GITHUB_AUTHORIZATION_URL = process.env.AUTH_GITHUB_AUTHORIZATION_URL || null;
+exports.AUTH_GITHUB_TOKEN_URL = process.env.AUTH_GITHUB_TOKEN_URL || null;
+exports.AUTH_GITHUB_USER_PROFILE_URL = process.env.AUTH_GITHUB_USER_PROFILE_URL || null;
 
 // GOOGLE
 exports.AUTH_GOOGLE_ACTIVE = process.env.AUTH_GOOGLE_ACTIVE ? process.env.AUTH_GOOGLE_ACTIVE === 'true' : false;
