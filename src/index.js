@@ -62,6 +62,10 @@ if (STORAGE_ACTIVE) {
   app.use('/storage', storage);
 }
 
+app.use('/healthz', (req, res) => {
+  res.send('OK');
+});
+
 // error handler
 app.use((err, req, res, next) => {
 	if (err) {
