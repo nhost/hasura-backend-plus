@@ -129,6 +129,9 @@ Restart your docker containers
 | `AUTH_GITHUB_CLIENT_ID`   | ``     | Github OAuth app Client ID.   |
 | `AUTH_GITHUB_CLIENT_SECRET`   | ``     | Github OAuth app Client Secret.   |
 | `AUTH_GITHUB_CALLBACK_URL`   | ``     | Github OAuth app authorization callback URL.   |
+| `AUTH_GITHUB_AUTHORIZATION_URL`   | ``     | Github (enterprise) OAuth app authorization url.   |
+| `AUTH_GITHUB_TOKEN_URL`   | ``     | Github (enterprise) OAuth app token url.   |
+| `AUTH_GITHUB_USER_PROFILE_URL`   | ``     | Github (enterprise) OAuth app user profile url.   |
 | `AUTH_GOOGLE_ACTIVE`   | `false`     | Activate Google as an OAuth provider.   |
 | `AUTH_GOOGLE_CLIENT_ID`   | ``     | Google OAuth app Client ID.   |
 | `AUTH_GOOGLE_CLIENT_SECRET`   | ``     | Google OAuth app Client Secret.   |
