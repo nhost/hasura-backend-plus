@@ -40,7 +40,7 @@ export default {
     authenticationType: '', // auth._token.local contains 'Bearer' prefix already
     clientConfigs: {
       default: {
-        httpEndpoint: '', // insert your own graphql link
+        httpEndpoint: '', // insert your own graphql link (https://backend-xxxxxxxx.nhost.io/v1/graphql)
         httpLinkOptions: {
           includeExtensions: true,
         },
@@ -53,7 +53,7 @@ export default {
       local: {
         endpoints: {
           login: {
-            url: '', // insert login link (https://backend-xxxxxxxx.nhost.io/auth/login)
+            url: '', // insert login link (https://backend-xxxxxxxx.nhost.io/auth/local/login)
             method: 'post',
             propertyName: 'jwt_token',
           },
