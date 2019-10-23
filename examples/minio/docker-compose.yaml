@@ -51,7 +51,7 @@ services:
       S3_ENDPOINT: http://minio:9000
       S3_BUCKET: hbtest
       DOMAIN: localhost
-      REFETCH_TOKEN_EXPIRES: 54000
+      REFRESH_TOKEN_EXPIRES: 54000
     volumes:
      - './storage-rules:/app/src/storage/rules'
   minio:
