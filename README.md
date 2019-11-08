@@ -199,17 +199,21 @@ https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-to
 
 `/auth/refresh-token`
 
+`POST`
+
 Returns a JWT token.
 
-### activate Account
+### Activate Account
 
 `/auth/local/activate-account`
+
+`POST`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
 | `secret_token`   | `uuid`     | YES |
 
-### Refresh Token
+### User
 
 `/auth/user`
 
@@ -229,6 +233,8 @@ Use HTTP POST method.
 
 `/auth/local/register`
 
+`POST`
+
 | variable | type | required | comment |
 | :---         |     :---      | :--- |
 | `email`   | `string`     | YES | |
@@ -239,6 +245,8 @@ Use HTTP POST method.
 ### Login
 
 `/auth/local/login`
+
+`POST`
 
 | variable | type | required |
 | :---         |     :---      | :--- |
@@ -308,7 +316,19 @@ Uploads to `/storage/upload`. Will return `key`, `originalname` and `mimetype`. 
 
 ### Download (get)
 
-Get files at `/storage/file/{key}`.
+`GET`
+`storage/file/{key}`
+
+### Delete (get)
+
+`DELETE`
+`/storage/file/{key}`
+
+
+### Get downloadable file
+
+`GET`
+`/storage/fn/get-download-url/{key}`.
 
 ### Security
 
