@@ -2,14 +2,14 @@ const express = require('express');
 const Joi = require('joi');
 const Boom = require('boom');
 const jwt = require('jsonwebtoken');
-const uuidv4 = require('uuid/v4');
-var multer = require('multer');
-var multerS3 = require('multer-s3');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
-var mime = require('mime-types');
+const mime = require('mime-types');
+const uuidv4 = require('uuid/v4');
 
 const {
-  STORAGE_JWT_SECRET,
+  HASURA_GRAPHQL_JWT_SECRET,
   HASURA_GRAPHQL_ADMIN_SECRET,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
@@ -35,10 +35,12 @@ const admin_secret_is_ok = (req) => {
 };
 
 const get_claims_from_request = (req) => {
-  const { storage_jwt_token = '' } = req.cookies;
+
+  // check possible get param token
+
   const { authorization = '' } = req.headers;
 
-  if (authorization === '' && jwt_token === '') {
+  if (authorization === '') {
     return void 0;
   }
 
@@ -47,19 +49,19 @@ const get_claims_from_request = (req) => {
   try {
     const decoded = jwt.verify(
       token,
-      STORAGE_JWT_SECRET.key,
+      HASURA_GRAPHQL_JWT_SECRET.key,
       {
-        algorithms: STORAGE_JWT_SECRET.type,
+        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
       }
     );
-    return decoded['storage_claims'];
+    return decoded['https://hasura.io/jwt/claims'];
   } catch (e) {
     console.error(e);
     return void 0;
   }
 };
 
-router.get('/file/*', (req, res, next) => {
+router.get('/fn/get-download-url/*', (req, res, next) => {
   const key = `${req.params[0]}`;
 
   // if not admin, do JWT checks
@@ -86,10 +88,70 @@ router.get('/file/*', (req, res, next) => {
 
     if (err) {
       console.error(err);
-      if (err.code === 'NotFound') {
-        return next(Boom.notFound());
-      }
-      return next(Boom.badImplementation('Unable to retreive file'));
+      return next(Boom.forbidden());
+    }
+
+    const { token } = data.Metadata;
+
+    res.send({
+      token,
+    });
+  });
+});
+
+router.delete('/file/*', (req, res, next) => {
+
+  const key = `${req.params[0]}`;
+
+  // if not admin, do JWT checks
+  if (!admin_secret_is_ok(req)) {
+
+    const claims = get_claims_from_request(req);
+
+    if (claims === undefined) {
+      return next(Boom.unauthorized('Incorrect JWT Token'));
+    }
+
+    // check access of key for jwt token claims
+    if (!storagePermission(key, 'write', claims)) {
+      return next(Boom.unauthorized('You are not allowed to remove this file'));
+    }
+  }
+
+  const params = {
+    Bucket: S3_BUCKET,
+    Key: key,
+  };
+
+  s3.deleteObject(params, (err, data) => {
+    if (err) {
+      console.log(err, err.stack);  // error
+      return next(Boom.badImplementation('could not delete file'));
+    }
+
+    res.send('OK');
+  });
+});
+
+router.get('/file/*', (req, res, next) => {
+  const key = `${req.params[0]}`;
+
+  const token = req.query.token;
+
+  const params = {
+    Bucket: S3_BUCKET,
+    Key: key,
+  };
+
+  s3.headObject(params, function (err, data) {
+
+    if (err) {
+      console.error(err);
+      return next(Boom.forbidden());
+    }
+
+    if (data.Metadata.token !== token) {
+      return next(Boom.forbidden());
     }
 
     const stream = s3.getObject(params).createReadStream();
@@ -108,10 +170,6 @@ router.get('/file/*', (req, res, next) => {
     res.set('Cache-Control', 'public, max-age=31557600');
     res.set('ETag', data.ETag);
 
-    // stream.on('end', () => {
-    //     console.log('Served by Amazon S3: ' + key);
-    // });
-
     //Pipe the s3 object to the response
     stream.pipe(res);
   });
@@ -123,8 +181,14 @@ const upload = multer({
     s3: s3,
     bucket: S3_BUCKET,
     metadata: (req, file, cb) => {
+
+      // TODO: Metadata
+      // req.headres (metadata)
+
       cb(null, {
         originalname: file.originalname,
+        token: req.token,
+        // ...metadata,
       });
     },
     contentType: function (req, file, cb) {
@@ -133,19 +197,18 @@ const upload = multer({
     key: function (req, file, cb) {
 
       // generate unique file names to be saved on the server
-      const uuid = uuidv4();
       const extension = mime.extension(file.mimetype);
-      const key = `${req.s3_key_prefix}${uuid}.${extension}`;
 
-      req.saved_files.push({
-        originalname: file.originalname,
+      req.saved_file = {
+        originalname  : file.originalname,
         mimetype: file.mimetype,
         encoding: file.encoding,
-        key,
+        key: `${req.file_path}`,
         extension,
-      });
+        token: req.token,
+      };
 
-      cb(null, key);
+      cb(null, req.file_path);
     },
   }),
 });
@@ -154,7 +217,9 @@ const upload_auth = (req, res, next) => {
 
   // path to where the file will be uploaded to
   try {
-    req.s3_key_prefix = req.headers['x-path'].replace(/^\/+/g, '');
+    req.file_path = req.headers['x-path']
+    .replace(/^\/+/g, '') // remove /
+    .replace(/^ +/g, ' '); // replace multiple (and single) spaces to single space.
   } catch (e) {
     return next(Boom.badImplementation('x-path header incorrect'));
   }
@@ -168,22 +233,21 @@ const upload_auth = (req, res, next) => {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 
-    if (!storagePermission(req.s3_key_prefix, 'write', claims)) {
+    if (!storagePermission(req.file_path, 'write', claims)) {
       return next(Boom.unauthorized('You are not allowed to write files here'));
     }
   }
 
-  // all uploaded files gets pushed in to this array
-  // this array is returned back to the client once all uploads are
-  // completed
-  req.saved_files = [];
+  // access token for file
+  // will be saved as metadata
+  req.token = uuidv4();
 
   // validation OK. Upload files
   next();
 };
 
-router.post('/upload', upload_auth, upload.array('files', 50), function (req, res) {
-  res.json(req.saved_files);
+router.post('/upload', upload_auth, upload.array('file', 1), function (req, res) {
+  res.json(req.saved_file);
 });
 
 module.exports = router;

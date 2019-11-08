@@ -8,7 +8,6 @@ const { graphql_client } = require('../graphql-client');
 const auth_functions = require('./auth-functions');
 
 const {
-  STORAGE_ACTIVE,
   USER_FIELDS,
   USER_REGISTRATION_AUTO_ACTIVE,
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
@@ -251,7 +250,6 @@ router.post('/login', async (req, res, next) => {
   }
 
   const jwt_token = auth_functions.generateJwtToken(user_account.user);
-  const storage_jwt_token = auth_functions.generateStorageJwtToken(user_account.user);
 
   // generate refresh token and put in database
   query = `
@@ -282,7 +280,6 @@ router.post('/login', async (req, res, next) => {
 
   // return jwt token and refresh token to client
   res.json({
-    storage_jwt_token,
     refresh_token,
     jwt_token,
   });

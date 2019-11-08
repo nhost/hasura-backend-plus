@@ -13,7 +13,6 @@ const {
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
-  STORAGE_ACTIVE,
 } = require('../config');
 
 const auth_functions = require('./auth-functions');
@@ -129,11 +128,9 @@ router.post('/refresh-token', async (req, res, next) => {
 
   // generate new jwt token
   const jwt_token = auth_functions.generateJwtToken(user);
-  const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
 
   res.json({
     refresh_token: new_refresh_token,
-    storage_jwt_token,
     jwt_token,
   });
 });
@@ -214,10 +211,6 @@ router.post('/logout-all', async (req, res, next) => {
   }
 
   // clear cookies
-  res.cookie('storage_jwt_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
   res.cookie('refresh_token', '', {
     maxAge: 0,
     httpOnly: true,
