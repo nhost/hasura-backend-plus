@@ -41,7 +41,7 @@ const get_claims_from_request = (req) => {
   const { authorization = '' } = req.headers;
 
   if (authorization === '') {
-    return void 0;
+    return null;
   }
 
   const token = authorization !== '' ? authorization.replace('Bearer ', '') : jwt_token;
