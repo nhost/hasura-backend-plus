@@ -213,9 +213,7 @@ const upload = multer({
       // req.headres (metadata)
 
       cb(null, {
-        originalname: file.originalname,
         token: req.token,
-        // ...metadata,
       });
     },
     contentType: function (req, file, cb) {
