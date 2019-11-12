@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const multerS3 = require('multer-s3');

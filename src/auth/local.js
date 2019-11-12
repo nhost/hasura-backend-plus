@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const jwt = require('jsonwebtoken');
