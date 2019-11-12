@@ -184,7 +184,7 @@ Then you will have a JWT a little something like this:
 This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console. Like this: `{"seller_company_id":{"_eq":"X-HASURA-COMPANY-ID"}}`
 
 It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
-https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/storage-tools.js#L16
+https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/rules/index.js
 
 # HASURA_GRAPHQL_ENDPOINT
 
