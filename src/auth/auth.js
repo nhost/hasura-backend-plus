@@ -159,7 +159,7 @@ router.post('/logout', async (req, res, next) => {
     }
   }
   `;
-  
+
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(mutation, {
@@ -170,16 +170,6 @@ router.post('/logout', async (req, res, next) => {
     // console.error('Error connection to GraphQL');
     return next(Boom.unauthorized('Unable to delete refresh token'));
   }
-
-  // clear cookies
-  res.cookie('storage_jwt_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
-  res.cookie('refresh_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
 
   res.send('OK');
 });
@@ -253,12 +243,6 @@ router.post('/logout-all', async (req, res, next) => {
     // console.error('Error connection to GraphQL');
     return next(Boom.unauthorized('Unable to delete refresh tokens'));
   }
-
-  // clear cookies
-  res.cookie('refresh_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
 
   res.send('OK');
 });
