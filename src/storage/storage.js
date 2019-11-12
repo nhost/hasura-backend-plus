@@ -55,8 +55,8 @@ const get_claims_from_request = (req) => {
       }
     );
     return decoded['https://hasura.io/jwt/claims'];
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
     return void 0;
   }
 };
@@ -84,16 +84,43 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
     Key: key,
   };
 
-  s3.headObject(params, function (err, data) {
+  s3.headObject(params, async function (err, data) {
 
     if (err) {
       console.error(err);
       return next(Boom.forbidden());
     }
 
-    const { token } = data.Metadata;
+    let { token } = data.Metadata;
 
-    res.send({
+    if (!token) {
+
+      token = uuidv4();
+
+      const bucket_decoded = decodeURIComponent(S3_BUCKET);
+      const key_decoded = decodeURIComponent(key);
+
+      // copy the object with the updated token
+      var params = {
+        Bucket: bucket_decoded,
+        Key: key_decoded,
+        CopySource: encodeURIComponent(`${bucket_decoded}/${key_decoded}`),
+        ContentType: data.ContentType,
+        Metadata: {
+          token,
+        },
+        MetadataDirective: 'REPLACE',
+      };
+
+      // no token exists. Add new token
+      try {
+        var data = await s3.copyObject(params).promise();
+      } catch (e) {
+        return next(Boom.badImplementation('Could not generate token'));
+      }
+    }
+
+    return res.send({
       token,
     });
   });
@@ -125,7 +152,7 @@ router.delete('/file/*', (req, res, next) => {
 
   s3.deleteObject(params, (err, data) => {
     if (err) {
-      console.log(err, err.stack);  // error
+      console.error(err, err.stack);  // error
       return next(Boom.badImplementation('could not delete file'));
     }
 
@@ -166,7 +193,7 @@ router.get('/file/*', (req, res, next) => {
     res.set('Content-Type', data.ContentType);
     res.set('Content-Length', data.ContentLength);
     res.set('Last-Modified', data.LastModified);
-    res.set('Content-Disposition', `inline; filename="${data.Metadata.originalname}"`);
+    res.set('Content-Disposition', `inline;`);
     res.set('Cache-Control', 'public, max-age=31557600');
     res.set('ETag', data.ETag);
 
