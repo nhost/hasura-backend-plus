@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/elitan/hasura-backend-plus#readme",
   "dependencies": {
+    "@hapi/boom": "^8.0.1",
     "aws-sdk": "^2.362.0",
     "aws-serverless-express": "^3.3.5",
     "bcryptjs": "^2.4.3",
-    "boom": "^7.2.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",

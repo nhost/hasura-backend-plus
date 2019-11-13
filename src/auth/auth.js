@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const Boom = require('boom');
+const Boom = require('@hapi/boom');
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const jwt = require('jsonwebtoken');
@@ -13,7 +13,6 @@ const {
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
-  STORAGE_ACTIVE,
 } = require('../config');
 
 const auth_functions = require('./auth-functions');
@@ -129,17 +128,49 @@ router.post('/refresh-token', async (req, res, next) => {
 
   // generate new jwt token
   const jwt_token = auth_functions.generateJwtToken(user);
-  const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
 
   res.json({
     refresh_token: new_refresh_token,
-    storage_jwt_token,
     jwt_token,
   });
 });
 
 router.post('/logout', async (req, res, next) => {
-  // TODO: Remove current refresh token from DB
+  // get refresh token
+  const schema = Joi.object().keys({
+    refresh_token: Joi.string().uuid().required(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  const { refresh_token } = value;
+
+  // delete refresh token passed in data
+  let mutation = `
+  mutation (
+    $refresh_token: uuid!,
+  ) {
+    delete_refresh_token: delete_${schema_name}refresh_tokens (
+      where: {
+        refresh_token: { _eq: $refresh_token }
+      }
+    ) {
+      affected_rows
+    }
+  }
+  `;
+
+  let hasura_data;
+  try {
+    hasura_data = await graphql_client.request(mutation, {
+      user_id: user.id,
+    });
+  } catch (e) {
+    console.error(e);
+    // console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized('Unable to delete refresh token'));
+  }
+
   res.send('OK');
 });
 
@@ -212,16 +243,6 @@ router.post('/logout-all', async (req, res, next) => {
     // console.error('Error connection to GraphQL');
     return next(Boom.unauthorized('Unable to delete refresh tokens'));
   }
-
-  // clear cookies
-  res.cookie('storage_jwt_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
-  res.cookie('refresh_token', '', {
-    maxAge: 0,
-    httpOnly: true,
-  });
 
   res.send('OK');
 });

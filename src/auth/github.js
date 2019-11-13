@@ -167,7 +167,6 @@ router.get('/callback',
     const { user } = req;
 
     const jwt_token = auth_functions.generateJwtToken(user);
-    const storage_jwt_token = auth_functions.generateStorageJwtToken(user);
 
     // generate refresh token and put in database
     const query = `
