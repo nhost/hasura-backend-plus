@@ -163,7 +163,7 @@ router.post('/logout', async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(mutation, {
-      user_id: user.id,
+      refresh_token: refresh_token,
     });
   } catch (e) {
     console.error(e);
