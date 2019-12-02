@@ -7,6 +7,7 @@ const multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
 const mime = require('mime-types');
 const uuidv4 = require('uuid/v4');
+const { graphql_client } = require('../graphql-client');
 
 const {
   HASURA_GRAPHQL_JWT_SECRET,
@@ -271,8 +272,28 @@ const upload_auth = (req, res, next) => {
   next();
 };
 
-router.post('/upload', upload_auth, upload.array('file', 1), function (req, res) {
-  res.json(req.saved_file);
+router.post('/upload', upload_auth, upload.array('file', 1), async function (req, res, next) {
+  const file = req.saved_file
+  
+  // save file data in `files` table
+  const mutation  = `
+  mutation (
+    $file: files_insert_input!
+  ) {
+    insert_files(objects: [$file]) {
+      affected_rows
+    }
+  }
+  `;
+  
+  try {
+    await graphql_client.request(mutation, file)
+  } catch (e) {
+    console.error(e)
+    return next(Boom.badImplementation('Could not save file data'))
+  }
+  
+  res.json(file);
 });
 
 module.exports = router;
