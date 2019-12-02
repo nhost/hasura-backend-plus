@@ -127,7 +127,7 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
   });
 });
 
-router.delete('/file/*', (req, res, next) => {
+router.delete('/file/*', async (req, res, next) => {
 
   const key = `${req.params[0]}`;
 
@@ -150,15 +150,23 @@ router.delete('/file/*', (req, res, next) => {
     Bucket: S3_BUCKET,
     Key: key,
   };
-
-  s3.deleteObject(params, (err, data) => {
-    if (err) {
-      console.error(err, err.stack);  // error
-      return next(Boom.badImplementation('could not delete file'));
+  
+  const mutation = `
+  mutation ($key: String!) {
+    delete_files (where: {key: {_eq: $key}}) {
+      affected_rows
     }
-
-    res.send('OK');
-  });
+  }
+  `;
+  
+  try {
+    await s3.deleteObject(params).promise();
+    await graphql_client.request(mutation, key);
+  } catch (e) {
+    console.error(e, e.stack);
+  }
+  
+  res.send('OK');
 });
 
 router.get('/file/*', (req, res, next) => {
