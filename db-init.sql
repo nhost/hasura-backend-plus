@@ -69,6 +69,15 @@ CREATE TABLE user_roles (
   role text NOT NULL
 );
 
+CREATE TABLE files (
+  id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+  originalname text NOT NULL,
+  mimetype text NOT NULL,
+  encoding text NOT NULL,
+  key text NOT NULL,
+  extension text NOT NULL,
+  token uuid NOT NULL
+);
 
 -- alter tables (constraints, FKs etc)
 
