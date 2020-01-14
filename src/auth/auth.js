@@ -143,6 +143,10 @@ router.post('/logout', async (req, res, next) => {
 
   const { error, value } = schema.validate(req.body);
 
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
+
   const { refresh_token } = value;
 
   // delete refresh token passed in data
@@ -181,6 +185,10 @@ router.post('/logout-all', async (req, res, next) => {
   });
 
   const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return next(Boom.badRequest(error.details[0].message));
+  }
 
   const { refresh_token } = value;
 
