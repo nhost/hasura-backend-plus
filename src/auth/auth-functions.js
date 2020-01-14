@@ -12,6 +12,11 @@ module.exports = {
     let custom_claims = {};
 
     USER_FIELDS.forEach(user_field => {
+
+      if (typeof user[user_field] === undefined || user[user_field] === null) {
+        return null;
+      }
+
       custom_claims['x-hasura-' + user_field.replace('_', '-')] = user[user_field] && user[user_field].toString();
     });
 
