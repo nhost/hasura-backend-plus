@@ -17,7 +17,7 @@ The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) man
 All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
 
 
-[<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png">](https://nhost.io/register)
+[<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png" width="200px">](https://nhost.io/register)
 
 [https://nhost.io](https://nhost.io)
 
