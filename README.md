@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://github.com/elitan/hasura-backend-plus">
-    <img src="https://github.com/elitan/hasura-backend-plus/raw/master/logo.png" width="250px" alt="HBP" />
+  <a href="https://github.com/nhost/hasura-backend-plus">
+    <img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/logo.png" width="250px" alt="HBP" />
   </a>
 </p>
 
@@ -15,6 +15,9 @@
 The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfect configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
 
 All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
+
+
+[<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png">](https://nhost.io/register)
 
 [https://nhost.io](https://nhost.io)
 
@@ -63,7 +66,7 @@ Add to `docker-compose.yaml`:
 
 ```
 hasura-backend-plus:
-  image: elitan/hasura-backend-plus:latest
+  image: nhost/hasura-backend-plus:latest
   environment:
     PORT: 3000
     AUTH_ACTIVE: 'true'
@@ -182,11 +185,11 @@ Then you will have a JWT a little something like this:
   "exp": 1549527743
 }
 ```
-This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console. 
+This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console.
 Like this: `{"seller_company_id":{"_eq":"X-Hasura-Company-Id"}}`
 
 It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
-https://github.com/elitan/hasura-backend-plus/blob/master/src/storage/rules/index.js
+https://github.com/nhost/hasura-backend-plus/blob/master/src/storage/rules/index.js
 
 # HASURA_GRAPHQL_ENDPOINT
 
