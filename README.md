@@ -119,7 +119,7 @@ Restart your docker containers
 
 | Name                                   | Default                                   | Description                                                                                                   |
 | -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `PORT`                                 | `4000`                                    | Express server port                                                                                           |
+| `PORT`                                 | `3010`                                    | Express server port                                                                                           |
 | `AUTH_ACTIVE`                          | `true`                                    | Activate authentication                                                                                       |
 | `USER_MANAGEMENT_DATABASE_SCHEMA_NAME` | ``                                        | Database schema name of where the `users` table is located                                                    |
 | `USER_FIELDS`                          | ``                                        | Specify user table fields that should be available as `x-hasura-` JWT claims.                                 |
