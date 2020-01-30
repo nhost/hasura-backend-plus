@@ -164,9 +164,8 @@ router.post('/logout', async (req, res, next) => {
   }
   `;
 
-  let hasura_data;
   try {
-    hasura_data = await graphql_client.request(mutation, {
+    await graphql_client.request(mutation, {
       refresh_token: refresh_token,
     });
   } catch (e) {
