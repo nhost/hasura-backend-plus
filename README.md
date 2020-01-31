@@ -68,7 +68,7 @@ Add to `docker-compose.yaml`:
 hasura-backend-plus:
   image: nhost/hasura-backend-plus:latest
   environment:
-    PORT: 3000
+    PORT: 3010
     AUTH_ACTIVE: 'true'
     AUTH_LOCAL_ACTIVE: 'true'
     USER_FIELDS: ''
@@ -103,7 +103,7 @@ hasura.myapp.io {
 }
 
 backend.myapp.io {
-  proxy / hasura-backend-plus:3000 {
+  proxy / hasura-backend-plus:3010 {
     transparent
   }
 }
@@ -272,7 +272,7 @@ Use HTTP POST method.
 ## Register your first user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/local/register \
+  http://localhost:3010/auth/local/register \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
@@ -285,7 +285,7 @@ The response is: `OK!`
 ## Login using that user
 ```sh
 curl -X POST \
-  http://localhost:3000/auth/local/login \
+  http://localhost:3010/auth/local/login \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{
