@@ -69,7 +69,7 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
 
     const claims = get_claims_from_request(req);
 
-    if (claims === undefined) {
+    if (claims === 'undefined') {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 
@@ -135,7 +135,7 @@ router.delete('/file/*', (req, res, next) => {
 
     const claims = get_claims_from_request(req);
 
-    if (claims === undefined) {
+    if (claims === 'undefined') {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 
@@ -254,7 +254,7 @@ const upload_auth = (req, res, next) => {
 
     const claims = get_claims_from_request(req);
 
-    if (claims === undefined) {
+    if (claims === 'undefined') {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 

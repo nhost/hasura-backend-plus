@@ -13,7 +13,7 @@ module.exports = {
 
     USER_FIELDS.forEach(user_field => {
 
-      if (typeof user[user_field] === undefined || user[user_field] === null) {
+      if (typeof user[user_field] === 'undefined' || user[user_field] === null) {
         return null;
       }
 
