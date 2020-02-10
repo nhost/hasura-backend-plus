@@ -41,7 +41,7 @@ router.post('/refresh-token', async (req, res, next) => {
     $refresh_token: uuid!,
     $current_timestampz: timestamptz!,
   ) {
-    refresh_tokens: ${schema_name}refresh_tokens (
+    refresh_tokens: auth_refresh_tokens (
       where: {
         _and: [{
           refresh_token: { _eq: $refresh_token }
@@ -59,6 +59,7 @@ router.post('/refresh-token', async (req, res, next) => {
         user_roles {
           role
         }
+        is_anonymous
         ${USER_FIELDS.join('\n')}
       }
     }
@@ -73,13 +74,13 @@ router.post('/refresh-token', async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    console.error('Error connection to GraphQL');
+    return next(Boom.unauthorized("Invalid 'refresh_token' 1"));
   }
 
   if (hasura_data[`refresh_tokens`].length === 0) {
-    // console.error('Incorrect user id or refresh token');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    console.error('Incorrect user id or refresh token');
+    return next(Boom.unauthorized("Invalid 'refresh_token' 2"));
   }
 
   const user = hasura_data[`refresh_tokens`][0].user;
@@ -90,16 +91,16 @@ router.post('/refresh-token', async (req, res, next) => {
   query = `
   mutation (
     $old_refresh_token: uuid!,
-    $new_refresh_token_data: refresh_tokens_insert_input!
+    $new_refresh_token_data: auth_refresh_tokens_insert_input!
   ) {
-    delete_refresh_token: delete_${schema_name}refresh_tokens (
+    delete_refresh_token: delete_auth_refresh_tokens (
       where: {
         refresh_token: { _eq: $old_refresh_token }
       }
     ) {
       affected_rows
     }
-    insert_refresh_token: insert_${schema_name}refresh_tokens (
+    insert_refresh_token: insert_auth_refresh_tokens (
       objects: [$new_refresh_token_data]
     ) {
       affected_rows
@@ -123,7 +124,7 @@ router.post('/refresh-token', async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('unable to create new refresh token and delete old');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    return next(Boom.unauthorized("Invalid 'refresh_token' 3"));
   }
 
   // generate new jwt token
@@ -154,7 +155,7 @@ router.post('/logout', async (req, res, next) => {
   mutation (
     $refresh_token: uuid!,
   ) {
-    delete_refresh_token: delete_${schema_name}refresh_tokens (
+    delete_refresh_token: delete_auth_refresh_tokens (
       where: {
         refresh_token: { _eq: $refresh_token }
       }
@@ -196,7 +197,7 @@ router.post('/logout-all', async (req, res, next) => {
     $refresh_token: uuid!,
     $current_timestampz: timestamptz!,
   ) {
-    refresh_tokens: ${schema_name}refresh_tokens (
+    refresh_tokens: auth_refresh_tokens (
       where: {
         _and: [{
           refresh_token: { _eq: $refresh_token }
@@ -230,7 +231,7 @@ router.post('/logout-all', async (req, res, next) => {
   mutation (
     $user_id: uuid!,
   ) {
-    delete_refresh_token: delete_${schema_name}refresh_tokens (
+    delete_refresh_token: delete_auth_refresh_tokens (
       where: {
         user_id: { _eq: $user_id }
       }
@@ -276,7 +277,7 @@ router.post('/activate-account', async (req, res, next) => {
     $new_secret_token: uuid!
     $now: timestamptz!
   ) {
-    update_users: update_${schema_name}users (
+    update_users: update_users (
       where: {
         _and: [
           {
@@ -356,7 +357,7 @@ router.get('/user', async (req, res, next) => {
   query (
     $id: uuid!
   ) {
-    user: ${schema_name}users_by_pk(id: $id) {
+    user: users_by_pk(id: $id) {
       id
       display_name
       email

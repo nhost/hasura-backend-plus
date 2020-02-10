@@ -33,6 +33,7 @@ module.exports = {
         'x-hasura-allowed-roles': user_roles,
         'x-hasura-default-role': user.default_role,
         'x-hasura-user-id': user.id.toString(),
+        'x-hasura-is-anonymous': user.is_anonymous.toString(),
         ...custom_claims,
       },
     }, HASURA_GRAPHQL_JWT_SECRET.key, {

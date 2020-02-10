@@ -14,6 +14,7 @@ const {
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
+  ANONYMOUS_USERS_ACTIVE,
 } = require('../config');
 
 let router = express.Router();
@@ -43,9 +44,9 @@ router.post('/register', async (req, res, next) => {
   // create user account
   const mutation  = `
   mutation (
-    $user: ${schema_name}users_insert_input!
+    $user: users_insert_input!
   ) {
-    insert_${schema_name}users (
+    insert_users (
       objects: [$user]
     ) {
       affected_rows
@@ -115,7 +116,7 @@ router.post('/new-password', async (req, res, next) => {
     $new_secret_token: uuid!
     $now: timestamptz!
   ) {
-    update_user_account_password: update_${schema_name}user_accounts (
+    update_user_account_password: update_user_accounts (
       where: {
         _and: [
           {
@@ -135,7 +136,7 @@ router.post('/new-password', async (req, res, next) => {
     ) {
       affected_rows
     }
-    update_secret_token: update_${schema_name}users (
+    update_secret_token: update_users (
       where: {
         _and: [
           {
@@ -198,7 +199,7 @@ router.post('/login', async (req, res, next) => {
   query (
     $username: String!
   ) {
-    user_accounts: ${schema_name}user_accounts (
+    user_accounts: user_accounts (
       where: {
         username: { _eq: $username}
       }
@@ -211,6 +212,7 @@ router.post('/login', async (req, res, next) => {
         user_roles {
           role
         }
+        is_anonymous
         ${USER_FIELDS.join('\n')}
       }
     }
@@ -228,13 +230,13 @@ router.post('/login', async (req, res, next) => {
     return next(Boom.unauthorized("Unable to find 'user'"));
   }
 
-  if (hasura_data[`${schema_name}user_accounts`].length === 0) {
+  if (hasura_data[`user_accounts`].length === 0) {
     // console.error("No user with this 'username'");
     return next(Boom.unauthorized("Invalid 'username' or 'password'"));
   }
 
   // check if we got any user back
-  const user_account = hasura_data[`${schema_name}user_accounts`][0];
+  const user_account = hasura_data[`user_accounts`][0];
 
   if (!user_account.user.active) {
     // console.error('User not activated');
@@ -254,9 +256,9 @@ router.post('/login', async (req, res, next) => {
   // generate refresh token and put in database
   query = `
   mutation (
-    $refresh_token_data: ${schema_name}refresh_tokens_insert_input!
+    $refresh_token_data: auth_refresh_tokens_insert_input!
   ) {
-    insert_${schema_name}refresh_tokens (
+    insert_auth_refresh_tokens (
       objects: [$refresh_token_data]
     ) {
       affected_rows
@@ -284,5 +286,91 @@ router.post('/login', async (req, res, next) => {
     jwt_token,
   });
 });
+
+if (ANONYMOUS_USERS_ACTIVE) {
+
+  // anonymous users
+  router.post('/sign-in-anonymously', async (req, res, next) => {
+
+    const mutation  = `
+    mutation (
+      $user: users_insert_input!
+    ) {
+      insert_users (
+        objects: [$user]
+      ) {
+        user: returning {
+          id
+          active
+          default_role
+          user_roles {
+            role
+          }
+          is_anonymous
+          ${USER_FIELDS.join('\n')}
+        }
+      }
+    }
+    `;
+
+    let hasura_data;
+
+    // create user and user_account in same mutation
+    try {
+      hasura_data = await graphql_client.request(mutation, {
+        user: {
+          display_name: 'Anonymous users',
+          is_anonymous: true,
+          default_role: 'anonymous',
+          active: true,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      return next(Boom.badImplementation('Unable to create user.'));
+    }
+
+    const user = hasura_data.insert_users.user[0];
+
+    // generate JWT and refresh token, just as login
+    const jwt_token = auth_functions.generateJwtToken(user);
+
+    // generate refresh token and put in database
+    query = `
+    mutation (
+      $refresh_token_data: auth_refresh_tokens_insert_input!
+    ) {
+      insert_auth_refresh_tokens (
+        objects: [$refresh_token_data]
+      ) {
+        affected_rows
+      }
+    }
+    `;
+    const refresh_token = uuidv4();
+
+    // convert from minutes to milli seconds
+    const expires_at = new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000));
+
+    try {
+      await graphql_client.request(query, {
+        refresh_token_data: {
+          user_id: user.id,
+          refresh_token: refresh_token,
+          expires_at: expires_at,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      return next(Boom.badImplementation("Could not update 'refresh token' for user"));
+    }
+
+    // return jwt token and refresh token to client
+    res.json({
+      refresh_token,
+      jwt_token,
+    });
+  });
+}
 
 module.exports = router;
