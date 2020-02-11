@@ -62,12 +62,12 @@ router.post('/register', async (req, res, next) => {
         email: email,
         active: USER_REGISTRATION_AUTO_ACTIVE,
         secret_token: uuidv4(),
+        register_data,
         user_accounts: {
           data: {
             username: username,
             email: email,
             password: await bcrypt.hash(password, 10),
-            register_data,
           },
         },
       },
@@ -292,6 +292,19 @@ if (ANONYMOUS_USERS_ACTIVE) {
   // anonymous users
   router.post('/sign-in-anonymously', async (req, res, next) => {
 
+    const schema = Joi.object().keys({
+      register_data: Joi.object().allow(null),
+    });
+
+    const { error, value } = schema.validate(req.body);
+
+    if (error) {
+      return next(Boom.badRequest(error.details[0].message));
+    }
+
+    const { register_data } = value;
+
+
     const mutation  = `
     mutation (
       $user: users_insert_input!
@@ -323,6 +336,7 @@ if (ANONYMOUS_USERS_ACTIVE) {
           is_anonymous: true,
           default_role: 'anonymous',
           active: true,
+          register_data,
         },
       });
     } catch (e) {

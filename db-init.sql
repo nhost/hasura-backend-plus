@@ -33,8 +33,7 @@ CREATE TABLE auth.user_accounts (
   user_id uuid NOT NULL,
   username text NOT NULL UNIQUE,
   email text UNIQUE,
-  password text NOT NULL,
-  register_data jsonb
+  password text NOT NULL
 );
 
 CREATE TABLE auth.user_providers (
@@ -58,6 +57,7 @@ CREATE TABLE public.users (
   email text UNIQUE,
   secret_token uuid DEFAULT gen_random_uuid() NOT NULL UNIQUE,
   secret_token_expires_at timestamp with time zone DEFAULT now() NOT NULL,
+  register_data jsonb,
   is_anonymous boolean DEFAULT false NOT NULL
 );
 

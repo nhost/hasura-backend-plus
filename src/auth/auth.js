@@ -75,12 +75,12 @@ router.post('/refresh-token', async (req, res, next) => {
   } catch (e) {
     console.error(e);
     console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Invalid 'refresh_token' 1"));
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
   if (hasura_data[`refresh_tokens`].length === 0) {
     console.error('Incorrect user id or refresh token');
-    return next(Boom.unauthorized("Invalid 'refresh_token' 2"));
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
   const user = hasura_data[`refresh_tokens`][0].user;
@@ -124,7 +124,7 @@ router.post('/refresh-token', async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('unable to create new refresh token and delete old');
-    return next(Boom.unauthorized("Invalid 'refresh_token' 3"));
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
   // generate new jwt token
