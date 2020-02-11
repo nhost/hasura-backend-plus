@@ -121,7 +121,6 @@ Restart your docker containers
 | -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `PORT`                                 | `4000`                                    | Express server port                                                                                           |
 | `AUTH_ACTIVE`                          | `true`                                    | Activate authentication                                                                                       |
-| `USER_MANAGEMENT_DATABASE_SCHEMA_NAME` | ``                                        | Database schema name of where the `users` table is located                                                    |
 | `USER_FIELDS`                          | ``                                        | Specify user table fields that should be available as `x-hasura-` JWT claims.                                 |
 | `USER_REGISTRATION_AUTO_ACTIVE`        | `false`                                   | Whether new user account should automatically be activated. Accounts that are not active are unable to log in |
 | `JWT_TOKEN_EXPIRES`                    | `15`                                      | Minutes until JWT token expires                                                                               |

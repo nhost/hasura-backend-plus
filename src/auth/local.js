@@ -10,7 +10,6 @@ const auth_functions = require('./auth-functions');
 const {
   USER_FIELDS,
   USER_REGISTRATION_AUTO_ACTIVE,
-  USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
@@ -18,8 +17,6 @@ const {
 } = require('../config');
 
 let router = express.Router();
-
-const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
 router.post('/register', async (req, res, next) => {
 

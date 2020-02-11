@@ -15,13 +15,10 @@ const {
   STORAGE_ACTIVE,
   JWT_TOKEN_EXPIRES,
   REFRESH_TOKEN_EXPIRES,
-  USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   USER_FIELDS,
   PROVIDERS_SUCCESS_REDIRECT,
   PROVIDERS_FAILURE_REDIRECT,
 } = require('../config');
-
-const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
 
 let router = express.Router();
 
@@ -43,7 +40,7 @@ async function(accessToken, refreshToken, profile, cb) {
   query (
     $profile_id: String!
   ) {
-    user_providers: ${schema_name}user_providers (
+    user_providers: auth_user_providers (
       where: {
         _and: [{
           auth_provider: {_eq: "github"}
@@ -84,9 +81,9 @@ async function(accessToken, refreshToken, profile, cb) {
     // create user account
     const mutation  = `
     mutation (
-      $user: ${schema_name}users_insert_input!
+      $user: users_insert_input!
     ) {
-      inserted_user: insert_${schema_name}users (
+      inserted_user: insert_users (
         objects: [$user]
       ) {
         returning {
@@ -96,6 +93,7 @@ async function(accessToken, refreshToken, profile, cb) {
           user_roles {
             role
           }
+          is_anonymous
           ${USER_FIELDS.join('\n')}
         }
       }
@@ -171,9 +169,9 @@ router.get('/callback',
     // generate refresh token and put in database
     const query = `
     mutation (
-      $refresh_token_data: ${schema_name}refresh_tokens_insert_input!
+      $refresh_token_data: auth_refresh_tokens_insert_input!
     ) {
-      insert_${schema_name}refresh_tokens (
+      insert_auth_refresh_tokens (
         objects: [$refresh_token_data]
       ) {
         affected_rows
