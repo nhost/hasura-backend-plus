@@ -199,7 +199,7 @@ router.post('/login', async (req, res, next) => {
   query (
     $username: String!
   ) {
-    user_accounts: user_accounts (
+    user_accounts: auth_user_accounts (
       where: {
         username: { _eq: $username}
       }
