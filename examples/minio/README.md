@@ -8,7 +8,7 @@ hasura-backend-plus:
    image: 'elitan/hasura-backend-plus'
    restart: always
    environment:
-     PORT: 3000
+     PORT: 3010
      HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1alpha1/graphql
      HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
      HASURA_GRAPHQL_JWT_SECRET: {"type":"HS256", "key": "secret_key"}
