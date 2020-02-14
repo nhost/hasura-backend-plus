@@ -13,7 +13,7 @@ const {
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
-  ANONYMOUS_USERS_ACTIVE,
+  AUTH_ANONYMOUS_USERS_ACTIVE,
 } = require('../config');
 
 let router = express.Router();
@@ -284,7 +284,7 @@ router.post('/login', async (req, res, next) => {
   });
 });
 
-if (ANONYMOUS_USERS_ACTIVE) {
+if (AUTH_ANONYMOUS_USERS_ACTIVE) {
 
   // anonymous users
   router.post('/sign-in-anonymously', async (req, res, next) => {

@@ -126,6 +126,7 @@ Restart your docker containers
 | `JWT_TOKEN_EXPIRES`                    | `15`                                      | Minutes until JWT token expires                                                                               |
 | `REFRESH_TOKEN_EXPIRES`                | `43200` (30 days)                         | Minutes until refresh token expires                                                                           |
 | `AUTH_LOCAL_ACTIVE`                    | `false`                                   | Activate authentication for local accounts                                                                    |
+| `AUTH_ANONYMOUS_USERS_ACTIVE`                    | `false`                                   | Allow anonymous users |
 | `PROVIDERS_SUCCESS_REDIRECT`           | ``                                        | The URL the user should be redirected to on successful signin/signup with a OAuth provider.                   |
 | `PROVIDERS_FAILURE_REDIRECT`           | ``                                        | The URL the user should be redirected to on failed signin/signup with a OAuth provider.                       |
 | `AUTH_GITHUB_ACTIVE`                   | `false`                                   | Activate Github as an OAuth provider                                                                          |
