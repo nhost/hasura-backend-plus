@@ -47,6 +47,7 @@ async function(accessToken, refreshToken, profile, cb) {
         id
         active
         default_role
+        is_anonymous
         user_roles {
           role
         }
@@ -120,7 +121,6 @@ async function(accessToken, refreshToken, profile, cb) {
             data: {
               auth_provider: profile.provider,
               auth_provider_unique_id: profile.id,
-              token: accessToken,
             },
           },
         },

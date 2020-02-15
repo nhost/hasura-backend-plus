@@ -41,7 +41,6 @@ CREATE TABLE auth.user_providers (
   created_at timestamp with time zone DEFAULT now() NOT NULL,
   updated_at timestamp with time zone DEFAULT now() NOT NULL,
   user_id uuid NOT NULL,
-  token text NOT NULL,
   auth_provider text NOT NULL,
   auth_provider_unique_id text NOT NULL
 );

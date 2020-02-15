@@ -50,6 +50,7 @@ async function(accessToken, refreshToken, profile, cb) {
         user_roles {
           role
         }
+        is_anonymous
         ${USER_FIELDS.join('\n')}
       }
     }
@@ -120,7 +121,6 @@ async function(accessToken, refreshToken, profile, cb) {
             data: {
               auth_provider: profile.provider,
               auth_provider_unique_id: profile.id,
-              token: accessToken,
             },
           },
         },
