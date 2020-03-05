@@ -1,0 +1,18 @@
+{
+  "exclude": ["node_modules"],
+  "include": ["src"],
+  "compilerOptions": {
+    "lib": ["dom", "es2015"],
+    "module": "commonjs",
+    "outDir": "dist",
+    "strict": true,
+    "target": "es5",
+    "alwaysStrict": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true
+  }
+}

@@ -1,0 +1,75 @@
+- args:
+    tables:
+      - object_relationships:
+          - name: user
+            using:
+              foreign_key_constraint_on: user_id
+        table:
+          name: refresh_tokens
+          schema: auth
+      - object_relationships:
+          - name: user
+            using:
+              foreign_key_constraint_on: user_id
+        table:
+          name: user_accounts
+          schema: auth
+      - array_relationships:
+          - name: user_roles
+            using:
+              foreign_key_constraint_on:
+                column: role
+                table:
+                  name: user_roles
+                  schema: public
+          - name: users
+            using:
+              foreign_key_constraint_on:
+                column: default_role
+                table:
+                  name: users
+                  schema: public
+        table:
+          name: roles
+          schema: public
+      - object_relationships:
+          - name: roleByRole
+            using:
+              foreign_key_constraint_on: role
+          - name: user
+            using:
+              foreign_key_constraint_on: user_id
+        table:
+          name: user_roles
+          schema: public
+      - array_relationships:
+          - name: refresh_tokens
+            using:
+              foreign_key_constraint_on:
+                column: user_id
+                table:
+                  name: refresh_tokens
+                  schema: auth
+          - name: user_accounts
+            using:
+              foreign_key_constraint_on:
+                column: user_id
+                table:
+                  name: user_accounts
+                  schema: auth
+          - name: user_roles
+            using:
+              foreign_key_constraint_on:
+                column: user_id
+                table:
+                  name: user_roles
+                  schema: public
+        object_relationships:
+          - name: role
+            using:
+              foreign_key_constraint_on: default_role
+        table:
+          name: users
+          schema: public
+    version: 2
+  type: replace_metadata
