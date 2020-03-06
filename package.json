@@ -1,7 +1,7 @@
 {
   "name": "authway",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsnd --no-notify src/index.ts",
@@ -23,13 +23,21 @@
     "@types/cors": "2.8.6",
     "@types/hapi__joi": "16.0.12",
     "@types/jsonwebtoken": "8.3.8",
-    "@types/node": "13.7.7",
+    "@types/node": "13.9.0",
     "@types/trouter": "3.1.0",
     "@types/uuid": "7.0.0",
     "dotenv": "8.2.0",
+    "husky": "4.2.3",
+    "prettier": "1.19.1",
+    "pretty-quick": "2.0.1",
     "trouter": "3.1.0",
     "ts-node-dev": "1.0.0-pre.44",
     "typescript": "3.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "prettier": {
     "semi": false,

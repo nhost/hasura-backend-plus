@@ -1,13 +1,8 @@
 import { GraphQLClient } from 'graphql-request'
 
-/**
- * API_ENDPOINT is the GraphQL Endpoint to your Hasura instance
- * ADMIN_SECRET is the "x-hasura-admin-secret" shown in your console
- */
-const { API_ENDPOINT, ADMIN_SECRET }: any = process.env
+const endpoint = process.env.HASURA_GRAPHQL_ENDPOINT as string
+const secret = process.env.HASURA_GRAPHQL_ADMIN_SECRET as string
 
-export default new GraphQLClient(API_ENDPOINT, {
-  headers: {
-    'x-hasura-admin-secret': ADMIN_SECRET
-  }
+export const client = new GraphQLClient(endpoint, {
+  headers: { 'x-hasura-admin-secret': secret }
 })

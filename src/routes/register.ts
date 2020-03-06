@@ -1,7 +1,8 @@
+import { insertUser, selectUser } from '../utils/queries'
+
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import client from '../utils/client'
-import { insertUser } from '../utils/queries'
+import { client } from '../utils/client'
 import polka from 'polka'
 import { registerSchema } from '../utils/schema'
 import { v4 as uuidv4 } from 'uuid'
@@ -14,12 +15,32 @@ export default polka().post('/', async ({ body }: any, res) => {
    * Store variables in memory
    */
   let password_hash: string
+  let hasura_data: { auth_user_accounts: any[] }
 
   try {
     /**
      * Validate request body
      */
     const { username, email, password } = await registerSchema.validateAsync(body)
+
+    /**
+     * Query requested user
+     */
+    try {
+      hasura_data = await client.request(selectUser, { email })
+    } catch (err) {
+      /**
+       * Internal server error
+       */
+      throw Boom.badImplementation()
+    }
+
+    if (hasura_data.auth_user_accounts.length !== 0) {
+      /**
+       * Bad request
+       */
+      throw Boom.badRequest('Email is already registered.')
+    }
 
     /**
      * Hash password

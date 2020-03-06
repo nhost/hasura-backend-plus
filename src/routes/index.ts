@@ -1,8 +1,25 @@
+import activate from './activate'
+import forgot from './forgot'
+import login from './login'
+import polka from 'polka'
+import refresh from './refresh'
+import register from './register'
+
 /**
- * Export all defaults for better developer experience
+ * Create a Polka Router
  */
-export { default as login } from './login'
-export { default as forgot } from './forgot'
-export { default as refresh } from './refresh'
-export { default as register } from './register'
-export { default as activate } from './activate'
+const Router = polka()
+
+/**
+ * Connect all API routes
+ */
+const apiRouter = Router.use('/login', login)
+  .use('/forgot', forgot)
+  .use('/refresh', refresh)
+  .use('/register', register)
+  .use('/activate', activate)
+
+/**
+ * Export the API Router
+ */
+export { apiRouter }

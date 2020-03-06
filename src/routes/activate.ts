@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom'
 import { activateSchema } from '../utils/schema'
 import { activateUser } from '../utils/queries'
-import client from '../utils/client'
+import { client } from '../utils/client'
 import polka from 'polka'
 import { v4 as uuidv4 } from 'uuid'
 

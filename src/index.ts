@@ -1,7 +1,6 @@
 import 'dotenv/config'
 
-import { activate, forgot, login, refresh, register } from './routes'
-
+import { apiRouter } from './routes'
 import cors from 'cors'
 import { isDeveloper } from './utils/helpers'
 import { json } from 'body-parser'
@@ -36,13 +35,9 @@ try {
   if (isDeveloper) app.use(logger)
 
   /**
-   * Define all API routes
+   * Connect the API Router
    */
-  app.use('/login', login)
-  app.use('/forgot', forgot)
-  app.use('/refresh', refresh)
-  app.use('/register', register)
-  app.use('/activate', activate)
+  app.use(apiRouter)
 
   /**
    * Start application

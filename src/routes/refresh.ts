@@ -1,8 +1,8 @@
-import { REFRESH_TOKEN_EXP, generateJwtToken } from '../utils/helpers'
+import { REFRESH_EXPIRES_AT, generateJwtToken } from '../utils/helpers'
 import { selectRefreshToken, updateRefreshToken } from '../utils/queries'
 
 import Boom from '@hapi/boom'
-import client from '../utils/client'
+import { client } from '../utils/client'
 import polka from 'polka'
 import { refreshSchema } from '../utils/schema'
 import { v4 as uuidv4 } from 'uuid'
@@ -49,7 +49,7 @@ export default polka().post('/', async ({ body }: any, res) => {
      */
     const new_refresh_token = uuidv4()
     const hasura_user = hasura_data.auth_refresh_tokens[0].user
-    const new_refresh_token_exp = new Date(new Date().getTime() + REFRESH_TOKEN_EXP * 60 * 1000)
+    const new_expires_at = new Date(new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000)
 
     /**
      * Send request
@@ -59,8 +59,8 @@ export default polka().post('/', async ({ body }: any, res) => {
         old_refresh_token: refresh_token,
         new_refresh_token_data: {
           user_id: hasura_user.id,
-          refresh_token: new_refresh_token,
-          expires_at: new_refresh_token_exp
+          expires_at: new_expires_at,
+          refresh_token: new_refresh_token
         }
       })
     } catch (err) {

@@ -41,6 +41,9 @@ export const refreshSchema = Joi.object({
     .required()
 })
 
+/**
+ * Base secret schema
+ */
 const secretSchema = {
   secret_token: Joi.string()
     .uuid({ version: 'uuidv4' })

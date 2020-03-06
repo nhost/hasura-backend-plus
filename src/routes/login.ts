@@ -1,9 +1,9 @@
-import { REFRESH_TOKEN_EXP, generateJwtToken } from '../utils/helpers'
+import { REFRESH_EXPIRES_AT, generateJwtToken } from '../utils/helpers'
 import { insertRefreshToken, selectUser } from '../utils/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import client from '../utils/client'
+import { client } from '../utils/client'
 import { loginSchema } from '../utils/schema'
 import polka from 'polka'
 import { v4 as uuidv4 } from 'uuid'
@@ -85,7 +85,7 @@ export default polka().post('/', async ({ body }: any, res) => {
         refresh_token_data: {
           refresh_token,
           user_id: user_account.user.id,
-          expires_at: new Date(new Date().getTime() + REFRESH_TOKEN_EXP * 60 * 1000)
+          expires_at: new Date(new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000)
         }
       })
     } catch (err) {

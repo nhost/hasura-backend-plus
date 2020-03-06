@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import client from '../utils/client'
+import { client } from '../utils/client'
 import { forgotSchema } from '../utils/schema'
 import polka from 'polka'
 import { updatePassword } from '../utils/queries'
