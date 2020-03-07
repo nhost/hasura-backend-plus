@@ -7,12 +7,12 @@ Authentication server for Hasura that does the job 💪
 
 ### Features:
 
-- 🚀 Easy to setup, can be deployed anywhere.
-- 🎨 Fully customizable with sensible defaults.
-- 📈 Rate limiting is enabled for all API routes.
-- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
 - 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 📈 Rate limiting is enabled for all API routes.
+- 🎨 Fully customizable with sensible defaults.
+- 🚀 Easy to setup, can be deployed anywhere.
 
 ## Install
 
