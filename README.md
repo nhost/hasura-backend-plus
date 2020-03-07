@@ -7,8 +7,8 @@ Authentication server for Hasura that does the job 💪
 
 ### Features:
 
+- 🚫 Block the usage of [pwned passwords](#Pwned_Passwords).
 - 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
-- 🚪 Prevent the usage of [pwned passwords](https://haveibeenpwned.com/Passwords).
 - 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
 - 🎨 Fully customizable with sensible defaults.
 - 🚀 Easy to setup, can be deployed anywhere.
@@ -72,6 +72,10 @@ To confirm that everything's working properly, run:
 ```sh
 $ pm2 logs authway
 ```
+
+## Pwned Passwords
+
+Authway comes with an opt-in feature to check passwords against the [HIBP](https://haveibeenpwned.com) API. These checks are only performed during registration and password recovery. The password is given in plain text, [but only the first 5 characters of its SHA-1 hash will be submitted to the API](https://github.com/wKovacs64/hibp/blob/develop/API.md#pwnedpassword). Enable the feature by setting `HIBP_ENABLED` to true in your `.env` file.
 
 ## API Documentation
 
