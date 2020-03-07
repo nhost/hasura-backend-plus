@@ -111,6 +111,12 @@ Contributions, issues and feature requests are welcome!
 
 Feel free to check [issues page](https://github.com/pnfcre/authway/issues).
 
+## 🚧 Roadmap
+
+- [ ] Confirmation emails
+- [ ] Password recovery emails
+- [ ] Two-factor authentication
+
 ## Show your support
 
 Give a ⭐️ if this project helped you!

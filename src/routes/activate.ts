@@ -30,8 +30,6 @@ const activateHandler = async ({ body }: Request, res: Response) => {
       now: new Date(),
       new_secret_token: uuidv4()
     })
-
-    console.log(hasura_data)
   } catch (err) {
     /**
      * Internal server error
