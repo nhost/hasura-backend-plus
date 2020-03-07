@@ -38,5 +38,5 @@ export const errorMiddleware = async (
   /**
    * Send response
    */
-  res.status(code).send({ error })
+  res.status(code).send({ ...error })
 }

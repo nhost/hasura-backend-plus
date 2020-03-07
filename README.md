@@ -1,17 +1,18 @@
 # Authway
 
-![Version](https://img.shields.io/badge/version-1.0.4-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.5-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪
 
 ### Features:
 
-- ✅ Block the usage of [Pwned Passwords](#pwned-passwords).
-- 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
-- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- 🎨 Fully customizable with sensible defaults.
 - 🚀 Easy to setup, can be deployed anywhere.
+- 🎨 Fully customizable with sensible defaults.
+- 📈 Rate limiting is enabled for all API routes.
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
+- 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
 
 ## Install
 
