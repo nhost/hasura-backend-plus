@@ -1,43 +1,29 @@
 import 'dotenv/config'
 
-import { apiRouter } from './routes'
 import cors from 'cors'
-import { isDeveloper } from './utils/helpers'
+import { errorMiddleware } from './utils/errors'
+import express from 'express'
 import { json } from 'body-parser'
-import polka from 'polka'
-
-const { PORT = 3000 } = process.env
+import { router } from './routes'
 
 /**
- * Logger middleware
+ * Port can be changed to your liking through the .env file
  */
-function logger(req: any, _res: any, next: any) {
-  console.log(`Received ${req.method} on ${req.url}`)
-  next()
-}
+const { PORT = 3000 } = process.env
 
 try {
-  const app = polka()
-
   /**
-   * JSON body parser middleware
+   * Initialize application
    */
-  app.use(json() as any)
+  const app = express()
+    .use(json()) // JSON middleware
+    .use(cors()) // CORS middleware
+    .use(router) // Connect all API routes
 
-  /**
-   * CORS middleware
-   */
-  app.use(cors() as any)
-
-  /**
-   * Logger middleware, only in development mode
-   */
-  if (isDeveloper) app.use(logger)
-
-  /**
-   * Connect the API Router
-   */
-  app.use(apiRouter)
+    /**
+     * Error middleware
+     */
+    .use(errorMiddleware)
 
   /**
    * Start application
@@ -47,12 +33,12 @@ try {
   })
 } catch (err) {
   /**
-   * Log error message
+   * Log errors
    */
   console.error(err)
 
   /**
-   * Exit application
+   * Kill application
    */
   process.exit(1)
 }

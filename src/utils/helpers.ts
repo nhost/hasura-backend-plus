@@ -28,16 +28,12 @@ export const generateJwtToken = ({ id }: any) => {
 }
 
 /**
- * Returns true if the application is running in development mode
+ * Refresh token expires in 43200 minutes (30 days) by default
  */
-const isDeveloper = process.env.NODE_ENV === 'development'
+export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
 
-/**
- * REFRESH_EXPIRES_AT has a default value of 43200 minutes (30 days)
- */
-const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
-
-/**
- * Export helper constants
- */
-export { isDeveloper, REFRESH_EXPIRES_AT }
+export function async(fn: any) {
+  return function(req: any, res: any, next: any) {
+    fn(req, res, next).catch(next)
+  }
+}
