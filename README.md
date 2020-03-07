@@ -7,7 +7,7 @@ Authentication server for Hasura that does the job 💪
 
 ### Features:
 
-- 🚫 Block the usage of [pwned passwords](#pwned-passwords).
+- ✅ Block the usage of [Pwned Passwords](#pwned-passwords).
 - 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
 - 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
 - 🎨 Fully customizable with sensible defaults.
