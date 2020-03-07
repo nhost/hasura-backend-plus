@@ -1,7 +1,7 @@
 {
   "name": "authway",
   "license": "MIT",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsnd --no-notify src/index.ts",
@@ -15,6 +15,7 @@
     "cors": "2.8.5",
     "express": "4.17.1",
     "graphql-request": "1.8.2",
+    "hibp": "8.0.0",
     "jsonwebtoken": "8.5.1",
     "uuid": "7.0.2"
   },

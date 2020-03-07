@@ -1,10 +1,11 @@
 import { Request, Response, Router } from 'express'
-import { insertUser, selectUser } from '../utils/queries'
+import { insertUser, selectUserByEmail, selectUserByUsername } from '../utils/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
 import { async } from '../utils/helpers'
 import { client } from '../utils/client'
+import { pwnedPassword } from 'hibp'
 import { registerSchema } from '../utils/schema'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -16,7 +17,8 @@ const registerHandler = async ({ body }: Request, res: Response) => {
    * Store variables in memory
    */
   let password_hash: string
-  let hasura_data: { auth_user_accounts: any[] }
+  let hasura_data_1: { auth_user_accounts: any[] }
+  let hasura_data_2: { auth_user_accounts: any[] }
 
   /**
    * Validate request body
@@ -24,10 +26,10 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   const { username, email, password } = await registerSchema.validateAsync(body)
 
   /**
-   * Query requested user
+   * Query requested user by email
    */
   try {
-    hasura_data = await client.request(selectUser, { email })
+    hasura_data_1 = await client.request(selectUserByEmail, { email })
   } catch (err) {
     /**
      * Internal server error
@@ -35,11 +37,54 @@ const registerHandler = async ({ body }: Request, res: Response) => {
     throw Boom.badImplementation()
   }
 
-  if (hasura_data.auth_user_accounts.length !== 0) {
+  /**
+   * Query requested user by username
+   */
+  try {
+    hasura_data_2 = await client.request(selectUserByUsername, { username })
+  } catch (err) {
+    /**
+     * Internal server error
+     */
+    throw Boom.badImplementation()
+  }
+
+  if (hasura_data_1.auth_user_accounts.length !== 0) {
     /**
      * Bad request
      */
     throw Boom.badRequest('Email is already registered.')
+  }
+
+  if (hasura_data_2.auth_user_accounts.length !== 0) {
+    /**
+     * Bad request
+     */
+    throw Boom.badRequest('Username is already taken.')
+  }
+
+  /**
+   * Check against the HIBP API
+   */
+  if (process.env.HIBP_ENABLED) {
+    try {
+      /**
+       * Check for pwnage
+       */
+      const pwned = await pwnedPassword(password)
+
+      /**
+       * Oh no — pwned!
+       */
+      if (pwned) {
+        throw new Error()
+      }
+    } catch (err) {
+      /**
+       * Bad request
+       */
+      throw Boom.badRequest('Password is too weak.')
+    }
   }
 
   /**

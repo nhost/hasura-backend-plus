@@ -1,6 +1,6 @@
 import { REFRESH_EXPIRES_AT, async, generateJwtToken } from '../utils/helpers'
 import { Request, Response, Router } from 'express'
-import { insertRefreshToken, selectUser } from '../utils/queries'
+import { insertRefreshToken, selectUserByEmail } from '../utils/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
@@ -26,7 +26,7 @@ const loginHandler = async ({ body }: Request, res: Response) => {
    * Query requested user
    */
   try {
-    hasura_data = await client.request(selectUser, { email })
+    hasura_data = await client.request(selectUserByEmail, { email })
   } catch (err) {
     /**
      * Internal server error

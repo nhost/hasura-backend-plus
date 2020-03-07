@@ -1,6 +1,6 @@
 # Authway
 
-![Version](https://img.shields.io/badge/version-1.0.2-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.3-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪
@@ -116,6 +116,7 @@ Feel free to check [issues page](https://github.com/pnfcre/authway/issues).
 - [ ] Confirmation emails
 - [ ] Password recovery emails
 - [ ] Two-factor authentication
+- [x] Check passwords against [HIBP](https://haveibeenpwned.com)
 
 ## Show your support
 

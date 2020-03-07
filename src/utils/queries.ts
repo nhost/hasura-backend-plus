@@ -42,11 +42,30 @@ export const updatePassword = `
 `
 
 /**
- * Query user account
+ * Query user account by email
  */
-export const selectUser = `
+export const selectUserByEmail = `
   query($email: String!) {
     auth_user_accounts(where: { email: { _eq: $email } }) {
+      password
+      user {
+        id
+        active
+        default_role
+        user_roles {
+          role
+        }
+      }
+    }
+  }
+`
+
+/**
+ * Query user account by username
+ */
+export const selectUserByUsername = `
+  query($username: String!) {
+    auth_user_accounts(where: { username: { _eq: $username } }) {
       password
       user {
         id
