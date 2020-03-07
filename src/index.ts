@@ -3,6 +3,7 @@ import 'dotenv/config'
 import cors from 'cors'
 import { errorMiddleware } from './utils/errors'
 import express from 'express'
+import helmet from 'helmet'
 import { json } from 'body-parser'
 import { limiter } from './utils/limiter'
 import { router } from './routes'
@@ -19,16 +20,32 @@ try {
   const app = express()
 
   /**
-   * Rate limit in production
+   * Rate limiting in production
    */
   if (process.env.NODE_ENV === 'production') {
     app.use(limiter)
   }
 
   app
-    .use(json()) // JSON middleware
-    .use(cors()) // CORS middleware
-    .use(router) // Connect all API routes
+    /**
+     * Security middleware
+     */
+    .use(helmet())
+
+    /**
+     * JSON middleware
+     */
+    .use(json())
+
+    /**
+     * CORS middleware
+     */
+    .use(cors())
+
+    /**
+     * Connect all API routes
+     */
+    .use(router)
 
     /**
      * Error middleware
