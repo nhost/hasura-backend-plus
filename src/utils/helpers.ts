@@ -1,4 +1,5 @@
 import jwt, { Algorithm } from 'jsonwebtoken'
+import { Request, Response, NextFunction } from 'express'
 
 const {
   HASURA_GRAPHQL_JWT_SECRET_KEY,
@@ -32,8 +33,12 @@ export const generateJwtToken = ({ id }: any) => {
  */
 export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
 
+/**
+ * Helper function to avoid try/catch boilerplate code
+ * @param fn Asynchronous function
+ */
 export function async(fn: any) {
-  return function(req: any, res: any, next: any) {
+  return function(req: Request, res: Response, next: NextFunction) {
     fn(req, res, next).catch(next)
   }
 }

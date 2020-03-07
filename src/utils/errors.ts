@@ -1,10 +1,22 @@
 import { NextFunction, Request, Response } from 'express'
 
+interface Error {
+  output?: {
+    payload?: Object
+    statusCode?: number
+  }
+  details?: [
+    {
+      message?: string
+    }
+  ]
+}
+
 /**
  * Error middleware
  */
 export const errorMiddleware = async (
-  err: any,
+  err: Error,
   _req: Request,
   res: Response,
   _next: NextFunction
@@ -20,7 +32,7 @@ export const errorMiddleware = async (
   const error = err?.output?.payload || {
     statusCode: code,
     error: code === 400 ? 'Bad Request' : 'Internal Server Error',
-    message: err?.details[0]?.message
+    message: err?.details![0]?.message
   }
 
   /**
