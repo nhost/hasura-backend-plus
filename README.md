@@ -1,9 +1,17 @@
 # Authway
 
-![Version](https://img.shields.io/badge/version-1.0.3-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.4-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪
+
+### Features:
+
+- 🔒 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
+- 🚪 Prevent the usage of [pwned passwords](https://haveibeenpwned.com/Passwords).
+- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
+- 🎨 Fully customizable with sensible defaults.
+- 🚀 Easy to setup, can be deployed anywhere.
 
 ## Install
 
@@ -47,6 +55,22 @@ Edit the file and start the server 🚀
 ```sh
 $ npm i -g pm2
 $ pm2 start npm --name "authway" -- start
+```
+
+## Update
+
+You can apply the latest updates by running:
+
+```sh
+$ git pull origin
+$ npm install
+$ pm2 restart authway
+```
+
+To confirm that everything's working properly, run:
+
+```sh
+$ pm2 logs authway
 ```
 
 ## API Documentation
@@ -97,26 +121,17 @@ Expects the following fields in the JSON body: `secret_token` and `password`.
 
 Returns `204 No Content` if password is successfully changed.
 
-## Author
-
-👤 **Hampus Kraft**
-
-- Website: https://pnfc.re
-- Twitter: [@pnfcre](https://twitter.com/pnfcre)
-- Github: [@pnfcre](https://github.com/pnfcre)
-
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!
-
-Feel free to check [issues page](https://github.com/pnfcre/authway/issues).
-
 ## 🚧 Roadmap
 
 - [ ] Confirmation emails
 - [ ] Password recovery emails
 - [ ] Two-factor authentication
-- [x] Check passwords against [HIBP](https://haveibeenpwned.com)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check the [issues page](https://github.com/pnfcre/authway/issues).
 
 ## Show your support
 
@@ -124,7 +139,7 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © 2020 [Hampus Kraft](https://github.com/pnfcre).
+Copyright © [Hampus Kraft](https://github.com/pnfcre).
 
 This project is [MIT](LICENSE) licensed.
 

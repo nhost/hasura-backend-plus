@@ -67,22 +67,15 @@ const registerHandler = async ({ body }: Request, res: Response) => {
    * Check against the HIBP API
    */
   if (process.env.HIBP_ENABLED) {
-    try {
-      /**
-       * Check for pwnage
-       */
-      const pwned = await pwnedPassword(password)
+    /**
+     * Check for pwnage
+     */
+    const pwned = await pwnedPassword(password)
 
-      /**
-       * Oh no — pwned!
-       */
-      if (pwned) {
-        throw new Error()
-      }
-    } catch (err) {
-      /**
-       * Bad request
-       */
+    /**
+     * Oh no — pwned!
+     */
+    if (pwned) {
       throw Boom.badRequest('Password is too weak.')
     }
   }

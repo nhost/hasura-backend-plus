@@ -5,6 +5,7 @@ import argon2 from 'argon2'
 import { async } from '../utils/helpers'
 import { client } from '../utils/client'
 import { forgotSchema } from '../utils/schema'
+import { pwnedPassword } from 'hibp'
 import { updatePassword } from '../utils/queries'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -22,6 +23,23 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
    * Validate request body
    */
   const { secret_token, password } = await forgotSchema.validateAsync(body)
+
+  /**
+   * Check against the HIBP API
+   */
+  if (process.env.HIBP_ENABLED) {
+    /**
+     * Check for pwnage
+     */
+    const pwned = await pwnedPassword(password)
+
+    /**
+     * Oh no — pwned!
+     */
+    if (pwned) {
+      throw Boom.badRequest('Password is too weak.')
+    }
+  }
 
   /**
    * Hash password
