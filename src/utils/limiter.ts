@@ -10,10 +10,7 @@ interface LimitMessage extends Message {
 
 export const limiter = rateLimit({
   /**
-   * Headers:
-   *  X-RateLimit-Limit
-   *  X-RateLimit-Remaining
-   *  Retry-After
+   * https://tools.ietf.org/id/draft-polli-ratelimit-headers-00.html#this-proposal
    */
   headers: true,
 
