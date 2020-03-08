@@ -5,9 +5,6 @@ import login from './login'
 import refresh from './refresh'
 import register from './register'
 
-/**
- * Connect all API routes
- */
 export const router = Router()
   .use('/login', login)
   .use('/forgot', forgot)

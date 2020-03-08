@@ -1,8 +1,5 @@
 import Joi from '@hapi/joi'
 
-/**
- * Base user schema
- */
 const userSchema = {
   email: Joi.string()
     .email()
@@ -14,14 +11,8 @@ const userSchema = {
     .required()
 }
 
-/**
- * Login schema
- */
 export const loginSchema = Joi.object(userSchema)
 
-/**
- * Register schema
- */
 export const registerSchema = Joi.object({
   ...userSchema,
 
@@ -32,27 +23,18 @@ export const registerSchema = Joi.object({
     .required()
 })
 
-/**
- * Refresh schema
- */
 export const refreshSchema = Joi.object({
   refresh_token: Joi.string()
     .uuid({ version: 'uuidv4' })
     .required()
 })
 
-/**
- * Base secret schema
- */
 const secretSchema = {
   secret_token: Joi.string()
     .uuid({ version: 'uuidv4' })
     .required()
 }
 
-/**
- * Forgot schema
- */
 export const forgotSchema = Joi.object({
   ...secretSchema,
 
@@ -62,7 +44,4 @@ export const forgotSchema = Joi.object({
     .required()
 })
 
-/**
- * Activate schema
- */
 export const activateSchema = Joi.object(secretSchema)

@@ -96,7 +96,7 @@ Returns `204 No Content` if account is successfully created.
 
 Expects the following field in the JSON body: `secret_token`.
 
-- `secret_token`: Valid UUIDv4 string.
+- `secret_token`: Valid v4 UUID string.
 
 Returns `204 No Content` if account is successfully activated.
 
@@ -113,7 +113,7 @@ Returns the following fields on successful login: `refresh_token` and `jwt_token
 
 Expects the following field in the JSON body: `refresh_token`.
 
-- `refresh_token`: Valid UUIDv4 string.
+- `refresh_token`: Valid v4 UUID string.
 
 Returns the following fields if successful: `refresh_token` and `jwt_token`.
 
@@ -121,7 +121,7 @@ Returns the following fields if successful: `refresh_token` and `jwt_token`.
 
 Expects the following fields in the JSON body: `secret_token` and `password`.
 
-- `secret_token`: Valid UUIDv4 string.
+- `secret_token`: Valid v4 UUID string.
 - `password`: String between 6-128 characters in length.
 
 Returns `204 No Content` if password is successfully changed.

@@ -12,31 +12,14 @@ interface Error {
   ]
 }
 
-/**
- * Error middleware
- */
-export const errorMiddleware = async (
-  err: Error,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
-  /**
-   * Set status code
-   */
+export const errors = async (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   const code = err?.output?.statusCode || 400
 
-  /**
-   * Set error message
-   */
   const error = err?.output?.payload || {
     statusCode: code,
     error: code === 400 ? 'Bad Request' : 'Internal Server Error',
     message: err?.details![0]?.message
   }
 
-  /**
-   * Send response
-   */
   res.status(code).send({ ...error })
 }

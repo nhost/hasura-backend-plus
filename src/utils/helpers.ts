@@ -7,10 +7,6 @@ const {
   JWT_EXPIRES_AT = '15m'
 } = process.env
 
-/**
- * Generates a JWT token with Hasura claims
- * @param user A user object
- */
 export const generateJwtToken = ({ id }: any) => {
   return jwt.sign(
     {
@@ -28,15 +24,8 @@ export const generateJwtToken = ({ id }: any) => {
   )
 }
 
-/**
- * Refresh token expires in 43200 minutes (30 days) by default
- */
 export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
 
-/**
- * Helper function to avoid try/catch boilerplate code
- * @param fn Asynchronous function
- */
 export function async(fn: any) {
   return function(req: Request, res: Response, next: NextFunction) {
     fn(req, res, next).catch(next)

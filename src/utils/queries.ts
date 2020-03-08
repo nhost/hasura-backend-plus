@@ -1,7 +1,6 @@
-/**
- * Create user account
- */
-export const insertUser = `
+import gql from 'graphql-tag'
+
+export const insertUser = gql`
   mutation($user: users_insert_input!) {
     insert_users(objects: [$user]) {
       affected_rows
@@ -9,10 +8,7 @@ export const insertUser = `
   }
 `
 
-/**
- * Update user password
- */
-export const updatePassword = `
+export const updatePassword = gql`
   mutation(
     $secret_token: uuid!
     $password_hash: String!
@@ -41,10 +37,7 @@ export const updatePassword = `
   }
 `
 
-/**
- * Query user account by email
- */
-export const selectUserByEmail = `
+export const selectUserByEmail = gql`
   query($email: String!) {
     auth_user_accounts(where: { email: { _eq: $email } }) {
       password
@@ -60,10 +53,7 @@ export const selectUserByEmail = `
   }
 `
 
-/**
- * Query user account by username
- */
-export const selectUserByUsername = `
+export const selectUserByUsername = gql`
   query($username: String!) {
     auth_user_accounts(where: { username: { _eq: $username } }) {
       password
@@ -79,10 +69,7 @@ export const selectUserByUsername = `
   }
 `
 
-/**
- * Insert refresh token
- */
-export const insertRefreshToken = `
+export const insertRefreshToken = gql`
   mutation($refresh_token_data: auth_refresh_tokens_insert_input!) {
     insert_auth_refresh_tokens(objects: [$refresh_token_data]) {
       affected_rows
@@ -90,10 +77,7 @@ export const insertRefreshToken = `
   }
 `
 
-/**
- * Query refresh token
- */
-export const selectRefreshToken = `
+export const selectRefreshToken = gql`
   query get_refresh_token($refresh_token: uuid!, $current_timestampz: timestamptz!) {
     auth_refresh_tokens(
       where: {
@@ -116,10 +100,7 @@ export const selectRefreshToken = `
   }
 `
 
-/**
- * Update refresh token
- */
-export const updateRefreshToken = `
+export const updateRefreshToken = gql`
   mutation($old_refresh_token: uuid!, $new_refresh_token_data: auth_refresh_tokens_insert_input!) {
     delete_auth_refresh_tokens(where: { refresh_token: { _eq: $old_refresh_token } }) {
       affected_rows
@@ -130,10 +111,7 @@ export const updateRefreshToken = `
   }
 `
 
-/**
- * Activate user account
- */
-export const activateUser = `
+export const activateUser = gql`
   mutation activate_account($secret_token: uuid!, $new_secret_token: uuid!, $now: timestamptz!) {
     update_users(
       where: {
