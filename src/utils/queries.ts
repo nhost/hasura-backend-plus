@@ -45,9 +45,6 @@ export const selectUserByEmail = gql`
         id
         active
         default_role
-        user_roles {
-          role
-        }
       }
     }
   }
@@ -61,9 +58,6 @@ export const selectUserByUsername = gql`
         id
         active
         default_role
-        user_roles {
-          role
-        }
       }
     }
   }
@@ -92,9 +86,6 @@ export const selectRefreshToken = gql`
         id
         active
         default_role
-        user_roles {
-          role
-        }
       }
     }
   }

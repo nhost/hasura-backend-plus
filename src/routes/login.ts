@@ -1,4 +1,4 @@
-import { REFRESH_EXPIRES_AT, async, generateJwtToken } from '../utils/helpers'
+import { JWT_EXPIRES_AT, REFRESH_EXPIRES_AT, async, generateJwtToken } from '../utils/helpers'
 import { Request, Response, Router } from 'express'
 import { insertRefreshToken, selectUserByEmail } from '../utils/queries'
 
@@ -33,22 +33,30 @@ const loginHandler = async ({ body }: Request, res: Response) => {
     throw Boom.unauthorized('Password does not match.')
   }
 
-  const jwt_token = generateJwtToken(user_account.user)
   const refresh_token = uuidv4()
+  const jwt_token = generateJwtToken(user_account.user)
+  const expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000
 
   try {
     await client(insertRefreshToken, {
       refresh_token_data: {
         refresh_token,
         user_id: user_account.user.id,
-        expires_at: new Date(new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000)
+        expires_at: new Date(expires_at)
       }
     })
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  return res.send({ refresh_token, jwt_token })
+  res.cookie('refresh_token', refresh_token, {
+    maxAge: expires_at,
+    httpOnly: true
+  })
+
+  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
+
+  return res.send({ jwt_token, jwt_token_expiry })
 }
 
 export default Router().post('/', async(loginHandler))

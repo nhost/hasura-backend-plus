@@ -42,8 +42,11 @@ Install the Hasura CLI to run migrations:
 
 ```sh
 $ npm i -g hasura-cli
-$ hasura migrate apply --endpoint "<endpoint>" --admin-secret "<admin-secret>"
+$ hasura init hasura --endpoint "<endpoint>" --admin-secret "<admin-secret>"
+$ mv hasura/config.yaml . && rm -rf hasura && hasura migrate apply
 ```
+
+Make sure to add `user` to the `public.roles` table through the Hasura Console.
 
 Copy the `.env.example` file to `.env`:
 
@@ -80,7 +83,7 @@ Authway comes with an opt-in feature to check passwords against the [HIBP](https
 
 ## API Documentation
 
-All fields are required.
+All fields are required. See [this article](https://hasura.io/blog/best-practices-of-using-jwt-with-graphql) for information on handling JWTs in the client.
 
 ### `POST /register`
 
@@ -107,7 +110,10 @@ Expects the following fields in the JSON body: `email` and `password`.
 - `email`: Valid email address.
 - `password`: String between 6-128 characters in length.
 
-Returns the following fields on successful login: `refresh_token` and `jwt_token`.
+Returns the following on successful login:
+
+- `httpOnly` cookie named `refresh_token`.
+- `jwt_token` and `jwt_token_expiry` in the JSON response.
 
 ### `POST /refresh`
 
@@ -115,7 +121,10 @@ Expects the following field in the JSON body: `refresh_token`.
 
 - `refresh_token`: Valid v4 UUID string.
 
-Returns the following fields if successful: `refresh_token` and `jwt_token`.
+Returns the following on successful login:
+
+- `httpOnly` cookie named `refresh_token`.
+- `jwt_token` and `jwt_token_expiry` in the JSON response.
 
 ### `POST /forgot`
 

@@ -1,5 +1,6 @@
 import 'dotenv/config'
 
+import cookie from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './utils/errors'
 import express from 'express'
@@ -20,6 +21,7 @@ try {
   app.use(helmet())
   app.use(json())
   app.use(cors())
+  app.use(cookie())
 
   app.use(router)
   app.use(errors)
