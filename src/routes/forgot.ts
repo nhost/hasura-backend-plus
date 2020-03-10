@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { async } from '../utils/helpers'
+import { asyncWrapper } from '../utils/helpers'
 import { client } from '../utils/client'
 import { forgotSchema } from '../utils/schema'
 import { pwnedPassword } from 'hibp'
@@ -47,4 +47,4 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', async(forgotHandler))
+export default Router().post('/', asyncWrapper(forgotHandler))

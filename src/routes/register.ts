@@ -3,7 +3,7 @@ import { insertUser, selectUserByEmail, selectUserByUsername } from '../utils/qu
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { async } from '../utils/helpers'
+import { asyncWrapper } from '../utils/helpers'
 import { client } from '../utils/client'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '../utils/schema'
@@ -62,4 +62,4 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', async(registerHandler))
+export default Router().post('/', asyncWrapper(registerHandler))

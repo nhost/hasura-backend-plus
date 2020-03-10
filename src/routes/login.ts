@@ -1,4 +1,9 @@
-import { JWT_EXPIRES_AT, REFRESH_EXPIRES_AT, async, generateJwtToken } from '../utils/helpers'
+import {
+  JWT_EXPIRES_AT,
+  REFRESH_EXPIRES_AT,
+  asyncWrapper,
+  generateJwtToken
+} from '../utils/helpers'
 import { Request, Response, Router } from 'express'
 import { insertRefreshToken, selectUserByEmail } from '../utils/queries'
 
@@ -34,8 +39,10 @@ const loginHandler = async ({ body }: Request, res: Response) => {
   }
 
   const refresh_token = uuidv4()
-  const jwt_token = generateJwtToken(user_account.user)
   const expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000
+
+  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
+  const jwt_token = generateJwtToken(user_account.user)
 
   try {
     await client(insertRefreshToken, {
@@ -54,9 +61,7 @@ const loginHandler = async ({ body }: Request, res: Response) => {
     httpOnly: true
   })
 
-  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
-
   return res.send({ jwt_token, jwt_token_expiry })
 }
 
-export default Router().post('/', async(loginHandler))
+export default Router().post('/', asyncWrapper(loginHandler))

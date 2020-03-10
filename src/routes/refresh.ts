@@ -1,4 +1,9 @@
-import { JWT_EXPIRES_AT, REFRESH_EXPIRES_AT, async, generateJwtToken } from '../utils/helpers'
+import {
+  JWT_EXPIRES_AT,
+  REFRESH_EXPIRES_AT,
+  asyncWrapper,
+  generateJwtToken
+} from '../utils/helpers'
 import { Request, Response, Router } from 'express'
 import { selectRefreshToken, updateRefreshToken } from '../utils/queries'
 
@@ -26,8 +31,12 @@ const refreshHandler = async ({ body }: Request, res: Response) => {
   }
 
   const new_refresh_token = uuidv4()
-  const hasura_user = hasura_data.auth_refresh_tokens[0].user
   const new_expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 1000
+
+  const hasura_user = hasura_data.auth_refresh_tokens[0].user
+
+  const jwt_token = generateJwtToken(hasura_user)
+  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
 
   try {
     await client(updateRefreshToken, {
@@ -42,16 +51,12 @@ const refreshHandler = async ({ body }: Request, res: Response) => {
     throw Boom.badImplementation()
   }
 
-  const jwt_token = generateJwtToken(hasura_user)
-
   res.cookie('refresh_token', new_refresh_token, {
     maxAge: new_expires_at,
     httpOnly: true
   })
 
-  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
-
   return res.send({ jwt_token, jwt_token_expiry })
 }
 
-export default Router().post('/', async(refreshHandler))
+export default Router().post('/', asyncWrapper(refreshHandler))

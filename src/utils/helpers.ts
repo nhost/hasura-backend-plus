@@ -23,7 +23,12 @@ export const generateJwtToken = ({ id }: any) => {
   )
 }
 
-export function async(fn: any) {
+/**
+ * This asynchronous wrapper is used for all routes (`src/routes/*.ts`).
+ * All thrown errors are caught and sent to `next()`. The error middleware
+ * in `src/utils/errors.ts` takes care of the rest.
+ */
+export function asyncWrapper(fn: any) {
   return function(req: Request, res: Response, next: NextFunction) {
     fn(req, res, next).catch(next)
   }
