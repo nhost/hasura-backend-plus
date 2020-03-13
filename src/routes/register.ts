@@ -1,9 +1,9 @@
 import { Request, Response, Router } from 'express'
+import { active, asyncWrapper } from '../utils/helpers'
 import { insertUser, selectUserByEmail, selectUserByUsername } from '../utils/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { asyncWrapper } from '../utils/helpers'
 import { client } from '../utils/client'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '../utils/schema'
@@ -11,8 +11,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 const registerHandler = async ({ body }: Request, res: Response) => {
   let password_hash: string
-  let hasura_data_1: { auth_user_accounts: any[] }
-  let hasura_data_2: { auth_user_accounts: any[] }
+
+  let hasura_data_1: { private_user_accounts: any[] }
+  let hasura_data_2: { private_user_accounts: any[] }
 
   const { username, email, password } = await registerSchema.validateAsync(body)
 
@@ -23,11 +24,11 @@ const registerHandler = async ({ body }: Request, res: Response) => {
     throw Boom.badImplementation()
   }
 
-  if (hasura_data_1.auth_user_accounts.length !== 0) {
+  if (hasura_data_1.private_user_accounts.length !== 0) {
     throw Boom.badRequest('Email is already registered.')
   }
 
-  if (hasura_data_2.auth_user_accounts.length !== 0) {
+  if (hasura_data_2.private_user_accounts.length !== 0) {
     throw Boom.badRequest('Username is already taken.')
   }
 
@@ -49,13 +50,14 @@ const registerHandler = async ({ body }: Request, res: Response) => {
     await client(insertUser, {
       user: {
         email,
+        active,
+        username,
         secret_token: uuidv4(),
-        user_accounts: {
-          data: { email, username, password: password_hash }
-        }
+        user_accounts: { data: { email, username, password_hash } }
       }
     })
   } catch (err) {
+    console.log(err)
     throw Boom.badImplementation()
   }
 

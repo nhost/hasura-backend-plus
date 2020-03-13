@@ -6,25 +6,20 @@
               foreign_key_constraint_on: user_id
         table:
           name: refresh_tokens
-          schema: auth
+          schema: private
       - object_relationships:
           - name: user
             using:
+              foreign_key_constraint_on: email
+          - name: userByUserId
+            using:
               foreign_key_constraint_on: user_id
+          - name: userByUsername
+            using:
+              foreign_key_constraint_on: username
         table:
           name: user_accounts
-          schema: auth
-      - array_relationships:
-          - name: users
-            using:
-              foreign_key_constraint_on:
-                column: default_role
-                table:
-                  name: users
-                  schema: public
-        table:
-          name: roles
-          schema: public
+          schema: private
       - array_relationships:
           - name: refresh_tokens
             using:
@@ -32,18 +27,31 @@
                 column: user_id
                 table:
                   name: refresh_tokens
-                  schema: auth
+                  schema: private
           - name: user_accounts
             using:
               foreign_key_constraint_on:
                 column: user_id
                 table:
                   name: user_accounts
-                  schema: auth
+                  schema: private
         object_relationships:
-          - name: role
+          - name: user_account
             using:
-              foreign_key_constraint_on: default_role
+              manual_configuration:
+                column_mapping:
+                  username: username
+                remote_table:
+                  name: user_accounts
+                  schema: private
+          - name: userAccountByEmail
+            using:
+              manual_configuration:
+                column_mapping:
+                  email: email
+                remote_table:
+                  name: user_accounts
+                  schema: private
         table:
           name: users
           schema: public
