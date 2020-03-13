@@ -34,16 +34,16 @@ const refreshHandler = async ({ cookies, signedCookies }: Request, res: Response
   const new_refresh_token = uuidv4()
   const new_expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 60 * 1000
 
-  const hasura_user = hasura_data.private_refresh_tokens[0].user
+  const { id } = hasura_data.private_refresh_tokens[0].user
 
-  const jwt_token = createToken(hasura_user.user.id, DEFAULT_ROLE)
+  const jwt_token = createToken(id, DEFAULT_ROLE)
   const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
 
   try {
     await client(updateRefreshToken, {
       old_refresh_token: refresh_token,
       new_refresh_token_data: {
-        user_id: hasura_user.id,
+        user_id: id,
         refresh_token: new_refresh_token,
         expires_at: new Date(new_expires_at)
       }
