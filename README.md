@@ -1,6 +1,6 @@
 # Authway
 
-![Version](https://img.shields.io/badge/version-1.0.6-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.7-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪
@@ -81,6 +81,10 @@ $ pm2 logs authway
 
 Authway comes with an opt-in feature to check passwords against the [HIBP](https://haveibeenpwned.com) API. These checks are only performed during registration and password recovery. The password is given in plain text, [but only the first 5 characters of its SHA-1 hash will be submitted to the API](https://github.com/wKovacs64/hibp/blob/develop/API.md#pwnedpassword). Enable the feature by setting `HIBP_ENABLED` to true in your `.env` file.
 
+## Signed Cookies
+
+Authway comes with an opt-in feature to sign cookies. You can enable it by setting `COOKIE_SECRET` to something strong and secure in your `.env` file. Be careful, though — existing unsigned refresh tokens will stop working.
+
 ## API Documentation
 
 All fields are required. See [this article](https://hasura.io/blog/best-practices-of-using-jwt-with-graphql) for information on handling JWTs in the client.
@@ -110,18 +114,16 @@ Expects the following fields in the JSON body: `email` and `password`.
 - `email`: Valid email address.
 - `password`: String between 6-128 characters in length.
 
-Returns the following on successful login:
+Returns the following on successful authentication:
 
 - `httpOnly` cookie named `refresh_token`.
 - `jwt_token` and `jwt_token_expiry` in the JSON response.
 
 ### `POST /refresh`
 
-Expects the following field in the JSON body: `refresh_token`.
+Expects a valid cookie named `refresh_token` in the request headers.
 
-- `refresh_token`: Valid v4 UUID string.
-
-Returns the following on successful login:
+Returns the following on successful authentication:
 
 - `httpOnly` cookie named `refresh_token`.
 - `jwt_token` and `jwt_token_expiry` in the JSON response.

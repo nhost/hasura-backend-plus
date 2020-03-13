@@ -3,8 +3,10 @@ import { Request, Response, NextFunction } from 'express'
 
 const { HASURA_GRAPHQL_JWT_SECRET_KEY, JWT_ALGORITHM = 'HS256' } = process.env
 
-export const JWT_EXPIRES_AT = parseInt(<string>process.env.JWT_EXPIRES_AT, 10) || 43200
-export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 15
+export const JWT_EXPIRES_AT = parseInt(<string>process.env.JWT_EXPIRES_AT, 10) || 15
+export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
+
+export const signed = process.env.COOKIE_SECRET ? true : false
 
 export const generateJwtToken = ({ id }: any) => {
   return jwt.sign(

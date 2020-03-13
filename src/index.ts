@@ -9,7 +9,7 @@ import { json } from 'body-parser'
 import { limiter } from './utils/limiter'
 import { router } from './routes'
 
-const { PORT = 3000 } = process.env
+const { COOKIE_SECRET, PORT = 3000 } = process.env
 
 try {
   const app = express()
@@ -21,7 +21,15 @@ try {
   app.use(helmet())
   app.use(json())
   app.use(cors())
-  app.use(cookie())
+
+  /**
+   * Set a cookie secret to enable server validation of cookies.
+   */
+  if (COOKIE_SECRET) {
+    app.use(cookie(COOKIE_SECRET))
+  } else {
+    app.use(cookie())
+  }
 
   app.use(router)
   app.use(errors)
