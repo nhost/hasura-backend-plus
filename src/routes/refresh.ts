@@ -1,8 +1,9 @@
 import {
+  DEFAULT_ROLE,
   JWT_EXPIRES_AT,
   REFRESH_EXPIRES_AT,
   asyncWrapper,
-  generateJwtToken,
+  createToken,
   signed
 } from '../utils/helpers'
 import { Request, Response, Router } from 'express'
@@ -35,7 +36,7 @@ const refreshHandler = async ({ cookies, signedCookies }: Request, res: Response
 
   const hasura_user = hasura_data.private_refresh_tokens[0].user
 
-  const jwt_token = generateJwtToken(hasura_user)
+  const jwt_token = createToken(hasura_user.user.id, DEFAULT_ROLE)
   const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
 
   try {

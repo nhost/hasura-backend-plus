@@ -21,7 +21,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.0.7-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.8-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ### Features:

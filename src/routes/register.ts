@@ -1,9 +1,9 @@
 import { Request, Response, Router } from 'express'
+import { active, asyncWrapper } from '../utils/helpers'
 import { insertUser, selectUserByEmail, selectUserByUsername } from '../utils/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { asyncWrapper } from '../utils/helpers'
 import { client } from '../utils/client'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '../utils/schema'
@@ -50,11 +50,10 @@ const registerHandler = async ({ body }: Request, res: Response) => {
     await client(insertUser, {
       user: {
         email,
+        active,
         username,
         secret_token: uuidv4(),
-        user_accounts: {
-          data: { email, username, password_hash }
-        }
+        user_accounts: { data: { email, username, password_hash } }
       }
     })
   } catch (err) {

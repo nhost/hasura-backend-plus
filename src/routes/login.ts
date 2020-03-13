@@ -1,8 +1,9 @@
 import {
+  DEFAULT_ROLE,
   JWT_EXPIRES_AT,
   REFRESH_EXPIRES_AT,
   asyncWrapper,
-  generateJwtToken,
+  createToken,
   signed
 } from '../utils/helpers'
 import { Request, Response, Router } from 'express'
@@ -43,7 +44,7 @@ const loginHandler = async ({ body }: Request, res: Response) => {
   const expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 60 * 1000
 
   const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
-  const jwt_token = generateJwtToken(user_account.user)
+  const jwt_token = createToken(user_account.user.id, DEFAULT_ROLE)
 
   try {
     await client(insertRefreshToken, {
