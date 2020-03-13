@@ -21,7 +21,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.0.6-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.7-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ### Features:
@@ -38,8 +38,8 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 You need [Node.js](https://nodejs.org) installed on your machine.
 
 ```sh
-$ git clone https://github.com/pnfcre/authway.git
-$ cd authway
+$ git clone https://github.com/nhost/hasura-backend-plus.git
+$ cd hasura-backend-plus && git checkout v2
 ```
 
 Install the required dependencies.
@@ -77,7 +77,7 @@ Edit the file and start the server 🚀
 
 ```sh
 $ npm i -g pm2
-$ pm2 start npm --name "authway" -- start
+$ pm2 start npm --name "hbp" -- start
 ```
 
 ## Update
@@ -87,22 +87,22 @@ You can apply the latest updates by running:
 ```sh
 $ git pull origin
 $ npm install
-$ pm2 restart authway
+$ pm2 restart hbp
 ```
 
 To confirm that everything's working properly, run:
 
 ```sh
-$ pm2 logs authway
+$ pm2 logs hbp
 ```
 
 ## Pwned Passwords
 
-Authway comes with an opt-in feature to check passwords against the [HIBP](https://haveibeenpwned.com) API. These checks are only performed during registration and password recovery. The password is given in plain text, [but only the first 5 characters of its SHA-1 hash will be submitted to the API](https://github.com/wKovacs64/hibp/blob/develop/API.md#pwnedpassword). Enable the feature by setting `HIBP_ENABLED` to true in your `.env` file.
+HBP v2 comes with an opt-in feature to check passwords against the [HIBP](https://haveibeenpwned.com) API. These checks are only performed during registration and password recovery. The password is given in plain text, [but only the first 5 characters of its SHA-1 hash will be submitted to the API](https://github.com/wKovacs64/hibp/blob/develop/API.md#pwnedpassword). Enable the feature by setting `HIBP_ENABLED` to true in your `.env` file.
 
 ## Signed Cookies
 
-Authway comes with an opt-in feature to sign cookies. You can enable it by setting `COOKIE_SECRET` to something strong and secure in your `.env` file. Be careful, though — existing unsigned refresh tokens will stop working.
+HBP v2 comes with an opt-in feature to sign cookies. You can enable it by setting `COOKIE_SECRET` to something strong and secure in your `.env` file. Be careful, though — existing unsigned refresh tokens will stop working.
 
 ## API Documentation
 
@@ -174,10 +174,4 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © [Hampus Kraft](https://github.com/pnfcre).
-
 This project is [MIT](LICENSE) licensed.
-
----
-
-This project is inspired by [Hasura Backend Plus](https://github.com/nhost/hasura-backend-plus).
