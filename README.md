@@ -1,6 +1,6 @@
 # Authway
 
-![Version](https://img.shields.io/badge/version-1.0.7-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.8-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪
