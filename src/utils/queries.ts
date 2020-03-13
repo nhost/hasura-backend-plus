@@ -10,19 +10,19 @@ export const insertUser = gql`
 
 export const updatePassword = gql`
   mutation(
+    $now: timestamptz!
     $secret_token: uuid!
     $password_hash: String!
     $new_secret_token: uuid!
-    $now: timestamptz!
   ) {
-    update_auth_user_accounts(
+    update_private_user_accounts(
       where: {
         _and: [
           { user: { secret_token: { _eq: $secret_token } } }
           { user: { secret_token_expires_at: { _lt: $now } } }
         ]
       }
-      _set: { password: $password_hash }
+      _set: { password_hash: $password_hash }
     ) {
       affected_rows
     }
@@ -39,12 +39,11 @@ export const updatePassword = gql`
 
 export const selectUserByEmail = gql`
   query($email: String!) {
-    auth_user_accounts(where: { email: { _eq: $email } }) {
-      password
+    private_user_accounts(where: { email: { _eq: $email } }) {
+      password_hash
       user {
         id
         active
-        default_role
       }
     }
   }
@@ -52,28 +51,27 @@ export const selectUserByEmail = gql`
 
 export const selectUserByUsername = gql`
   query($username: String!) {
-    auth_user_accounts(where: { username: { _eq: $username } }) {
-      password
+    private_user_accounts(where: { username: { _eq: $username } }) {
+      password_hash
       user {
         id
         active
-        default_role
       }
     }
   }
 `
 
 export const insertRefreshToken = gql`
-  mutation($refresh_token_data: auth_refresh_tokens_insert_input!) {
-    insert_auth_refresh_tokens(objects: [$refresh_token_data]) {
+  mutation($refresh_token_data: private_refresh_tokens_insert_input!) {
+    insert_private_refresh_tokens(objects: [$refresh_token_data]) {
       affected_rows
     }
   }
 `
 
 export const selectRefreshToken = gql`
-  query get_refresh_token($refresh_token: uuid!, $current_timestampz: timestamptz!) {
-    auth_refresh_tokens(
+  query($refresh_token: uuid!, $current_timestampz: timestamptz!) {
+    private_refresh_tokens(
       where: {
         _and: [
           { refresh_token: { _eq: $refresh_token } }
@@ -85,25 +83,27 @@ export const selectRefreshToken = gql`
       user {
         id
         active
-        default_role
       }
     }
   }
 `
 
 export const updateRefreshToken = gql`
-  mutation($old_refresh_token: uuid!, $new_refresh_token_data: auth_refresh_tokens_insert_input!) {
-    delete_auth_refresh_tokens(where: { refresh_token: { _eq: $old_refresh_token } }) {
+  mutation(
+    $old_refresh_token: uuid!
+    $new_refresh_token_data: private_refresh_tokens_insert_input!
+  ) {
+    delete_private_refresh_tokens(where: { refresh_token: { _eq: $old_refresh_token } }) {
       affected_rows
     }
-    insert_auth_refresh_tokens(objects: [$new_refresh_token_data]) {
+    insert_private_refresh_tokens(objects: [$new_refresh_token_data]) {
       affected_rows
     }
   }
 `
 
 export const activateUser = gql`
-  mutation activate_account($secret_token: uuid!, $new_secret_token: uuid!, $now: timestamptz!) {
+  mutation($secret_token: uuid!, $new_secret_token: uuid!, $now: timestamptz!) {
     update_users(
       where: {
         _and: [

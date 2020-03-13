@@ -11,7 +11,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 const forgotHandler = async ({ body }: Request, res: Response) => {
   let password_hash: string
-  let hasura_data: { update_auth_user_accounts: { affected_rows: number } }
+
+  let hasura_data: { update_private_user_accounts: { affected_rows: number } }
 
   const { secret_token, password } = await forgotSchema.validateAsync(body)
 
@@ -40,7 +41,7 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
     throw Boom.badImplementation()
   }
 
-  if (hasura_data.update_auth_user_accounts.affected_rows === 0) {
+  if (hasura_data.update_private_user_accounts.affected_rows === 0) {
     throw Boom.unauthorized('Secret token does not match.')
   }
 
