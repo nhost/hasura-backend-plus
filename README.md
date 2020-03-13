@@ -4,7 +4,6 @@
   </a>
 </p>
 
-
 <h3 align="center">Hasura Backend Plus (HBP)</h3>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
 
@@ -16,395 +15,167 @@ The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) man
 
 All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
 
-
 [<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png" width="200px">](https://nhost.io/register)
 
 [https://nhost.io](https://nhost.io)
 
 ---
 
-# Setup
+![Version](https://img.shields.io/badge/version-1.0.6-blue.svg?cacheSeconds=2592000)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Get your database ready
+### Features:
 
-Create the tables and initial state for your user management by copying everything from the file `db-init.sql`, and insert into the SQL tab in the Hasura Console.
+- 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
+- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 📈 Rate limiting is enabled for all API routes.
+- 🎨 Fully customizable with sensible defaults.
+- 🚀 Easy to setup, can be deployed anywhere.
 
-## Track your tables and relations in Hasura
+## Install
 
-Go to the Hasura console. Click the "Data" menu link and then click "Track all" under both "Untracked tables or views" and "Untracked foreign-key relations"
+You need [Node.js](https://nodejs.org) installed on your machine.
 
-## Create minimal storage rules
-
-In the same directory where you have your `docker-compose.yaml` for your Hasura and HBP project. Do the following:
-
-```
-mkdir storage-rules
-vim storage-rules/index.js
-```
-
-Add this:
-
-```
-module.exports = {
-
-  // key - file path
-  // type - [ read, write ]
-  // claims - claims in JWT
-  // this is similar to Firebase Storage Security Rules.
-
-  storagePermission: function(key, type, claims) {
-    // UNSECURE! Allow read/write all files. Good to get started though
-    return true;
-  },
-};
-
-```
-
-## Deploy
-
-Add to `docker-compose.yaml`:
-
-```
-hasura-backend-plus:
-  image: nhost/hasura-backend-plus:latest
-  environment:
-    PORT: 3010
-    AUTH_ACTIVE: 'true'
-    AUTH_LOCAL_ACTIVE: 'true'
-    USER_FIELDS: ''
-    USER_REGISTRATION_AUTO_ACTIVE: 'true'
-    HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1/graphql
-    HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-    HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "a_pretty_long_secret_key"}'
-    S3_ACCESS_KEY_ID: <access>
-    S3_SECRET_ACCESS_KEY: <secret>
-    S3_ENDPOINT: <endpoint>
-    S3_BUCKET: <bucket>
-    REFRESH_TOKEN_EXPIRES: 43200
-    JWT_TOKEN_EXPIRES: 15
-  volumes:
-  - ./storage-rules:/app/src/storage/rules
-
-caddy:
-  ....
-  depends_on:
-  - graphql-engine
-  - hasura-backend-plus
-```
-
-Add this to your caddy file
-
-```
-hasura.myapp.io {
-  proxy / graphql-engine:8080 {
-    websocket
-    transparent
-  }
-}
-
-backend.myapp.io {
-  proxy / hasura-backend-plus:3010 {
-    transparent
-  }
-}
-```
-
-Restart your docker containers
-
-`docker-compose up -d`
-
-## Configuration
-
-### ENV VARIABLES:
-
-| Name                                   | Default                                   | Description                                                                                                   |
-| -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `PORT`                                 | `3010`                                    | Express server port                                                                                           |
-| `AUTH_ACTIVE`                          | `true`                                    | Activate authentication                                                                                       |
-| `USER_FIELDS`                          | ``                                        | Specify user table fields that should be available as `x-hasura-` JWT claims.                                 |
-| `USER_REGISTRATION_AUTO_ACTIVE`        | `false`                                   | Whether new user account should automatically be activated. Accounts that are not active are unable to log in |
-| `JWT_TOKEN_EXPIRES`                    | `15`                                      | Minutes until JWT token expires                                                                               |
-| `REFRESH_TOKEN_EXPIRES`                | `43200` (30 days)                         | Minutes until refresh token expires                                                                           |
-| `AUTH_LOCAL_ACTIVE`                    | `false`                                   | Activate authentication for local accounts                                                                    |
-| `AUTH_ANONYMOUS_USERS_ACTIVE`                    | `false`                                   | Allow anonymous users |
-| `PROVIDERS_SUCCESS_REDIRECT`           | ``                                        | The URL the user should be redirected to on successful signin/signup with a OAuth provider.                   |
-| `PROVIDERS_FAILURE_REDIRECT`           | ``                                        | The URL the user should be redirected to on failed signin/signup with a OAuth provider.                       |
-| `AUTH_GITHUB_ACTIVE`                   | `false`                                   | Activate Github as an OAuth provider                                                                          |
-| `AUTH_GITHUB_CLIENT_ID`                | ``                                        | Github OAuth app Client ID                                                                                    |
-| `AUTH_GITHUB_CLIENT_SECRET`            | ``                                        | Github OAuth app Client Secret                                                                                |
-| `AUTH_GITHUB_CALLBACK_URL`             | ``                                        | Github OAuth app authorization callback URL                                                                   |
-| `AUTH_GITHUB_AUTHORIZATION_URL`        | ``                                        | Github (enterprise) OAuth app authorization url                                                               |
-| `AUTH_GITHUB_TOKEN_URL`                | ``                                        | Github (enterprise) OAuth app token url                                                                       |
-| `AUTH_GITHUB_USER_PROFILE_URL`         | ``                                        | Github (enterprise) OAuth app user profile url                                                                |
-| `AUTH_GOOGLE_ACTIVE`                   | `false`                                   | Activate Google as an OAuth provider                                                                          |
-| `AUTH_GOOGLE_CLIENT_ID`                | ``                                        | Google OAuth app Client ID                                                                                    |
-| `AUTH_GOOGLE_CLIENT_SECRET`            | ``                                        | Google OAuth app Client Secret                                                                                |
-| `AUTH_GOOGLE_CALLBACK_URL`             | ``                                        | Google OAuth app authorization callback URL                                                                   |
-| `AUTH_FACEBOOK_ACTIVE`                 | `false`                                   | Activate Facebook as an OAuth provider                                                                        |
-| `AUTH_FACEBOOK_CLIENT_ID`              | ``                                        | Facebook OAuth app Client ID                                                                                  |
-| `AUTH_FACEBOOK_CLIENT_SECRET`          | ``                                        | Facebook OAuth app Client Secret                                                                              |
-| `AUTH_FACEBOOK_CALLBACK_URL`           | ``                                        | Facebook OAuth app authorization callback URL                                                                 |
-| `STORAGE_ACTIVE`                       | `true`                                    | Activate storage                                                                                              |
-| `HASURA_GRAPHQL_ENDPOINT`              | `http://graphql-engine:8080/v1/graphql`   | Hasura GraphQL endpoint                                                                                       |
-| `HASURA_GRAPHQL_ADMIN_SECRET`          | ``                                        | Hasura GraphQL admin secret                                                                                   |
-| `HASURA_GRAPHQL_JWT_SECRET`            | `{ 'type': 'HS256', 'key': 'secretkey' }` | Shared JWT secret. Must be same as Hasura's `HASURA_GRAPHQL_JWT_SECRET`                                        |
-| `S3_ACCESS_KEY_ID`                     | ``                                        | S3 access key id                                                                                              |
-| `S3_SECRET_ACCESS_KEY`                 | ``                                        | S3 secret access key                                                                                          |
-| `S3_ENDPOINT`                          | ``                                        | S3 endpoint                                                                                                   |
-| `S3_BUCKET`                            | ``                                        | S3 bucket name                                                                                                |
-
-
-#### USER_FIELDS
-
-If you have some specific fields on your users that you also want to have as a JWT claim you can specify those user fields in the `USER_FIELDS` env var.
-
-So let's say you have a user table with the following columns:
-
-* id
-* email
-* password
-* role
-* **company_id**
-
-And you want to include the `company_id` as a JWT claim. You can specify `USER_FIELDS=company_id`.
-
-Then you will have a JWT a little something like this:
-
-```
-{
-  "https://hasura.io/jwt/claims": {
-    "x-hasura-allowed-roles": [
-      "user"
-      "company_admin"
-    ],
-    "x-hasura-default-role": "company_admin",
-    "x-hasura-user-id": "3",
-    "x-hasura-company-id": "1" <------ THERE WE GO :)
-  },
-  "iat": 1549526843,
-  "exp": 1549527743
-}
-```
-This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console.
-Like this: `{"seller_company_id":{"_eq":"X-Hasura-Company-Id"}}`
-
-It also enables you to write permission rules for the storage endpoint in this repo. Here is an example:
-https://github.com/nhost/hasura-backend-plus/blob/master/src/storage/rules/index.js
-
-# HASURA_GRAPHQL_ENDPOINT
-
-## Auth
-```
-/auth/refresh-token
-/auth/activate-account
-/auth/users
-```
-
-### Refresh Token
-
-`/auth/refresh-token`
-
-`POST`
-
-Returns a JWT token.
-
-### Activate Account
-
-`/auth/local/activate-account`
-
-`POST`
-
-| Variable       | Type   | Required |
-| -------------- | ------ | -------- |
-| `secret_token` | `uuid` | YES      |
-
-### User
-
-`/auth/user`
-
-Returns the full User object
-
-## Auth Local
-
-```
-/auth/local/register
-/auth/local/login
-/auth/local/new-password
-```
-
-Use HTTP POST method.
-
-### Register
-
-`/auth/local/register`
-
-`POST`
-
-| Variable        | Type          | Required | Comment              |
-| --------------- | ------------- | -------- | -------------------- |
-| `email`         | `string`      | YES      |                      |
-| `username`      | `string`      | YES      | can be same as email |
-| `password`      | `string`      | YES      |                      |
-| `register_data` | `json object` | NO       |                      |
-
-### Login
-
-`/auth/local/login`
-
-`POST`
-
-| Variable   | Type     | Required |
-| ---------- | -------- | -------- |
-| `username` | `string` | YES      |
-| `password` | `string` | YES      |
-
-### New password
-
-`/auth/local/new-password`
-
-`POST`
-
-| Variable       | Type   | Required |
-| -------------- | ------ | -------- |
-| `secret_token` | `uuid` | YES      |
-| `password`     | `text` | YES      |
-
-## Register your first user
 ```sh
-curl -X POST \
-  http://localhost:3010/auth/local/register \
-  -H 'Content-Type: application/json' \
-  -H 'cache-control: no-cache' \
-  -d '{
-	"username": "testuser",
-	"password": "test"
-}'
+$ git clone https://github.com/pnfcre/authway.git
+$ cd authway
 ```
-The response is: `OK!`
 
-## Login using that user
+Install the required dependencies.
+
 ```sh
-curl -X POST \
-  http://localhost:3010/auth/local/login \
-  -H 'Content-Type: application/json' \
-  -H 'cache-control: no-cache' \
-  -d '{
-    "username": "testuser",
-    "password": "test"
-}'
+$ npm install
 ```
 
-This will have a valid token in the response:
+## Usage
 
-```json
-{
-    "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
-    "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
-    "user_id": 1
-}
+Start your Hasura instance with the following [environment variables](https://hasura.io/docs/1.0/graphql/manual/deployment/graphql-engine-flags/config-examples.html) set:
+
+```sh
+HASURA_GRAPHQL_ADMIN_SECRET: a_very_secure_admin_secret_goes_here
+HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "a_very_secure_jwt_secret_goes_here"}'
 ```
 
-## OAuth providers
+Install the Hasura CLI to run migrations:
 
-```
-/auth/github
-/auth/google
-```
-
-# Storage
-
-Will act as a proxy between your client and a S3 compatible block storage service (for example: AWS S3, Digital Ocean Spaces, Minio).
-HBP can handle read, write and security permissions.
-Digital Ocean offers S3-compatible object storage for $5/month, with 250 GB of storage and 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
-You can also use open source self-hosted private cloud storage solutions like [Minio](https://minio.io/).
-
-### Uploads
-
-Upload a file blob to `/storage/upload`. Will return `key`, `originalname` and `mimetype`. You can upload one file at a time.
-
-### Download (get)
-
-`GET`
-`storage/file/{key}`
-
-### Delete (get)
-
-`DELETE`
-`/storage/file/{key}`
-
-
-### Get download token
-
-`GET`
-`/storage/fn/get-download-url/{key}`.
-
-Returns:
-
-```json
-{
-  "token": "cce1193c-a299-400b-9e70-2b33b11fd113",
-}
+```sh
+$ npm i -g hasura-cli
+$ hasura init hasura --endpoint "<endpoint>" --admin-secret "<admin-secret>"
+$ mv hasura/config.yaml . && rm -rf hasura && hasura migrate apply
 ```
 
-Use this token with `/storage/file/{file}?token={token}`.
+Make sure to add `user` to the `public.roles` table through the Hasura Console.
 
-**This token will give permanent access to the file**.
+Copy the `.env.example` file to `.env`:
 
-### Security
-
-Security rules are placed in `storage-tools.js` in the function `validateInteraction`.
-
-`key` = Interacted file. Ex: `/companies/2/customer/3/report.pdf`.
-
-`type` = Operation type. Can be one of: `read`, `write`.
-
-`claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['X-Hasura-User-Id']`.
-
-
-#### Example:
-
-File:
-`src/storage/storage-rules.js`
-
-Code:
-
-```
-module.exports = {
-
-  // key - file path
-  // type - [ read, write ]
-  // claims - claims in JWT
-  // this is similar to Firebase Security Rules for files. but not as good looking
-  storagePermission: function(key, type, claims) {
-    let res;
-
-    // console.log({key});
-    // console.log({type});
-    // console.log({claims});
-
-    res = key.match(/\/companies\/(?<company_id>\w*)\/customers\/(\d*)\/.*/);
-    if (res) {
-      if (claims['x-hasura-company-id'] === res.groups.company_id) {
-        return true;
-      }
-      return false;
-    }
-
-    // accept read to public directory
-    res = key.match(/\/public\/.*/);
-    if (res) {
-      if (type === 'read') {
-        return true;
-      }
-    }
-
-    return false;
-  },
-};
+```sh
+$ cp .env.example .env && $EDITOR $_
 ```
 
-You can see other examples [here](examples) in examples folder.
+Edit the file and start the server 🚀
 
-# nhost-js-sdk
+```sh
+$ npm i -g pm2
+$ pm2 start npm --name "authway" -- start
+```
 
-Use [nhost-js-sdk](https://www.npmjs.com/package/nhost-js-sdk) for client side interaction with Hasura Backend Plus.
+## Update
+
+You can apply the latest updates by running:
+
+```sh
+$ git pull origin
+$ npm install
+$ pm2 restart authway
+```
+
+To confirm that everything's working properly, run:
+
+```sh
+$ pm2 logs authway
+```
+
+## Pwned Passwords
+
+Authway comes with an opt-in feature to check passwords against the [HIBP](https://haveibeenpwned.com) API. These checks are only performed during registration and password recovery. The password is given in plain text, [but only the first 5 characters of its SHA-1 hash will be submitted to the API](https://github.com/wKovacs64/hibp/blob/develop/API.md#pwnedpassword). Enable the feature by setting `HIBP_ENABLED` to true in your `.env` file.
+
+## API Documentation
+
+All fields are required. See [this article](https://hasura.io/blog/best-practices-of-using-jwt-with-graphql) for information on handling JWTs in the client.
+
+### `POST /register`
+
+Expects the following fields in the JSON body: `email`, `password` and `username`.
+
+- `email`: Valid email address.
+- `password`: String between 6-128 characters in length.
+- `username`: Alpha-numeric string between 2-32 characters in length.
+
+Returns `204 No Content` if account is successfully created.
+
+### `POST /activate`
+
+Expects the following field in the JSON body: `secret_token`.
+
+- `secret_token`: Valid v4 UUID string.
+
+Returns `204 No Content` if account is successfully activated.
+
+### `POST /login`
+
+Expects the following fields in the JSON body: `email` and `password`.
+
+- `email`: Valid email address.
+- `password`: String between 6-128 characters in length.
+
+Returns the following on successful login:
+
+- `httpOnly` cookie named `refresh_token`.
+- `jwt_token` and `jwt_token_expiry` in the JSON response.
+
+### `POST /refresh`
+
+Expects the following field in the JSON body: `refresh_token`.
+
+- `refresh_token`: Valid v4 UUID string.
+
+Returns the following on successful login:
+
+- `httpOnly` cookie named `refresh_token`.
+- `jwt_token` and `jwt_token_expiry` in the JSON response.
+
+### `POST /forgot`
+
+Expects the following fields in the JSON body: `secret_token` and `password`.
+
+- `secret_token`: Valid v4 UUID string.
+- `password`: String between 6-128 characters in length.
+
+Returns `204 No Content` if password is successfully changed.
+
+## 🚧 Roadmap
+
+- [ ] Confirmation emails
+- [ ] Password recovery emails
+- [ ] Two-factor authentication
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check the [issues page](https://github.com/pnfcre/authway/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## 📝 License
+
+Copyright © [Hampus Kraft](https://github.com/pnfcre).
+
+This project is [MIT](LICENSE) licensed.
+
+---
+
+This project is inspired by [Hasura Backend Plus](https://github.com/nhost/hasura-backend-plus).
