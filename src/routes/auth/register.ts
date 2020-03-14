@@ -1,16 +1,16 @@
 import { Request, Response, Router } from 'express'
-import { active, asyncWrapper } from '../utils/helpers'
-import { insertUser, selectUserByEmail, selectUserByUsername } from '../utils/queries'
+import { active, asyncWrapper } from '../../shared/helpers'
+import { insertUser, selectUserByEmail, selectUserByUsername } from '../../shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { client } from '../utils/client'
+import { client } from '../../shared/client'
 import { pwnedPassword } from 'hibp'
-import { registerSchema } from '../utils/schema'
+import { registerSchema } from '../../shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
 const registerHandler = async ({ body }: Request, res: Response) => {
-  let passwordHash: string
+  let password_hash: string
 
   let hasuraData_1: { private_user_accounts: any[] }
   let hasuraData_2: { private_user_accounts: any[] }
@@ -24,11 +24,15 @@ const registerHandler = async ({ body }: Request, res: Response) => {
     throw Boom.badImplementation()
   }
 
-  if (hasuraData_1.private_user_accounts.length !== 0) {
+  const { length: length_1 } = hasuraData_1.private_user_accounts
+
+  if (length_1 !== 0) {
     throw Boom.badRequest('Email is already registered.')
   }
 
-  if (hasuraData_2.private_user_accounts.length !== 0) {
+  const { length: length_2 } = hasuraData_2.private_user_accounts
+
+  if (length_2 !== 0) {
     throw Boom.badRequest('Username is already taken.')
   }
 
@@ -41,7 +45,7 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   }
 
   try {
-    passwordHash = await argon2.hash(password)
+    password_hash = await argon2.hash(password)
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -52,18 +56,17 @@ const registerHandler = async ({ body }: Request, res: Response) => {
         email,
         active,
         username,
-        secret_token: uuidv4(),
+        ticket: uuidv4(),
         user_accounts: {
           data: {
             email,
             username,
-            password_hash: passwordHash
+            password_hash
           }
         }
       }
     })
   } catch (err) {
-    console.log(err)
     throw Boom.badImplementation()
   }
 

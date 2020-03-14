@@ -21,7 +21,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.0.9-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ### Features:
@@ -85,7 +85,8 @@ You can apply the latest updates by running:
 ```sh
 $ git pull origin
 $ npm install
-$ pm2 restart hbp
+$ hasura migrate apply
+$ pm2 restart authway
 ```
 
 To confirm that everything's working properly, run:
@@ -106,59 +107,237 @@ HBP v2 comes with an opt-in feature to sign cookies. You can enable it by settin
 
 All fields are required. See [this article](https://hasura.io/blog/best-practices-of-using-jwt-with-graphql) for information on handling JWTs in the client.
 
-### `POST /register`
+<details>
+<summary><strong>/auth/login</strong></summary>
 
-Expects the following fields in the JSON body:
+## POST Request:
 
-- `email`: Valid email address.
-- `password`: String between 6-128 characters in length.
-- `username`: Alpha-numeric string between 2-32 characters in length.
+```json
+{
+  "email": "hello@example.com",
+  "password": "between 6-128 characters"
+}
+```
 
-Returns `204 No Content` if account is successfully created.
+## Server Respone:
 
-### `POST /activate`
+```
+Set-Cookie: refresh_token=...
+```
 
-Expects the following field in the JSON body:
+```json
+{
+  "jwt_token": "...",
+  "jwt_expires_in": 900000
+}
+```
 
-- `secretToken`: Valid v4 UUID string.
+> If MFA is enabled for the account, a `ticket` is returned in the JSON response.<br />
+> Proceed authentication by requesting the `/auth/mfa/totp` endpoint (see below).
 
-Returns `204 No Content` if account is successfully activated.
+</details>
 
-### `POST /login`
+<details>
+<summary><strong>/auth/register</strong></summary>
 
-Expects the following fields in the JSON body:
+## POST Request:
 
-- `email`: Valid email address.
-- `password`: String between 6-128 characters in length.
+```json
+{
+  "email": "hello@example.com",
+  "password": "between 6-128 characters",
+  "username": "alphanumeric string between 2-32 in length"
+}
+```
 
-Returns the following on successful authentication:
+## Server Respone:
 
-- `httpOnly` cookie named `refreshToken`.
-- `jwtToken` and `newJwtExpiry` in the JSON response.
+```
+204 No Content
+```
 
-### `POST /refresh`
+</details>
 
-Expects a valid cookie named `refreshToken` in the request headers.
+<br />
 
-Returns the following on successful authentication:
+<details>
+<summary><strong>/auth/user/activate</strong></summary>
 
-- `httpOnly` cookie named `refreshToken`.
-- `jwtToken` and `newJwtExpiry` in the JSON response.
+## POST Request:
 
-### `POST /forgot`
+```json
+{
+  "ticket": "0175b2e2-b6b5-4d3f-a5db-5b2d4bfc2ce7"
+}
+```
 
-Expects the following fields in the JSON body:
+## Server Respone:
 
-- `secretToken`: Valid v4 UUID string.
-- `password`: String between 6-128 characters in length.
+```
+204 No Content
+```
 
-Returns `204 No Content` if password is successfully changed.
+</details>
 
-## 🚧 Roadmap
+<details>
+<summary><strong>/auth/user/forgot</strong></summary>
 
-- [ ] Confirmation emails
-- [ ] Password recovery emails
-- [ ] Two-factor authentication
+## POST Request:
+
+```json
+{
+  "ticket": "6a135423-85c8-4c99-b9ca-3a0108202255",
+  "new_password": "between 6-128 characters"
+}
+```
+
+## Server Respone:
+
+```
+204 No Content
+```
+
+</details>
+
+<br />
+
+<details>
+<summary><strong>/auth/token/refresh</strong></summary>
+
+## POST Request:
+
+```
+Cookie: refresh_token=...
+```
+
+## Server Respone:
+
+```
+Set-Cookie: refresh_token=...
+```
+
+```json
+{
+  "jwt_token": "...",
+  "jwt_expires_in": 900000
+}
+```
+
+</details>
+
+<details>
+<summary><strong>/auth/token/revoke</strong></summary>
+
+## POST Request:
+
+```
+Authorization: Bearer ...
+```
+
+## Server Respone:
+
+```
+204 No Content
+```
+
+</details>
+
+<br />
+
+<details>
+<summary><strong>/auth/mfa/generate</strong></summary>
+
+## POST Request:
+
+```
+Authorization: Bearer ...
+```
+
+## Server Respone:
+
+```json
+{
+  "image_url": "...",
+  "otp_secret": "..."
+}
+```
+
+</details>
+
+<details>
+<summary><strong>/auth/mfa/enable</strong></summary>
+
+## POST Request:
+
+```
+Authorization: Bearer ...
+```
+
+```json
+{
+  "code": "892723"
+}
+```
+
+## Server Respone:
+
+```json
+204 No Content
+```
+
+</details>
+
+<details>
+<summary><strong>/auth/mfa/disable</strong></summary>
+
+## POST Request:
+
+```
+Authorization: Bearer ...
+```
+
+```json
+{
+  "code": "109509"
+}
+```
+
+## Server Respone:
+
+```json
+204 No Content
+```
+
+</details>
+
+<br />
+
+<details>
+<summary><strong>/auth/mfa/totp</strong></summary>
+
+## POST Request:
+
+```json
+{
+  "code": "364124",
+  "ticket": "259878d6-87be-4729-a3cc-53548f7ff72c"
+}
+```
+
+## Server Respone:
+
+```
+Set-Cookie: refresh_token=...
+```
+
+```json
+{
+  "jwt_token": "...",
+  "jwt_expires_in": 900000
+}
+```
+
+</details>
 
 ## 🤝 Contributing
 
