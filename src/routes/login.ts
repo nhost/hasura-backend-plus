@@ -1,12 +1,5 @@
-import {
-  DEFAULT_ROLE,
-  JWT_EXPIRES_AT,
-  REFRESH_EXPIRES_AT,
-  asyncWrapper,
-  createToken,
-  signed
-} from '../utils/helpers'
 import { Request, Response, Router } from 'express'
+import { asyncWrapper, createToken, newJwtExpiry, newRefreshExpiry, signed } from '../utils/helpers'
 import { insertRefreshToken, selectUserByEmail } from '../utils/queries'
 
 import Boom from '@hapi/boom'
@@ -16,55 +9,52 @@ import { loginSchema } from '../utils/schema'
 import { v4 as uuidv4 } from 'uuid'
 
 const loginHandler = async ({ body }: Request, res: Response) => {
-  let hasura_data: { private_user_accounts: any[] }
+  let hasuraData: { private_user_accounts: any[] }
 
   const { email, password } = await loginSchema.validateAsync(body)
 
   try {
-    hasura_data = await client(selectUserByEmail, { email })
+    hasuraData = await client(selectUserByEmail, { email })
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  if (hasura_data.private_user_accounts.length === 0) {
+  if (hasuraData.private_user_accounts.length === 0) {
     throw Boom.badRequest('User does not exist.')
   }
 
-  const user_account = hasura_data.private_user_accounts[0]
+  const { user, password_hash } = hasuraData.private_user_accounts[0]
 
-  if (!user_account.user.active) {
+  if (!user.active) {
     throw Boom.badRequest('User not activated.')
   }
 
-  if (!(await argon2.verify(user_account.password_hash, password))) {
+  if (!(await argon2.verify(password_hash, password))) {
     throw Boom.unauthorized('Password does not match.')
   }
 
-  const refresh_token = uuidv4()
-  const expires_at = new Date().getTime() + REFRESH_EXPIRES_AT * 60 * 60 * 1000
-
-  const jwt_token_expiry = JWT_EXPIRES_AT * 60 * 1000
-  const jwt_token = createToken(user_account.user.id, DEFAULT_ROLE)
+  const refreshToken = uuidv4()
+  const jwtToken = createToken(user.id)
 
   try {
     await client(insertRefreshToken, {
       refresh_token_data: {
-        refresh_token,
-        user_id: user_account.user.id,
-        expires_at: new Date(expires_at)
+        user_id: user.id,
+        refresh_token: refreshToken,
+        expires_at: new Date(newRefreshExpiry())
       }
     })
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  res.cookie('refresh_token', refresh_token, {
+  res.cookie('refresh_token', refreshToken, {
     signed,
     httpOnly: true,
-    maxAge: expires_at
+    maxAge: newRefreshExpiry()
   })
 
-  return res.send({ jwt_token, jwt_token_expiry })
+  return res.send({ jwtToken, newJwtExpiry })
 }
 
 export default Router().post('/', asyncWrapper(loginHandler))
