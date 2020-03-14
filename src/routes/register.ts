@@ -10,25 +10,25 @@ import { registerSchema } from '../utils/schema'
 import { v4 as uuidv4 } from 'uuid'
 
 const registerHandler = async ({ body }: Request, res: Response) => {
-  let password_hash: string
+  let passwordHash: string
 
-  let hasura_data_1: { private_user_accounts: any[] }
-  let hasura_data_2: { private_user_accounts: any[] }
+  let hasuraData_1: { private_user_accounts: any[] }
+  let hasuraData_2: { private_user_accounts: any[] }
 
   const { username, email, password } = await registerSchema.validateAsync(body)
 
   try {
-    hasura_data_1 = await client(selectUserByEmail, { email })
-    hasura_data_2 = await client(selectUserByUsername, { username })
+    hasuraData_1 = await client(selectUserByEmail, { email })
+    hasuraData_2 = await client(selectUserByUsername, { username })
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  if (hasura_data_1.private_user_accounts.length !== 0) {
+  if (hasuraData_1.private_user_accounts.length !== 0) {
     throw Boom.badRequest('Email is already registered.')
   }
 
-  if (hasura_data_2.private_user_accounts.length !== 0) {
+  if (hasuraData_2.private_user_accounts.length !== 0) {
     throw Boom.badRequest('Username is already taken.')
   }
 
@@ -41,7 +41,7 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   }
 
   try {
-    password_hash = await argon2.hash(password)
+    passwordHash = await argon2.hash(password)
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -53,7 +53,13 @@ const registerHandler = async ({ body }: Request, res: Response) => {
         active,
         username,
         secret_token: uuidv4(),
-        user_accounts: { data: { email, username, password_hash } }
+        user_accounts: {
+          data: {
+            email,
+            username,
+            password_hash: passwordHash
+          }
+        }
       }
     })
   } catch (err) {

@@ -24,7 +24,7 @@ export const registerSchema = Joi.object({
 })
 
 const secretSchema = {
-  secret_token: Joi.string()
+  secretToken: Joi.string()
     .uuid({ version: 'uuidv4' })
     .required()
 }
