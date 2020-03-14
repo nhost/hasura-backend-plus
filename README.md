@@ -86,7 +86,7 @@ You can apply the latest updates by running:
 $ git pull origin
 $ npm install
 $ hasura migrate apply
-$ pm2 restart authway
+$ pm2 restart hbp
 ```
 
 To confirm that everything's working properly, run:
@@ -343,7 +343,7 @@ Set-Cookie: refresh_token=...
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check the [issues page](https://github.com/pnfcre/authway/issues).
+Feel free to check the [issues page](https://github.com/nhost/hasura-backend-plus/issues).
 
 ## Show your support
 
