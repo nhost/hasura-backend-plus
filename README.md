@@ -113,7 +113,7 @@ Set-Cookie: refresh_token=...
 }
 ```
 
-> If MFA is enabled for the account, a `ticket` is returned in the JSON response.<br />
+> If MFA is enabled for the account, a `ticket` is returned in the JSON response.
 > Proceed authentication by requesting the `/auth/mfa/totp` endpoint (see below).
 
 </details>
@@ -138,8 +138,6 @@ Set-Cookie: refresh_token=...
 ```
 
 </details>
-
-<br />
 
 <details>
 <summary><strong>/auth/user/activate</strong></summary>
@@ -179,8 +177,6 @@ Set-Cookie: refresh_token=...
 ```
 
 </details>
-
-<br />
 
 <details>
 <summary><strong>/auth/token/refresh</strong></summary>
@@ -223,8 +219,6 @@ Authorization: Bearer ...
 
 </details>
 
-<br />
-
 <details>
 <summary><strong>/auth/mfa/generate</strong></summary>
 
@@ -262,7 +256,7 @@ Authorization: Bearer ...
 
 ## Server Respone:
 
-```json
+```
 204 No Content
 ```
 
@@ -285,13 +279,11 @@ Authorization: Bearer ...
 
 ## Server Respone:
 
-```json
+```
 204 No Content
 ```
 
 </details>
-
-<br />
 
 <details>
 <summary><strong>/auth/mfa/totp</strong></summary>
