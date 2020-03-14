@@ -6,11 +6,24 @@ const { HASURA_GRAPHQL_JWT_SECRET_KEY, JWT_ALGORITHM = 'HS256' } = process.env
 export const signed = process.env.COOKIE_SECRET ? true : false
 export const active = process.env.AUTO_ACTIVATE ? true : false
 
-export const DEFAULT_ROLE = <string>process.env.DEFAULT_ROLE || 'user'
-export const JWT_EXPIRES_AT = parseInt(<string>process.env.JWT_EXPIRES_AT, 10) || 15
-export const REFRESH_EXPIRES_AT = parseInt(<string>process.env.REFRESH_EXPIRES_AT, 10) || 43200
+const jwtExpiresIn = parseInt(<string>process.env.JWT_EXPIRES_IN, 10) || 15
+const refreshExpiresIn = parseInt(<string>process.env.REFRESH_EXPIRES_IN, 10) || 43200
 
-export const createToken = (id: string, defaultRole: string, roles: string[] = [defaultRole]) => {
+const _defaultRole = <string>process.env.DEFAULT_ROLE || 'user'
+
+export const newJwtExpiry = jwtExpiresIn * 60 * 1000
+
+export const newRefreshExpiry = () => {
+  const now = new Date()
+  const days = refreshExpiresIn / 1440
+  return now.setDate(now.getDate() + days)
+}
+
+export const createToken = (
+  id: string,
+  defaultRole: string = _defaultRole,
+  roles: string[] = [defaultRole]
+) => {
   return jwt.sign(
     {
       'https://hasura.io/jwt/claims': {
@@ -22,7 +35,7 @@ export const createToken = (id: string, defaultRole: string, roles: string[] = [
     HASURA_GRAPHQL_JWT_SECRET_KEY as string,
     {
       algorithm: JWT_ALGORITHM as Algorithm,
-      expiresIn: `${JWT_EXPIRES_AT}m`
+      expiresIn: `${jwtExpiresIn}m`
     }
   )
 }

@@ -21,7 +21,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.0.8-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.0.9-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ### Features:
@@ -110,7 +110,7 @@ All fields are required. See [this article](https://hasura.io/blog/best-practice
 
 ### `POST /register`
 
-Expects the following fields in the JSON body: `email`, `password` and `username`.
+Expects the following fields in the JSON body:
 
 - `email`: Valid email address.
 - `password`: String between 6-128 characters in length.
@@ -120,38 +120,38 @@ Returns `204 No Content` if account is successfully created.
 
 ### `POST /activate`
 
-Expects the following field in the JSON body: `secret_token`.
+Expects the following field in the JSON body:
 
-- `secret_token`: Valid v4 UUID string.
+- `secretToken`: Valid v4 UUID string.
 
 Returns `204 No Content` if account is successfully activated.
 
 ### `POST /login`
 
-Expects the following fields in the JSON body: `email` and `password`.
+Expects the following fields in the JSON body:
 
 - `email`: Valid email address.
 - `password`: String between 6-128 characters in length.
 
 Returns the following on successful authentication:
 
-- `httpOnly` cookie named `refresh_token`.
-- `jwt_token` and `jwt_token_expiry` in the JSON response.
+- `httpOnly` cookie named `refreshToken`.
+- `jwtToken` and `newJwtExpiry` in the JSON response.
 
 ### `POST /refresh`
 
-Expects a valid cookie named `refresh_token` in the request headers.
+Expects a valid cookie named `refreshToken` in the request headers.
 
 Returns the following on successful authentication:
 
-- `httpOnly` cookie named `refresh_token`.
-- `jwt_token` and `jwt_token_expiry` in the JSON response.
+- `httpOnly` cookie named `refreshToken`.
+- `jwtToken` and `newJwtExpiry` in the JSON response.
 
 ### `POST /forgot`
 
-Expects the following fields in the JSON body: `secret_token` and `password`.
+Expects the following fields in the JSON body:
 
-- `secret_token`: Valid v4 UUID string.
+- `secretToken`: Valid v4 UUID string.
 - `password`: String between 6-128 characters in length.
 
 Returns `204 No Content` if password is successfully changed.
