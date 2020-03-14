@@ -46,8 +46,6 @@ $ hasura init hasura --endpoint "<endpoint>" --admin-secret "<admin-secret>"
 $ mv hasura/config.yaml . && rm -rf hasura && hasura migrate apply
 ```
 
-Make sure to add `user` to the `public.roles` table through the Hasura Console.
-
 Copy the `.env.example` file to `.env`:
 
 ```sh
