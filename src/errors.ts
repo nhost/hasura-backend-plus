@@ -24,7 +24,7 @@ export const errors = async (err: Error, _req: Request, res: Response, _next: Ne
   const code = err?.output?.statusCode || 400
 
   /**
-   * If running in development mode, log error.
+   * Log errors in development mode.
    */
   if (process.env.NODE_ENV === 'development') {
     console.error(err)

@@ -2,22 +2,21 @@ import { Request, Response, Router } from 'express'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { asyncWrapper } from '../utils/helpers'
-import { client } from '../utils/client'
-import { forgotSchema } from '../utils/schema'
+import { asyncWrapper } from '../../../shared/helpers'
+import { client } from '../../../shared/client'
+import { forgotSchema } from '../../../shared/schema'
 import { pwnedPassword } from 'hibp'
-import { updatePassword } from '../utils/queries'
+import { updatePassword } from '../../../shared/queries'
 import { v4 as uuidv4 } from 'uuid'
 
 const forgotHandler = async ({ body }: Request, res: Response) => {
-  let passwordHash: string
-
+  let password_hash: string
   let hasuraData: { update_private_user_accounts: { affected_rows: number } }
 
-  const { secretToken, password } = await forgotSchema.validateAsync(body)
+  const { ticket, new_password } = await forgotSchema.validateAsync(body)
 
   if (process.env.HIBP_ENABLED) {
-    const pwned = await pwnedPassword(password)
+    const pwned = await pwnedPassword(new_password)
 
     if (pwned) {
       throw Boom.badRequest('Password is too weak.')
@@ -25,23 +24,25 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
   }
 
   try {
-    passwordHash = await argon2.hash(password)
+    password_hash = await argon2.hash(new_password)
   } catch (err) {
     throw Boom.badImplementation()
   }
 
   try {
     hasuraData = await client(updatePassword, {
+      ticket,
+      password_hash,
       now: new Date(),
-      secret_token: secretToken,
-      new_secret_token: uuidv4(),
-      password_hash: passwordHash
+      new_ticket: uuidv4()
     })
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  if (hasuraData.update_private_user_accounts.affected_rows === 0) {
+  const { affected_rows } = hasuraData.update_private_user_accounts
+
+  if (affected_rows === 0) {
     throw Boom.unauthorized('Secret token does not match.')
   }
 

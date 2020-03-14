@@ -2,14 +2,14 @@ import 'dotenv/config'
 
 import cookie from 'cookie-parser'
 import cors from 'cors'
-import { errors } from './utils/errors'
+import { errors } from './errors'
 import express from 'express'
 import helmet from 'helmet'
 import { json } from 'body-parser'
-import { limiter } from './utils/limiter'
+import { limiter } from './limiter'
 import { router } from './routes'
 
-const { COOKIE_SECRET, SERVER_PORT = 3000 } = process.env
+const { COOKIE_SECRET: secret, SERVER_PORT: port = 3000 } = process.env
 
 try {
   const app = express()
@@ -25,8 +25,8 @@ try {
   /**
    * Set a cookie secret to enable server validation of cookies.
    */
-  if (COOKIE_SECRET) {
-    app.use(cookie(COOKIE_SECRET))
+  if (secret) {
+    app.use(cookie(secret))
   } else {
     app.use(cookie())
   }
@@ -34,8 +34,8 @@ try {
   app.use(router)
   app.use(errors)
 
-  app.listen(SERVER_PORT, () => {
-    console.log(`Running on http://localhost:${SERVER_PORT}`)
+  app.listen(port, () => {
+    console.log(`Running on http://localhost:${port}`)
   })
 } catch (err) {
   console.error(err)

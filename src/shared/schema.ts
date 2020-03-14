@@ -23,14 +23,14 @@ export const registerSchema = Joi.object({
     .required()
 })
 
-const secretSchema = {
-  secretToken: Joi.string()
+const ticketSchema = {
+  ticket: Joi.string()
     .uuid({ version: 'uuidv4' })
     .required()
 }
 
 export const forgotSchema = Joi.object({
-  ...secretSchema,
+  ...ticketSchema,
 
   password: Joi.string()
     .min(6)
@@ -38,4 +38,14 @@ export const forgotSchema = Joi.object({
     .required()
 })
 
-export const activateSchema = Joi.object(secretSchema)
+export const activateSchema = Joi.object(ticketSchema)
+
+const codeSchema = {
+  code: Joi.string()
+    .length(6)
+    .required()
+}
+
+export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })
+
+export const mfaSchema = Joi.object(codeSchema)
