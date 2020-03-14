@@ -9,15 +9,17 @@ CREATE TABLE private.user_accounts (
     email text NOT NULL,
     password_hash text NOT NULL,
     user_id uuid NOT NULL,
-    username text NOT NULL
+    username text NOT NULL,
+    otp_secret text,
+    mfa_enabled boolean DEFAULT false NOT NULL
 );
 CREATE TABLE public.users (
     active boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     email text NOT NULL,
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
-    secret_token uuid DEFAULT public.gen_random_uuid() NOT NULL,
-    secret_token_expires_at timestamp with time zone DEFAULT now() NOT NULL,
+    ticket uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    ticket_expires_at timestamp with time zone DEFAULT now() NOT NULL,
     username text NOT NULL
 );
 ALTER TABLE ONLY private.refresh_tokens
@@ -26,6 +28,8 @@ ALTER TABLE ONLY private.refresh_tokens
     ADD CONSTRAINT refresh_tokens_refresh_token_key UNIQUE (refresh_token);
 ALTER TABLE ONLY private.user_accounts
     ADD CONSTRAINT user_accounts_email_key UNIQUE (email);
+ALTER TABLE ONLY private.user_accounts
+    ADD CONSTRAINT user_accounts_mfa_secret_key UNIQUE (otp_secret);
 ALTER TABLE ONLY private.user_accounts
     ADD CONSTRAINT user_accounts_pkey PRIMARY KEY (user_id);
 ALTER TABLE ONLY private.user_accounts
@@ -37,7 +41,7 @@ ALTER TABLE ONLY public.users
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_secret_token_key UNIQUE (secret_token);
+    ADD CONSTRAINT users_secret_token_key UNIQUE (ticket);
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
 ALTER TABLE ONLY private.refresh_tokens
