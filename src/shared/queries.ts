@@ -9,7 +9,7 @@ export const insertUser = gql`
 `
 
 export const updatePassword = gql`
-  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
+  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: citext!, $new_ticket: uuid!) {
     update_private_user_accounts(
       where: {
         _and: [
@@ -46,7 +46,7 @@ export const selectUserById = gql`
 `
 
 export const selectUserByEmail = gql`
-  query($email: String!) {
+  query($email: citext!) {
     private_user_accounts(where: { email: { _eq: $email } }) {
       otp_secret
       mfa_enabled
@@ -61,7 +61,7 @@ export const selectUserByEmail = gql`
 `
 
 export const selectUserByUsername = gql`
-  query($username: String!) {
+  query($username: citext!) {
     private_user_accounts(where: { username: { _eq: $username } }) {
       otp_secret
       mfa_enabled
@@ -153,7 +153,7 @@ export const activateUser = gql`
 `
 
 export const updateOtpSecret = gql`
-  mutation($user_id: uuid!, $otp_secret: String!) {
+  mutation($user_id: uuid!, $otp_secret: citext!) {
     update_private_user_accounts(
       where: { user_id: { _eq: $user_id } }
       _set: { otp_secret: $otp_secret }
