@@ -1,4 +1,5 @@
 CREATE SCHEMA private;
+CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE private.refresh_tokens (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     expires_at timestamp with time zone NOT NULL,
@@ -6,21 +7,21 @@ CREATE TABLE private.refresh_tokens (
     user_id uuid NOT NULL
 );
 CREATE TABLE private.user_accounts (
-    email text NOT NULL,
+    email public.citext NOT NULL,
     password_hash text NOT NULL,
     user_id uuid NOT NULL,
-    username text NOT NULL,
+    username public.citext NOT NULL,
     otp_secret text,
     mfa_enabled boolean DEFAULT false NOT NULL
 );
 CREATE TABLE public.users (
     active boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    email text NOT NULL,
+    email public.citext NOT NULL,
     id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     ticket uuid DEFAULT public.gen_random_uuid() NOT NULL,
     ticket_expires_at timestamp with time zone DEFAULT now() NOT NULL,
-    username text NOT NULL
+    username public.citext NOT NULL
 );
 ALTER TABLE ONLY private.refresh_tokens
     ADD CONSTRAINT refresh_tokens_pkey PRIMARY KEY (refresh_token);

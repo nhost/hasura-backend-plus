@@ -40,15 +40,15 @@
             using:
               manual_configuration:
                 column_mapping:
-                  username: username
+                  email: email
                 remote_table:
                   name: user_accounts
                   schema: private
-          - name: userAccountByEmail
+          - name: userAccountByUsername
             using:
               manual_configuration:
                 column_mapping:
-                  email: email
+                  username: username
                 remote_table:
                   name: user_accounts
                   schema: private
