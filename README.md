@@ -7,13 +7,13 @@ Authentication server for Hasura that does the job 💪
 
 ### Core Features:
 
-- 🚀 Easy to setup, can be deployed anywhere.
-- 🔑 First-class two-factor authentication support.
 - 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
-- 📈 Rate limiting your API endpoints by default.
 - 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- 🎨 Fully customizable with sensible defaults.
 - ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 🎨 Fully customizable with sensible defaults.
+- 📈 Rate limit your API endpoints by default.
+- 🚀 Easy to setup, can be deployed anywhere.
+- 🔑 Two-factor authentication support.
 
 ## Install
 
@@ -90,12 +90,11 @@ Authway comes with an opt-in feature to sign cookies. You can enable it by setti
 All fields are required. See [this article](https://hasura.io/blog/best-practices-of-using-jwt-with-graphql) for information on handling JWTs in the client.
 
 <details>
-<summary><strong>/auth/login</strong></summary>
+<summary><strong>POST /auth/login</strong></summary>
 
 ## Request:
 
 ```json
-// POST /auth/login
 {
   "email": "hello@example.com",
   "password": "between 6-128 characters"
@@ -121,7 +120,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>/auth/register</strong></summary>
+<summary><strong>POST /auth/register</strong></summary>
 
 ## Request:
 
@@ -142,7 +141,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>/auth/user/activate</strong></summary>
+<summary><strong>POST /auth/user/activate</strong></summary>
 
 ## Request:
 
@@ -161,7 +160,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>/auth/user/forgot</strong></summary>
+<summary><strong>POST /auth/user/forgot</strong></summary>
 
 ## Request:
 
@@ -181,7 +180,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>/auth/token/refresh</strong></summary>
+<summary><strong>POST /auth/token/refresh</strong></summary>
 
 ## Request:
 
@@ -205,7 +204,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>/auth/token/revoke</strong></summary>
+<summary><strong>POST /auth/token/revoke</strong></summary>
 
 ## Request:
 
@@ -222,7 +221,7 @@ Authorization: Bearer ...
 </details>
 
 <details>
-<summary><strong>/auth/mfa/generate</strong></summary>
+<summary><strong>POST /auth/mfa/generate</strong></summary>
 
 ## Request:
 
@@ -242,7 +241,7 @@ Authorization: Bearer ...
 </details>
 
 <details>
-<summary><strong>/auth/mfa/enable</strong></summary>
+<summary><strong>POST /auth/mfa/enable</strong></summary>
 
 ## Request:
 
@@ -265,7 +264,7 @@ Authorization: Bearer ...
 </details>
 
 <details>
-<summary><strong>/auth/mfa/disable</strong></summary>
+<summary><strong>POST /auth/mfa/disable</strong></summary>
 
 ## Request:
 
@@ -288,7 +287,7 @@ Authorization: Bearer ...
 </details>
 
 <details>
-<summary><strong>/auth/mfa/totp</strong></summary>
+<summary><strong>POST /auth/mfa/totp</strong></summary>
 
 ## Request:
 
