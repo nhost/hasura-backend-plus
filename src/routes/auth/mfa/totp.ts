@@ -1,26 +1,20 @@
-import { Request, Response, Router } from 'express'
-import {
-  asyncWrapper,
-  createJwt,
-  newJwtExpiry,
-  newRefreshExpiry,
-  signed
-} from '../../../shared/helpers'
-import { insertRefreshToken, selectUserByTicket } from '../../../shared/queries'
+import { Request, Response } from 'express'
+import { asyncWrapper, createJwt, newJwtExpiry, newRefreshExpiry, signed } from '@shared/helpers'
+import { insertRefreshToken, selectUserByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
-import { client } from '../../../shared/client'
-import { totpSchema } from '../../../shared/schema'
+import { request } from '@shared/request'
+import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
-const totpHandler = async ({ body }: Request, res: Response) => {
+async function totp({ body }: Request, res: Response) {
   let hasuraData: { private_user_accounts: any[] }
 
   const { ticket, code } = await totpSchema.validateAsync(body)
 
   try {
-    hasuraData = await client(selectUserByTicket, { ticket })
+    hasuraData = await request(selectUserByTicket, { ticket })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -43,7 +37,7 @@ const totpHandler = async ({ body }: Request, res: Response) => {
   const refresh_token = uuidv4()
 
   try {
-    await client(insertRefreshToken, {
+    await request(insertRefreshToken, {
       refresh_token_data: {
         user_id: id,
         refresh_token,
@@ -66,4 +60,4 @@ const totpHandler = async ({ body }: Request, res: Response) => {
   })
 }
 
-export default Router().post('/', asyncWrapper(totpHandler))
+export default asyncWrapper(totp)

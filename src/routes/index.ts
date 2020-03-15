@@ -11,13 +11,16 @@ import revoke from './auth/token/revoke'
 import totp from './auth/mfa/totp'
 
 export const router = Router()
-  .use('/auth/login', login)
-  .use('/auth/mfa/totp', totp)
-  .use('/auth/mfa/enable', enable)
-  .use('/auth/register', register)
-  .use('/auth/user/forgot', forgot)
-  .use('/auth/mfa/disable', disable)
-  .use('/auth/token/revoke', revoke)
-  .use('/auth/mfa/generate', generate)
-  .use('/auth/token/refresh', refresh)
-  .use('/auth/user/activate', activate)
+  .post('/auth/login', login)
+  .post('/auth/register', register)
+
+  .post('/auth/mfa/disable', disable)
+  .post('/auth/mfa/enable', enable)
+  .post('/auth/mfa/generate', generate)
+  .post('/auth/mfa/totp', totp)
+
+  .post('/auth/token/refresh', refresh)
+  .post('/auth/token/revoke', revoke)
+
+  .post('/auth/user/activate', activate)
+  .post('/auth/user/forgot', forgot)

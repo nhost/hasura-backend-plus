@@ -24,14 +24,17 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 ![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-### Features:
+Authentication server for Hasura that does the job 💪
 
-- 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
-- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
-- 📈 Rate limiting is enabled for all API routes.
-- 🎨 Fully customizable with sensible defaults.
+### Core Features:
+
 - 🚀 Easy to setup, can be deployed anywhere.
+- 🔑 First-class two-factor authentication support.
+- 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
+- 📈 Rate limiting your API endpoints by default.
+- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
+- 🎨 Fully customizable with sensible defaults.
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
 
 ## Install
 
@@ -110,16 +113,17 @@ All fields are required. See [this article](https://hasura.io/blog/best-practice
 <details>
 <summary><strong>/auth/login</strong></summary>
 
-## POST Request:
+## Request:
 
 ```json
+// POST /auth/login
 {
   "email": "hello@example.com",
   "password": "between 6-128 characters"
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 Set-Cookie: refresh_token=...
@@ -132,7 +136,7 @@ Set-Cookie: refresh_token=...
 }
 ```
 
-> If MFA is enabled for the account, a `ticket` is returned in the JSON response.
+> If MFA is enabled for the account, a `ticket` is returned in the JSON response.<br />
 > Proceed authentication by requesting the `/auth/mfa/totp` endpoint (see below).
 
 </details>
@@ -140,7 +144,7 @@ Set-Cookie: refresh_token=...
 <details>
 <summary><strong>/auth/register</strong></summary>
 
-## POST Request:
+## Request:
 
 ```json
 {
@@ -150,7 +154,7 @@ Set-Cookie: refresh_token=...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -161,7 +165,7 @@ Set-Cookie: refresh_token=...
 <details>
 <summary><strong>/auth/user/activate</strong></summary>
 
-## POST Request:
+## Request:
 
 ```json
 {
@@ -169,7 +173,7 @@ Set-Cookie: refresh_token=...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -180,7 +184,7 @@ Set-Cookie: refresh_token=...
 <details>
 <summary><strong>/auth/user/forgot</strong></summary>
 
-## POST Request:
+## Request:
 
 ```json
 {
@@ -189,7 +193,7 @@ Set-Cookie: refresh_token=...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -200,13 +204,13 @@ Set-Cookie: refresh_token=...
 <details>
 <summary><strong>/auth/token/refresh</strong></summary>
 
-## POST Request:
+## Request:
 
 ```
 Cookie: refresh_token=...
 ```
 
-## Server Respone:
+## Response:
 
 ```
 Set-Cookie: refresh_token=...
@@ -224,13 +228,13 @@ Set-Cookie: refresh_token=...
 <details>
 <summary><strong>/auth/token/revoke</strong></summary>
 
-## POST Request:
+## Request:
 
 ```
 Authorization: Bearer ...
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -241,13 +245,13 @@ Authorization: Bearer ...
 <details>
 <summary><strong>/auth/mfa/generate</strong></summary>
 
-## POST Request:
+## Request:
 
 ```
 Authorization: Bearer ...
 ```
 
-## Server Respone:
+## Response:
 
 ```json
 {
@@ -261,7 +265,7 @@ Authorization: Bearer ...
 <details>
 <summary><strong>/auth/mfa/enable</strong></summary>
 
-## POST Request:
+## Request:
 
 ```
 Authorization: Bearer ...
@@ -273,7 +277,7 @@ Authorization: Bearer ...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -284,7 +288,7 @@ Authorization: Bearer ...
 <details>
 <summary><strong>/auth/mfa/disable</strong></summary>
 
-## POST Request:
+## Request:
 
 ```
 Authorization: Bearer ...
@@ -296,7 +300,7 @@ Authorization: Bearer ...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 204 No Content
@@ -307,7 +311,7 @@ Authorization: Bearer ...
 <details>
 <summary><strong>/auth/mfa/totp</strong></summary>
 
-## POST Request:
+## Request:
 
 ```json
 {
@@ -316,7 +320,7 @@ Authorization: Bearer ...
 }
 ```
 
-## Server Respone:
+## Response:
 
 ```
 Set-Cookie: refresh_token=...

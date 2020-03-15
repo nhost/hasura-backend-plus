@@ -1,26 +1,20 @@
-import { Request, Response, Router } from 'express'
-import {
-  asyncWrapper,
-  createJwt,
-  newJwtExpiry,
-  newRefreshExpiry,
-  signed
-} from '../../shared/helpers'
-import { insertRefreshToken, selectUserByEmail } from '../../shared/queries'
+import { Request, Response } from 'express'
+import { asyncWrapper, createJwt, newJwtExpiry, newRefreshExpiry, signed } from '@shared/helpers'
+import { insertRefreshToken, selectUserByEmail } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { client } from '../../shared/client'
-import { loginSchema } from '../../shared/schema'
+import { loginSchema } from '@shared/schema'
+import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-const loginHandler = async ({ body }: Request, res: Response) => {
+async function login({ body }: Request, res: Response) {
   let hasuraData: { private_user_accounts: any[] }
 
   const { email, password } = await loginSchema.validateAsync(body)
 
   try {
-    hasuraData = await client(selectUserByEmail, { email })
+    hasuraData = await request(selectUserByEmail, { email })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -49,7 +43,7 @@ const loginHandler = async ({ body }: Request, res: Response) => {
   const refresh_token = uuidv4()
 
   try {
-    await client(insertRefreshToken, {
+    await request(insertRefreshToken, {
       refresh_token_data: {
         user_id: id,
         refresh_token,
@@ -72,4 +66,4 @@ const loginHandler = async ({ body }: Request, res: Response) => {
   })
 }
 
-export default Router().post('/', asyncWrapper(loginHandler))
+export default asyncWrapper(login)
