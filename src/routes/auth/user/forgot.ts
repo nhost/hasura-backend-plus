@@ -1,15 +1,15 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { asyncWrapper } from '../../../shared/helpers'
-import { client } from '../../../shared/client'
-import { forgotSchema } from '../../../shared/schema'
+import { asyncWrapper } from '@shared/helpers'
+import { forgotSchema } from '@shared/schema'
 import { pwnedPassword } from 'hibp'
-import { updatePassword } from '../../../shared/queries'
+import { request } from '@shared/request'
+import { updatePassword } from '@shared/queries'
 import { v4 as uuidv4 } from 'uuid'
 
-const forgotHandler = async ({ body }: Request, res: Response) => {
+async function forgot({ body }: Request, res: Response) {
   let password_hash: string
   let hasuraData: { update_private_user_accounts: { affected_rows: number } }
 
@@ -30,7 +30,7 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
   }
 
   try {
-    hasuraData = await client(updatePassword, {
+    hasuraData = await request(updatePassword, {
       ticket,
       password_hash,
       now: new Date(),
@@ -49,4 +49,4 @@ const forgotHandler = async ({ body }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', asyncWrapper(forgotHandler))
+export default asyncWrapper(forgot)

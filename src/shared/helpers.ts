@@ -82,20 +82,18 @@ export async function verifyJwt(authorization: string) {
 
 /**
  * Create QR code.
- * @param text Required OTP secret.
+ * @param secret Required OTP secret.
  */
-export async function createQR(text: string) {
+export async function createQR(secret: string) {
   try {
-    return await QRCode.toDataURL(text)
+    return await QRCode.toDataURL(secret)
   } catch (err) {
     throw Boom.badImplementation()
   }
 }
 
 /**
- * This asynchronous wrapper is used for all routes (`src/routes/*.ts`).
- * All thrown errors are caught and sent to `next()`. The error middleware
- * in `src/utils/errors.ts` takes care of the rest.
+ * This wrapper function sends any route errors to `next()`.
  */
 export function asyncWrapper(fn: any) {
   return function(req: Request, res: Response, next: NextFunction) {

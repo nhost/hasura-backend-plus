@@ -1,15 +1,15 @@
-import { Request, Response, Router } from 'express'
-import { active, asyncWrapper } from '../../shared/helpers'
-import { insertUser, selectUserByEmail, selectUserByUsername } from '../../shared/queries'
+import { Request, Response } from 'express'
+import { active, asyncWrapper } from '@shared/helpers'
+import { insertUser, selectUserByEmail, selectUserByUsername } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
-import { client } from '../../shared/client'
 import { pwnedPassword } from 'hibp'
-import { registerSchema } from '../../shared/schema'
+import { registerSchema } from '@shared/schema'
+import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-const registerHandler = async ({ body }: Request, res: Response) => {
+async function register({ body }: Request, res: Response) {
   let password_hash: string
 
   let hasuraData_1: { private_user_accounts: any[] }
@@ -18,8 +18,8 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   const { username, email, password } = await registerSchema.validateAsync(body)
 
   try {
-    hasuraData_1 = await client(selectUserByEmail, { email })
-    hasuraData_2 = await client(selectUserByUsername, { username })
+    hasuraData_1 = await request(selectUserByEmail, { email })
+    hasuraData_2 = await request(selectUserByUsername, { username })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -51,7 +51,7 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   }
 
   try {
-    await client(insertUser, {
+    await request(insertUser, {
       user: {
         email,
         active,
@@ -73,4 +73,4 @@ const registerHandler = async ({ body }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', asyncWrapper(registerHandler))
+export default asyncWrapper(register)

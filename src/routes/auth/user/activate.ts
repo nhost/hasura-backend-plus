@@ -1,19 +1,19 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
-import { activateSchema } from '../../../shared/schema'
-import { activateUser } from '../../../shared/queries'
-import { asyncWrapper } from '../../../shared/helpers'
-import { client } from '../../../shared/client'
+import { activateSchema } from '@shared/schema'
+import { activateUser } from '@shared/queries'
+import { asyncWrapper } from '@shared/helpers'
+import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-const activateHandler = async ({ body }: Request, res: Response) => {
+async function activate({ body }: Request, res: Response) {
   let hasuraData: { update_users: { affected_rows: number } }
 
   const { ticket } = await activateSchema.validateAsync(body)
 
   try {
-    hasuraData = await client(activateUser, {
+    hasuraData = await request(activateUser, {
       ticket,
       now: new Date(),
       new_ticket: uuidv4()
@@ -31,4 +31,4 @@ const activateHandler = async ({ body }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', asyncWrapper(activateHandler))
+export default asyncWrapper(activate)

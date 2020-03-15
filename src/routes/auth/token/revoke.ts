@@ -1,17 +1,15 @@
-import { Request, Response, Router } from 'express'
-import { Token, asyncWrapper, verifyJwt } from '../../../shared/helpers'
+import { Request, Response } from 'express'
+import { Token, asyncWrapper, verifyJwt } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
-import { client } from '../../../shared/client'
-import { deleteRefreshToken } from '../../../shared/queries'
+import { deleteRefreshToken } from '@shared/queries'
+import { request } from '@shared/request'
 
-const revokeHandler = async ({ headers }: Request, res: Response) => {
+async function revoke({ headers }: Request, res: Response) {
   let decodedToken: Token
 
-  let hasuraData: { private_refresh_tokens: any[] }
-
   try {
-    decodedToken = await verifyJwt(headers.authorization)
+    decodedToken = await verifyJwt(headers.authorization!)
   } catch (err) {
     throw Boom.unauthorized()
   }
@@ -19,7 +17,7 @@ const revokeHandler = async ({ headers }: Request, res: Response) => {
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = await client(deleteRefreshToken, { user_id })
+    await request(deleteRefreshToken, { user_id })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -27,4 +25,4 @@ const revokeHandler = async ({ headers }: Request, res: Response) => {
   return res.status(204).send()
 }
 
-export default Router().post('/', asyncWrapper(revokeHandler))
+export default asyncWrapper(revoke)

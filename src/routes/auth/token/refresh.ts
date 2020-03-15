@@ -1,24 +1,18 @@
-import { Request, Response, Router } from 'express'
-import {
-  asyncWrapper,
-  createJwt,
-  newJwtExpiry,
-  newRefreshExpiry,
-  signed
-} from '../../../shared/helpers'
-import { selectRefreshToken, updateRefreshToken } from '../../../shared/queries'
+import { Request, Response } from 'express'
+import { asyncWrapper, createJwt, newJwtExpiry, newRefreshExpiry, signed } from '@shared/helpers'
+import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { client } from '../../../shared/client'
+import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-const refreshHandler = async ({ cookies, signedCookies }: Request, res: Response) => {
+async function refresh({ cookies, signedCookies }: Request, res: Response) {
   let hasuraData: { private_refresh_tokens: any[] }
 
   const { refresh_token } = signed ? signedCookies : cookies
 
   try {
-    hasuraData = await client(selectRefreshToken, {
+    hasuraData = await request(selectRefreshToken, {
       refresh_token,
       current_timestamp: new Date()
     })
@@ -36,7 +30,7 @@ const refreshHandler = async ({ cookies, signedCookies }: Request, res: Response
   const new_refresh_token = uuidv4()
 
   try {
-    await client(updateRefreshToken, {
+    await request(updateRefreshToken, {
       old_refresh_token: refresh_token,
       new_refresh_token_data: {
         user_id: id,
@@ -60,4 +54,4 @@ const refreshHandler = async ({ cookies, signedCookies }: Request, res: Response
   })
 }
 
-export default Router().post('/', asyncWrapper(refreshHandler))
+export default asyncWrapper(refresh)

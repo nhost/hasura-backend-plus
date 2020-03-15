@@ -1,19 +1,18 @@
-import { Request, Response, Router } from 'express'
-import { Token, asyncWrapper, createQR, verifyJwt } from '../../../shared/helpers'
-import { selectUserById, updateOtpSecret } from '../../../shared/queries'
+import { Request, Response } from 'express'
+import { Token, asyncWrapper, createQR, verifyJwt } from '@shared/helpers'
+import { selectUserById, updateOtpSecret } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
-import { client } from '../../../shared/client'
+import { request } from '@shared/request'
 
-const generateHandler = async ({ headers }: Request, res: Response) => {
+async function generate({ headers }: Request, res: Response) {
   let image_url: string
   let decodedToken: Token
-
   let hasuraData: { private_user_accounts: any[] }
 
   try {
-    decodedToken = await verifyJwt(headers.authorization)
+    decodedToken = await verifyJwt(headers.authorization!)
   } catch (err) {
     throw Boom.unauthorized()
   }
@@ -21,7 +20,7 @@ const generateHandler = async ({ headers }: Request, res: Response) => {
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = await client(selectUserById, { user_id })
+    hasuraData = await request(selectUserById, { user_id })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -36,7 +35,7 @@ const generateHandler = async ({ headers }: Request, res: Response) => {
   const otpAuth = authenticator.keyuri(user_id, OTP_ISSUER, otp_secret)
 
   try {
-    await client(updateOtpSecret, { user_id, otp_secret: otpSecret })
+    await request(updateOtpSecret, { user_id, otp_secret: otpSecret })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -50,4 +49,4 @@ const generateHandler = async ({ headers }: Request, res: Response) => {
   return res.send({ image_url, otp_secret: otpSecret })
 }
 
-export default Router().post('/', asyncWrapper(generateHandler))
+export default asyncWrapper(generate)

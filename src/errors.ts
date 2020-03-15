@@ -15,12 +15,8 @@ interface Error {
 /**
  * This is a custom error middleware for Express.
  * https://expressjs.com/en/guide/error-handling.html
-
- * Whenever `next()` is called through the `asyncWrapper`
- * function (`src/utils/helper.ts`), this function will
- * create an error object that's sent to the client.
  */
-export const errors = async (err: Error, _req: Request, res: Response, _next: NextFunction) => {
+export async function errors(err: Error, _req: Request, res: Response, _next: NextFunction) {
   const code = err?.output?.statusCode || 400
 
   /**
