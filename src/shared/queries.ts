@@ -46,7 +46,7 @@ export const selectUserById = gql`
 `
 
 export const selectUserByEmail = gql`
-  query($email: String!) {
+  query($email: citext!) {
     private_user_accounts(where: { email: { _eq: $email } }) {
       otp_secret
       mfa_enabled
@@ -61,7 +61,7 @@ export const selectUserByEmail = gql`
 `
 
 export const selectUserByUsername = gql`
-  query($username: String!) {
+  query($username: citext!) {
     private_user_accounts(where: { username: { _eq: $username } }) {
       otp_secret
       mfa_enabled
