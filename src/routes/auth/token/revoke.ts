@@ -1,28 +1,28 @@
-import { Request, Response } from 'express'
-import { Token, asyncWrapper, verifyJwt } from '@shared/helpers'
+import { Request, Response } from 'express';
+import { Token, asyncWrapper, verifyJwt } from '@shared/helpers';
 
-import Boom from '@hapi/boom'
-import { deleteRefreshToken } from '@shared/queries'
-import { request } from '@shared/request'
+import Boom from '@hapi/boom';
+import { deleteRefreshToken } from '@shared/queries';
+import { request } from '@shared/request';
 
 async function revoke({ headers }: Request, res: Response) {
-  let decodedToken: Token
+  let decodedToken: Token;
 
   try {
-    decodedToken = await verifyJwt(headers.authorization!)
+    decodedToken = await verifyJwt(headers.authorization!);
   } catch (err) {
-    throw Boom.unauthorized()
+    throw Boom.unauthorized();
   }
 
-  const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id'];
 
   try {
-    await request(deleteRefreshToken, { user_id })
+    await request(deleteRefreshToken, { user_id });
   } catch (err) {
-    throw Boom.badImplementation()
+    throw Boom.badImplementation();
   }
 
-  return res.status(204).send()
+  return res.status(204).send();
 }
 
-export default asyncWrapper(revoke)
+export default asyncWrapper(revoke);

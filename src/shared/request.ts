@@ -12,7 +12,7 @@ const { HASURA_GRAPHQL_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET } = process.env;
 
  * https://github.com/prisma-labs/graphql-request/issues/10
  */
-export function gql_request(query: ASTNode, variables?: Variables) {
+export function request(query: ASTNode, variables?: Variables) {
   const request = new GraphQLClient(<string>HASURA_GRAPHQL_ENDPOINT, {
     headers: { 'x-hasura-admin-secret': <string>HASURA_GRAPHQL_ADMIN_SECRET },
   });
