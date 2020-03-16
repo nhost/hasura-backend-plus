@@ -10,7 +10,7 @@ import QRCode from 'qrcode';
 export const {
   COOKIE_SECRET: signed,
   AUTO_ACTIVATE: active,
-  JWT_ALGORITHM = 'HS256'
+  JWT_ALGORITHM = 'HS256',
 } = process.env;
 
 const refreshExpiresIn = parseInt(<string>process.env.REFRESH_EXPIRES_IN, 10) || 43200;
@@ -46,13 +46,13 @@ export function createJwt(
       'https://hasura.io/jwt/claims': {
         'x-hasura-user-id': id,
         'x-hasura-allowed-roles': roles,
-        'x-hasura-default-role': defaultRole
-      }
+        'x-hasura-default-role': defaultRole,
+      },
     },
     jwtSecretKey,
     {
       algorithm: JWT_ALGORITHM as Algorithm,
-      expiresIn: `${jwtExpiresIn}m`
+      expiresIn: `${jwtExpiresIn}m`,
     }
   );
 }

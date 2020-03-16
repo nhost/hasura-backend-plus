@@ -8,7 +8,7 @@ const userSchema = {
   password: Joi.string()
     .min(6)
     .max(128)
-    .required()
+    .required(),
 };
 
 export const loginSchema = Joi.object(userSchema);
@@ -20,13 +20,13 @@ export const registerSchema = Joi.object({
     .alphanum()
     .min(2)
     .max(32)
-    .required()
+    .required(),
 });
 
 const ticketSchema = {
   ticket: Joi.string()
     .uuid({ version: 'uuidv4' })
-    .required()
+    .required(),
 };
 
 export const forgotSchema = Joi.object({
@@ -35,7 +35,7 @@ export const forgotSchema = Joi.object({
   password: Joi.string()
     .min(6)
     .max(128)
-    .required()
+    .required(),
 });
 
 export const activateSchema = Joi.object(ticketSchema);
@@ -43,7 +43,7 @@ export const activateSchema = Joi.object(ticketSchema);
 const codeSchema = {
   code: Joi.string()
     .length(6)
-    .required()
+    .required(),
 };
 
 export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema });
