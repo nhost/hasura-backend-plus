@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/index.ts",
-    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/index.js"
+    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/index.js",
+    "lint": "./node_modules/.bin/eslint -c .eslintrc.js ./**/*.ts",
+    "lint-fix": "./node_modules/.bin/eslint -c .eslintrc.js --fix ./**/*.ts"
   },
   "dependencies": {
     "@hapi/boom": "9.1.0",
