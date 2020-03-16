@@ -184,3 +184,14 @@ export const updateOtpStatus = gql`
     }
   }
 `
+
+export const rotateTicket = gql`
+  mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
+    update_users(
+      where: { _and: { ticket: { _eq: $ticket }, ticket_expires_at: { _lt: $now } } }
+      _set: { ticket: $new_ticket }
+    ) {
+      affected_rows
+    }
+  }
+`

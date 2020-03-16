@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, createJwt, newJwtExpiry, newRefreshExpiry, signed } from '@shared/helpers'
-import { insertRefreshToken, selectUserByTicket } from '@shared/queries'
+import { insertRefreshToken, rotateTicket, selectUserByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
@@ -60,6 +60,15 @@ async function totp({ body }: Request, res: Response) {
         refresh_token,
         expires_at: new Date(newRefreshExpiry())
       }
+    })
+
+    /**
+     * Rotate user ticket.
+     */
+    await request(rotateTicket, {
+      ticket,
+      now: new Date(),
+      new_ticket: uuidv4()
     })
   } catch (err) {
     throw Boom.badImplementation()
