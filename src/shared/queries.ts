@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 export const insertUser = gql`
   mutation($user: users_insert_input!) {
@@ -6,7 +6,7 @@ export const insertUser = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const updatePassword = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: citext!, $new_ticket: uuid!) {
@@ -28,7 +28,7 @@ export const updatePassword = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const selectUserById = gql`
   query($user_id: uuid!) {
@@ -43,7 +43,7 @@ export const selectUserById = gql`
       }
     }
   }
-`
+`;
 
 export const selectUserByEmail = gql`
   query($email: citext!) {
@@ -58,7 +58,7 @@ export const selectUserByEmail = gql`
       }
     }
   }
-`
+`;
 
 export const selectUserByUsername = gql`
   query($username: citext!) {
@@ -73,7 +73,7 @@ export const selectUserByUsername = gql`
       }
     }
   }
-`
+`;
 
 export const selectUserByTicket = gql`
   query($ticket: uuid!) {
@@ -88,7 +88,7 @@ export const selectUserByTicket = gql`
       }
     }
   }
-`
+`;
 
 export const insertRefreshToken = gql`
   mutation($refresh_token_data: private_refresh_tokens_insert_input!) {
@@ -96,7 +96,7 @@ export const insertRefreshToken = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const selectRefreshToken = gql`
   query($refresh_token: uuid!, $current_timestamp: timestamptz!) {
@@ -115,7 +115,7 @@ export const selectRefreshToken = gql`
       }
     }
   }
-`
+`;
 
 export const updateRefreshToken = gql`
   mutation(
@@ -129,7 +129,7 @@ export const updateRefreshToken = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const deleteRefreshToken = gql`
   mutation($user_id: uuid!) {
@@ -137,7 +137,7 @@ export const deleteRefreshToken = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const activateUser = gql`
   mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
@@ -150,7 +150,7 @@ export const activateUser = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const updateOtpSecret = gql`
   mutation($user_id: uuid!, $otp_secret: citext!) {
@@ -161,7 +161,7 @@ export const updateOtpSecret = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const deleteOtpSecret = gql`
   mutation($user_id: uuid!) {
@@ -172,7 +172,7 @@ export const deleteOtpSecret = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const updateOtpStatus = gql`
   mutation($user_id: uuid!, $mfa_enabled: Boolean!) {
@@ -183,7 +183,7 @@ export const updateOtpStatus = gql`
       affected_rows
     }
   }
-`
+`;
 
 export const rotateTicket = gql`
   mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
@@ -194,4 +194,4 @@ export const rotateTicket = gql`
       affected_rows
     }
   }
-`
+`;

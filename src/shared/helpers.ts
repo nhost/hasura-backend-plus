@@ -1,29 +1,33 @@
-import { NextFunction, Request, Response } from 'express'
-import jwt, { Algorithm } from 'jsonwebtoken'
+import { NextFunction, Request, Response } from 'express';
+import jwt, { Algorithm } from 'jsonwebtoken';
 
-import Boom from '@hapi/boom'
-import QRCode from 'qrcode'
+import Boom from '@hapi/boom';
+import QRCode from 'qrcode';
 
 /**
  * Destructuring environment variables.
  */
-export const { COOKIE_SECRET: signed, AUTO_ACTIVATE: active, JWT_ALGORITHM = 'HS256' } = process.env
+export const {
+  COOKIE_SECRET: signed,
+  AUTO_ACTIVATE: active,
+  JWT_ALGORITHM = 'HS256'
+} = process.env;
 
-const refreshExpiresIn = parseInt(<string>process.env.REFRESH_EXPIRES_IN, 10) || 43200
+const refreshExpiresIn = parseInt(<string>process.env.REFRESH_EXPIRES_IN, 10) || 43200;
 
-const jwtSecretKey = <string>process.env.HASURA_GRAPHQL_JWT_SECRET_KEY
-const jwtExpiresIn = parseInt(<string>process.env.JWT_EXPIRES_IN, 10) || 15
-const _defaultRole = <string>process.env.DEFAULT_ROLE || 'user'
+const jwtSecretKey = <string>process.env.HASURA_GRAPHQL_JWT_SECRET_KEY;
+const jwtExpiresIn = parseInt(<string>process.env.JWT_EXPIRES_IN, 10) || 15;
+const _defaultRole = <string>process.env.DEFAULT_ROLE || 'user';
 
-export const newJwtExpiry = jwtExpiresIn * 60 * 1000
+export const newJwtExpiry = jwtExpiresIn * 60 * 1000;
 
 /**
  * New refresh token expiry date.
  */
 export function newRefreshExpiry() {
-  const now = new Date()
-  const days = refreshExpiresIn / 1440
-  return now.setDate(now.getDate() + days)
+  const now = new Date();
+  const days = refreshExpiresIn / 1440;
+  return now.setDate(now.getDate() + days);
 }
 
 /**
@@ -50,7 +54,7 @@ export function createJwt(
       algorithm: JWT_ALGORITHM as Algorithm,
       expiresIn: `${jwtExpiresIn}m`
     }
-  )
+  );
 }
 
 /**
@@ -58,12 +62,12 @@ export function createJwt(
  */
 export interface Token {
   'https://hasura.io/jwt/claims': {
-    'x-hasura-user-id': string
-    'x-hasura-default-role': string
-    'x-hasura-allowed-roles': any[]
-  }
-  exp: bigint
-  iat: bigint
+    'x-hasura-user-id': string;
+    'x-hasura-default-role': string;
+    'x-hasura-allowed-roles': any[];
+  };
+  exp: bigint;
+  iat: bigint;
 }
 
 /**
@@ -72,11 +76,11 @@ export interface Token {
  */
 export async function verifyJwt(authorization: string) {
   try {
-    if (!authorization) throw new Error()
-    const token = authorization.replace('Bearer ', '')
-    return jwt.verify(token, jwtSecretKey) as Token
+    if (!authorization) throw new Error();
+    const token = authorization.replace('Bearer ', '');
+    return jwt.verify(token, jwtSecretKey) as Token;
   } catch (err) {
-    throw Boom.unauthorized()
+    throw Boom.unauthorized();
   }
 }
 
@@ -86,9 +90,9 @@ export async function verifyJwt(authorization: string) {
  */
 export async function createQR(secret: string) {
   try {
-    return await QRCode.toDataURL(secret)
+    return await QRCode.toDataURL(secret);
   } catch (err) {
-    throw Boom.badImplementation()
+    throw Boom.badImplementation();
   }
 }
 
@@ -97,6 +101,6 @@ export async function createQR(secret: string) {
  */
 export function asyncWrapper(fn: any) {
   return function(req: Request, res: Response, next: NextFunction) {
-    fn(req, res, next).catch(next)
-  }
+    fn(req, res, next).catch(next);
+  };
 }

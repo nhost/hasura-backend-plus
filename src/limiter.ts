@@ -1,6 +1,6 @@
-import rateLimit, { Message } from 'express-rate-limit'
+import rateLimit, { Message } from 'express-rate-limit';
 
-const { MAX_REQUESTS = 100, TIME_FRAME = 15 * 60 * 1000 } = process.env
+const { MAX_REQUESTS = 100, TIME_FRAME = 15 * 60 * 1000 } = process.env;
 
 /**
  * In order to stay consistent with the error message
@@ -9,9 +9,9 @@ const { MAX_REQUESTS = 100, TIME_FRAME = 15 * 60 * 1000 } = process.env
  * include the `statusCode` property.
  */
 interface LimitMessage extends Message {
-  statusCode: number
-  message: string
-  [key: string]: any
+  statusCode: number;
+  message: string;
+  [key: string]: any;
 }
 
 export const limiter = rateLimit({
@@ -29,4 +29,4 @@ export const limiter = rateLimit({
     error: 'Too Many Requests',
     message: 'You are being rate limited.'
   })
-})
+});

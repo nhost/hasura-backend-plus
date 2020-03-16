@@ -1,29 +1,29 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express';
 
 interface Error {
   output?: {
-    payload?: Object
-    statusCode?: number
-  }
+    payload?: Object;
+    statusCode?: number;
+  };
   details?: [
     {
-      message?: string
+      message?: string;
     }
-  ]
+  ];
 }
 
 /**
  * This is a custom error middleware for Express.
  * https://expressjs.com/en/guide/error-handling.html
  */
-export async function errors(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  const code = err?.output?.statusCode || 400
+export async function errors(err: Error, _req: Request, res: Response) {
+  const code = err?.output?.statusCode || 400;
 
   /**
    * Log errors in development mode.
    */
   if (process.env.NODE_ENV === 'development') {
-    console.error(err)
+    console.error(err);
   }
 
   /**
@@ -33,7 +33,7 @@ export async function errors(err: Error, _req: Request, res: Response, _next: Ne
     statusCode: code,
     error: code === 400 ? 'Bad Request' : 'Internal Server Error',
     message: err?.details![0]?.message
-  }
+  };
 
-  res.status(code).send({ ...error })
+  res.status(code).send({ ...error });
 }
