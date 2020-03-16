@@ -19,13 +19,31 @@ async function totp({ body }: Request, res: Response) {
     throw Boom.badImplementation()
   }
 
-  const { user, mfa_enabled, otp_secret } = hasuraData.private_user_accounts[0]
+  const hasuraUser: {
+    user: {
+      id: string
+      ticket: string
+      active: boolean
+    }
+    otp_secret: string
+    mfa_enabled: boolean
+  }[] = hasuraData.private_user_accounts
+
+  if (hasuraUser.length === 0) {
+    throw Boom.badRequest('User does not exist.')
+  }
+
+  const {
+    otp_secret,
+    mfa_enabled,
+    user: { id, active }
+  } = hasuraUser[0]
 
   if (!mfa_enabled) {
     throw Boom.badRequest('MFA is not enabled.')
   }
 
-  if (!user.active) {
+  if (!active) {
     throw Boom.badRequest('User not activated.')
   }
 
@@ -33,7 +51,6 @@ async function totp({ body }: Request, res: Response) {
     throw Boom.unauthorized('Invalid two-factor code.')
   }
 
-  const { id } = user
   const refresh_token = uuidv4()
 
   try {
