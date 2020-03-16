@@ -14,7 +14,7 @@ const { HASURA_GRAPHQL_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET } = process.env;
  */
 export function gql_request(query: ASTNode, variables?: Variables) {
   const request = new GraphQLClient(<string>HASURA_GRAPHQL_ENDPOINT, {
-    headers: { 'x-hasura-admin-secret': <string>HASURA_GRAPHQL_ADMIN_SECRET }
+    headers: { 'x-hasura-admin-secret': <string>HASURA_GRAPHQL_ADMIN_SECRET },
   });
 
   return request.request(print(query), variables);

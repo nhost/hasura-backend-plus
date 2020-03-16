@@ -32,7 +32,7 @@ export async function errors(err: Error, _req: Request, res: Response) {
   const error = err?.output?.payload || {
     statusCode: code,
     error: code === 400 ? 'Bad Request' : 'Internal Server Error',
-    message: err?.details![0]?.message
+    message: err?.details![0]?.message,
   };
 
   res.status(code).send({ ...error });
