@@ -19,19 +19,31 @@ async function login({ body }: Request, res: Response) {
     throw Boom.badImplementation()
   }
 
-  const { user, password_hash, mfa_enabled } = hasuraData.private_user_accounts[0]
+  const hasuraUser: {
+    user: {
+      id: string
+      ticket: string
+      active: boolean
+    }
+    mfa_enabled: boolean
+    password_hash: string
+  }[] = hasuraData.private_user_accounts
 
-  const { ticket } = user
+  if (hasuraUser.length === 0) {
+    throw Boom.badRequest('User does not exist.')
+  }
+
+  const {
+    mfa_enabled,
+    password_hash,
+    user: { id, active, ticket }
+  } = hasuraUser[0]
 
   if (mfa_enabled) {
     return res.send({ mfa: true, ticket })
   }
 
-  if (user === undefined) {
-    throw Boom.badRequest('User does not exist.')
-  }
-
-  if (!user.active) {
+  if (!active) {
     throw Boom.badRequest('User not activated.')
   }
 
@@ -39,7 +51,6 @@ async function login({ body }: Request, res: Response) {
     throw Boom.unauthorized('Password does not match.')
   }
 
-  const { id } = user
   const refresh_token = uuidv4()
 
   try {
