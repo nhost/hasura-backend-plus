@@ -1,9 +1,44 @@
 import Joi from '@hapi/joi'
 
+interface ExtendedStringSchema extends Joi.StringSchema {
+  allowedDomains(): this
+}
+
+interface ExtendedJoi extends Joi.Root {
+  string(): ExtendedStringSchema
+}
+
+const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
+  type: 'string',
+  base: joi.string(),
+  messages: {
+    'string.allowedDomains': '{{#label}} is not in an authorised domain'
+  },
+
+  rules: {
+    allowedDomains: {
+      method(): unknown {
+        return this.$_addRule({ name: 'allowedDomains' })
+      },
+      validate(value: string, helpers): unknown {
+        if (process.env.ALLOWED_EMAIL_DOMAINS) {
+          const lowerValue = value.toLowerCase()
+          const allowedEmailDomains = process.env.ALLOWED_EMAIL_DOMAINS.split(',')
+          if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase())))
+            return helpers.error('string.allowedDomains')
+        }
+        return value
+      }
+    }
+  }
+}))
+
 const userSchema = {
-  email: Joi.string()
+  email: extendedJoi
+    .string()
     .email()
-    .required(),
+    .required()
+    .allowedDomains(),
 
   password: Joi.string()
     .min(6)
@@ -11,7 +46,7 @@ const userSchema = {
     .required()
 }
 
-export const loginSchema = Joi.object(userSchema)
+export const loginSchema = extendedJoi.object(userSchema)
 
 export const registerSchema = Joi.object({
   ...userSchema,
