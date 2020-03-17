@@ -7,7 +7,7 @@ import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 
 interface HasuraData {
-  private_user_accounts: { otp_secret: string }
+  private_user_accounts: [{ otp_secret: string }]
 }
 
 async function generate({ headers }: Request, res: Response): Promise<unknown> {
@@ -25,7 +25,7 @@ async function generate({ headers }: Request, res: Response): Promise<unknown> {
   }
 
   const { OTP_ISSUER = 'Authway' } = process.env
-  const { otp_secret } = hasuraData.private_user_accounts
+  const { otp_secret } = hasuraData.private_user_accounts[0]
 
   /**
    * Generate OTP secret and key URI.

@@ -8,7 +8,7 @@ import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
 interface HasuraData {
-  private_user_accounts: { otp_secret: string; mfa_enabled: boolean }
+  private_user_accounts: [{ otp_secret: string; mfa_enabled: boolean }]
 }
 
 async function enable({ headers, body }: Request, res: Response): Promise<unknown> {
@@ -26,7 +26,7 @@ async function enable({ headers, body }: Request, res: Response): Promise<unknow
     throw Boom.badImplementation()
   }
 
-  const { otp_secret, mfa_enabled } = hasuraData.private_user_accounts
+  const { otp_secret, mfa_enabled } = hasuraData.private_user_accounts[0]
 
   if (mfa_enabled) {
     throw Boom.badRequest('MFA is already enabled.')
