@@ -8,5 +8,5 @@ alter table "public"."users"
            foreign key ("default_role")
            references "public"."roles"
            ("name") on update restrict on delete restrict;
-INSERT INTO public.roles (role) VALUES ('user'), ('anonymous');
+INSERT INTO public.roles (name) VALUES ('user'), ('anonymous');
 ALTER TABLE "public"."users" ADD COLUMN "is_anonymous" boolean NOT NULL DEFAULT FALSE;
