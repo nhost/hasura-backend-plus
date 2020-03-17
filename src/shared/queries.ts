@@ -9,7 +9,7 @@ export const insertUser = gql`
 `
 
 export const updatePassword = gql`
-  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: citext!, $new_ticket: uuid!) {
+  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_private_user_accounts(
       where: {
         _and: [
@@ -30,6 +30,18 @@ export const updatePassword = gql`
   }
 `
 
+const userFragment = gql`
+  fragment userFragment on users {
+    id
+    active
+    default_role
+    roles {
+      role
+    }
+    is_anonymous
+  }
+`
+
 export const selectUserById = gql`
   query($user_id: uuid!) {
     private_user_accounts(where: { user_id: { _eq: $user_id } }) {
@@ -37,42 +49,42 @@ export const selectUserById = gql`
       mfa_enabled
       password_hash
       user {
-        id
-        active
+        ...userFragment
         ticket
       }
     }
   }
+  ${userFragment}
 `
 
 export const selectUserByEmail = gql`
-  query($email: citext!) {
+  query($email: String!) {
     private_user_accounts(where: { email: { _eq: $email } }) {
       otp_secret
       mfa_enabled
       password_hash
       user {
-        id
-        active
+        ...userFragment
         ticket
       }
     }
   }
+  ${userFragment}
 `
 
 export const selectUserByUsername = gql`
-  query($username: citext!) {
+  query($username: String!) {
     private_user_accounts(where: { username: { _eq: $username } }) {
       otp_secret
       mfa_enabled
       password_hash
       user {
-        id
-        active
+        ...userFragment
         ticket
       }
     }
   }
+  ${userFragment}
 `
 
 export const selectUserByTicket = gql`
@@ -82,12 +94,12 @@ export const selectUserByTicket = gql`
       mfa_enabled
       password_hash
       user {
-        id
-        active
+        ...userFragment
         ticket
       }
     }
   }
+  ${userFragment}
 `
 
 export const insertRefreshToken = gql`
@@ -110,11 +122,11 @@ export const selectRefreshToken = gql`
       }
     ) {
       user {
-        id
-        active
+        ...userFragment
       }
     }
   }
+  ${userFragment}
 `
 
 export const updateRefreshToken = gql`
@@ -153,7 +165,7 @@ export const activateUser = gql`
 `
 
 export const updateOtpSecret = gql`
-  mutation($user_id: uuid!, $otp_secret: citext!) {
+  mutation($user_id: uuid!, $otp_secret: String!) {
     update_private_user_accounts(
       where: { user_id: { _eq: $user_id } }
       _set: { otp_secret: $otp_secret }

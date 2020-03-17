@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { active, asyncWrapper } from '@shared/helpers'
-import { insertUser, selectUserByEmail, selectUserByUsername } from '@shared/queries'
+import { active, asyncWrapper, selectUser } from '@shared/helpers'
+import { insertUser } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
@@ -9,35 +9,12 @@ import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-interface HasuraData {
-  private_user_accounts: unknown[]
-}
-
 async function register({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
 
-  let hasuraData_1: HasuraData
-  let hasuraData_2: HasuraData
-
   const { username, email, password } = await registerSchema.validateAsync(body)
-
-  try {
-    hasuraData_1 = (await request(selectUserByEmail, { email })) as HasuraData
-    hasuraData_2 = (await request(selectUserByUsername, { username })) as HasuraData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-
-  const hasuraEmail = hasuraData_1.private_user_accounts
-  const hasuraUsername = hasuraData_2.private_user_accounts
-
-  if (hasuraEmail && hasuraEmail.length) {
-    throw Boom.badRequest('Email is already registered.')
-  }
-
-  if (hasuraUsername && hasuraUsername.length) {
-    throw Boom.badRequest('Username is already taken.')
-  }
+  const user = await selectUser(body)
+  if (user) throw Boom.badRequest('User is already registered.')
 
   if (process.env.HIBP_ENABLED) {
     const pwned = await pwnedPassword(password)
