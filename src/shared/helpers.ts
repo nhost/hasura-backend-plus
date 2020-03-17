@@ -48,7 +48,7 @@ export function createJwt({
     {
       'https://hasura.io/jwt/claims': {
         'x-hasura-user-id': id,
-        'x-hasura-allowed-roles': roles,
+        'x-hasura-allowed-roles': userRoles,
         'x-hasura-default-role': default_role
       }
     },
