@@ -57,6 +57,7 @@
     "eslint-plugin-prettier": "3.1.2",
     "husky": "4.2.3",
     "jest": "25.1.0",
+    "jest-extended": "0.11.5",
     "lint-staged": "10.0.8",
     "prettier": "1.19.1",
     "pretty-quick": "2.0.1",
@@ -96,7 +97,10 @@
     "preset": "ts-jest",
     "moduleNameMapper": {
       "^@shared/(.*)$": "<rootDir>/src/shared/$1"
-    }
+    },
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ]
   },
   "lint-staged": {
     "*.js,*.ts,*.md,*.json": [
