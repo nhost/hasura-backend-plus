@@ -22,7 +22,7 @@ async function login({ body }: Request, res: Response): Promise<unknown> {
   const {
     mfa_enabled,
     password_hash,
-    user: { id, active, ticket, default_role, roles }
+    user: { id, active, ticket }
   } = hasuraUser
 
   if (mfa_enabled) {
