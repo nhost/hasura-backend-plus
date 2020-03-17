@@ -61,9 +61,9 @@ export function createJwt({
 }
 
 /**
- * Exported token interface.
+ * Token interface.
  */
-export interface Token {
+interface Token {
   'https://hasura.io/jwt/claims': {
     'x-hasura-user-id': string
     'x-hasura-default-role': string
@@ -83,7 +83,7 @@ export async function verifyJwt(authorization: string): Promise<Token> {
     const token = authorization.replace('Bearer ', '')
     return jwt.verify(token, jwtSecretKey) as Token
   } catch (err) {
-    throw Boom.unauthorized()
+    throw Boom.unauthorized('Invalid or expired JWT token.')
   }
 }
 

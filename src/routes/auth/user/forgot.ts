@@ -47,7 +47,7 @@ async function forgot({ body }: Request, res: Response): Promise<unknown> {
   const { affected_rows } = hasuraData.update_private_user_accounts
 
   if (affected_rows === 0) {
-    throw Boom.unauthorized('Secret token does not match.')
+    throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
   return res.status(204).send()
