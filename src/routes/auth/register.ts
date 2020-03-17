@@ -9,30 +9,30 @@ import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function register({ body }: Request, res: Response) {
+interface HasuraData {
+  private_user_accounts: unknown[]
+}
+
+async function register({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
 
-  let hasuraData_1: { private_user_accounts: any[] }
-  let hasuraData_2: { private_user_accounts: any[] }
+  let hasuraData_1: HasuraData
+  let hasuraData_2: HasuraData
 
   const { username, email, password } = await registerSchema.validateAsync(body)
 
   try {
-    hasuraData_1 = await request(selectUserByEmail, { email })
-    hasuraData_2 = await request(selectUserByUsername, { username })
+    hasuraData_1 = (await request(selectUserByEmail, { email })) as HasuraData
+    hasuraData_2 = (await request(selectUserByUsername, { username })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const { length: length_1 } = hasuraData_1.private_user_accounts
-
-  if (length_1 !== 0) {
+  if (!hasuraData_1.private_user_accounts || !hasuraData_1.private_user_accounts.length) {
     throw Boom.badRequest('Email is already registered.')
   }
 
-  const { length: length_2 } = hasuraData_2.private_user_accounts
-
-  if (length_2 !== 0) {
+  if (!hasuraData_2.private_user_accounts || !hasuraData_2.private_user_accounts.length) {
     throw Boom.badRequest('Username is already taken.')
   }
 

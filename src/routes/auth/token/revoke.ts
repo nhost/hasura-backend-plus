@@ -5,10 +5,11 @@ import Boom from '@hapi/boom'
 import { deleteRefreshToken } from '@shared/queries'
 import { request } from '@shared/request'
 
-async function revoke({ headers }: Request, res: Response) {
+async function revoke({ headers }: Request, res: Response): Promise<unknown> {
   let decodedToken: Token
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     decodedToken = await verifyJwt(headers.authorization!)
   } catch (err) {
     throw Boom.unauthorized()

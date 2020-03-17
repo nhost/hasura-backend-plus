@@ -9,9 +9,13 @@ import { request } from '@shared/request'
 import { updatePassword } from '@shared/queries'
 import { v4 as uuidv4 } from 'uuid'
 
-async function forgot({ body }: Request, res: Response) {
+interface HasuraData {
+  update_private_user_accounts: { affected_rows: number }
+}
+
+async function forgot({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
-  let hasuraData: { update_private_user_accounts: { affected_rows: number } }
+  let hasuraData: HasuraData
 
   const { ticket, new_password } = await forgotSchema.validateAsync(body)
 
@@ -30,12 +34,12 @@ async function forgot({ body }: Request, res: Response) {
   }
 
   try {
-    hasuraData = await request(updatePassword, {
+    hasuraData = (await request(updatePassword, {
       ticket,
       password_hash,
       now: new Date(),
       new_ticket: uuidv4()
-    })
+    })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }

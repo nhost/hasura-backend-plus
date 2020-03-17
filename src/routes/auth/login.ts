@@ -8,28 +8,34 @@ import { loginSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function login({ body }: Request, res: Response) {
-  let hasuraData: { private_user_accounts: any[] }
+interface HasuraData {
+  private_user_accounts: [
+    {
+      user: {
+        id: string
+        ticket: string
+        active: boolean
+      }
+      mfa_enabled: boolean
+      password_hash: string
+    }
+  ]
+}
+
+async function login({ body }: Request, res: Response): Promise<unknown> {
+  let hasuraData: HasuraData
 
   const { email, password } = await loginSchema.validateAsync(body)
 
   try {
-    hasuraData = await request(selectUserByEmail, { email })
+    hasuraData = (await request(selectUserByEmail, { email })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const hasuraUser: {
-    user: {
-      id: string
-      ticket: string
-      active: boolean
-    }
-    mfa_enabled: boolean
-    password_hash: string
-  }[] = hasuraData.private_user_accounts
+  const hasuraUser = hasuraData.private_user_accounts
 
-  if (hasuraUser.length === 0) {
+  if (!hasuraUser || !hasuraUser.length) {
     throw Boom.badRequest('User does not exist.')
   }
 

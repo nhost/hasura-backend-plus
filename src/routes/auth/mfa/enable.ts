@@ -7,13 +7,18 @@ import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
-async function enable({ headers, body }: Request, res: Response) {
+interface HasuraData {
+  private_user_accounts: { otp_secret: string; mfa_enabled: boolean }
+}
+
+async function enable({ headers, body }: Request, res: Response): Promise<unknown> {
   let decodedToken: Token
-  let hasuraData: { private_user_accounts: any[] }
+  let hasuraData: HasuraData
 
   const { code } = await mfaSchema.validateAsync(body)
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     decodedToken = await verifyJwt(headers.authorization!)
   } catch (err) {
     throw Boom.unauthorized()
@@ -22,12 +27,12 @@ async function enable({ headers, body }: Request, res: Response) {
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = await request(selectUserById, { user_id })
+    hasuraData = (await request(selectUserById, { user_id })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const { otp_secret, mfa_enabled } = hasuraData.private_user_accounts[0]
+  const { otp_secret, mfa_enabled } = hasuraData.private_user_accounts
 
   if (mfa_enabled) {
     throw Boom.badRequest('MFA is already enabled.')

@@ -7,17 +7,21 @@ import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function activate({ body }: Request, res: Response) {
-  let hasuraData: { update_users: { affected_rows: number } }
+interface HasuraData {
+  update_users: { affected_rows: number }
+}
+
+async function activate({ body }: Request, res: Response): Promise<unknown> {
+  let hasuraData: HasuraData
 
   const { ticket } = await activateSchema.validateAsync(body)
 
   try {
-    hasuraData = await request(activateUser, {
+    hasuraData = (await request(activateUser, {
       ticket,
       now: new Date(),
       new_ticket: uuidv4()
-    })
+    })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }

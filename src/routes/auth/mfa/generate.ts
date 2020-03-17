@@ -6,12 +6,18 @@ import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 
-async function generate({ headers }: Request, res: Response) {
+interface HasuraData {
+  private_user_accounts: { otp_secret: string }
+}
+
+async function generate({ headers }: Request, res: Response): Promise<unknown> {
   let image_url: string
   let decodedToken: Token
-  let hasuraData: { private_user_accounts: any[] }
+
+  let hasuraData: HasuraData
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     decodedToken = await verifyJwt(headers.authorization!)
   } catch (err) {
     throw Boom.unauthorized()
@@ -20,13 +26,13 @@ async function generate({ headers }: Request, res: Response) {
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = await request(selectUserById, { user_id })
+    hasuraData = (await request(selectUserById, { user_id })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
   const { OTP_ISSUER = 'Authway' } = process.env
-  const { otp_secret } = hasuraData.private_user_accounts[0]
+  const { otp_secret } = hasuraData.private_user_accounts
 
   /**
    * Generate OTP secret and key URI.
@@ -41,7 +47,7 @@ async function generate({ headers }: Request, res: Response) {
   }
 
   try {
-    image_url = await createQR(otpAuth)
+    image_url = (await createQR(otpAuth)) as string
   } catch (err) {
     throw Boom.badImplementation()
   }
