@@ -1,5 +1,12 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createJwt, newJwtExpiry, newRefreshExpiry, signed } from '@shared/helpers'
+import {
+  asyncWrapper,
+  createJwt,
+  newJwtExpiry,
+  newRefreshExpiry,
+  signed,
+  HasuraUserData
+} from '@shared/helpers'
 import { insertRefreshToken, rotateTicket, selectUserByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -8,27 +15,13 @@ import { request } from '@shared/request'
 import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
-interface HasuraData {
-  private_user_accounts: [
-    {
-      user: {
-        id: string
-        ticket: string
-        active: boolean
-      }
-      otp_secret: string
-      mfa_enabled: boolean
-    }
-  ]
-}
-
 async function totp({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
+  let hasuraData: HasuraUserData
 
   const { ticket, code } = await totpSchema.validateAsync(body)
 
   try {
-    hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraData
+    hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -51,6 +44,10 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
 
   if (!active) {
     throw Boom.badRequest('User not activated.')
+  }
+
+  if (!otp_secret) {
+    throw Boom.badRequest('OTP secret is not set.')
   }
 
   if (!authenticator.check(code, otp_secret)) {
@@ -87,7 +84,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createJwt(id),
+    jwt_token: createJwt(hasuraUser[0]),
     jwt_expires_in: newJwtExpiry
   })
 }
