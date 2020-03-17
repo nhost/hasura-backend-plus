@@ -8,28 +8,34 @@ import { request } from '@shared/request'
 import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
-async function totp({ body }: Request, res: Response) {
-  let hasuraData: { private_user_accounts: any[] }
+interface HasuraData {
+  private_user_accounts: [
+    {
+      user: {
+        id: string
+        ticket: string
+        active: boolean
+      }
+      otp_secret: string
+      mfa_enabled: boolean
+    }
+  ]
+}
+
+async function totp({ body }: Request, res: Response): Promise<unknown> {
+  let hasuraData: HasuraData
 
   const { ticket, code } = await totpSchema.validateAsync(body)
 
   try {
-    hasuraData = await request(selectUserByTicket, { ticket })
+    hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const hasuraUser: {
-    user: {
-      id: string
-      ticket: string
-      active: boolean
-    }
-    otp_secret: string
-    mfa_enabled: boolean
-  }[] = hasuraData.private_user_accounts
+  const hasuraUser = hasuraData.private_user_accounts
 
-  if (hasuraUser.length === 0) {
+  if (!hasuraUser || !hasuraUser.length) {
     throw Boom.badRequest('User does not exist.')
   }
 

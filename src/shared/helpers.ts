@@ -9,20 +9,21 @@ import QRCode from 'qrcode'
  */
 export const { COOKIE_SECRET: signed, AUTO_ACTIVATE: active, JWT_ALGORITHM = 'HS256' } = process.env
 
-const refreshExpiresIn = parseInt(<string>process.env.REFRESH_EXPIRES_IN, 10) || 43200
+const refreshExpiresIn = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
 
-const jwtSecretKey = <string>process.env.HASURA_GRAPHQL_JWT_SECRET_KEY
-const jwtExpiresIn = parseInt(<string>process.env.JWT_EXPIRES_IN, 10) || 15
-const _defaultRole = <string>process.env.DEFAULT_ROLE || 'user'
+const jwtSecretKey = process.env.HASURA_GRAPHQL_JWT_SECRET_KEY as string
+const jwtExpiresIn = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
+const _defaultRole = (process.env.DEFAULT_ROLE as string) || 'user'
 
 export const newJwtExpiry = jwtExpiresIn * 60 * 1000
 
 /**
  * New refresh token expiry date.
  */
-export function newRefreshExpiry() {
+export function newRefreshExpiry(): number {
   const now = new Date()
   const days = refreshExpiresIn / 1440
+
   return now.setDate(now.getDate() + days)
 }
 
@@ -36,7 +37,7 @@ export function createJwt(
   id: string,
   defaultRole: string = _defaultRole,
   roles: string[] = [defaultRole]
-) {
+): unknown {
   return jwt.sign(
     {
       'https://hasura.io/jwt/claims': {
@@ -60,7 +61,7 @@ export interface Token {
   'https://hasura.io/jwt/claims': {
     'x-hasura-user-id': string
     'x-hasura-default-role': string
-    'x-hasura-allowed-roles': any[]
+    'x-hasura-allowed-roles': unknown[]
   }
   exp: bigint
   iat: bigint
@@ -70,7 +71,7 @@ export interface Token {
  * Verify JWT token.
  * @param authorization Authorization header.
  */
-export async function verifyJwt(authorization: string) {
+export async function verifyJwt(authorization: string): Promise<Token> {
   try {
     if (!authorization) throw new Error()
     const token = authorization.replace('Bearer ', '')
@@ -84,7 +85,7 @@ export async function verifyJwt(authorization: string) {
  * Create QR code.
  * @param secret Required OTP secret.
  */
-export async function createQR(secret: string) {
+export async function createQR(secret: string): Promise<unknown> {
   try {
     return await QRCode.toDataURL(secret)
   } catch (err) {
@@ -95,8 +96,9 @@ export async function createQR(secret: string) {
 /**
  * This wrapper function sends any route errors to `next()`.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asyncWrapper(fn: any) {
-  return function(req: Request, res: Response, next: NextFunction) {
+  return function(req: Request, res: Response, next: NextFunction): void {
     fn(req, res, next).catch(next)
   }
 }

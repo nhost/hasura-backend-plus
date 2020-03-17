@@ -6,28 +6,38 @@ import Boom from '@hapi/boom'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function refresh({ cookies, signedCookies }: Request, res: Response) {
-  let hasuraData: { private_refresh_tokens: any[] }
+interface HasuraData {
+  private_refresh_tokens: [
+    {
+      user: {
+        id: string
+      }
+    }
+  ]
+}
+
+async function refresh({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
+  let hasuraData: HasuraData
 
   const { refresh_token } = signed ? signedCookies : cookies
 
   try {
-    hasuraData = await request(selectRefreshToken, {
+    hasuraData = (await request(selectRefreshToken, {
       refresh_token,
       current_timestamp: new Date()
-    })
+    })) as HasuraData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const { user } = hasuraData.private_refresh_tokens[0]
+  const refreshTokens = hasuraData.private_refresh_tokens
 
-  if (user === undefined) {
+  if (!refreshTokens || !refreshTokens.length) {
     throw Boom.unauthorized('Refresh token does not match.')
   }
 
-  const { id } = user
   const new_refresh_token = uuidv4()
+  const { id } = hasuraData.private_refresh_tokens[0].user
 
   try {
     await request(updateRefreshToken, {

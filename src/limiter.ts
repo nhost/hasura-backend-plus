@@ -11,22 +11,22 @@ const { MAX_REQUESTS = 100, TIME_FRAME = 15 * 60 * 1000 } = process.env
 interface LimitMessage extends Message {
   statusCode: number
   message: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export const limiter = rateLimit({
   headers: true,
 
-  max: parseInt(<string>MAX_REQUESTS),
-  windowMs: parseInt(<string>TIME_FRAME),
+  max: parseInt(MAX_REQUESTS as string),
+  windowMs: parseInt(TIME_FRAME as string),
 
   /**
    * To use the above created interface, an `unknown`
    * conversion for non-overlapping types is necessary.
    */
-  message: <LimitMessage>(<unknown>{
+  message: ({
     statusCode: 429,
     error: 'Too Many Requests',
     message: 'You are being rate limited.'
-  })
+  } as unknown) as LimitMessage
 })

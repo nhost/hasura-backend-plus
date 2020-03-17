@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 
 interface Error {
   output?: {
-    payload?: Object
+    payload?: Record<string, unknown>
     statusCode?: number
   }
   details?: [
@@ -16,7 +16,13 @@ interface Error {
  * This is a custom error middleware for Express.
  * https://expressjs.com/en/guide/error-handling.html
  */
-export async function errors(err: Error, _req: Request, res: Response, _next: NextFunction) {
+export async function errors(
+  err: Error,
+  _req: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: NextFunction
+): Promise<unknown> {
   const code = err?.output?.statusCode || 400
 
   /**
@@ -32,8 +38,8 @@ export async function errors(err: Error, _req: Request, res: Response, _next: Ne
   const error = err?.output?.payload || {
     statusCode: code,
     error: code === 400 ? 'Bad Request' : 'Internal Server Error',
-    message: err?.details![0]?.message
+    message: err?.details?.[0]?.message
   }
 
-  res.status(code).send({ ...error })
+  return res.status(code).send({ ...error })
 }

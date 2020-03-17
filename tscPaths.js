@@ -1,7 +1,7 @@
-const tsConfig = require('./tsconfig.json')
-const tsConfigPaths = require('tsconfig-paths')
+import { compilerOptions } from './tsconfig.json'
+import { register } from 'tsconfig-paths'
 
-tsConfigPaths.register({
+register({
   baseUrl: 'dist',
-  paths: tsConfig.compilerOptions.paths
+  paths: compilerOptions.paths
 })

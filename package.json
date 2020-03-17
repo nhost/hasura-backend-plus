@@ -5,14 +5,14 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/index.ts",
-    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/index.js"
+    "start": "tsc && cross-env NODE_ENV=production node -r esm ./tscPaths.js dist/index.js"
   },
   "dependencies": {
     "@hapi/boom": "9.1.0",
     "@hapi/joi": "17.1.1",
     "argon2": "0.26.1",
     "body-parser": "1.19.0",
-    "cookie-parser": "1.4.4",
+    "cookie-parser": "1.4.5",
     "cors": "2.8.5",
     "cross-env": "7.0.2",
     "dotenv": "8.2.0",
@@ -23,15 +23,10 @@
     "graphql-tag": "2.10.3",
     "helmet": "3.21.3",
     "hibp": "8.0.0",
-    "husky": "4.2.3",
     "jsonwebtoken": "8.5.1",
     "otplib": "12.0.1",
-    "prettier": "1.19.1",
-    "pretty-quick": "2.0.1",
     "qrcode": "1.4.4",
-    "ts-node-dev": "1.0.0-pre.44",
     "tsconfig-paths": "3.9.0",
-    "typescript": "3.8.3",
     "uuid": "7.0.2"
   },
   "devDependencies": {
@@ -45,12 +40,46 @@
     "@types/jsonwebtoken": "8.3.8",
     "@types/node": "13.9.1",
     "@types/qrcode": "1.3.4",
-    "@types/uuid": "7.0.0"
+    "@types/uuid": "7.0.0",
+    "@typescript-eslint/eslint-plugin": "2.24.0",
+    "@typescript-eslint/parser": "2.24.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.0",
+    "eslint-plugin-prettier": "3.1.2",
+    "esm": "3.2.25",
+    "husky": "4.2.3",
+    "lint-staged": "10.0.8",
+    "prettier": "1.19.1",
+    "pretty-quick": "2.0.1",
+    "ts-node-dev": "1.0.0-pre.44",
+    "typescript": "3.8.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "rules": {
+      "@typescript-eslint/camelcase": "off"
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint"
+    ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.js,*.ts,*.md,*.json": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "prettier": {
     "semi": false,
