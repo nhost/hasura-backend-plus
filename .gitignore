@@ -2,7 +2,6 @@ dist
 .env
 *.log
 hasura
-yarn.lock
 config.yaml
 node_modules
 package-lock.json
