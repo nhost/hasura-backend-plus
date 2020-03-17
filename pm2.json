@@ -1,0 +1,5 @@
+{
+  "name": "hasura-backend-plus",
+  "script": "npm",
+  "args": "start"
+}

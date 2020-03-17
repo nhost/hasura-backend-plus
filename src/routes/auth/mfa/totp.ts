@@ -4,8 +4,8 @@ import {
   createJwt,
   newJwtExpiry,
   newRefreshExpiry,
-  signed,
-  selectUser
+  selectUser,
+  signed
 } from '@shared/helpers'
 import { insertRefreshToken, rotateTicket } from '@shared/queries'
 

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { active, asyncWrapper, selectUser } from '@shared/helpers'
-import { insertUser } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
+import { insertUser } from '@shared/queries'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
