@@ -10,7 +10,7 @@ import { updatePassword } from '@shared/queries'
 import { v4 as uuidv4 } from 'uuid'
 
 interface HasuraData {
-  update_private_user_accounts: { affected_rows: number }
+  update_private_user_accounts: [{ affected_rows: number }]
 }
 
 async function forgot({ body }: Request, res: Response): Promise<unknown> {
@@ -44,7 +44,7 @@ async function forgot({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  const { affected_rows } = hasuraData.update_private_user_accounts
+  const { affected_rows } = hasuraData.update_private_user_accounts[0]
 
   if (affected_rows === 0) {
     throw Boom.unauthorized('Secret token does not match.')
