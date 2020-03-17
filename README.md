@@ -21,7 +21,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg?cacheSeconds=2592000)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Authentication server for Hasura that does the job 💪

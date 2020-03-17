@@ -4,13 +4,13 @@ import {
   createJwt,
   newJwtExpiry,
   newRefreshExpiry,
-  signed,
-  selectUser
+  selectUser,
+  signed
 } from '@shared/helpers'
-import { insertRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
+import { insertRefreshToken } from '@shared/queries'
 import { loginSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'

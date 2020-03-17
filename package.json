@@ -1,7 +1,11 @@
 {
   "name": "hasura-backend-plus",
   "license": "MIT",
-  "version": "1.1.0",
+  "repository": {
+    "url": "git://github.com/nhost/hasura-backend-plus.git",
+    "type": "git"
+  },
+  "version": "1.2.0",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/index.ts",

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import {
+  UserData,
   asyncWrapper,
   createJwt,
   newJwtExpiry,
   newRefreshExpiry,
-  signed,
-  UserData
+  signed
 } from '@shared/helpers'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 

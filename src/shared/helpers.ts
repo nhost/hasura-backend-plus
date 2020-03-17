@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt, { Algorithm } from 'jsonwebtoken'
+import { selectUserByEmail, selectUserByTicket, selectUserByUsername } from './queries'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
-import { selectUserByEmail, selectUserByUsername, selectUserByTicket } from './queries'
 
 /**
  * Destructuring environment variables.
