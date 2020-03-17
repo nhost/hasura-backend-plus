@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import {
   asyncWrapper,
-  createJwt,
-  newJwtExpiry,
+  createHasuraJwt,
   newRefreshExpiry,
   selectUser,
   signed
@@ -14,6 +13,7 @@ import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
+import { newJwtExpiry } from '@shared/jwt'
 
 async function totp({ body }: Request, res: Response): Promise<unknown> {
   const { ticket, code } = await totpSchema.validateAsync(body)
@@ -75,7 +75,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createJwt(hasuraUser),
+    jwt_token: createHasuraJwt(hasuraUser),
     jwt_expires_in: newJwtExpiry
   })
 }

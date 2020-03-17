@@ -1,11 +1,12 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, verifyJwt } from '@shared/helpers'
+import { asyncWrapper } from '@shared/helpers'
 import { deleteOtpSecret, selectUserById } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
+import { verify } from '@shared/jwt'
 
 interface HasuraData {
   private_user_accounts: [{ otp_secret: string; mfa_enabled: boolean }]
@@ -17,7 +18,7 @@ async function disable({ headers, body }: Request, res: Response): Promise<unkno
   const { code } = await mfaSchema.validateAsync(body)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const decodedToken = await verifyJwt(headers.authorization!)
+  const decodedToken = verify(headers.authorization!)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {

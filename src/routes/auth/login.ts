@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import {
   asyncWrapper,
-  createJwt,
-  newJwtExpiry,
+  createHasuraJwt,
   newRefreshExpiry,
   selectUser,
   signed
@@ -14,6 +13,7 @@ import { insertRefreshToken } from '@shared/queries'
 import { loginSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
+import { newJwtExpiry } from '@shared/jwt'
 
 async function login({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
@@ -58,7 +58,7 @@ async function login({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createJwt(hasuraUser),
+    jwt_token: createHasuraJwt(hasuraUser),
     jwt_expires_in: newJwtExpiry
   })
 }

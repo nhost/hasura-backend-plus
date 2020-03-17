@@ -27,7 +27,7 @@
     "graphql-tag": "2.10.3",
     "helmet": "3.21.3",
     "hibp": "8.0.0",
-    "jsonwebtoken": "8.5.1",
+    "jose": "^1.25.0",
     "otplib": "12.0.1",
     "qrcode": "1.4.4",
     "tsconfig-paths": "3.9.0",
