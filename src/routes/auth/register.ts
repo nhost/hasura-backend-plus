@@ -28,11 +28,14 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  if (!hasuraData_1.private_user_accounts || !hasuraData_1.private_user_accounts.length) {
+  const hasuraEmail = hasuraData_1.private_user_accounts
+  const hasuraUsername = hasuraData_2.private_user_accounts
+
+  if (hasuraEmail && hasuraEmail.length) {
     throw Boom.badRequest('Email is already registered.')
   }
 
-  if (!hasuraData_2.private_user_accounts || !hasuraData_2.private_user_accounts.length) {
+  if (hasuraUsername && hasuraUsername.length) {
     throw Boom.badRequest('Username is already taken.')
   }
 

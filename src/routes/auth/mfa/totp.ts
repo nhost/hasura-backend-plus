@@ -36,7 +36,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   const hasuraUser = hasuraData.private_user_accounts
 
   if (!hasuraUser || !hasuraUser.length) {
-    throw Boom.badRequest('User does not exist.')
+    throw Boom.badRequest('Invalid or expired ticket.')
   }
 
   const {
@@ -50,7 +50,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   }
 
   if (!active) {
-    throw Boom.badRequest('User not activated.')
+    throw Boom.badRequest('User is not activated.')
   }
 
   if (!authenticator.check(code, otp_secret)) {

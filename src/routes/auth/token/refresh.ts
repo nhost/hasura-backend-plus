@@ -33,7 +33,7 @@ async function refresh({ cookies, signedCookies }: Request, res: Response): Prom
   const refreshTokens = hasuraData.private_refresh_tokens
 
   if (!refreshTokens || !refreshTokens.length) {
-    throw Boom.unauthorized('Refresh token does not match.')
+    throw Boom.unauthorized('Invalid or expired refresh token.')
   }
 
   const new_refresh_token = uuidv4()
