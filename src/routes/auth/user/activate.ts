@@ -8,7 +8,7 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 interface HasuraData {
-  update_users: [{ affected_rows: number }]
+  update_users: { affected_rows: number }
 }
 
 async function activate({ body }: Request, res: Response): Promise<unknown> {
@@ -26,7 +26,7 @@ async function activate({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  const { affected_rows } = hasuraData.update_users[0]
+  const { affected_rows } = hasuraData.update_users
 
   if (affected_rows === 0) {
     throw Boom.unauthorized('Invalid or expired ticket.')
