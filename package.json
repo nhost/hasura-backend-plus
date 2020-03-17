@@ -74,6 +74,10 @@
       "prettier/@typescript-eslint"
     ]
   },
+  "eslintIgnore": [
+    "dist",
+    "node_modules"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
