@@ -18,11 +18,11 @@ async function generate({ headers }: Request, res: Response): Promise<unknown> {
   /**
    * Generate OTP secret and key URI.
    */
-  const otpSecret = authenticator.generateSecret()
-  const otpAuth = authenticator.keyuri(user_id, OTP_ISSUER, otpSecret)
+  const otp_secret = authenticator.generateSecret()
+  const otpAuth = authenticator.keyuri(user_id, OTP_ISSUER, otp_secret)
 
   try {
-    await request(updateOtpSecret, { user_id, otp_secret: otpSecret })
+    await request(updateOtpSecret, { user_id, otp_secret })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -33,7 +33,7 @@ async function generate({ headers }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  return res.send({ image_url, otp_secret: otpSecret })
+  return res.send({ image_url, otp_secret })
 }
 
 export default asyncWrapper(generate)
