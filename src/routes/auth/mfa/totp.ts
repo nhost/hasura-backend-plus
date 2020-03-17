@@ -5,9 +5,9 @@ import {
   newJwtExpiry,
   newRefreshExpiry,
   signed,
-  HasuraUserData
+  selectUser
 } from '@shared/helpers'
-import { insertRefreshToken, rotateTicket, selectUserByTicket } from '@shared/queries'
+import { insertRefreshToken, rotateTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
@@ -16,19 +16,10 @@ import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
 async function totp({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUserData
-
   const { ticket, code } = await totpSchema.validateAsync(body)
+  const hasuraUser = await selectUser(body)
 
-  try {
-    hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-
-  const hasuraUser = hasuraData.private_user_accounts
-
-  if (!hasuraUser || !hasuraUser.length) {
+  if (!hasuraUser) {
     throw Boom.badRequest('Invalid or expired ticket.')
   }
 
@@ -36,7 +27,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
     otp_secret,
     mfa_enabled,
     user: { id, active }
-  } = hasuraUser[0]
+  } = hasuraUser
 
   if (!mfa_enabled) {
     throw Boom.badRequest('MFA is not enabled.')
@@ -84,7 +75,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createJwt(hasuraUser[0]),
+    jwt_token: createJwt(hasuraUser),
     jwt_expires_in: newJwtExpiry
   })
 }

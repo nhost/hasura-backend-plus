@@ -4,7 +4,7 @@ import jwt, { Algorithm } from 'jsonwebtoken'
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
-import { selectUserByEmail, selectUserByUsername } from './queries'
+import { selectUserByEmail, selectUserByUsername, selectUserByTicket } from './queries'
 
 /**
  * Destructuring environment variables.
@@ -132,17 +132,22 @@ export interface HasuraUserData {
  * @return user data, null if users is not found
  */
 export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
-  const { username, email } = httpBody
+  const { username, email, ticket } = httpBody
   try {
     if (email) {
-      const hasuraData_1 = (await request(selectUserByEmail, { email })) as HasuraUserData
-      if (hasuraData_1.private_user_accounts && hasuraData_1.private_user_accounts.length)
-        return hasuraData_1.private_user_accounts[0]
+      const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+        return hasuraData.private_user_accounts[0]
     }
     if (username) {
-      const hasuraData_2 = (await request(selectUserByUsername, { username })) as HasuraUserData
-      if (hasuraData_2.private_user_accounts && hasuraData_2.private_user_accounts.length)
-        return hasuraData_2.private_user_accounts[0]
+      const hasuraData = (await request(selectUserByUsername, { username })) as HasuraUserData
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+        return hasuraData.private_user_accounts[0]
+    }
+    if (ticket) {
+      const hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+        return hasuraData.private_user_accounts[0]
     }
     return null
   } catch (err) {

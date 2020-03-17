@@ -24,7 +24,7 @@ async function generate({ headers }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  const { OTP_ISSUER = 'Authway' } = process.env
+  const { OTP_ISSUER = 'HBP' } = process.env
   const { otp_secret } = hasuraData.private_user_accounts[0]
 
   /**

@@ -9,7 +9,7 @@ export const insertUser = gql`
 `
 
 export const updatePassword = gql`
-  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: citext!, $new_ticket: uuid!) {
+  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_private_user_accounts(
       where: {
         _and: [
@@ -165,7 +165,7 @@ export const activateUser = gql`
 `
 
 export const updateOtpSecret = gql`
-  mutation($user_id: uuid!, $otp_secret: citext!) {
+  mutation($user_id: uuid!, $otp_secret: String!) {
     update_private_user_accounts(
       where: { user_id: { _eq: $user_id } }
       _set: { otp_secret: $otp_secret }
