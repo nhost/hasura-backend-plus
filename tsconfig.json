@@ -6,10 +6,10 @@
     "paths": {
       "@shared/*": ["shared/*"]
     },
-    "outDir": "dist",
-    "target": "es2019",
     "module": "commonjs",
+    "outDir": "dist",
     "strict": true,
+    "target": "es2019",
     "baseUrl": "src",
     "noUnusedLocals": true,
     "esModuleInterop": true,
