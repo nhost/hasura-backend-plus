@@ -50,7 +50,7 @@ async function login({ body }: Request, res: Response): Promise<unknown> {
   }
 
   if (!active) {
-    throw Boom.badRequest('User not activated.')
+    throw Boom.badRequest('User is not activated.')
   }
 
   if (!(await argon2.verify(password_hash, password))) {

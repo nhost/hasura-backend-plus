@@ -29,7 +29,7 @@ async function activate({ body }: Request, res: Response): Promise<unknown> {
   const { affected_rows } = hasuraData.update_users[0]
 
   if (affected_rows === 0) {
-    throw Boom.unauthorized('Secret token does not match.')
+    throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
   return res.status(204).send()
