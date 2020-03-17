@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Token, asyncWrapper, createQR, verifyJwt } from '@shared/helpers'
+import { asyncWrapper, createQR, verifyJwt } from '@shared/helpers'
 import { selectUserById, updateOtpSecret } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -12,17 +12,10 @@ interface HasuraData {
 
 async function generate({ headers }: Request, res: Response): Promise<unknown> {
   let image_url: string
-  let decodedToken: Token
-
   let hasuraData: HasuraData
 
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    decodedToken = await verifyJwt(headers.authorization!)
-  } catch (err) {
-    throw Boom.unauthorized()
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const decodedToken = await verifyJwt(headers.authorization!)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
