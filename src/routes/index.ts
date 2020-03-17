@@ -10,6 +10,10 @@ import register from './auth/register'
 import revoke from './auth/token/revoke'
 import totp from './auth/mfa/totp'
 
+import upload from './storage/upload'
+import get_file_meta from './storage/get_file_meta'
+import get_file from './storage/get_file'
+
 export const router = Router()
   .post('/auth/login', login)
   .post('/auth/register', register)
@@ -24,3 +28,7 @@ export const router = Router()
 
   .post('/auth/user/activate', activate)
   .post('/auth/user/forgot', forgot)
+
+  .post('/storage/upload', upload)
+  .get('/storage/file-meta/*', get_file_meta)
+  .get('/storage/file/*', get_file)

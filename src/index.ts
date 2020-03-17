@@ -2,6 +2,7 @@ import 'dotenv/config'
 
 import cookie from 'cookie-parser'
 import cors from 'cors'
+import fileUpload from 'express-fileupload'
 import { errors } from './errors'
 import express from 'express'
 import helmet from 'helmet'
@@ -21,6 +22,7 @@ try {
   app.use(helmet())
   app.use(json())
   app.use(cors())
+  app.use(fileUpload())
 
   /**
    * Set a cookie secret to enable server validation of cookies.
