@@ -1,30 +1,47 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
-    <img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/logo.png" width="250px" alt="HBP" />
+    <img
+      src="assets/logo.png"
+      width="250px"
+      alt="HBP"
+    />
+  </a>
+</p>
+
+<p align="center">
+  <img
+    src="https://img.shields.io/badge/version-1.2.0-blue.svg?cacheSeconds=2592000"
+  />
+
+  <a href="LICENSE">
+    <img
+      src="https://img.shields.io/badge/License-MIT-yellow.svg"
+      alt="License: MIT"
+    />
   </a>
 </p>
 
 <h3 align="center">Hasura Backend Plus (HBP)</h3>
-<h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
+<h4 align="center">Auth & Files (S3-Compatible Object Storage) for Hasura</h4>
 
 ---
 
 # Nhost
 
-The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfect configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
+The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfectly configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
 
-All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
+All [Nhost](https://nhost.io) projects are built on open source software so you can make real-time web and mobile apps fast 🚀
 
-[<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png" width="200px">](https://nhost.io/register)
+<a href="https://nhost.io/register">
+  <img
+    src="assets/nhost-register-button.png"
+    width="200px"
+  />
+</a>
 
 [https://nhost.io](https://nhost.io)
 
 ---
-
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?cacheSeconds=2592000)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-Authentication server for Hasura that does the job 💪
 
 ### Core Features:
 

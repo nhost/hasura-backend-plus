@@ -32,6 +32,10 @@ async function enable({ headers, body }: Request, res: Response): Promise<unknow
     throw Boom.badRequest('MFA is already enabled.')
   }
 
+  if (!otp_secret) {
+    throw Boom.badRequest('OTP secret is not set.')
+  }
+
   if (!authenticator.check(code, otp_secret)) {
     throw Boom.unauthorized('Invalid two-factor code.')
   }

@@ -1,5 +1,6 @@
-import { compilerOptions } from './tsconfig.json'
-import { register } from 'tsconfig-paths'
+/* eslint-disable */
+const { compilerOptions } = require('./tsconfig.json')
+const { register } = require('tsconfig-paths')
 
 register({
   baseUrl: 'dist',

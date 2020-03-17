@@ -1,5 +1,6 @@
 dist
 .env
+*.log
 hasura
 config.yaml
 node_modules
