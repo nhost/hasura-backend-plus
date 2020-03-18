@@ -74,7 +74,7 @@ Start your Hasura instance with the following [environment variables](https://ha
 
 ```sh
 HASURA_GRAPHQL_ADMIN_SECRET: a_very_secure_admin_secret_goes_here
-HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "a_very_secure_jwt_secret_goes_here"}'
+JWT_SECRET_KEY: a_very_secure_jwt_secret_goes_here
 ```
 
 Install the Hasura CLI to run migrations:
