@@ -12,6 +12,11 @@ import remove from './auth/user/remove'
 import revoke from './auth/token/revoke'
 import totp from './auth/mfa/totp'
 
+import upload_file from './storage/upload_file'
+import get_file_meta from './storage/get_file_meta'
+import get_file from './storage/get_file'
+import delete_file from './storage/delete_file'
+
 export const router = Router()
   .get('/auth/jwks', jwks)
   .post('/auth/login', login)
@@ -28,3 +33,8 @@ export const router = Router()
   .post('/auth/user/activate', activate)
   .post('/auth/user/forgot', forgot)
   .post('/auth/user/remove', remove)
+
+  .post('/storage/upload', upload_file)
+  .get('/storage/file-meta/*', get_file_meta)
+  .get('/storage/file/*', get_file)
+  .delete('/storage/file/*', delete_file)

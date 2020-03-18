@@ -65,14 +65,20 @@ export const sign = (payload: object): string =>
   })
 
 /**
+ * Claims interface.
+ */
+export interface Claims {
+  'x-hasura-user-id': string
+  'x-hasura-default-role': string
+  'x-hasura-allowed-roles': string[]
+  [key: string]: string | string[]
+}
+
+/**
  * Token interface.
  */
 interface Token {
-  'https://hasura.io/jwt/claims': {
-    'x-hasura-user-id': string
-    'x-hasura-default-role': string
-    'x-hasura-allowed-roles': string[]
-  }
+  'https://hasura.io/jwt/claims': Claims
   exp: bigint
   iat: bigint
 }
@@ -81,9 +87,11 @@ interface Token {
  * Verify JWT token.
  * @param authorization Authorization header.
  */
-export function verify(authorization: string): Token {
+export function verify(authorization: string | undefined): Token {
   try {
-    if (!authorization) throw new Error()
+    if (!authorization) {
+      throw Boom.unauthorized('Missing Authorization header')
+    }
     const token = authorization.replace('Bearer ', '')
     return JWT.verify(token, jwtKey) as Token
   } catch (err) {
