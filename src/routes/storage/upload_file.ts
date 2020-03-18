@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import { verifyJwt } from '@shared/helpers'
+import { verify } from '@shared/jwt'
 import { storagePermission } from './rules'
 import Boom from '@hapi/boom'
 import { s3 } from '@shared/s3'
@@ -40,7 +40,7 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
   const key = req.headers['x-key'] as string
 
   // check storageRules if request is ok
-  const jwt_token = verifyJwt(req.headers.authorization)
+  const jwt_token = verify(req.headers.authorization)
   const claims = jwt_token['https://hasura.io/jwt/claims']
 
   if (!storagePermission(key, 'write', claims)) {

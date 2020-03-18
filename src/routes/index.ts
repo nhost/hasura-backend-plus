@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import jwks from './auth/jwks'
 import activate from './auth/user/activate'
 import disable from './auth/mfa/disable'
 import enable from './auth/mfa/enable'
@@ -17,6 +18,7 @@ import get_file from './storage/get_file'
 import delete_file from './storage/delete_file'
 
 export const router = Router()
+  .get('/auth/jwks', jwks)
   .post('/auth/login', login)
   .post('/auth/register', register)
 

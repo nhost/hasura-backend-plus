@@ -1,13 +1,14 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, verifyJwt } from '@shared/helpers'
+import { asyncWrapper } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import { deleteUserById } from '@shared/queries'
 import { request } from '@shared/request'
+import { verify } from '@shared/jwt'
 
 async function remove({ headers }: Request, res: Response): Promise<unknown> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const decodedToken = await verifyJwt(headers.authorization!)
+  const decodedToken = verify(headers.authorization!)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {

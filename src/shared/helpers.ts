@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import jwt, { Algorithm } from 'jsonwebtoken'
 import { selectUserByEmail, selectUserByTicket, selectUserByUsername } from './queries'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
+import { sign } from './jwt'
 
 /**
  * Destructuring environment variables.
@@ -12,16 +12,10 @@ import { request } from './request'
 export const {
   COOKIE_SECRET: signed,
   AUTO_ACTIVATE: active,
-  JWT_ALGORITHM = 'HS256',
   DEFAULT_USER_ROLE: _defaultUserRole = 'user'
 } = process.env
 
 const refreshExpiresIn = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
-
-const jwtSecretKey = process.env.HASURA_GRAPHQL_JWT_SECRET_KEY as string
-const jwtExpiresIn = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
-
-export const newJwtExpiry = jwtExpiresIn * 60 * 1000
 
 /**
  * New refresh token expiry date.
@@ -39,60 +33,18 @@ export function newRefreshExpiry(): number {
  * @param defaultRole Defaults to "user".
  * @param roles Defaults to ["user"].
  */
-export function createJwt({
+export function createHasuraJwt({
   user: { id, default_role = _defaultUserRole, roles = [] }
-}: UserData): unknown {
+}: UserData): string {
   const userRoles = roles.map(({ role }) => role)
   if (!userRoles.includes(default_role)) userRoles.push(default_role)
-  return jwt.sign(
-    {
-      'https://hasura.io/jwt/claims': {
-        'x-hasura-user-id': id,
-        'x-hasura-allowed-roles': userRoles,
-        'x-hasura-default-role': default_role
-      }
-    },
-    jwtSecretKey,
-    {
-      algorithm: JWT_ALGORITHM as Algorithm,
-      expiresIn: `${jwtExpiresIn}m`
+  return sign({
+    'https://hasura.io/jwt/claims': {
+      'x-hasura-user-id': id,
+      'x-hasura-allowed-roles': userRoles,
+      'x-hasura-default-role': default_role
     }
-  )
-}
-
-/**
- * Claims interface.
- */
-export interface Claims {
-  'x-hasura-user-id': string
-  'x-hasura-default-role': string
-  'x-hasura-allowed-roles': string[]
-  [key: string]: string | string[]
-}
-
-/**
- * Token interface.
- */
-interface Token {
-  'https://hasura.io/jwt/claims': Claims
-  exp: bigint
-  iat: bigint
-}
-
-/**
- * Verify JWT token.
- * @param authorization Authorization header.
- */
-export function verifyJwt(authorization: string | undefined): Token {
-  try {
-    if (!authorization) {
-      throw Boom.unauthorized('Invalid or expired JWT token.')
-    }
-    const token = authorization.replace('Bearer ', '')
-    return jwt.verify(token, jwtSecretKey) as Token
-  } catch (err) {
-    throw Boom.unauthorized('Invalid or expired JWT token.')
-  }
+  })
 }
 
 /**
