@@ -10,10 +10,10 @@ import { insertRefreshToken, rotateTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
+import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
 import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
-import { newJwtExpiry } from '@shared/jwt'
 
 async function totp({ body }: Request, res: Response): Promise<unknown> {
   const { ticket, code } = await totpSchema.validateAsync(body)

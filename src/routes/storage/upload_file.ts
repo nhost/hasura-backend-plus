@@ -1,16 +1,17 @@
 import { Request, Response } from 'express'
-import { asyncWrapper } from '@shared/helpers'
-import { verify } from '@shared/jwt'
-import { storagePermission } from './rules'
+
 import Boom from '@hapi/boom'
+import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
+import { storagePermission } from './rules'
 import { v4 as uuidv4 } from 'uuid'
+import { verify } from '@shared/jwt'
 
 interface UploadedFile {
   /** file name */
   name: string
   /** A function to move the file elsewhere on your server */
-  mv(path: string, callback: (err: any) => void): void
+  mv(path: string, callback: (err: unknown) => void): void
   mv(path: string): Promise<void>
   /** Encoding type of the file */
   encoding: string

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
-import { asyncWrapper } from '@shared/helpers'
+
 import Boom from '@hapi/boom'
+import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
 
 async function get_file(req: Request, res: Response): Promise<void> {

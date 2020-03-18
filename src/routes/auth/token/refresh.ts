@@ -3,9 +3,9 @@ import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry, signed } fro
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
+import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { newJwtExpiry } from '@shared/jwt'
 
 interface HasuraData {
   private_refresh_tokens: UserData[]

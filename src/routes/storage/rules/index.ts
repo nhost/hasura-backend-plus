@@ -1,4 +1,4 @@
-import { Claims } from '@shared/helpers'
+import { Claims } from '@shared/jwt'
 
 /**
  * Validate storage permission based on key, type and jwt claims
@@ -8,11 +8,13 @@ import { Claims } from '@shared/helpers'
  * @param claims Hasura JWT claims
  * @returns boolean
  */
-// eslint-disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function storagePermission(key: string, type: string, claims: Claims): boolean {
-  console.log('check storage permissions')
-  console.log(`key: ${key}`)
-  console.log(`type: ${type}`)
-  console.log(`claims:`)
+  console.log('Check Storage Permissions')
+
+  console.log(`Key: ${key}`)
+  console.log(`Type: ${type}`)
+  console.log(`Claims:`)
+
   return true
 }

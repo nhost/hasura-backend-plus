@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { asyncWrapper } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
+import { asyncWrapper } from '@shared/helpers'
 import { deleteUserById } from '@shared/queries'
 import { request } from '@shared/request'
 import { verify } from '@shared/jwt'

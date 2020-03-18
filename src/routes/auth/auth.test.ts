@@ -1,16 +1,15 @@
 import 'jest-extended'
 
-import { deleteUserById, selectUserByUsername } from '@shared/queries'
-
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
 import request from 'supertest'
+import { selectUserByUsername } from '@shared/queries'
 
 /**
  * Store JWT token in memory.
  */
-// let jwtToken: string
+let jwtToken: string
 
 const { AUTO_ACTIVATE = false } = process.env
 
@@ -49,8 +48,10 @@ if (!AUTO_ACTIVATE) {
 it('should sign the user in', async () => {
   const { body, status } = await agent.post('/auth/login').send({ email, password })
 
-  // jwtToken = body.jwt_token
-  // console.log('jwtToken:', jwtToken)
+  /**
+   * Save JWT token to globally scoped varaible.
+   */
+  jwtToken = body.jwt_token
 
   expect(status).toEqual(200)
 
@@ -67,12 +68,10 @@ it('should refresh the token', async () => {
   expect(body.jwt_expires_in).toBeNumber()
 })
 
-/**
- * Goodbye test user!
- */
-afterAll(async () => {
-  const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
-  const user_id = hasuraData.private_user_accounts[0].user.id
+it('should remove the user', async () => {
+  const { status } = await agent
+    .post('/auth/user/remove')
+    .set('Authorization', `Bearer ${jwtToken}`)
 
-  await admin(deleteUserById, { user_id })
+  expect(status).toEqual(204)
 })

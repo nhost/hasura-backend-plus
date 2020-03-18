@@ -1,7 +1,8 @@
-import { JWK, JWT, JWKS } from 'jose'
-import path from 'path'
-import fs from 'fs'
+import { JWK, JWKS, JWT } from 'jose'
+
 import Boom from '@hapi/boom'
+import fs from 'fs'
+import path from 'path'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
