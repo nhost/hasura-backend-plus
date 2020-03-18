@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import { getAWSOptions } from '../../shared/helpers'
+import { getAWSOptions, verifyJwt } from '@shared/helpers'
+import { storagePermission } from './rules'
 import Boom from '@hapi/boom'
 import AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
@@ -27,21 +28,27 @@ interface UploadedFile {
   md5: string
 }
 
-async function upload(req: Request, res: Response): Promise<unknown> {
+async function upload_file(req: Request, res: Response): Promise<unknown> {
   if (!req.files?.file) {
     throw Boom.badRequest('No file')
   }
 
+  // get file being uploaded
   const uploaded_file = req.files.file as UploadedFile
-
-  // check storageRules if request is ok
-  // TODO:
-
-  // generate access token for file
-  const token = uuidv4()
 
   // get path to upload file
   const key = req.headers['x-key'] as string
+
+  // check storageRules if request is ok
+  const jwt_token = verifyJwt(req.headers.authorization)
+  const claims = jwt_token['https://hasura.io/jwt/claims']
+
+  if (!storagePermission(key, 'write', claims)) {
+    throw Boom.forbidden()
+  }
+
+  // generate access token for file
+  const token = uuidv4()
 
   // upload file
   const aws_options = getAWSOptions()
@@ -76,4 +83,4 @@ async function upload(req: Request, res: Response): Promise<unknown> {
   })
 }
 
-export default asyncWrapper(upload)
+export default asyncWrapper(upload_file)

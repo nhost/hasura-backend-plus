@@ -23,7 +23,7 @@ async function get_file(req: Request, res: Response): Promise<void> {
     data = await s3.headObject(params).promise()
   } catch (e) {
     if (e) {
-      throw Boom.forbidden()
+      throw Boom.notFound()
     }
   }
 
