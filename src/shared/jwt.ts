@@ -16,7 +16,7 @@ let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = process.
  * * If not, tries to read the private.pem file, or generates it otherwise
  * * If SHA algorithm, then uses the JWT_SECRET_KEY environment variables
  */
-const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'private.pem')
+const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'keys/private.pem')
 if (RSA_TYPES.includes(jwtAlgorithm)) {
   if (jwtKey)
     try {
