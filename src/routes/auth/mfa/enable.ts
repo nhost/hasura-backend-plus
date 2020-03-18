@@ -1,4 +1,4 @@
-import { HasuraUserData, asyncWrapper, verifyJwt } from '@shared/helpers'
+import { HasuraUserData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
 import { selectUserById, updateOtpStatus } from '@shared/queries'
 
@@ -6,6 +6,7 @@ import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
+import { verify } from '@shared/jwt'
 
 async function enable({ headers, body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraUserData
@@ -13,7 +14,7 @@ async function enable({ headers, body }: Request, res: Response): Promise<unknow
   const { code } = await mfaSchema.validateAsync(body)
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const decodedToken = await verifyJwt(headers.authorization!)
+  const decodedToken = verify(headers.authorization!)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {

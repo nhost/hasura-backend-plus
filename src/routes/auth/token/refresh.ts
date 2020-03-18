@@ -1,17 +1,11 @@
 import { Request, Response } from 'express'
-import {
-  UserData,
-  asyncWrapper,
-  createJwt,
-  newJwtExpiry,
-  newRefreshExpiry,
-  signed
-} from '@shared/helpers'
+import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry, signed } from '@shared/helpers'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
+import { newJwtExpiry } from '@shared/jwt'
 
 interface HasuraData {
   private_refresh_tokens: UserData[]
@@ -60,7 +54,7 @@ async function refresh({ cookies, signedCookies }: Request, res: Response): Prom
   })
 
   return res.send({
-    jwt_token: createJwt(hasuraData.private_refresh_tokens[0]),
+    jwt_token: createHasuraJwt(hasuraData.private_refresh_tokens[0]),
     jwt_expires_in: newJwtExpiry
   })
 }
