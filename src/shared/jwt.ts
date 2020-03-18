@@ -7,7 +7,7 @@ import path from 'path'
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
 
-const jwtAlgorithm = process.env.JWT_ALGORITHM || 'HS256'
+const jwtAlgorithm = process.env.JWT_ALGORITHM || 'RS256'
 let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = process.env
   .JWT_SECRET_KEY as string
 
