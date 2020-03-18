@@ -376,6 +376,21 @@ Set-Cookie: refresh_token=...
 
 </details>
 
+---
+
+<details>
+<summary><strong>GET /healthz</strong></summary>
+
+Simple health check.
+
+## Response:
+
+```
+OK
+```
+
+</details>
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
