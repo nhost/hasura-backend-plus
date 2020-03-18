@@ -1,17 +1,13 @@
 import { Request, Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import { getAWSOptions } from '../../shared/helpers'
 import Boom from '@hapi/boom'
-import AWS from 'aws-sdk'
+import { s3 } from '@shared/s3'
 
 async function get_file(req: Request, res: Response): Promise<void> {
   const key = `${req.params[0]}`
   const token = req.query.token
 
   // get file info
-  const aws_options = getAWSOptions()
-  const s3 = new AWS.S3(aws_options)
-
   const params = {
     Bucket: process.env.S3_BUCKET as string,
     Key: key

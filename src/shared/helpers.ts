@@ -107,16 +107,6 @@ export async function createQR(secret: string): Promise<unknown> {
   }
 }
 
-export function getAWSOptions(): object {
-  return {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    endpoint: process.env.S3_ENDPOINT,
-    s3ForcePathStyle: true,
-    signatureVersion: 'v4'
-  }
-}
-
 /**
  * This wrapper function sends any route errors to `next()`.
  */

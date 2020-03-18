@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, verifyJwt } from '@shared/helpers'
-import { getAWSOptions } from '@shared/helpers'
 import { storagePermission } from './rules'
 import Boom from '@hapi/boom'
-import AWS from 'aws-sdk'
+import { s3 } from '@shared/s3'
 
 async function get_file(req: Request, res: Response): Promise<unknown> {
   const key = `${req.params[0]}`
@@ -17,9 +16,6 @@ async function get_file(req: Request, res: Response): Promise<unknown> {
   }
 
   // get file info
-  const aws_options = getAWSOptions()
-  const s3 = new AWS.S3(aws_options)
-
   const params = {
     Bucket: process.env.S3_BUCKET as string,
     Key: key

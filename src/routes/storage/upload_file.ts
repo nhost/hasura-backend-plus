@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import { getAWSOptions, verifyJwt } from '@shared/helpers'
+import { verifyJwt } from '@shared/helpers'
 import { storagePermission } from './rules'
 import Boom from '@hapi/boom'
-import AWS from 'aws-sdk'
+import { s3 } from '@shared/s3'
 import { v4 as uuidv4 } from 'uuid'
 
 interface UploadedFile {
@@ -51,9 +51,6 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
   const token = uuidv4()
 
   // upload file
-  const aws_options = getAWSOptions()
-  const s3 = new AWS.S3(aws_options)
-
   const upload_params = {
     Bucket: process.env.S3_BUCKET as string,
     Key: key,
