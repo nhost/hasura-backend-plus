@@ -1,5 +1,5 @@
+import { HasuraUserData, asyncWrapper, verifyJwt } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { asyncWrapper, verifyJwt } from '@shared/helpers'
 import { selectUserById, updateOtpStatus } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -7,12 +7,8 @@ import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
-interface HasuraData {
-  private_user_accounts: [{ otp_secret: string; mfa_enabled: boolean }]
-}
-
 async function enable({ headers, body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
+  let hasuraData: HasuraUserData
 
   const { code } = await mfaSchema.validateAsync(body)
 
@@ -21,7 +17,7 @@ async function enable({ headers, body }: Request, res: Response): Promise<unknow
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = (await request(selectUserById, { user_id })) as HasuraData
+    hasuraData = (await request(selectUserById, { user_id })) as HasuraUserData
   } catch (err) {
     throw Boom.badImplementation()
   }
