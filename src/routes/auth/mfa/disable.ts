@@ -1,5 +1,5 @@
+import { HasuraUserData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { asyncWrapper } from '@shared/helpers'
 import { deleteOtpSecret, selectUserById } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -8,12 +8,8 @@ import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
-interface HasuraData {
-  private_user_accounts: [{ otp_secret: string; mfa_enabled: boolean }]
-}
-
 async function disable({ headers, body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
+  let hasuraData: HasuraUserData
 
   const { code } = await mfaSchema.validateAsync(body)
 
@@ -22,7 +18,7 @@ async function disable({ headers, body }: Request, res: Response): Promise<unkno
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = (await request(selectUserById, { user_id })) as HasuraData
+    hasuraData = (await request(selectUserById, { user_id })) as HasuraUserData
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -33,12 +29,13 @@ async function disable({ headers, body }: Request, res: Response): Promise<unkno
     throw Boom.badRequest('MFA is already disabled.')
   }
 
-  if (!authenticator.check(code, otp_secret)) {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (!authenticator.check(code, otp_secret!)) {
     throw Boom.unauthorized('Invalid two-factor code.')
   }
 
   try {
-    hasuraData = (await request(deleteOtpSecret, { user_id })) as HasuraData
+    hasuraData = (await request(deleteOtpSecret, { user_id })) as HasuraUserData
   } catch (err) {
     throw Boom.badImplementation()
   }

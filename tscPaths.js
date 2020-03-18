@@ -1,5 +1,5 @@
 /* eslint-disable */
-const { compilerOptions } = require('./tsconfig.json')
+const { compilerOptions } = require('./tsconfig')
 const { register } = require('tsconfig-paths')
 
 register({

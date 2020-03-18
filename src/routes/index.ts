@@ -8,6 +8,7 @@ import generate from './auth/mfa/generate'
 import login from './auth/login'
 import refresh from './auth/token/refresh'
 import register from './auth/register'
+import remove from './auth/user/remove'
 import revoke from './auth/token/revoke'
 import totp from './auth/mfa/totp'
 
@@ -26,3 +27,4 @@ export const router = Router()
 
   .post('/auth/user/activate', activate)
   .post('/auth/user/forgot', forgot)
+  .post('/auth/user/remove', remove)

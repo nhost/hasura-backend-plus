@@ -178,6 +178,8 @@ Set-Cookie: refresh_token=...
 
 </details>
 
+---
+
 <details>
 <summary><strong>POST /auth/user/activate</strong></summary>
 
@@ -216,6 +218,25 @@ Set-Cookie: refresh_token=...
 ```
 
 </details>
+
+<details>
+<summary><strong>POST /auth/user/remove</strong></summary>
+
+## Request:
+
+```
+Authorization: Bearer ...
+```
+
+## Response:
+
+```
+204 No Content
+```
+
+</details>
+
+---
 
 <details>
 <summary><strong>POST /auth/token/refresh</strong></summary>
@@ -257,6 +278,8 @@ Authorization: Bearer ...
 ```
 
 </details>
+
+---
 
 <details>
 <summary><strong>POST /auth/mfa/generate</strong></summary>
@@ -323,6 +346,8 @@ Authorization: Bearer ...
 ```
 
 </details>
+
+---
 
 <details>
 <summary><strong>POST /auth/mfa/totp</strong></summary>

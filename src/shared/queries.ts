@@ -207,3 +207,17 @@ export const rotateTicket = gql`
     }
   }
 `
+
+export const deleteUserById = gql`
+  mutation($user_id: uuid) {
+    delete_private_user_accounts(where: { user_id: { _eq: $user_id } }) {
+      affected_rows
+    }
+    delete_private_refresh_tokens(where: { user_id: { _eq: $user_id } }) {
+      affected_rows
+    }
+    delete_users(where: { id: { _eq: $user_id } }) {
+      affected_rows
+    }
+  }
+`

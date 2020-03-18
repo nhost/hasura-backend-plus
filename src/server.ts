@@ -11,9 +11,9 @@ import { router } from './routes'
 
 const { COOKIE_SECRET: secret, SERVER_PORT: port = 3000 } = process.env
 
-try {
-  const app = express()
+export const app = express()
 
+try {
   if (process.env.NODE_ENV === 'production') {
     app.use(limiter)
   }
