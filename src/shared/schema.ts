@@ -67,7 +67,7 @@ const ticketSchema = {
 export const forgotSchema = Joi.object({
   ...ticketSchema,
 
-  password: Joi.string()
+  new_password: Joi.string()
     .min(6)
     .max(128)
     .required()

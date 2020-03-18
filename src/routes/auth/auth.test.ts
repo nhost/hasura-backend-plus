@@ -3,13 +3,16 @@ import 'jest-extended'
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
+import { authenticator } from 'otplib'
 import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
 
 /**
- * Store JWT token in memory.
+ * Store variables in memory.
  */
 let jwtToken: string
+let otpSecret: string
+let userTicket: string
 
 const { AUTO_ACTIVATE = false } = process.env
 
@@ -66,6 +69,91 @@ it('should refresh the token', async () => {
 
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should revoke the token', async () => {
+  const { status } = await agent
+    .post('/auth/token/revoke')
+    .set('Authorization', `Bearer ${jwtToken}`)
+
+  expect(status).toEqual(204)
+})
+
+it('should change the password', async () => {
+  const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
+  const ticket = hasuraData.private_user_accounts[0].user.ticket
+
+  const { status } = await agent.post('/auth/user/forgot').send({
+    ticket,
+    new_password: password
+  })
+
+  expect(status).toEqual(204)
+})
+
+it('should generate a secret', async () => {
+  const { body, status } = await agent
+    .post('/auth/mfa/generate')
+    .set('Authorization', `Bearer ${jwtToken}`)
+
+  /**
+   * Save OTP secret to globally scoped variable.
+   */
+  otpSecret = body.otp_secret
+
+  expect(status).toEqual(200)
+
+  expect(body.image_url).toBeString()
+  expect(body.otp_secret).toBeString()
+})
+
+it('should enable mfa for user', async () => {
+  const { status } = await agent
+    .post('/auth/mfa/enable')
+    .set('Authorization', `Bearer ${jwtToken}`)
+    .send({ code: authenticator.generate(otpSecret) })
+
+  expect(status).toEqual(204)
+})
+
+it('should return a ticket', async () => {
+  const { body, status } = await agent.post('/auth/login').send({ email, password })
+
+  /**
+   * Save ticket to globally scoped varaible.
+   */
+  userTicket = body.ticket
+
+  expect(status).toEqual(200)
+
+  expect(body.mfa).toBeTrue()
+  expect(body.ticket).toBeString()
+})
+
+it('should sign the user in (mfa)', async () => {
+  const { body, status } = await agent.post('/auth/mfa/totp').send({
+    ticket: userTicket,
+    code: authenticator.generate(otpSecret)
+  })
+
+  /**
+   * Save JWT token to globally scoped varaible.
+   */
+  jwtToken = body.jwt_token
+
+  expect(status).toEqual(200)
+
+  expect(body.jwt_token).toBeString()
+  expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should disable mfa for user', async () => {
+  const { status } = await agent
+    .post('/auth/mfa/disable')
+    .set('Authorization', `Bearer ${jwtToken}`)
+    .send({ code: authenticator.generate(otpSecret) })
+
+  expect(status).toEqual(204)
 })
 
 it('should remove the user', async () => {

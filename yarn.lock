@@ -495,7 +495,7 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
 
-"@types/express-fileupload@^1.1.2":
+"@types/express-fileupload@1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@types/express-fileupload/-/express-fileupload-1.1.2.tgz#3cc420abd0614b71cc7f2743c9d0b70182025922"
   integrity sha512-a2rhTcnF1NBphmp6/fKGW+udO0yYafUi6oDxYoutB6L5Hd9qBvlE0by4CB2mqTzXdp0qz+56Zt9SHOGN2TGhBQ==
@@ -891,7 +891,7 @@ atob@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
 
-aws-sdk@^2.640.0:
+aws-sdk@2.641.0:
   version "2.641.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.641.0.tgz#edc1895f950b795fb0411d6e9333ee5b6659444f"
   integrity sha512-9GYrBWR7ygIwwFBr0L+P+6tecNGsDuSe1mB18rv7CXSDLDdg6VPYwma1PSw5bUBs4wix9ganK6QLfW8D8ztBEQ==
@@ -1879,7 +1879,7 @@ expect@^25.1.0:
     jest-message-util "^25.1.0"
     jest-regex-util "^25.1.0"
 
-express-fileupload@^1.1.6:
+express-fileupload@1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.1.6.tgz#0ac2659ad8c1128c92c8580fd6e15b8b15343db0"
   integrity sha512-w24zPWT8DkoIxSVkbxYPo9hkTiLpCQQzNsLRTCnecBhfbYv+IkIC5uLw2MIUAxBZ+7UMmXPjGxlhzUXo4RcbZw==
@@ -3186,9 +3186,10 @@ jmespath@0.15.0:
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
 
-jose@^1.25.0:
+jose@1.25.0:
   version "1.25.0"
   resolved "https://registry.yarnpkg.com/jose/-/jose-1.25.0.tgz#59e1185134657d124da12d77c01f52a045cc0b7f"
+  integrity sha512-IaS/sJzBPIlgnSW+SnJr7We8cXrzKKwwJe765c50aSbB1u46CSaTYxgYRfFnXRZAPxGyQhkhPHUkcLvYmhiDpw==
   dependencies:
     "@panva/asn1.js" "^1.0.0"
 
