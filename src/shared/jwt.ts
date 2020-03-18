@@ -82,7 +82,6 @@ interface Token {
  * @param authorization Authorization header.
  */
 export function verify(authorization: string): Token {
-  // TODO tester
   try {
     if (!authorization) throw new Error()
     const token = authorization.replace('Bearer ', '')
