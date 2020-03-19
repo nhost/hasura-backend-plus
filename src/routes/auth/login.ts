@@ -1,16 +1,16 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-import { v4 as uuidv4 } from 'uuid'
-import argon2 from 'argon2'
-
 import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectUser } from '@shared/helpers'
+
+import Boom from '@hapi/boom'
+import { COOKIE_SECRET } from '@shared/config'
+import argon2 from 'argon2'
 import { insertRefreshToken } from '@shared/queries'
 import { loginSchema } from '@shared/schema'
 import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
-import { COOKIE_SECRET } from '@shared/config'
+import { v4 as uuidv4 } from 'uuid'
 
-async function login({ body }: Request, res: Response): Promise<unknown> {
+async function loginUser({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
   const hasuraUser = await selectUser(body)
 
@@ -62,4 +62,4 @@ async function login({ body }: Request, res: Response): Promise<unknown> {
   })
 }
 
-export default asyncWrapper(login)
+export default asyncWrapper(loginUser)

@@ -1,17 +1,17 @@
+import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-import { v4 as uuidv4 } from 'uuid'
-import argon2 from 'argon2'
-import { pwnedPassword } from 'hibp'
-
 import { asyncWrapper, selectUser } from '@shared/helpers'
+
+import Boom from '@hapi/boom'
+import argon2 from 'argon2'
+import { emailClient } from '@shared/email'
 import { insertUser } from '@shared/queries'
+import { pwnedPassword } from 'hibp'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
-// import { sendEmail } from '@shared/email'
-import { HIBP_ENABLED, AUTO_ACTIVATE } from '@shared/config'
+import { v4 as uuidv4 } from 'uuid'
 
-async function register({ body }: Request, res: Response): Promise<unknown> {
+async function registerUser({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
 
   const { username, email, password } = await registerSchema.validateAsync(body)
@@ -41,9 +41,9 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     await request(insertUser, {
       user: {
         email,
-        active: AUTO_ACTIVATE,
         ticket,
         username,
+        active: AUTO_ACTIVATE,
         user_accounts: {
           data: {
             email,
@@ -54,13 +54,17 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
       }
     })
 
-    /*if (!active) {
-      await sendEmail({
-        to: email,
-        subject: 'Hello World',
-        text: `Ticket: ${ticket}`
+    if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+      await emailClient.send({
+        template: 'confirm',
+        message: { to: email },
+        locals: {
+          ticket,
+          username,
+          url: SERVER_URL
+        }
       })
-    }*/
+    }
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -68,4 +72,4 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
   return res.status(204).send()
 }
 
-export default asyncWrapper(register)
+export default asyncWrapper(registerUser)

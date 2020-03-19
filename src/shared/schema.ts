@@ -1,5 +1,5 @@
-import Joi from '@hapi/joi'
 import { ALLOWED_EMAIL_DOMAINS } from './config'
+import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
@@ -15,7 +15,6 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
   messages: {
     'string.allowedDomains': '{{#label}} is not in an authorised domain'
   },
-
   rules: {
     allowedDomains: {
       method(): unknown {
@@ -25,34 +24,36 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
         if (ALLOWED_EMAIL_DOMAINS) {
           const lowerValue = value.toLowerCase()
           const allowedEmailDomains = ALLOWED_EMAIL_DOMAINS.split(',')
+
           if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
           }
         }
+
         return value
       }
     }
   }
 }))
 
-const userSchema = {
+const emailSchema = {
   email: extendedJoi
     .string()
     .email()
     .required()
-    .allowedDomains(),
+    .allowedDomains()
+}
 
+const userSchema = {
+  ...emailSchema,
   password: Joi.string()
     .min(6)
     .max(128)
     .required()
 }
 
-export const loginSchema = extendedJoi.object(userSchema)
-
 export const registerSchema = Joi.object({
   ...userSchema,
-
   username: Joi.string()
     .alphanum()
     .min(2)
@@ -66,23 +67,38 @@ const ticketSchema = {
     .required()
 }
 
-export const forgotSchema = Joi.object({
-  ...ticketSchema,
-
-  new_password: Joi.string()
-    .min(6)
-    .max(128)
-    .required()
-})
-
-export const activateSchema = Joi.object(ticketSchema)
-
 const codeSchema = {
   code: Joi.string()
     .length(6)
     .required()
 }
 
-export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })
+export const passwordResetSchema = Joi.object({
+  ...ticketSchema,
+  new_password: Joi.string()
+    .min(6)
+    .max(128)
+    .required()
+})
+
+export const verifySchema = Joi.object({
+  ...ticketSchema,
+  new_email: extendedJoi
+    .string()
+    .email()
+    .allowedDomains()
+})
+
+export const emailResetSchema = Joi.object({
+  ...emailSchema,
+  new_email: extendedJoi
+    .string()
+    .email()
+    .required()
+    .allowedDomains()
+})
 
 export const mfaSchema = Joi.object(codeSchema)
+export const loginSchema = extendedJoi.object(userSchema)
+export const forgotSchema = Joi.object({ ...emailSchema })
+export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })

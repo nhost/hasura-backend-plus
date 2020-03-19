@@ -1,5 +1,5 @@
-import rateLimit, { Message } from 'express-rate-limit'
 import { MAX_REQUESTS, TIME_FRAME } from '@shared/config'
+import rateLimit, { Message } from 'express-rate-limit'
 
 /**
  * In order to stay consistent with the error message

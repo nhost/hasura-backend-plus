@@ -1,8 +1,9 @@
+import { HASURA_GRAPHQL_ADMIN_SECRET, HASURA_GRAPHQL_ENDPOINT } from './config'
+
 import { ASTNode } from 'graphql'
 import { GraphQLClient } from 'graphql-request'
 import { Variables } from 'graphql-request/dist/src/types'
 import { print } from 'graphql/language/printer'
-import { HASURA_GRAPHQL_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET } from './config'
 
 /**
  * To take advantage of syntax highlighting and auto-formatting

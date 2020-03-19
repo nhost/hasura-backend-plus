@@ -1,3 +1,5 @@
+import { COOKIE_SECRET, SERVER_PORT } from '@shared/config'
+
 import cookie from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
@@ -7,7 +9,6 @@ import helmet from 'helmet'
 import { json } from 'body-parser'
 import { limiter } from './limiter'
 import { router } from './routes'
-import { COOKIE_SECRET, SERVER_PORT } from '@shared/config'
 
 export const app = express()
 

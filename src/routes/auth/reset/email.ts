@@ -8,10 +8,10 @@ import { forgotSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { selectUserByEmail } from '@shared/queries'
 
-async function forgotPassword({ body }: Request, res: Response): Promise<unknown> {
+async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraUserData
 
-  const { email } = await forgotSchema.validateAsync(body)
+  const { email, new_email } = await forgotSchema.validateAsync(body)
 
   try {
     hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
@@ -30,9 +30,9 @@ async function forgotPassword({ body }: Request, res: Response): Promise<unknown
   if (SMTP_ENABLED) {
     try {
       await emailClient.send({
-        locals: { ticket },
-        template: 'forgot',
-        message: { to: email }
+        template: 'confirm',
+        message: { to: email },
+        locals: { ticket, new_email }
       })
     } catch (err) {
       throw Boom.badImplementation()
@@ -42,4 +42,4 @@ async function forgotPassword({ body }: Request, res: Response): Promise<unknown
   return res.status(204).send()
 }
 
-export default asyncWrapper(forgotPassword)
+export default asyncWrapper(resetEmail)

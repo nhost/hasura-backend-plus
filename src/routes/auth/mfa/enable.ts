@@ -8,7 +8,7 @@ import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
-async function enable({ headers, body }: Request, res: Response): Promise<unknown> {
+async function enableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraUserData
 
   const { code } = await mfaSchema.validateAsync(body)
@@ -45,4 +45,4 @@ async function enable({ headers, body }: Request, res: Response): Promise<unknow
   return res.status(204).send()
 }
 
-export default asyncWrapper(enable)
+export default asyncWrapper(enableMfa)

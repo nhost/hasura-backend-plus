@@ -181,13 +181,20 @@ Set-Cookie: refresh_token=...
 ---
 
 <details>
-<summary><strong>POST /auth/user/activate</strong></summary>
+<summary><strong>GET /auth/user/verify?ticket=...&new_email=...</strong></summary>
+
+Redirects to your configured redirect URL (`REDIRECT_URL_ERROR` and `REDIRECT_URL_SUCCESS`).
+
+</details>
+
+<details>
+<summary><strong>POST /auth/user/forgot</strong></summary>
 
 ## Request:
 
 ```json
 {
-  "ticket": "0175b2e2-b6b5-4d3f-a5db-5b2d4bfc2ce7"
+  "email": "test@example.com"
 }
 ```
 
@@ -200,7 +207,7 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>POST /auth/user/forgot</strong></summary>
+<summary><strong>POST /auth/reset/password</strong></summary>
 
 ## Request:
 
@@ -220,7 +227,27 @@ Set-Cookie: refresh_token=...
 </details>
 
 <details>
-<summary><strong>POST /auth/user/remove</strong></summary>
+<summary><strong>POST /auth/reset/email</strong></summary>
+
+## Request:
+
+```json
+{
+  "email": "old@example.com",
+  "new_email": "new@example.com"
+}
+```
+
+## Response:
+
+```
+204 No Content
+```
+
+</details>
+
+<details>
+<summary><strong>POST /auth/user/delete</strong></summary>
 
 ## Request:
 
