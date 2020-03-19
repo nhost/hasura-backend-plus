@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
     <img
-      src="assets/logo.png"
+      src="docs/.vuepress/public/logo.png"
       width="250px"
       alt="HBP"
     />
@@ -34,7 +34,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 <a href="https://nhost.io/register">
   <img
-    src="assets/nhost-register-button.png"
+    src="docs/.vuepress/public/nhost-register-button.png"
     width="200px"
   />
 </a>
