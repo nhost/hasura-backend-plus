@@ -3,11 +3,11 @@ import { active, asyncWrapper, selectUser } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
+import { emailClient } from '@shared/email'
 import { insertUser } from '@shared/queries'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
-// import { sendEmail } from '@shared/email'
 import { v4 as uuidv4 } from 'uuid'
 
 async function register({ body }: Request, res: Response): Promise<unknown> {
@@ -53,13 +53,15 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
       }
     })
 
-    /*if (!active) {
-      await sendEmail({
-        to: email,
-        subject: 'Hello World',
-        text: `Ticket: ${ticket}`
-      })
-    }*/
+    if (!active && process.env.SMTP_ENABLED) {
+      emailClient
+        .send({
+          template: 'confirm',
+          message: { to: email },
+          locals: { name: username, ticket }
+        })
+        .catch(console.error)
+    }
   } catch (err) {
     throw Boom.badImplementation()
   }

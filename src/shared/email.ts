@@ -1,30 +1,39 @@
+import Email from 'email-templates'
 import nodemailer from 'nodemailer'
 
-interface Email {
-  to: string
-  text: string
-  from?: string
-  subject: string
-}
+const {
+  SMTP_PASS,
+  SMTP_HOST,
+  SMTP_USER,
+  /**
+   * TLS is a secure protcol, while SSL is not.
+   */
+  SMTP_SECURE = true,
+  SMTP_PORT = SMTP_SECURE ? 587 : 465,
+  /**
+   * Sender name defaults to the SMTP username.
+   */
+  SMTP_SENDER = SMTP_USER
+} = process.env
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendEmail(options: Email): Promise<any> {
-  const { to, text, from = '"noreply" <noreply@example.com>', subject } = options
+/**
+ * SMTP transport.
+ */
+const transport = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: Number(SMTP_PORT),
+  secure: Boolean(SMTP_SECURE),
+  auth: {
+    pass: SMTP_PASS,
+    user: SMTP_USER
+  }
+})
 
-  const testAccount = await nodemailer.createTestAccount()
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass
-    }
-  })
-
-  const info = await transporter.sendMail({ from, to, subject, text })
-
-  console.log('Message sent: %s', info.messageId)
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
-}
+/**
+ * Reusable email client.
+ */
+export const emailClient = new Email({
+  transport,
+  send: true,
+  message: { from: SMTP_SENDER }
+})
