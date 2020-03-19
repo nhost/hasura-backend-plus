@@ -15,7 +15,10 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
 
   const { username, email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
-  if (user) throw Boom.badRequest('User is already registered.')
+
+  if (user) {
+    throw Boom.badRequest('User is already registered.')
+  }
 
   if (process.env.HIBP_ENABLED) {
     const pwned = await pwnedPassword(password)

@@ -74,6 +74,10 @@
   "eslintConfig": {
     "root": true,
     "rules": {
+      "curly": [
+        1,
+        "all"
+      ],
       "@typescript-eslint/camelcase": "off"
     },
     "parser": "@typescript-eslint/parser",

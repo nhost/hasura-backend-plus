@@ -18,7 +18,11 @@ import { v4 as uuidv4 } from 'uuid'
 async function login({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
   const hasuraUser = await selectUser(body)
-  if (!hasuraUser) throw Boom.badRequest('User does not exist.')
+
+  if (!hasuraUser) {
+    throw Boom.badRequest('User does not exist.')
+  }
+
   const {
     mfa_enabled,
     password_hash,

@@ -24,8 +24,9 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
         if (process.env.ALLOWED_EMAIL_DOMAINS) {
           const lowerValue = value.toLowerCase()
           const allowedEmailDomains = process.env.ALLOWED_EMAIL_DOMAINS.split(',')
-          if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase())))
+          if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
+          }
         }
         return value
       }

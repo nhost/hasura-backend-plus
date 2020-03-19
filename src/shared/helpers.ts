@@ -37,7 +37,11 @@ export function createHasuraJwt({
   user: { id, default_role = _defaultUserRole, roles = [] }
 }: UserData): string {
   const userRoles = roles.map(({ role }) => role)
-  if (!userRoles.includes(default_role)) userRoles.push(default_role)
+
+  if (!userRoles.includes(default_role)) {
+    userRoles.push(default_role)
+  }
+
   return sign({
     'https://hasura.io/jwt/claims': {
       'x-hasura-user-id': id,
@@ -82,6 +86,7 @@ export interface UserData {
   mfa_enabled: boolean
   password_hash: string
 }
+
 export interface HasuraUserData {
   private_user_accounts: UserData[]
 }
@@ -93,21 +98,30 @@ export interface HasuraUserData {
  */
 export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
   const { username, email, ticket } = httpBody
+
   try {
     if (email) {
       const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
+
     if (username) {
       const hasuraData = (await request(selectUserByUsername, { username })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
+
     if (ticket) {
       const hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
     return null
   } catch (err) {
