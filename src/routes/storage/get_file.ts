@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
-
 import Boom from '@hapi/boom'
+
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
+import { S3_BUCKET } from '@shared/config'
 
 async function get_file(req: Request, res: Response): Promise<void> {
   const key = req.params[0]
@@ -10,7 +11,7 @@ async function get_file(req: Request, res: Response): Promise<void> {
 
   // get file info
   const params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key
   }
 
