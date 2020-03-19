@@ -5,24 +5,14 @@ import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
 import { sign } from './jwt'
-
-/**
- * Destructuring environment variables.
- */
-export const {
-  COOKIE_SECRET: signed,
-  AUTO_ACTIVATE: active,
-  DEFAULT_USER_ROLE: _defaultUserRole = 'user'
-} = process.env
-
-const refreshExpiresIn = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
+import { DEFAULT_USER_ROLE, REFRESH_EXPIRES_IN } from './config'
 
 /**
  * New refresh token expiry date.
  */
 export function newRefreshExpiry(): number {
   const now = new Date()
-  const days = refreshExpiresIn / 1440
+  const days = REFRESH_EXPIRES_IN / 1440
 
   return now.setDate(now.getDate() + days)
 }
@@ -34,7 +24,7 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  user: { id, default_role = _defaultUserRole, roles = [] }
+  user: { id, default_role = DEFAULT_USER_ROLE, roles = [] }
 }: UserData): string {
   const userRoles = roles.map(({ role }) => role)
 

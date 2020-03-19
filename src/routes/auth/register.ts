@@ -1,14 +1,15 @@
 import { Request, Response } from 'express'
-import { active, asyncWrapper, selectUser } from '@shared/helpers'
-
 import Boom from '@hapi/boom'
+import { v4 as uuidv4 } from 'uuid'
 import argon2 from 'argon2'
-import { insertUser } from '@shared/queries'
 import { pwnedPassword } from 'hibp'
+
+import { asyncWrapper, selectUser } from '@shared/helpers'
+import { insertUser } from '@shared/queries'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 // import { sendEmail } from '@shared/email'
-import { v4 as uuidv4 } from 'uuid'
+import { HIBP_ENABLED, AUTO_ACTIVATE } from '@shared/config'
 
 async function register({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
@@ -20,7 +21,7 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badRequest('User is already registered.')
   }
 
-  if (process.env.HIBP_ENABLED) {
+  if (HIBP_ENABLED) {
     const pwned = await pwnedPassword(password)
 
     if (pwned) {
@@ -40,7 +41,7 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     await request(insertUser, {
       user: {
         email,
-        active,
+        active: AUTO_ACTIVATE,
         ticket,
         username,
         user_accounts: {

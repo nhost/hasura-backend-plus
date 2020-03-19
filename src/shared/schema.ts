@@ -1,4 +1,5 @@
 import Joi from '@hapi/joi'
+import { ALLOWED_EMAIL_DOMAINS } from './config'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
@@ -21,9 +22,9 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
         return this.$_addRule({ name: 'allowedDomains' })
       },
       validate(value: string, helpers): unknown {
-        if (process.env.ALLOWED_EMAIL_DOMAINS) {
+        if (ALLOWED_EMAIL_DOMAINS) {
           const lowerValue = value.toLowerCase()
-          const allowedEmailDomains = process.env.ALLOWED_EMAIL_DOMAINS.split(',')
+          const allowedEmailDomains = ALLOWED_EMAIL_DOMAINS.split(',')
           if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
           }

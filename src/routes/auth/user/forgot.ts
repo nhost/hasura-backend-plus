@@ -5,9 +5,10 @@ import argon2 from 'argon2'
 import { asyncWrapper } from '@shared/helpers'
 import { forgotSchema } from '@shared/schema'
 import { pwnedPassword } from 'hibp'
+import { v4 as uuidv4 } from 'uuid'
 import { request } from '@shared/request'
 import { updatePassword } from '@shared/queries'
-import { v4 as uuidv4 } from 'uuid'
+import { HIBP_ENABLED } from '@shared/config'
 
 interface HasuraData {
   update_private_user_accounts: { affected_rows: number }
@@ -19,7 +20,7 @@ async function forgot({ body }: Request, res: Response): Promise<unknown> {
 
   const { ticket, new_password } = await forgotSchema.validateAsync(body)
 
-  if (process.env.HIBP_ENABLED) {
+  if (HIBP_ENABLED) {
     const pwned = await pwnedPassword(new_password)
 
     if (pwned) {
