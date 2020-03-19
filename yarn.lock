@@ -579,9 +579,14 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
 
-"@types/node@*", "@types/node@13.9.1":
+"@types/node@*":
   version "13.9.1"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.9.1.tgz#96f606f8cd67fb018847d9b61e93997dabdefc72"
+
+"@types/node@13.9.2":
+  version "13.9.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.9.2.tgz#ace1880c03594cc3e80206d96847157d8e7fa349"
+  integrity sha512-bnoqK579sAYrQbp73wwglccjJ4sfRdKU7WNEZ5FW4K2U6Kc0/eZ5kvXG0JKsEKFB50zrFmfFt52/cvBbZa7eXg==
 
 "@types/nodemailer@6.4.0":
   version "6.4.0"
@@ -898,10 +903,10 @@ atob@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
 
-aws-sdk@2.641.0:
-  version "2.641.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.641.0.tgz#edc1895f950b795fb0411d6e9333ee5b6659444f"
-  integrity sha512-9GYrBWR7ygIwwFBr0L+P+6tecNGsDuSe1mB18rv7CXSDLDdg6VPYwma1PSw5bUBs4wix9ganK6QLfW8D8ztBEQ==
+aws-sdk@2.642.0:
+  version "2.642.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.642.0.tgz#a18cd18db852378c7d9386c17b84d3fbdef539bf"
+  integrity sha512-0ZNgL1HBXRVobFD9Z64RyQk50cNABDMU1GV4lYIAvao4urYqYJi2MEVQmq+7WyXyzkBWu3lAPNDiJ8WW7emTzg==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -920,12 +925,6 @@ aws-sign2@~0.7.0:
 aws4@^1.8.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.9.1.tgz#7e33d8f7d449b3f673cd72deb9abdc552dbe528e"
-
-axios@^0.19.0:
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
-  dependencies:
-    follow-redirects "1.5.10"
 
 babel-jest@^25.1.0:
   version "25.1.0"
@@ -1452,12 +1451,6 @@ debounce@^1.0.0:
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
-  dependencies:
-    ms "2.0.0"
-
-debug@=3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
     ms "2.0.0"
 
@@ -2100,12 +2093,6 @@ flatted@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.1.tgz#69e57caa8f0eacbc281d2e2cb458d46fdb449e08"
 
-follow-redirects@1.5.10:
-  version "1.5.10"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.10.tgz#7b7a9f9aea2fdff36786a94ff643ed07f4ff5e2a"
-  dependencies:
-    debug "=3.1.0"
-
 for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -2379,11 +2366,12 @@ helmet@3.21.3:
     referrer-policy "1.2.0"
     x-xss-protection "1.3.0"
 
-hibp@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/hibp/-/hibp-8.0.0.tgz#608bbb0f5083a35fc7dacc064bf888e386d66c7d"
+hibp@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/hibp/-/hibp-9.0.0.tgz#74d5762b1a4ceb4a5548b44c88b5c81f811cfcd1"
+  integrity sha512-uzVIdQrDT5xIioWwy6tkUcUnlyia9Y0vPnilJ+L39F770Fa70KYyoEJp/NFYBjRS3Txkp8L69MPjordm9rTaXQ==
   dependencies:
-    axios "^0.19.0"
+    isomorphic-unfetch "^3.0.0"
     jssha "^2.3.1"
 
 hide-powered-by@1.1.0:
@@ -2761,6 +2749,14 @@ isobject@^2.0.0:
 isobject@^3.0.0, isobject@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
+
+isomorphic-unfetch@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-unfetch/-/isomorphic-unfetch-3.0.0.tgz#de6d80abde487b17de2c400a7ef9e5ecc2efb362"
+  integrity sha512-V0tmJSYfkKokZ5mgl0cmfQMTb7MLHsBMngTkbLY0eXvKqiVRRoZP04Ly+KhKrJfKtzC9E6Pp15Jo+bwh7Vi2XQ==
+  dependencies:
+    node-fetch "^2.2.0"
+    unfetch "^4.0.0"
 
 isstream@~0.1.2:
   version "0.1.2"
@@ -3681,6 +3677,11 @@ node-addon-api@^2.0.0:
 node-fetch@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.1.2.tgz#ab884e8e7e57e38a944753cec706f788d1768bb5"
+
+node-fetch@^2.2.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
+  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -5164,6 +5165,11 @@ typedarray-to-buffer@^3.1.5:
 typescript@3.8.3:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.3.tgz#409eb8544ea0335711205869ec458ab109ee1061"
+
+unfetch@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/unfetch/-/unfetch-4.1.0.tgz#6ec2dd0de887e58a4dee83a050ded80ffc4137db"
+  integrity sha512-crP/n3eAPUJxZXM9T80/yv0YhkTEx2K1D3h7D1AJM6fzsWZrxdyRuLN0JH/dkZh1LNH8LxCnBzoPFCPbb2iGpg==
 
 union-value@^1.0.0:
   version "1.0.1"
