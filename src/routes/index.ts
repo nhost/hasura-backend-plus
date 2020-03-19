@@ -1,40 +1,33 @@
+import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
+import { deleteUser, forgotPassword, resetPassword, verifyUser } from './auth/user'
+import { disableMfa, enableMfa, generateMfa, totpLogin } from './auth/mfa'
+import { getJwks, loginUser, registerUser } from './auth'
+import { refreshToken, revokeToken } from './auth/token'
+
 import { Router } from 'express'
-import activate from './auth/user/activate'
-import delete_file from './storage/delete_file'
-import disable from './auth/mfa/disable'
-import enable from './auth/mfa/enable'
-import forgot from './auth/user/forgot'
-import generate from './auth/mfa/generate'
-import get_file from './storage/get_file'
-import get_file_meta from './storage/get_file_meta'
-import jwks from './auth/jwks'
-import login from './auth/login'
-import refresh from './auth/token/refresh'
-import register from './auth/register'
-import remove from './auth/user/remove'
-import revoke from './auth/token/revoke'
-import totp from './auth/mfa/totp'
-import upload_file from './storage/upload_file'
 
 export const router = Router()
-  .get('/auth/jwks', jwks)
-  .post('/auth/login', login)
-  .post('/auth/register', register)
-
-  .post('/auth/mfa/disable', disable)
-  .post('/auth/mfa/enable', enable)
-  .post('/auth/mfa/generate', generate)
-  .post('/auth/mfa/totp', totp)
-
-  .post('/auth/token/refresh', refresh)
-  .post('/auth/token/revoke', revoke)
-  .post('/auth/user/activate', activate)
-  .post('/auth/user/forgot', forgot)
-  .post('/auth/user/remove', remove)
-
-  .delete('/storage/file/*', delete_file)
-  .get('/storage/file-meta/*', get_file_meta)
-  .get('/storage/file/*', get_file)
-  .post('/storage/upload', upload_file)
+  .get('/auth/jwks', getJwks)
 
   .get('/healthz', (_req, res) => res.send('OK'))
+
+  .post('/auth/login', loginUser)
+  .post('/auth/register', registerUser)
+
+  .post('/auth/token/refresh', refreshToken)
+  .post('/auth/token/revoke', revokeToken)
+
+  .get('/auth/user/verify', verifyUser)
+  .post('/auth/user/delete', deleteUser)
+  .post('/auth/user/forgot', forgotPassword)
+  .post('/auth/user/reset', resetPassword)
+
+  .post('/auth/mfa/disable', disableMfa)
+  .post('/auth/mfa/enable', enableMfa)
+  .post('/auth/mfa/generate', generateMfa)
+  .post('/auth/mfa/totp', totpLogin)
+
+  .delete('/storage/file/*', deleteFile)
+  .get('/storage/file-meta/*', getFileMeta)
+  .get('/storage/file/*', getFile)
+  .post('/storage/upload', uploadFile)

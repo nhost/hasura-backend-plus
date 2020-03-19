@@ -1,12 +1,13 @@
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
+import { S3_BUCKET } from '@shared/config'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
 import { storagePermission } from './rules'
 import { verify } from '@shared/jwt'
 
-async function get_file(req: Request, res: Response): Promise<unknown> {
+async function getFileMeta(req: Request, res: Response): Promise<unknown> {
   const key = req.params[0]
 
   // check storage rules if allowed to get meta info of file
@@ -19,7 +20,7 @@ async function get_file(req: Request, res: Response): Promise<unknown> {
 
   // get file info
   const params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key
   }
 
@@ -30,8 +31,7 @@ async function get_file(req: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  // TODO: Generate data.Metadata.token if token does not exists.
-
+  // TODO: Generate data.Metadata.token if token does not exist
   if (!data?.Metadata) {
     throw Boom.forbidden()
   }
@@ -46,4 +46,4 @@ async function get_file(req: Request, res: Response): Promise<unknown> {
   })
 }
 
-export default asyncWrapper(get_file)
+export default asyncWrapper(getFileMeta)

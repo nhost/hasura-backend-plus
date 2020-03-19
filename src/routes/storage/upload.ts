@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
+import { S3_BUCKET } from '@shared/config'
 import { UploadedFile } from 'express-fileupload'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
@@ -8,7 +9,7 @@ import { storagePermission } from './rules'
 import { v4 as uuidv4 } from 'uuid'
 import { verify } from '@shared/jwt'
 
-async function upload_file(req: Request, res: Response): Promise<unknown> {
+async function uploadFile(req: Request, res: Response): Promise<unknown> {
   if (!req.files?.file) {
     throw Boom.badRequest('No file')
   }
@@ -32,7 +33,7 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
 
   // upload file
   const upload_params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key,
     Body: uploaded_file.data,
     ContentType: uploaded_file.mimetype,
@@ -58,4 +59,4 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
   })
 }
 
-export default asyncWrapper(upload_file)
+export default asyncWrapper(uploadFile)

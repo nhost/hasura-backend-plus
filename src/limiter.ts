@@ -1,6 +1,5 @@
+import { MAX_REQUESTS, TIME_FRAME } from '@shared/config'
 import rateLimit, { Message } from 'express-rate-limit'
-
-const { MAX_REQUESTS = 100, TIME_FRAME = 15 * 60 * 1000 } = process.env
 
 /**
  * In order to stay consistent with the error message

@@ -1,5 +1,6 @@
 import 'jest-extended'
 
+import { AUTO_ACTIVATE } from '@shared/config'
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
@@ -13,8 +14,6 @@ import { selectUserByUsername } from '@shared/queries'
 let jwtToken: string
 let otpSecret: string
 let userTicket: string
-
-const { AUTO_ACTIVATE = false } = process.env
 
 /**
  * Dummy user information.

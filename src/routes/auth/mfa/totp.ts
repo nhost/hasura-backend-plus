@@ -1,21 +1,16 @@
 import { Request, Response } from 'express'
-import {
-  asyncWrapper,
-  createHasuraJwt,
-  newRefreshExpiry,
-  selectUser,
-  signed
-} from '@shared/helpers'
+import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectUser } from '@shared/helpers'
 import { insertRefreshToken, rotateTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
+import { COOKIE_SECRET } from '@shared/config'
 import { authenticator } from 'otplib'
 import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
 import { totpSchema } from '@shared/schema'
 import { v4 as uuidv4 } from 'uuid'
 
-async function totp({ body }: Request, res: Response): Promise<unknown> {
+async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const hasuraUser = await selectUser(body)
 
@@ -70,7 +65,7 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
 
   res.cookie('refresh_token', refresh_token, {
     httpOnly: true,
-    signed: Boolean(signed),
+    signed: Boolean(COOKIE_SECRET),
     maxAge: newRefreshExpiry()
   })
 
@@ -80,4 +75,4 @@ async function totp({ body }: Request, res: Response): Promise<unknown> {
   })
 }
 
-export default asyncWrapper(totp)
+export default asyncWrapper(totpLogin)

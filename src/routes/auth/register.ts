@@ -1,5 +1,6 @@
+import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { Request, Response } from 'express'
-import { active, asyncWrapper, selectUser } from '@shared/helpers'
+import { asyncWrapper, selectUser } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import argon2 from 'argon2'
@@ -10,7 +11,7 @@ import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function register({ body }: Request, res: Response): Promise<unknown> {
+async function registerUser({ body }: Request, res: Response): Promise<unknown> {
   let password_hash: string
 
   const { username, email, password } = await registerSchema.validateAsync(body)
@@ -20,7 +21,7 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badRequest('User is already registered.')
   }
 
-  if (process.env.HIBP_ENABLED) {
+  if (HIBP_ENABLED) {
     const pwned = await pwnedPassword(password)
 
     if (pwned) {
@@ -40,9 +41,9 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     await request(insertUser, {
       user: {
         email,
-        active,
         ticket,
         username,
+        active: AUTO_ACTIVATE,
         user_accounts: {
           data: {
             email,
@@ -53,14 +54,16 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
       }
     })
 
-    if (!active && process.env.SMTP_ENABLED) {
-      emailClient
-        .send({
-          template: 'confirm',
-          message: { to: email },
-          locals: { name: username, ticket }
-        })
-        .catch(console.error)
+    if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+      await emailClient.send({
+        template: 'confirm',
+        message: { to: email },
+        locals: {
+          ticket,
+          username,
+          url: SERVER_URL
+        }
+      })
     }
   } catch (err) {
     throw Boom.badImplementation()
@@ -69,4 +72,4 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
   return res.status(204).send()
 }
 
-export default asyncWrapper(register)
+export default asyncWrapper(registerUser)

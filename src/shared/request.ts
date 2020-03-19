@@ -1,3 +1,5 @@
+import { HASURA_GRAPHQL_ADMIN_SECRET, HASURA_GRAPHQL_ENDPOINT } from './config'
+
 import { ASTNode } from 'graphql'
 import { GraphQLClient } from 'graphql-request'
 import { Variables } from 'graphql-request/dist/src/types'
@@ -11,11 +13,8 @@ import { print } from 'graphql/language/printer'
  * https://github.com/prisma-labs/graphql-request/issues/10
  */
 export function request(query: ASTNode, variables?: Variables): Promise<unknown> {
-  const endpoint = process.env.HASURA_GRAPHQL_ENDPOINT as string
-  const secret = process.env.HASURA_GRAPHQL_ADMIN_SECRET as string
-
-  const client = new GraphQLClient(endpoint, {
-    headers: { 'x-hasura-admin-secret': secret }
+  const client = new GraphQLClient(HASURA_GRAPHQL_ENDPOINT as string, {
+    headers: { 'x-hasura-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET as string }
   })
 
   return client.request(print(query), variables)

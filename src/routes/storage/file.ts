@@ -1,16 +1,17 @@
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
+import { S3_BUCKET } from '@shared/config'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
 
-async function get_file(req: Request, res: Response): Promise<void> {
+async function getFile(req: Request, res: Response): Promise<void> {
   const key = req.params[0]
   const token = req.query.token
 
   // get file info
   const params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key
   }
 
@@ -38,7 +39,7 @@ async function get_file(req: Request, res: Response): Promise<void> {
     throw Boom.badImplementation()
   })
 
-  //Add the content type to the response (it's not propagated from the S3 SDK)
+  // Add the content type to the response (it's not propagated from the S3 SDK)
   res.set('Content-Type', data.ContentType)
   res.set('Content-Length', data.ContentLength?.toString())
   res.set('Last-Modified', data.LastModified?.toString())
@@ -46,8 +47,8 @@ async function get_file(req: Request, res: Response): Promise<void> {
   res.set('Cache-Control', 'public, max-age=31557600')
   res.set('ETag', data.ETag)
 
-  //Pipe the s3 object to the response
+  // Pipe the s3 object to the response
   stream.pipe(res)
 }
 
-export default asyncWrapper(get_file)
+export default asyncWrapper(getFile)

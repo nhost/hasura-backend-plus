@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
-import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry, signed } from '@shared/helpers'
+import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry } from '@shared/helpers'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
+import { COOKIE_SECRET } from '@shared/config'
 import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -11,10 +12,10 @@ interface HasuraData {
   private_refresh_tokens: UserData[]
 }
 
-async function refresh({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
+async function refreshToken({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
-  const { refresh_token } = signed ? signedCookies : cookies
+  const { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
 
   try {
     hasuraData = (await request(selectRefreshToken, {
@@ -49,7 +50,7 @@ async function refresh({ cookies, signedCookies }: Request, res: Response): Prom
 
   res.cookie('refresh_token', new_refresh_token, {
     httpOnly: true,
-    signed: Boolean(signed),
+    signed: Boolean(COOKIE_SECRET),
     maxAge: newRefreshExpiry()
   })
 
@@ -59,4 +60,4 @@ async function refresh({ cookies, signedCookies }: Request, res: Response): Prom
   })
 }
 
-export default asyncWrapper(refresh)
+export default asyncWrapper(refreshToken)
