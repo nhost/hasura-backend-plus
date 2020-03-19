@@ -181,7 +181,7 @@ Set-Cookie: refresh_token=...
 ---
 
 <details>
-<summary><strong>GET /auth/user/verify?ticket={uuid}</strong></summary>
+<summary><strong>GET /auth/user/verify?ticket=...&new_email=...</strong></summary>
 
 Redirects to your configured redirect URL (`REDIRECT_URL_ERROR` and `REDIRECT_URL_SUCCESS`).
 
@@ -207,7 +207,7 @@ Redirects to your configured redirect URL (`REDIRECT_URL_ERROR` and `REDIRECT_UR
 </details>
 
 <details>
-<summary><strong>POST /auth/user/reset</strong></summary>
+<summary><strong>POST /auth/reset/password</strong></summary>
 
 ## Request:
 
@@ -215,6 +215,26 @@ Redirects to your configured redirect URL (`REDIRECT_URL_ERROR` and `REDIRECT_UR
 {
   "ticket": "6a135423-85c8-4c99-b9ca-3a0108202255",
   "new_password": "between 6-128 characters"
+}
+```
+
+## Response:
+
+```
+204 No Content
+```
+
+</details>
+
+<details>
+<summary><strong>POST /auth/reset/email</strong></summary>
+
+## Request:
+
+```json
+{
+  "email": "old@example.com",
+  "new_email": "new@example.com"
 }
 ```
 

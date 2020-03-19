@@ -46,7 +46,6 @@ const emailSchema = {
 
 const userSchema = {
   ...emailSchema,
-
   password: Joi.string()
     .min(6)
     .max(128)
@@ -55,7 +54,6 @@ const userSchema = {
 
 export const registerSchema = Joi.object({
   ...userSchema,
-
   username: Joi.string()
     .alphanum()
     .min(2)
@@ -75,17 +73,32 @@ const codeSchema = {
     .required()
 }
 
-export const resetSchema = Joi.object({
+export const passwordResetSchema = Joi.object({
   ...ticketSchema,
-
   new_password: Joi.string()
     .min(6)
     .max(128)
     .required()
 })
 
+export const verifySchema = Joi.object({
+  ...ticketSchema,
+  new_email: extendedJoi
+    .string()
+    .email()
+    .allowedDomains()
+})
+
+export const emailResetSchema = Joi.object({
+  ...emailSchema,
+  new_email: extendedJoi
+    .string()
+    .email()
+    .required()
+    .allowedDomains()
+})
+
 export const mfaSchema = Joi.object(codeSchema)
-export const activateSchema = Joi.object(ticketSchema)
 export const loginSchema = extendedJoi.object(userSchema)
 export const forgotSchema = Joi.object({ ...emailSchema })
 export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })

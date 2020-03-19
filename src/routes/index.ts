@@ -1,15 +1,14 @@
 import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
-import { deleteUser, forgotPassword, resetPassword, verifyUser } from './auth/user'
+import { deleteUser, forgotPassword, verifyUser } from './auth/user'
 import { disableMfa, enableMfa, generateMfa, totpLogin } from './auth/mfa'
 import { getJwks, loginUser, registerUser } from './auth'
 import { refreshToken, revokeToken } from './auth/token'
+import { resetEmail, resetPassword } from './auth/reset'
 
 import { Router } from 'express'
 
 export const router = Router()
   .get('/auth/jwks', getJwks)
-
-  .get('/healthz', (_req, res) => res.send('OK'))
 
   .post('/auth/login', loginUser)
   .post('/auth/register', registerUser)
@@ -20,7 +19,9 @@ export const router = Router()
   .get('/auth/user/verify', verifyUser)
   .post('/auth/user/delete', deleteUser)
   .post('/auth/user/forgot', forgotPassword)
-  .post('/auth/user/reset', resetPassword)
+
+  .post('/auth/reset/email', resetEmail)
+  .post('/auth/reset/password', resetPassword)
 
   .post('/auth/mfa/disable', disableMfa)
   .post('/auth/mfa/enable', enableMfa)
@@ -31,3 +32,5 @@ export const router = Router()
   .get('/storage/file-meta/*', getFileMeta)
   .get('/storage/file/*', getFile)
   .post('/storage/upload', uploadFile)
+
+  .get('/healthz', (_req, res) => res.send('OK'))

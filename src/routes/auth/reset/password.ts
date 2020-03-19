@@ -4,9 +4,9 @@ import Boom from '@hapi/boom'
 import { HIBP_ENABLED } from '@shared/config'
 import argon2 from 'argon2'
 import { asyncWrapper } from '@shared/helpers'
+import { passwordResetSchema } from '@shared/schema'
 import { pwnedPassword } from 'hibp'
 import { request } from '@shared/request'
-import { resetSchema } from '@shared/schema'
 import { updatePassword } from '@shared/queries'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -18,7 +18,7 @@ async function resetPassword({ body }: Request, res: Response): Promise<unknown>
   let password_hash: string
   let hasuraData: HasuraData
 
-  const { ticket, new_password } = await resetSchema.validateAsync(body)
+  const { ticket, new_password } = await passwordResetSchema.validateAsync(body)
 
   if (HIBP_ENABLED) {
     const pwned = await pwnedPassword(new_password)

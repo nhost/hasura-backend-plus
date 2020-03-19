@@ -221,3 +221,25 @@ export const deleteUserById = gql`
     }
   }
 `
+
+export const changeEmailByTicket = gql`
+  mutation($now: timestamptz, $ticket: uuid!, $new_email: String!) {
+    update_private_user_accounts(
+      where: {
+        _and: [
+          { user: { ticket: { _eq: $ticket } } }
+          { user: { ticket_expires_at: { _lt: $now } } }
+        ]
+      }
+      _set: { email: $new_email }
+    ) {
+      affected_rows
+    }
+    update_users(
+      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
+      _set: { email: $new_email }
+    ) {
+      affected_rows
+    }
+  }
+`

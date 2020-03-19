@@ -41,9 +41,9 @@ if (!AUTO_ACTIVATE) {
     const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
     const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-    const { status } = await agent.post('/auth/user/activate').send({ ticket })
+    const { status } = await agent.get(`/auth/user/verify?ticket=${ticket}`)
 
-    expect(status).toEqual(204)
+    expect(status).toEqual(302)
   })
 }
 
@@ -82,7 +82,7 @@ it('should change the password', async () => {
   const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
   const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-  const { status } = await agent.post('/auth/user/forgot').send({
+  const { status } = await agent.post('/auth/reset/password').send({
     ticket,
     new_password: password
   })
@@ -155,9 +155,9 @@ it('should disable mfa for user', async () => {
   expect(status).toEqual(204)
 })
 
-it('should remove the user', async () => {
+it('should delete the user', async () => {
   const { status } = await agent
-    .post('/auth/user/remove')
+    .post('/auth/user/delete')
     .set('Authorization', `Bearer ${jwtToken}`)
 
   expect(status).toEqual(204)
