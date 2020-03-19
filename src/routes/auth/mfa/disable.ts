@@ -13,8 +13,7 @@ async function disable({ headers, body }: Request, res: Response): Promise<unkno
 
   const { code } = await mfaSchema.validateAsync(body)
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const decodedToken = verify(headers.authorization!)
+  const decodedToken = verify(headers.authorization)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {

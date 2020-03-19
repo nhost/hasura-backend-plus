@@ -7,6 +7,7 @@ import { insertUser } from '@shared/queries'
 import { pwnedPassword } from 'hibp'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
+// import { sendEmail } from '@shared/email'
 import { v4 as uuidv4 } from 'uuid'
 
 async function register({ body }: Request, res: Response): Promise<unknown> {
@@ -30,13 +31,15 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
+  const ticket = uuidv4()
+
   try {
     await request(insertUser, {
       user: {
         email,
         active,
+        ticket,
         username,
-        ticket: uuidv4(),
         user_accounts: {
           data: {
             email,
@@ -46,6 +49,14 @@ async function register({ body }: Request, res: Response): Promise<unknown> {
         }
       }
     })
+
+    /*if (!active) {
+      await sendEmail({
+        to: email,
+        subject: 'Hello World',
+        text: `Ticket: ${ticket}`
+      })
+    }*/
   } catch (err) {
     throw Boom.badImplementation()
   }

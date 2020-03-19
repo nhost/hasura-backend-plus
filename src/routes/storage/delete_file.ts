@@ -7,7 +7,7 @@ import { storagePermission } from './rules'
 import { verify } from '@shared/jwt'
 
 async function delete_file(req: Request, res: Response): Promise<unknown> {
-  const key = `${req.params[0]}`
+  const key = req.params[0]
 
   // check storage rules if allowed to get meta info of file
   const jwt_token = verify(req.headers.authorization)
@@ -25,9 +25,7 @@ async function delete_file(req: Request, res: Response): Promise<unknown> {
 
   try {
     await s3.deleteObject(params).promise()
-  } catch (e) {
-    console.error('error')
-    console.error({ e })
+  } catch (err) {
     throw Boom.badImplementation()
   }
 

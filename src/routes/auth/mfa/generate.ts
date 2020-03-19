@@ -10,8 +10,7 @@ import { verify } from '@shared/jwt'
 async function generate({ headers }: Request, res: Response): Promise<unknown> {
   let image_url: string
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const decodedToken = verify(headers.authorization!)
+  const decodedToken = verify(headers.authorization)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   const { OTP_ISSUER = 'HBP' } = process.env
