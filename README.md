@@ -379,6 +379,94 @@ Set-Cookie: refresh_token=...
 ---
 
 <details>
+<summary><strong>POST /storage/upload</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+ContentType: application/x-www-form-urlencoded
+x-path: <key>
+Authorization: Bearer ...
+```
+
+### Body
+
+form-data
+
+```
+key: file, value: <file>
+```
+
+## Response:
+
+```json
+{
+  "key": "...",
+  "mimetype": "...",
+  "token": "..."
+}
+```
+
+</details>
+
+<details>
+<summary><strong>GET /storage/file/`key`?token=`token`</strong></summary>
+
+## Request:
+
+## Response:
+
+File
+
+</details>
+
+<details>
+<summary><strong>GET /storage/file-meta/`key`</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+Authorization: Bearer ...
+```
+
+## Response:
+
+```json
+{
+  "key": "...",
+  "mimetype": "...",
+  "token": "..."
+}
+```
+
+</details>
+
+<details>
+<summary><strong>DELETE /storage/file-meta/`key`</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+Authorization: Bearer ...
+```
+
+## Response:
+
+```
+204 No Content
+```
+
+</details>
+
+---
+
+<details>
 <summary><strong>GET /healthz</strong></summary>
 
 Simple health check.
