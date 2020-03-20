@@ -1,45 +1,63 @@
-import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { REDIRECT_URL_ERROR, REDIRECT_URL_SUCCESS } from '@shared/config'
 import { Request, Response } from 'express'
+import { activateUser, changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { SMTP_ENABLED } from '@shared/config'
-import { emailClient } from '@shared/email'
-import { forgotSchema } from '@shared/schema'
+import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
-import { selectUserByEmail } from '@shared/queries'
+import { v4 as uuidv4 } from 'uuid'
+import { verifySchema } from '@shared/schema'
 
-async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUserData
+interface HasuraData {
+  update_users: { affected_rows: number }
+}
 
-  const { email, new_email } = await forgotSchema.validateAsync(body)
+async function resetEmail({ query }: Request, res: Response): Promise<unknown> {
+  let hasuraData: HasuraData
+
+  const { ticket } = await verifySchema.validateAsync(query)
+
+  const new_ticket = uuidv4()
 
   try {
-    hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
+    hasuraData = (await request(activateUser, {
+      ticket,
+      new_ticket,
+      now: new Date()
+    })) as HasuraData
+
+    /**
+     * Get `new_email` from database.
+     */
+    const new_email = await request(getNewEmailByTicket, { ticket })
+
+    /**
+     * Change email and ticket.
+     */
+    await request(changeEmailByTicket, { ticket: new_ticket, new_email })
   } catch (err) {
+    if (REDIRECT_URL_ERROR) {
+      return res.redirect(302, REDIRECT_URL_ERROR as string)
+    }
+
     throw Boom.badImplementation()
   }
 
-  const hasuraUser = hasuraData.private_user_accounts[0]
+  const { affected_rows } = hasuraData.update_users
 
-  if (!hasuraUser) {
-    throw Boom.badRequest('User does not exist.')
-  }
-
-  const ticket = hasuraUser.user.ticket
-
-  if (SMTP_ENABLED) {
-    try {
-      await emailClient.send({
-        template: 'confirm',
-        message: { to: email },
-        locals: { ticket, new_email }
-      })
-    } catch (err) {
-      throw Boom.badImplementation()
+  if (affected_rows === 0) {
+    if (REDIRECT_URL_ERROR) {
+      return res.redirect(302, REDIRECT_URL_ERROR as string)
     }
+
+    throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
-  return res.status(204).send()
+  if (REDIRECT_URL_SUCCESS) {
+    return res.redirect(302, REDIRECT_URL_SUCCESS as string)
+  }
+
+  res.status(204).send()
 }
 
 export default asyncWrapper(resetEmail)

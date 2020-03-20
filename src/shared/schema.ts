@@ -81,14 +81,6 @@ export const passwordResetSchema = Joi.object({
     .required()
 })
 
-export const verifySchema = Joi.object({
-  ...ticketSchema,
-  new_email: extendedJoi
-    .string()
-    .email()
-    .allowedDomains()
-})
-
 export const emailResetSchema = Joi.object({
   ...emailSchema,
   new_email: extendedJoi
@@ -101,4 +93,5 @@ export const emailResetSchema = Joi.object({
 export const mfaSchema = Joi.object(codeSchema)
 export const loginSchema = extendedJoi.object(userSchema)
 export const forgotSchema = Joi.object({ ...emailSchema })
+export const verifySchema = Joi.object({ ...ticketSchema })
 export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })

@@ -243,3 +243,19 @@ export const changeEmailByTicket = gql`
     }
   }
 `
+
+export const saveNewEmail = gql`
+  mutation($email: String!, $new_email: String!) {
+    update_users(where: { email: { _eq: $email } }, _set: { new_email: $new_email }) {
+      affected_rows
+    }
+  }
+`
+
+export const getNewEmailByTicket = gql`
+  query($ticket: uuid!) {
+    users(where: { ticket: { _eq: $ticket } }) {
+      new_email
+    }
+  }
+`

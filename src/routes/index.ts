@@ -1,6 +1,7 @@
 import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
-import { deleteUser, forgotPassword, verifyUser } from './auth/user'
+import { deleteUser, verifyUser } from './auth/user'
 import { disableMfa, enableMfa, generateMfa, totpLogin } from './auth/mfa'
+import { forgotEmail, forgotPassword } from './auth/forgot'
 import { getJwks, loginUser, registerUser } from './auth'
 import { refreshToken, revokeToken } from './auth/token'
 import { resetEmail, resetPassword } from './auth/reset'
@@ -18,7 +19,9 @@ export const router = Router()
 
   .get('/auth/user/verify', verifyUser)
   .post('/auth/user/delete', deleteUser)
-  .post('/auth/user/forgot', forgotPassword)
+
+  .post('/auth/forgot/email', forgotEmail)
+  .post('/auth/forgot/password', forgotPassword)
 
   .post('/auth/reset/email', resetEmail)
   .post('/auth/reset/password', resetPassword)
