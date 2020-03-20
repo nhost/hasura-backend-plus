@@ -9,6 +9,7 @@ import {
 
 import Email from 'email-templates'
 import nodemailer from 'nodemailer'
+import path from 'path'
 
 /**
  * SMTP transport.
@@ -31,6 +32,7 @@ export const emailClient = new Email({
   message: { from: SMTP_SENDER },
   send: process.env.NODE_ENV === 'production',
   views: {
+    root: path.resolve(process.env.PWD || '.', 'custom/emails'),
     options: {
       extension: 'ejs'
     }
