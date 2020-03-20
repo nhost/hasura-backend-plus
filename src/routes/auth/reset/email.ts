@@ -1,4 +1,3 @@
-import { REDIRECT_URL_ERROR, REDIRECT_URL_SUCCESS } from '@shared/config'
 import { Request, Response } from 'express'
 import { activateUser, changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
 
@@ -12,10 +11,10 @@ interface HasuraData {
   update_users: { affected_rows: number }
 }
 
-async function resetEmail({ query }: Request, res: Response): Promise<unknown> {
+async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
-  const { ticket } = await verifySchema.validateAsync(query)
+  const { ticket } = await verifySchema.validateAsync(body)
 
   const new_ticket = uuidv4()
 
@@ -36,28 +35,16 @@ async function resetEmail({ query }: Request, res: Response): Promise<unknown> {
      */
     await request(changeEmailByTicket, { ticket: new_ticket, new_email })
   } catch (err) {
-    if (REDIRECT_URL_ERROR) {
-      return res.redirect(302, REDIRECT_URL_ERROR as string)
-    }
-
     throw Boom.badImplementation()
   }
 
   const { affected_rows } = hasuraData.update_users
 
   if (affected_rows === 0) {
-    if (REDIRECT_URL_ERROR) {
-      return res.redirect(302, REDIRECT_URL_ERROR as string)
-    }
-
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if (REDIRECT_URL_SUCCESS) {
-    return res.redirect(302, REDIRECT_URL_SUCCESS as string)
-  }
-
-  res.status(204).send()
+  return res.status(204).send()
 }
 
 export default asyncWrapper(resetEmail)

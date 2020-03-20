@@ -5,13 +5,13 @@ import { saveNewEmail, selectUserByEmail } from '@shared/queries'
 import Boom from '@hapi/boom'
 import { SMTP_ENABLED } from '@shared/config'
 import { emailClient } from '@shared/email'
-import { forgotSchema } from '@shared/schema'
+import { emailResetSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
 async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraUserData
 
-  const { email, new_email } = await forgotSchema.validateAsync(body)
+  const { email, new_email } = await emailResetSchema.validateAsync(body)
 
   try {
     hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
