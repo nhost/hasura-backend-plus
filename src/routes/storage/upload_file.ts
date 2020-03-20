@@ -8,7 +8,7 @@ import { s3 } from '@shared/s3'
 import { verify } from '@shared/jwt'
 import { S3_BUCKET } from '@shared/config'
 
-import { storagePermission } from './rules'
+import { storagePermission } from '@custom/storage-rules'
 
 async function upload_file(req: Request, res: Response): Promise<unknown> {
   if (!req.files?.file) {

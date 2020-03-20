@@ -106,7 +106,8 @@
   "jest": {
     "preset": "ts-jest",
     "moduleNameMapper": {
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
+      "^@shared/(.*)$": "<rootDir>/src/shared/$1",
+      "^@custom/(.*)$": "<rootDir>/custom/$1"
     },
     "setupFilesAfterEnv": [
       "jest-extended"

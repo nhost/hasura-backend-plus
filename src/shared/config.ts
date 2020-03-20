@@ -27,6 +27,6 @@ export const {
 
 export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
 export const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
-export const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'keys/private.pem')
+export const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
 
 if (!HASURA_GRAPHQL_ENDPOINT) throw Boom.badImplementation('No Hasura Graphql enpoint found.')
