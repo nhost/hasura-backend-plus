@@ -1,42 +1,51 @@
 import { Router } from 'express'
-import activate from './auth/user/activate'
-import delete_file from './storage/delete_file'
-import disable from './auth/mfa/disable'
-import enable from './auth/mfa/enable'
-import forgot from './auth/user/forgot'
-import generate from './auth/mfa/generate'
-import get_file from './storage/get_file'
-import get_file_meta from './storage/get_file_meta'
-import jwks from './auth/jwks'
-import login from './auth/login'
-import refresh from './auth/token/refresh'
-import register from './auth/register'
-import remove from './auth/user/remove'
-import revoke from './auth/token/revoke'
-import totp from './auth/mfa/totp'
-import revokeFile from './storage/revoke_file'
-import upload_file from './storage/upload_file'
+
+import { deleteFile, getFile, getFileMeta, uploadFile, revokeFile } from './storage'
+import {
+  getJwks,
+  loginUser,
+  registerUser,
+  refreshToken,
+  revokeToken,
+  activateUser,
+  deleteUser,
+  forgotPassword,
+  resetPassword,
+  forgotEmail,
+  resetEmail,
+  disableMfa,
+  enableMfa,
+  generateMfa,
+  totpLogin
+} from './auth'
 
 export const router = Router()
-  .get('/auth/jwks', jwks)
-  .post('/auth/login', login)
-  .post('/auth/register', register)
+  .get('/auth/jwks', getJwks)
 
-  .post('/auth/mfa/disable', disable)
-  .post('/auth/mfa/enable', enable)
-  .post('/auth/mfa/generate', generate)
-  .post('/auth/mfa/totp', totp)
+  .post('/auth/login', loginUser)
+  .post('/auth/register', registerUser)
 
-  .post('/auth/token/refresh', refresh)
-  .post('/auth/token/revoke', revoke)
-  .post('/auth/user/activate', activate)
-  .post('/auth/user/forgot', forgot)
-  .post('/auth/user/remove', remove)
+  .post('/auth/token/refresh', refreshToken)
+  .post('/auth/token/revoke', revokeToken)
 
-  .delete('/storage/file/*', delete_file)
-  .get('/storage/file-meta/*', get_file_meta)
-  .get('/storage/file/*', get_file)
+  .get('/auth/user/activate', activateUser)
+  .post('/auth/user/delete', deleteUser)
+
+  .post('/auth/user/password/forgot', forgotPassword)
+  .post('/auth/user/password/reset', resetPassword)
+
+  .post('/auth/email/forgot', forgotEmail)
+  .post('/auth/email/reset', resetEmail)
+
+  .post('/auth/mfa/disable', disableMfa)
+  .post('/auth/mfa/enable', enableMfa)
+  .post('/auth/mfa/generate', generateMfa)
+  .post('/auth/mfa/totp', totpLogin)
+
+  .delete('/storage/file/*', deleteFile)
+  .get('/storage/file-meta/*', getFileMeta)
+  .get('/storage/file/*', getFile)
   .post('/storage/revoke/*', revokeFile)
-  .post('/storage/upload', upload_file)
+  .post('/storage/upload', uploadFile)
 
   .get('/healthz', (_req, res) => res.send('OK'))

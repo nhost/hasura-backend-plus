@@ -1,8 +1,8 @@
 import { JWK, JWKS, JWT } from 'jose'
+import { JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_SECRET_KEY, KEY_FILE_PATH } from './config'
+
 import Boom from '@hapi/boom'
 import fs from 'fs'
-
-import { JWT_ALGORITHM, KEY_FILE_PATH, JWT_EXPIRES_IN, JWT_SECRET_KEY } from './config'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']

@@ -12,7 +12,7 @@ interface HasuraData {
   delete_users: { affected_rows: number }
 }
 
-async function remove({ headers }: Request, res: Response): Promise<unknown> {
+async function deleteUser({ headers }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
   const decodedToken = verify(headers.authorization)
@@ -36,4 +36,4 @@ async function remove({ headers }: Request, res: Response): Promise<unknown> {
   return res.status(204).send()
 }
 
-export default asyncWrapper(remove)
+export default asyncWrapper(deleteUser)

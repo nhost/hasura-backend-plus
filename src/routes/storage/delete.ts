@@ -1,14 +1,13 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
 
+import Boom from '@hapi/boom'
+import { S3_BUCKET } from '@shared/config'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
 import { verify } from '@shared/jwt'
-import { S3_BUCKET } from '@shared/config'
-
 import { storagePermission } from '@custom/storage-rules'
 
-async function delete_file(req: Request, res: Response): Promise<unknown> {
+async function deleteFile(req: Request, res: Response): Promise<unknown> {
   const key = req.params[0]
 
   // check storage rules if allowed to get meta info of file
@@ -34,4 +33,4 @@ async function delete_file(req: Request, res: Response): Promise<unknown> {
   return res.sendStatus(204)
 }
 
-export default asyncWrapper(delete_file)
+export default asyncWrapper(deleteFile)

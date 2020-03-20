@@ -8,7 +8,7 @@ import { mfaSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
-async function disable({ headers, body }: Request, res: Response): Promise<unknown> {
+async function disableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraUserData
 
   const { code } = await mfaSchema.validateAsync(body)
@@ -42,4 +42,4 @@ async function disable({ headers, body }: Request, res: Response): Promise<unkno
   return res.status(204).send()
 }
 
-export default asyncWrapper(disable)
+export default asyncWrapper(disableMfa)

@@ -1,3 +1,4 @@
+import { DEFAULT_USER_ROLE, REFRESH_EXPIRES_IN } from './config'
 import { NextFunction, Request, Response } from 'express'
 import { selectUserByEmail, selectUserByTicket, selectUserByUsername } from './queries'
 
@@ -5,7 +6,6 @@ import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
 import { sign } from './jwt'
-import { DEFAULT_USER_ROLE, REFRESH_EXPIRES_IN } from './config'
 
 /**
  * New refresh token expiry date.
@@ -84,7 +84,7 @@ export interface HasuraUserData {
 /**
  * Looks for an user in the database, first by email, second by username
  * @param httpBody
- * @return user data, null if users is not found
+ * @return user data, null if user is not found
  */
 export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
   const { username, email, ticket } = httpBody

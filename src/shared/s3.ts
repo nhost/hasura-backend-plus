@@ -1,5 +1,6 @@
+import { S3_ACCESS_KEY_ID, S3_ENDPOINT, S3_SECRET_ACCESS_KEY } from './config'
+
 import AWS from 'aws-sdk'
-import { S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_ENDPOINT } from './config'
 
 const s3 = new AWS.S3({
   accessKeyId: S3_ACCESS_KEY_ID,

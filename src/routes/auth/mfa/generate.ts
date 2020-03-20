@@ -1,14 +1,14 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-import { authenticator } from 'otplib'
-
 import { asyncWrapper, createQR } from '@shared/helpers'
+
+import Boom from '@hapi/boom'
+import { OTP_ISSUER } from '@shared/config'
+import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 import { updateOtpSecret } from '@shared/queries'
 import { verify } from '@shared/jwt'
-import { OTP_ISSUER } from '@shared/config'
 
-async function generate({ headers }: Request, res: Response): Promise<unknown> {
+async function generateMfa({ headers }: Request, res: Response): Promise<unknown> {
   let image_url: string
 
   const decodedToken = verify(headers.authorization)
@@ -35,4 +35,4 @@ async function generate({ headers }: Request, res: Response): Promise<unknown> {
   return res.send({ image_url, otp_secret })
 }
 
-export default asyncWrapper(generate)
+export default asyncWrapper(generateMfa)

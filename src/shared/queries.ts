@@ -8,7 +8,7 @@ export const insertUser = gql`
   }
 `
 
-export const updatePassword = gql`
+export const updatePasswordWithTicket = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_private_user_accounts(
       where: {
@@ -24,6 +24,17 @@ export const updatePassword = gql`
     update_users(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
       _set: { ticket: $new_ticket, ticket_expires_at: $now }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const updatePasswordWithUserId = gql`
+  mutation($user_id: uuid!, $password_hash: String!) {
+    update_private_user_accounts(
+      where: { user_id: { _eq: $user_id } }
+      _set: { password_hash: $password_hash }
     ) {
       affected_rows
     }
@@ -218,6 +229,44 @@ export const deleteUserById = gql`
     }
     delete_users(where: { id: { _eq: $user_id } }) {
       affected_rows
+    }
+  }
+`
+
+export const changeEmailByTicket = gql`
+  mutation($now: timestamptz, $ticket: uuid!, $new_email: String!) {
+    update_private_user_accounts(
+      where: {
+        _and: [
+          { user: { ticket: { _eq: $ticket } } }
+          { user: { ticket_expires_at: { _lt: $now } } }
+        ]
+      }
+      _set: { email: $new_email }
+    ) {
+      affected_rows
+    }
+    update_users(
+      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
+      _set: { email: $new_email }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const saveNewEmail = gql`
+  mutation($email: String!, $new_email: String!) {
+    update_users(where: { email: { _eq: $email } }, _set: { new_email: $new_email }) {
+      affected_rows
+    }
+  }
+`
+
+export const getNewEmailByTicket = gql`
+  query($ticket: uuid!) {
+    users(where: { ticket: { _eq: $ticket } }) {
+      new_email
     }
   }
 `

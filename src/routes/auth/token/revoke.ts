@@ -6,7 +6,7 @@ import { deleteAllUsersRefreshTokens } from '@shared/queries'
 import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
-async function revoke({ headers }: Request, res: Response): Promise<unknown> {
+async function revokeToken({ headers }: Request, res: Response): Promise<unknown> {
   const decodedToken = verify(headers.authorization)
   const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
@@ -19,4 +19,4 @@ async function revoke({ headers }: Request, res: Response): Promise<unknown> {
   return res.status(204).send()
 }
 
-export default asyncWrapper(revoke)
+export default asyncWrapper(revokeToken)

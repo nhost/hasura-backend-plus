@@ -1,30 +1,40 @@
+import {
+  SMTP_HOST,
+  SMTP_PASS,
+  SMTP_PORT,
+  SMTP_SECURE,
+  SMTP_SENDER,
+  SMTP_USER
+} from '@shared/config'
+
+import Email from 'email-templates'
 import nodemailer from 'nodemailer'
+import path from 'path'
 
-interface Email {
-  to: string
-  text: string
-  from?: string
-  subject: string
-}
+/**
+ * SMTP transport.
+ */
+const transport = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: Number(SMTP_PORT),
+  secure: Boolean(SMTP_SECURE),
+  auth: {
+    pass: SMTP_PASS,
+    user: SMTP_USER
+  }
+})
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendEmail(options: Email): Promise<any> {
-  const { to, text, from = '"noreply" <noreply@example.com>', subject } = options
-
-  const testAccount = await nodemailer.createTestAccount()
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass
+/**
+ * Reusable email client.
+ */
+export const emailClient = new Email({
+  transport,
+  message: { from: SMTP_SENDER },
+  send: process.env.NODE_ENV === 'production',
+  views: {
+    root: path.resolve(process.env.PWD || '.', 'custom/emails'),
+    options: {
+      extension: 'ejs'
     }
-  })
-
-  const info = await transporter.sendMail({ from, to, subject, text })
-
-  console.log('Message sent: %s', info.messageId)
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
-}
+  }
+})

@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-import { v4 as uuidv4 } from 'uuid'
-
 import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry } from '@shared/helpers'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
+
+import Boom from '@hapi/boom'
+import { COOKIE_SECRET } from '@shared/config'
 import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
-import { COOKIE_SECRET } from '@shared/config'
+import { v4 as uuidv4 } from 'uuid'
 
 interface HasuraData {
   private_refresh_tokens: UserData[]
 }
 
-async function refresh({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
+async function refreshToken({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
   const { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
@@ -60,4 +60,4 @@ async function refresh({ cookies, signedCookies }: Request, res: Response): Prom
   })
 }
 
-export default asyncWrapper(refresh)
+export default asyncWrapper(refreshToken)
