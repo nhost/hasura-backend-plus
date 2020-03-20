@@ -55,15 +55,17 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
     })
 
     if (!AUTO_ACTIVATE && SMTP_ENABLED) {
-      await emailClient.send({
-        template: 'confirm',
-        message: { to: email },
-        locals: {
-          ticket,
-          username,
-          url: SERVER_URL
-        }
-      })
+      await emailClient
+        .send({
+          template: 'confirm',
+          message: { to: email },
+          locals: {
+            ticket,
+            username,
+            url: SERVER_URL
+          }
+        })
+        .catch(console.error)
     }
   } catch (err) {
     throw Boom.badImplementation()
