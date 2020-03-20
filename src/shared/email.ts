@@ -29,5 +29,10 @@ const transport = nodemailer.createTransport({
 export const emailClient = new Email({
   transport,
   message: { from: SMTP_SENDER },
-  send: process.env.NODE_ENV === 'production'
+  send: process.env.NODE_ENV === 'production',
+  views: {
+    options: {
+      extension: 'ejs'
+    }
+  }
 })
