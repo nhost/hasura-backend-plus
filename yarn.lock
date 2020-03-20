@@ -525,6 +525,11 @@
   dependencies:
     "@types/express" "*"
 
+"@types/ejs@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/ejs/-/ejs-3.0.1.tgz#ef3d3d8cf1710a69c3b25dde9bbc7b21ae7c5969"
+  integrity sha512-e8zAwnKg8lGy8MpAZx7gblNXY4agrAXH9YaAWYsMIfvusHdoS50WvwlcBb75JP8U2rg99PqxbEIstbiZSPAnEg==
+
 "@types/email-templates@6.0.2":
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/@types/email-templates/-/email-templates-6.0.2.tgz#02a2563334e1d7368f14037945aee39b65e32e3c"
@@ -645,11 +650,6 @@
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
-
-"@types/pug@2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@types/pug/-/pug-2.0.4.tgz#8772fcd0418e3cd2cc171555d73007415051f4b2"
-  integrity sha1-h3L80EGOPNLMFxVV1zAHQVBR9LI=
 
 "@types/qrcode@1.3.4":
   version "1.3.4"
