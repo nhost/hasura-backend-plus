@@ -14,6 +14,7 @@ import register from './auth/register'
 import remove from './auth/user/remove'
 import revoke from './auth/token/revoke'
 import totp from './auth/mfa/totp'
+import revokeFile from './storage/revoke_file'
 import upload_file from './storage/upload_file'
 
 export const router = Router()
@@ -35,6 +36,7 @@ export const router = Router()
   .delete('/storage/file/*', delete_file)
   .get('/storage/file-meta/*', get_file_meta)
   .get('/storage/file/*', get_file)
+  .post('/storage/revoke/*', revokeFile)
   .post('/storage/upload', upload_file)
 
   .get('/healthz', (_req, res) => res.send('OK'))
