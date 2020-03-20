@@ -55,7 +55,7 @@ export const {
   SMTP_USER,
   SMTP_ENABLED,
   SMTP_PORT = 587,
-  SMTP_SECURE = SMTP_PORT !== 587,
+  SMTP_SECURE = false, // note: false disables SSL (deprecated)
   SMTP_SENDER = SMTP_USER
 } = process.env
 
