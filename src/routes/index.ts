@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
+import { deleteFile, getFile, getFileMeta, uploadFile, revokeFile } from './storage'
 import {
   getJwks,
   loginUser,
@@ -45,6 +45,7 @@ export const router = Router()
   .delete('/storage/file/*', deleteFile)
   .get('/storage/file-meta/*', getFileMeta)
   .get('/storage/file/*', getFile)
+  .post('/storage/revoke/*', revokeFile)
   .post('/storage/upload', uploadFile)
 
   .get('/healthz', (_req, res) => res.send('OK'))

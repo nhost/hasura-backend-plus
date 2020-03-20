@@ -154,7 +154,7 @@ export const updateRefreshToken = gql`
   }
 `
 
-export const deleteRefreshToken = gql`
+export const deleteAllUsersRefreshTokens = gql`
   mutation($user_id: uuid!) {
     delete_private_refresh_tokens(where: { user_id: { _eq: $user_id } }) {
       affected_rows

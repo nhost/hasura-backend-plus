@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
     <img
-      src="assets/logo.png"
+      src="docs/.vuepress/public/logo.png"
       width="250px"
       alt="HBP"
     />
@@ -34,7 +34,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 <a href="https://nhost.io/register">
   <img
-    src="assets/nhost-register-button.png"
+    src="docs/.vuepress/public/nhost-register-button.png"
     width="200px"
   />
 </a>
@@ -399,6 +399,94 @@ Set-Cookie: refresh_token=...
   "jwt_token": "...",
   "jwt_expires_in": 900000
 }
+```
+
+</details>
+
+---
+
+<details>
+<summary><strong>POST /storage/upload</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+ContentType: application/x-www-form-urlencoded
+x-path: <key>
+Authorization: Bearer ...
+```
+
+### Body
+
+form-data
+
+```
+key: file, value: <file>
+```
+
+## Response:
+
+```json
+{
+  "key": "...",
+  "mimetype": "...",
+  "token": "..."
+}
+```
+
+</details>
+
+<details>
+<summary><strong>GET /storage/file/`key`?token=`token`</strong></summary>
+
+## Request:
+
+## Response:
+
+File
+
+</details>
+
+<details>
+<summary><strong>GET /storage/file-meta/`key`</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+Authorization: Bearer ...
+```
+
+## Response:
+
+```json
+{
+  "key": "...",
+  "mimetype": "...",
+  "token": "..."
+}
+```
+
+</details>
+
+<details>
+<summary><strong>DELETE /storage/file-meta/`key`</strong></summary>
+
+## Request:
+
+### Headers
+
+```
+Authorization: Bearer ...
+```
+
+## Response:
+
+```
+204 No Content
 ```
 
 </details>
