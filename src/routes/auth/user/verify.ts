@@ -15,6 +15,11 @@ interface HasuraData {
 async function verifyUser({ query }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
+  /**
+   * Delete undefined query components.
+   */
+  Object.keys(query).forEach(k => query[k] === 'undefined' && delete query[k])
+
   const { ticket, new_email } = await verifySchema.validateAsync({
     ticket: query.ticket,
     new_email: query?.new_email

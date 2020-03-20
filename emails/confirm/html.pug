@@ -18,7 +18,7 @@ html
   body
     h2 Hello, #{username}.
     p Please confirm your email address by clicking the button below:
-    a(href=`${url}/auth/user/verify${`?ticket=${ticket}` + new_email ? `&new_email=${new_email}` : ''}`)
+    a(href=`${url}/auth/user/verify?ticket=${ticket}&new_email=${new_email}`)
       button Confirm email address
     p
       | Thanks,
