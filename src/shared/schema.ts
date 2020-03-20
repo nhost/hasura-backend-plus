@@ -36,20 +36,20 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
   }
 }))
 
-const emailSchema = {
-  email: extendedJoi
-    .string()
-    .email()
-    .required()
-    .allowedDomains()
-}
+const passwordRule = Joi.string()
+  .min(6)
+  .max(128)
+  .required()
+
+const emailRule = extendedJoi
+  .string()
+  .email()
+  .required()
+  .allowedDomains()
 
 const userSchema = {
-  ...emailSchema,
-  password: Joi.string()
-    .min(6)
-    .max(128)
-    .required()
+  email: emailRule,
+  password: passwordRule
 }
 
 export const registerSchema = Joi.object({
@@ -73,25 +73,23 @@ const codeSchema = {
     .required()
 }
 
-export const passwordResetSchema = Joi.object({
+export const resetPasswordWithTicketSchema = Joi.object({
   ...ticketSchema,
-  new_password: Joi.string()
-    .min(6)
-    .max(128)
-    .required()
+  new_password: passwordRule
+})
+
+export const resetPasswordWithOldPasswordSchema = Joi.object({
+  old_password: passwordRule,
+  new_password: passwordRule
 })
 
 export const emailResetSchema = Joi.object({
-  ...emailSchema,
-  new_email: extendedJoi
-    .string()
-    .email()
-    .required()
-    .allowedDomains()
+  email: emailRule,
+  new_email: emailRule
 })
 
 export const mfaSchema = Joi.object(codeSchema)
 export const loginSchema = extendedJoi.object(userSchema)
-export const forgotSchema = Joi.object({ ...emailSchema })
+export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketSchema })
 export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })

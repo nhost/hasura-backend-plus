@@ -8,7 +8,7 @@ export const insertUser = gql`
   }
 `
 
-export const updatePassword = gql`
+export const updatePasswordWithTicket = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_private_user_accounts(
       where: {
@@ -24,6 +24,17 @@ export const updatePassword = gql`
     update_users(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
       _set: { ticket: $new_ticket, ticket_expires_at: $now }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const updatePasswordWithUserId = gql`
+  mutation($user_id: uuid!, $password_hash: String!) {
+    update_private_user_accounts(
+      where: { user_id: { _eq: $user_id } }
+      _set: { password_hash: $password_hash }
     ) {
       affected_rows
     }

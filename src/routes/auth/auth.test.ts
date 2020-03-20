@@ -1,12 +1,13 @@
 import 'jest-extended'
+import { authenticator } from 'otplib'
+import request from 'supertest'
 
 import { AUTO_ACTIVATE } from '@shared/config'
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
-import { app } from '../../server'
-import { authenticator } from 'otplib'
-import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
+
+import { app } from '../../server'
 
 /**
  * Store variables in memory.
@@ -41,7 +42,7 @@ if (!AUTO_ACTIVATE) {
     const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
     const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-    const { status } = await agent.get(`/auth/user/verify?ticket=${ticket}`)
+    const { status } = await agent.get(`/auth/user/activate?ticket=${ticket}`)
 
     expect(status).toEqual(302)
   })
@@ -82,7 +83,7 @@ it('should change the password', async () => {
   const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
   const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-  const { status } = await agent.post('/auth/reset/password').send({
+  const { status } = await agent.post('/auth/user/password/reset').send({
     ticket,
     new_password: password
   })

@@ -1,12 +1,23 @@
-import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
-import { deleteUser, verifyUser } from './auth/user'
-import { disableMfa, enableMfa, generateMfa, totpLogin } from './auth/mfa'
-import { forgotEmail, forgotPassword } from './auth/forgot'
-import { getJwks, loginUser, registerUser } from './auth'
-import { refreshToken, revokeToken } from './auth/token'
-import { resetEmail, resetPassword } from './auth/reset'
-
 import { Router } from 'express'
+
+import { deleteFile, getFile, getFileMeta, uploadFile } from './storage'
+import {
+  getJwks,
+  loginUser,
+  registerUser,
+  refreshToken,
+  revokeToken,
+  activateUser,
+  deleteUser,
+  forgotPassword,
+  resetPassword,
+  forgotEmail,
+  resetEmail,
+  disableMfa,
+  enableMfa,
+  generateMfa,
+  totpLogin
+} from './auth'
 
 export const router = Router()
   .get('/auth/jwks', getJwks)
@@ -17,14 +28,14 @@ export const router = Router()
   .post('/auth/token/refresh', refreshToken)
   .post('/auth/token/revoke', revokeToken)
 
-  .get('/auth/user/verify', verifyUser)
+  .get('/auth/user/activate', activateUser)
   .post('/auth/user/delete', deleteUser)
 
-  .post('/auth/forgot/email', forgotEmail)
-  .post('/auth/forgot/password', forgotPassword)
+  .post('/auth/user/password/forgot', forgotPassword)
+  .post('/auth/user/password/reset', resetPassword)
 
-  .post('/auth/reset/email', resetEmail)
-  .post('/auth/reset/password', resetPassword)
+  .post('/auth/email/forgot', forgotEmail)
+  .post('/auth/email/reset', resetEmail)
 
   .post('/auth/mfa/disable', disableMfa)
   .post('/auth/mfa/enable', enableMfa)

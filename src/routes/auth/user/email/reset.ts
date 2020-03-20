@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
-import { activateUser, changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
-
 import Boom from '@hapi/boom'
+import { v4 as uuidv4 } from 'uuid'
+
+import { activateUser, changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
-import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/schema'
 
 interface HasuraData {

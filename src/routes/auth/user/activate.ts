@@ -2,7 +2,7 @@ import { REDIRECT_URL_ERROR, REDIRECT_URL_SUCCESS } from '@shared/config'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
-import { activateUser } from '@shared/queries'
+import { activateUser as activateUserQuery } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -12,7 +12,7 @@ interface HasuraData {
   update_users: { affected_rows: number }
 }
 
-async function verifyUser({ query }: Request, res: Response): Promise<unknown> {
+async function activateUser({ query }: Request, res: Response): Promise<unknown> {
   let hasuraData: HasuraData
 
   const { ticket } = await verifySchema.validateAsync(query)
@@ -20,7 +20,7 @@ async function verifyUser({ query }: Request, res: Response): Promise<unknown> {
   const new_ticket = uuidv4()
 
   try {
-    hasuraData = (await request(activateUser, {
+    hasuraData = (await request(activateUserQuery, {
       ticket,
       new_ticket,
       now: new Date()
@@ -50,4 +50,4 @@ async function verifyUser({ query }: Request, res: Response): Promise<unknown> {
   res.status(204).send()
 }
 
-export default asyncWrapper(verifyUser)
+export default asyncWrapper(activateUser)
