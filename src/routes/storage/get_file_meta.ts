@@ -3,11 +3,13 @@ import { Request, Response } from 'express'
 import Boom from '@hapi/boom'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
-import { storagePermission } from './rules'
 import { verify } from '@shared/jwt'
+import { S3_BUCKET } from '@shared/config'
+
+import { storagePermission } from './rules'
 
 async function get_file(req: Request, res: Response): Promise<unknown> {
-  const key = `${req.params[0]}`
+  const key = req.params[0]
 
   // check storage rules if allowed to get meta info of file
   const jwt_token = verify(req.headers.authorization)
@@ -19,16 +21,14 @@ async function get_file(req: Request, res: Response): Promise<unknown> {
 
   // get file info
   const params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key
   }
 
   let data
   try {
     data = await s3.headObject(params).promise()
-  } catch (e) {
-    console.error('error')
-    console.error({ e })
+  } catch (err) {
     throw Boom.badImplementation()
   }
 

@@ -1,16 +1,17 @@
 import { Request, Response } from 'express'
-
 import Boom from '@hapi/boom'
+
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
+import { S3_BUCKET } from '@shared/config'
 
 async function get_file(req: Request, res: Response): Promise<void> {
-  const key = `${req.params[0]}`
+  const key = req.params[0]
   const token = req.query.token
 
   // get file info
   const params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key
   }
 
@@ -18,10 +19,8 @@ async function get_file(req: Request, res: Response): Promise<void> {
 
   try {
     data = await s3.headObject(params).promise()
-  } catch (e) {
-    if (e) {
-      throw Boom.notFound()
-    }
+  } catch (err) {
+    throw Boom.notFound()
   }
 
   if (!data?.Metadata) {
@@ -35,7 +34,7 @@ async function get_file(req: Request, res: Response): Promise<void> {
   const stream = s3.getObject(params).createReadStream()
 
   // forward errors
-  stream.on('error', function error(err) {
+  stream.on('error', err => {
     console.error(err)
     throw Boom.badImplementation()
   })

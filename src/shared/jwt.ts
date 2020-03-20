@@ -1,15 +1,13 @@
 import { JWK, JWKS, JWT } from 'jose'
-
 import Boom from '@hapi/boom'
 import fs from 'fs'
-import path from 'path'
+
+import { JWT_ALGORITHM, KEY_FILE_PATH, JWT_EXPIRES_IN, JWT_SECRET_KEY } from './config'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
 
-const jwtAlgorithm = process.env.JWT_ALGORITHM || 'RS256'
-let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = process.env
-  .JWT_SECRET_KEY as string
+let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = JWT_SECRET_KEY as string
 
 /**
  * * Sets the JWT Key.
@@ -17,38 +15,41 @@ let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = process.
  * * If not, tries to read the private.pem file, or generates it otherwise
  * * If SHA algorithm, then uses the JWT_SECRET_KEY environment variables
  */
-const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'keys/private.pem')
-if (RSA_TYPES.includes(jwtAlgorithm)) {
-  if (jwtKey)
+if (RSA_TYPES.includes(JWT_ALGORITHM)) {
+  if (jwtKey) {
     try {
-      jwtKey = JWK.asKey(jwtKey, { alg: jwtAlgorithm })
+      jwtKey = JWK.asKey(jwtKey, { alg: JWT_ALGORITHM })
       jwtKey.toPEM(true)
     } catch (error) {
       throw Boom.badImplementation(
         `Invalid RSA private key in the JWT_SECRET_KEY environment variable.`
       )
     }
-  else
+  } else {
     try {
       const file = fs.readFileSync(KEY_FILE_PATH)
       jwtKey = JWK.asKey(file)
     } catch (error) {
-      jwtKey = JWK.generateSync('RSA', 2048, { alg: jwtAlgorithm, use: 'sig' }, true)
+      jwtKey = JWK.generateSync('RSA', 2048, { alg: JWT_ALGORITHM, use: 'sig' }, true)
       fs.writeFileSync(KEY_FILE_PATH, jwtKey.toPEM(true))
     }
-} else if (SHA_TYPES.includes(jwtAlgorithm)) {
-  if (!jwtKey) throw Boom.badImplementation(`Empty JWT secret key.`)
-} else throw Boom.badImplementation(`Invalid JWT algorithm: ${jwtAlgorithm}`)
+  }
+} else if (SHA_TYPES.includes(JWT_ALGORITHM)) {
+  if (!jwtKey) {
+    throw Boom.badImplementation(`Empty JWT secret key.`)
+  }
+} else {
+  throw Boom.badImplementation(`Invalid JWT algorithm: ${JWT_ALGORITHM}`)
+}
 
-const jwtExpiresIn = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
-export const newJwtExpiry = jwtExpiresIn * 60 * 1000
+export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
 
 /**
  * * Creates a JWKS store. Only works with RSA algorithms. Raises an error otherwise
  * @returns JWKS store
  */
 export const getJwkStore = (): JWKS.KeyStore => {
-  if (RSA_TYPES.includes(jwtAlgorithm)) {
+  if (RSA_TYPES.includes(JWT_ALGORITHM)) {
     const keyStore = new JWKS.KeyStore()
     keyStore.add(jwtKey as JWK.RSAKey)
     return keyStore
@@ -61,8 +62,8 @@ export const getJwkStore = (): JWKS.KeyStore => {
  */
 export const sign = (payload: object): string =>
   JWT.sign(payload, jwtKey, {
-    algorithm: jwtAlgorithm,
-    expiresIn: `${jwtExpiresIn}m`
+    algorithm: JWT_ALGORITHM,
+    expiresIn: `${JWT_EXPIRES_IN}m`
   })
 
 /**

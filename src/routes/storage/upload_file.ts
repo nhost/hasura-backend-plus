@@ -1,33 +1,14 @@
 import { Request, Response } from 'express'
-
 import Boom from '@hapi/boom'
+import { UploadedFile } from 'express-fileupload'
+import { v4 as uuidv4 } from 'uuid'
+
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
-import { storagePermission } from './rules'
-import { v4 as uuidv4 } from 'uuid'
 import { verify } from '@shared/jwt'
+import { S3_BUCKET } from '@shared/config'
 
-interface UploadedFile {
-  /** file name */
-  name: string
-  /** A function to move the file elsewhere on your server */
-  mv(path: string, callback: (err: unknown) => void): void
-  mv(path: string): Promise<void>
-  /** Encoding type of the file */
-  encoding: string
-  /** The mimetype of your file */
-  mimetype: string
-  /** A buffer representation of your file, returns empty buffer in case useTempFiles option was set to true. */
-  data: Buffer
-  /** A path to the temporary file in case useTempFiles option was set to true. */
-  tempFilePath: string
-  /** A boolean that represents if the file is over the size limit */
-  truncated: boolean
-  /** Uploaded size in bytes */
-  size: number
-  /** MD5 checksum of the uploaded file */
-  md5: string
-}
+import { storagePermission } from './rules'
 
 async function upload_file(req: Request, res: Response): Promise<unknown> {
   if (!req.files?.file) {
@@ -53,7 +34,7 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
 
   // upload file
   const upload_params = {
-    Bucket: process.env.S3_BUCKET as string,
+    Bucket: S3_BUCKET as string,
     Key: key,
     Body: uploaded_file.data,
     ContentType: uploaded_file.mimetype,
@@ -65,9 +46,7 @@ async function upload_file(req: Request, res: Response): Promise<unknown> {
 
   try {
     await s3.upload(upload_params).promise()
-  } catch (e) {
-    console.log('error')
-    console.log({ e })
+  } catch (err) {
     throw Boom.badImplementation()
   }
 

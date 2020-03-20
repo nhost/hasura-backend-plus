@@ -5,24 +5,14 @@ import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import { request } from './request'
 import { sign } from './jwt'
-
-/**
- * Destructuring environment variables.
- */
-export const {
-  COOKIE_SECRET: signed,
-  AUTO_ACTIVATE: active,
-  DEFAULT_USER_ROLE: _defaultUserRole = 'user'
-} = process.env
-
-const refreshExpiresIn = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
+import { DEFAULT_USER_ROLE, REFRESH_EXPIRES_IN } from './config'
 
 /**
  * New refresh token expiry date.
  */
 export function newRefreshExpiry(): number {
   const now = new Date()
-  const days = refreshExpiresIn / 1440
+  const days = REFRESH_EXPIRES_IN / 1440
 
   return now.setDate(now.getDate() + days)
 }
@@ -34,10 +24,14 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  user: { id, default_role = _defaultUserRole, roles = [] }
+  user: { id, default_role = DEFAULT_USER_ROLE, roles = [] }
 }: UserData): string {
   const userRoles = roles.map(({ role }) => role)
-  if (!userRoles.includes(default_role)) userRoles.push(default_role)
+
+  if (!userRoles.includes(default_role)) {
+    userRoles.push(default_role)
+  }
+
   return sign({
     'https://hasura.io/jwt/claims': {
       'x-hasura-user-id': id,
@@ -82,6 +76,7 @@ export interface UserData {
   mfa_enabled: boolean
   password_hash: string
 }
+
 export interface HasuraUserData {
   private_user_accounts: UserData[]
 }
@@ -93,21 +88,30 @@ export interface HasuraUserData {
  */
 export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
   const { username, email, ticket } = httpBody
+
   try {
     if (email) {
       const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
+
     if (username) {
       const hasuraData = (await request(selectUserByUsername, { username })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
+
     if (ticket) {
       const hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length)
+
+      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]
+      }
     }
     return null
   } catch (err) {

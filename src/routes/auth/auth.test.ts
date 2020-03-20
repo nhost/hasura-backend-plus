@@ -6,6 +6,7 @@ import { app } from '../../server'
 import { authenticator } from 'otplib'
 import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
+import { AUTO_ACTIVATE } from '@shared/config'
 
 /**
  * Store variables in memory.
@@ -13,8 +14,6 @@ import { selectUserByUsername } from '@shared/queries'
 let jwtToken: string
 let otpSecret: string
 let userTicket: string
-
-const { AUTO_ACTIVATE = false } = process.env
 
 /**
  * Dummy user information.

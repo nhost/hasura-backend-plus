@@ -1,24 +1,23 @@
 import { Request, Response } from 'express'
-import {
-  asyncWrapper,
-  createHasuraJwt,
-  newRefreshExpiry,
-  selectUser,
-  signed
-} from '@shared/helpers'
-
 import Boom from '@hapi/boom'
+import { v4 as uuidv4 } from 'uuid'
 import argon2 from 'argon2'
+
+import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectUser } from '@shared/helpers'
 import { insertRefreshToken } from '@shared/queries'
 import { loginSchema } from '@shared/schema'
 import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
-import { v4 as uuidv4 } from 'uuid'
+import { COOKIE_SECRET } from '@shared/config'
 
 async function login({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
   const hasuraUser = await selectUser(body)
-  if (!hasuraUser) throw Boom.badRequest('User does not exist.')
+
+  if (!hasuraUser) {
+    throw Boom.badRequest('User does not exist.')
+  }
+
   const {
     mfa_enabled,
     password_hash,
@@ -53,7 +52,7 @@ async function login({ body }: Request, res: Response): Promise<unknown> {
 
   res.cookie('refresh_token', refresh_token, {
     httpOnly: true,
-    signed: Boolean(signed),
+    signed: Boolean(COOKIE_SECRET),
     maxAge: newRefreshExpiry()
   })
 
