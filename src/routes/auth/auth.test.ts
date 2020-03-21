@@ -7,7 +7,7 @@ import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { selectUserByUsername } from '@shared/queries'
 
-import { app } from '../../server'
+import { server } from '../../server'
 
 /**
  * Store variables in memory.
@@ -26,7 +26,7 @@ const password = '1d5e6ceb-f42a-4f2e-b24d-8f1b925971c1'
 /**
  * Create agent for global state.
  */
-const agent = request.agent(app)
+const agent = request.agent(server)
 
 it('should create an account', async () => {
   const { status } = await agent.post('/auth/register').send({ email, password, username })
@@ -163,3 +163,5 @@ it('should delete the user', async () => {
 
   expect(status).toEqual(204)
 })
+
+server.close(() => console.log('Express server closed.'))
