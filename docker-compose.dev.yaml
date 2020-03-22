@@ -1,0 +1,20 @@
+version: '3.6'
+services:
+  graphql-engine:
+    environment:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
+  hasura-backend-plus:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    command: yarn run dev
+    env_file: .env.development
+    volumes:
+      - .:/app
+      - /app/node_modules
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
