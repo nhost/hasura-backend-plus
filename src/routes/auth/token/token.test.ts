@@ -1,5 +1,5 @@
 import 'jest-extended'
-import { request, user } from '@shared/test-common'
+import { request, user } from '@shared/test-utils'
 
 it('should refresh the token', async () => {
   const { body, status } = await request.post('/auth/token/refresh')

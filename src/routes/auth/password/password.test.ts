@@ -1,5 +1,5 @@
 import 'jest-extended'
-import { request, user, generateRandomString } from '@shared/test-common'
+import { request, user, generateRandomString } from '@shared/test-utils'
 import { request as admin } from '@shared/request'
 import { selectUserByUsername } from '@shared/queries'
 import { HasuraUserData } from '@shared/helpers'
@@ -7,7 +7,7 @@ import { HasuraUserData } from '@shared/helpers'
 it('should change the user password from the old password', async () => {
   const new_password = generateRandomString()
   const { status } = await request
-    .post('/auth/user/password/reset')
+    .post('/auth/password/reset')
     .set('Authorization', `Bearer ${user.token}`)
     .send({ old_password: user.password, new_password })
   user.password = new_password
@@ -23,7 +23,7 @@ it('should change the user password from a ticket', async () => {
   })) as HasuraUserData
   const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-  const { status } = await request.post('/auth/user/password/reset').send({
+  const { status } = await request.post('/auth/password/reset').send({
     ticket,
     new_password: user.password
   })
