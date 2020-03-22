@@ -4,7 +4,6 @@
   "compilerOptions": {
     "lib": ["dom", "es2020"],
     "paths": {
-      "*": ["src/*"],
       "@shared/*": ["src/shared/*"],
       "@custom/*": ["custom/*"]
     },

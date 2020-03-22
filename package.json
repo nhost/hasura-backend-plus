@@ -6,12 +6,12 @@
     "type": "git"
   },
   "version": "1.2.0",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/server.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
-    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/server.js",
+    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/src/server.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
