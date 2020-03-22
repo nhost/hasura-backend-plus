@@ -12,32 +12,20 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 async function registerUser({ body }: Request, res: Response): Promise<unknown> {
-  let password_hash: string
-
   const { username, email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
 
   if (user) {
-    throw Boom.badRequest('User is already registered.')
+    throw Boom.badRequest('user already exists')
   }
 
-  if (HIBP_ENABLED) {
-    const pwned = await pwnedPassword(password)
-
-    if (pwned) {
-      throw Boom.badRequest('Password is too weak.')
-    }
+  if (HIBP_ENABLED && (await pwnedPassword(password))) {
+    throw Boom.badRequest('password is too weak')
   }
 
   try {
-    password_hash = await argon2.hash(password)
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-
-  const ticket = uuidv4()
-
-  try {
+    const ticket = uuidv4()
+    const password_hash = await argon2.hash(password)
     await request(insertUser, {
       user: {
         email,
@@ -68,7 +56,6 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   } catch (err) {
     throw Boom.badImplementation()
   }
-
   return res.status(204).send()
 }
 

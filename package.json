@@ -8,9 +8,9 @@
   "version": "1.2.0",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/server.ts",
-    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/server.js",
-    "test": "jest",
+    "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
+    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/start.js",
+    "test": "jest --coverage",
     "test:watch": "jest --watch",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"

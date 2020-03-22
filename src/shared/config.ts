@@ -1,7 +1,13 @@
-import 'dotenv/config'
-
 import Boom from '@hapi/boom'
 import path from 'path'
+import dotenv from 'dotenv'
+
+// Load '.env' file if production mode, '.env.<NODE_ENV>' otherwise
+const envFile =
+  process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
+    ? `.env.${process.env.NODE_ENV}`
+    : '.env'
+dotenv.config({ path: envFile })
 
 /**
  * Destructuring environment variables.
@@ -18,7 +24,7 @@ export const {
   /**
    * Hasura settings.
    */
-  HASURA_GRAPHQL_ENDPOINT,
+  HASURA_ENDPOINT,
   HASURA_GRAPHQL_ADMIN_SECRET,
 
   /**
@@ -63,6 +69,6 @@ export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN as str
 export const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
 export const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
 
-if (!HASURA_GRAPHQL_ENDPOINT) {
+if (!HASURA_ENDPOINT) {
   throw Boom.badImplementation('No Hasura GraphQL endpoint found.')
 }
