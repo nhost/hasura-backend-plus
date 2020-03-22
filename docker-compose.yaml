@@ -15,9 +15,9 @@ services:
       - 'postgres'
     restart: always
     environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
-      # HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-      # HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
+      HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
     volumes:
       - ./migrations:/hasura-migrations
   hasura-backend-plus:
@@ -25,8 +25,7 @@ services:
     ports:
       - '3000:3000'
     environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
-      # HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
-      # JWT_ALGORITHM: RS256
 volumes:
   db_data:

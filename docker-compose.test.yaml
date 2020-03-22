@@ -1,25 +1,18 @@
 version: '3.6'
 services:
   graphql-engine:
-    image: hasura/graphql-engine:v1.1.0.cli-migrations
-    ports:
-      - '8080:8080'
-    depends_on:
-      - 'postgres'
-    restart: always
-    env_file: .env.test
     environment:
-      HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
       HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
   hasura-backend-plus:
-    build: .
-    ports:
-      - '3000:3000'
+    build:
+      context: .
+      args:
+        - NODE_ENV=test
     env_file: .env.test
+    volumes:
+      - ./coverage:/app/coverage
   mailhog:
     image: mailhog/mailhog
     ports:
       - 1025:1025 # smtp server
       - 8025:8025 # web ui
-volumes:
-  db_data:
