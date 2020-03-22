@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-
 import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { Request, Response } from 'express'
+
+import Boom from '@hapi/boom'
 import { SMTP_ENABLED } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/schema'

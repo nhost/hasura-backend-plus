@@ -58,7 +58,7 @@ export async function createQR(secret: string): Promise<unknown> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asyncWrapper(fn: any) {
-  return function(req: Request, res: Response, next: NextFunction): void {
+  return function (req: Request, res: Response, next: NextFunction): void {
     fn(req, res, next).catch(next)
   }
 }

@@ -1,12 +1,11 @@
 import 'jest-extended'
-import { authenticator } from 'otplib'
-import request from 'supertest'
 
 import { AUTO_ACTIVATE } from '@shared/config'
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
+import { authenticator } from 'otplib'
+import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
-
 import { server } from '../../server'
 
 /**

@@ -9,7 +9,7 @@ interface ExtendedJoi extends Joi.Root {
   string(): ExtendedStringSchema
 }
 
-const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
+const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   type: 'string',
   base: joi.string(),
   messages: {
@@ -25,7 +25,7 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
           const lowerValue = value.toLowerCase()
           const allowedEmailDomains = ALLOWED_EMAIL_DOMAINS.split(',')
 
-          if (allowedEmailDomains.every(domain => !lowerValue.endsWith(domain.toLowerCase()))) {
+          if (allowedEmailDomains.every((domain) => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
           }
         }
@@ -36,16 +36,9 @@ const extendedJoi: ExtendedJoi = Joi.extend(joi => ({
   }
 }))
 
-const passwordRule = Joi.string()
-  .min(6)
-  .max(128)
-  .required()
+const passwordRule = Joi.string().min(6).max(128).required()
 
-const emailRule = extendedJoi
-  .string()
-  .email()
-  .required()
-  .allowedDomains()
+const emailRule = extendedJoi.string().email().required().allowedDomains()
 
 const userSchema = {
   email: emailRule,
@@ -54,23 +47,15 @@ const userSchema = {
 
 export const registerSchema = Joi.object({
   ...userSchema,
-  username: Joi.string()
-    .alphanum()
-    .min(2)
-    .max(32)
-    .required()
+  username: Joi.string().alphanum().min(2).max(32).required()
 })
 
 const ticketSchema = {
-  ticket: Joi.string()
-    .uuid({ version: 'uuidv4' })
-    .required()
+  ticket: Joi.string().uuid({ version: 'uuidv4' }).required()
 }
 
 const codeSchema = {
-  code: Joi.string()
-    .length(6)
-    .required()
+  code: Joi.string().length(6).required()
 }
 
 export const resetPasswordWithTicketSchema = Joi.object({

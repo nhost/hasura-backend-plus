@@ -9,18 +9,18 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/server.ts",
+    "docs:build": "vuepress build docs",
+    "docs:dev": "vuepress dev docs",
     "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/server.js",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@hapi/boom": "9.1.0",
     "@hapi/joi": "17.1.1",
     "@types/express-fileupload": "1.1.2",
     "argon2": "0.26.1",
-    "aws-sdk": "2.642.0",
+    "aws-sdk": "2.643.0",
     "body-parser": "1.19.0",
     "cookie-parser": "1.4.5",
     "cors": "2.8.5",
@@ -37,7 +37,7 @@
     "helmet": "3.21.3",
     "hibp": "9.0.0",
     "jose": "1.25.0",
-    "nodemailer": "6.4.5",
+    "nodemailer": "6.4.6",
     "otplib": "12.0.1",
     "qrcode": "1.4.4",
     "tsconfig-paths": "3.9.0",
@@ -62,7 +62,7 @@
     "@types/uuid": "7.0.2",
     "@typescript-eslint/eslint-plugin": "2.24.0",
     "@typescript-eslint/parser": "2.24.0",
-    "@vuepress/plugin-back-to-top": "^1.4.0",
+    "@vuepress/plugin-back-to-top": "1.4.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-jest": "23.8.2",
@@ -71,15 +71,15 @@
     "jest": "25.1.0",
     "jest-extended": "0.11.5",
     "lint-staged": "10.0.8",
-    "markdown-it-multimd-table": "^4.0.1",
-    "prettier": "1.19.1",
+    "markdown-it-multimd-table": "4.0.1",
+    "prettier": "2.0.1",
     "pretty-quick": "2.0.1",
     "supertest": "4.0.2",
     "ts-jest": "25.2.1",
-    "ts-node": "^8.7.0",
+    "ts-node": "8.8.0",
     "ts-node-dev": "1.0.0-pre.44",
     "typescript": "3.8.3",
-    "vuepress": "^1.4.0"
+    "vuepress": "1.4.0"
   },
   "eslintConfig": {
     "root": true,
@@ -131,6 +131,7 @@
   "prettier": {
     "semi": false,
     "printWidth": 100,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "none"
   }
 }

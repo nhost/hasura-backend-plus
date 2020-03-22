@@ -1,23 +1,23 @@
-import { Router } from 'express'
-
-import { deleteFile, getFile, getFileMeta, uploadFile, revokeFile } from './storage'
 import {
-  getJwks,
-  loginUser,
-  registerUser,
-  refreshToken,
-  revokeToken,
   activateUser,
   deleteUser,
-  forgotPassword,
-  resetPassword,
-  forgotEmail,
-  resetEmail,
   disableMfa,
   enableMfa,
+  forgotEmail,
+  forgotPassword,
   generateMfa,
+  getJwks,
+  loginUser,
+  refreshToken,
+  registerUser,
+  resetEmail,
+  resetPassword,
+  revokeToken,
   totpLogin
 } from './auth'
+import { deleteFile, getFile, getFileMeta, revokeFile, uploadFile } from './storage'
+
+import { Router } from 'express'
 
 export const router = Router()
   .get('/auth/jwks', getJwks)
@@ -30,7 +30,6 @@ export const router = Router()
 
   .get('/auth/user/activate', activateUser)
   .post('/auth/user/delete', deleteUser)
-
   .post('/auth/user/password/forgot', forgotPassword)
   .post('/auth/user/password/reset', resetPassword)
 

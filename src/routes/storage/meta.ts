@@ -4,9 +4,8 @@ import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
-import { verify } from '@shared/jwt'
-
 import { storagePermission } from '@custom/storage-rules'
+import { verify } from '@shared/jwt'
 
 async function getFileMeta(req: Request, res: Response): Promise<unknown> {
   const key = req.params[0]

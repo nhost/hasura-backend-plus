@@ -1,8 +1,8 @@
-import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
-
-import { saveNewEmail, selectUserByEmail } from '@shared/queries'
 import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { Request, Response } from 'express'
+import { saveNewEmail, selectUserByEmail } from '@shared/queries'
+
+import Boom from '@hapi/boom'
 import { SMTP_ENABLED } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { emailResetSchema } from '@shared/schema'
