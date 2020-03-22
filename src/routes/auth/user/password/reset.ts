@@ -36,7 +36,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
 
       const { affected_rows } = hasuraData.update_private_user_accounts
 
-      if (affected_rows === 0) {
+      if (!affected_rows) {
         throw Boom.unauthorized('Invalid or expired ticket.')
       }
     } catch (err) {
