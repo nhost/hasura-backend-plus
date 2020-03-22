@@ -1,12 +1,10 @@
-import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
+import { AUTO_ACTIVATE, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, selectUser } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectUser } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
-import argon2 from 'argon2'
 import { emailClient } from '@shared/email'
 import { insertUser } from '@shared/queries'
-import { pwnedPassword } from 'hibp'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -19,13 +17,11 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
     throw Boom.badRequest('user already exists')
   }
 
-  if (HIBP_ENABLED && (await pwnedPassword(password))) {
-    throw Boom.badRequest('password is too weak')
-  }
+  await checkHibp(password)
 
   try {
     const ticket = uuidv4()
-    const password_hash = await argon2.hash(password)
+    const password_hash = await hashPassword(password)
     await request(insertUser, {
       user: {
         email,

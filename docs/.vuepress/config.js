@@ -20,7 +20,7 @@ module.exports = {
   plugins: ['@vuepress/plugin-back-to-top'],
   markdown: {
     lineNumbers: true,
-    extendMarkdown: md => {
+    extendMarkdown: (md) => {
       md.use(require('markdown-it-multimd-table'), {
         multiline: true,
         rowspan: true,

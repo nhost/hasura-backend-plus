@@ -15,7 +15,7 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
   const hasuraUser = await selectUser(body)
 
   if (!hasuraUser) {
-    throw Boom.badRequest('Invalid or expired ticket.')
+    throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
   const {

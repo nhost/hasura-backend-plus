@@ -33,8 +33,4 @@ if (COOKIE_SECRET) {
 app.use(router)
 app.use(errors)
 
-// const server = app.listen(SERVER_PORT, () => {
-//   console.log(`Running on http://localhost:${SERVER_PORT}`)
-// })
-
 export { app }

@@ -35,7 +35,7 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
 
   const { affected_rows } = hasuraData.update_users
 
-  if (affected_rows === 0) {
+  if (!affected_rows) {
     if (REDIRECT_URL_ERROR) {
       return res.redirect(302, REDIRECT_URL_ERROR as string)
     }

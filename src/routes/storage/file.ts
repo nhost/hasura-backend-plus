@@ -34,7 +34,7 @@ async function getFile(req: Request, res: Response): Promise<void> {
   const stream = s3.getObject(params).createReadStream()
 
   // forward errors
-  stream.on('error', err => {
+  stream.on('error', (err) => {
     console.error(err)
     throw Boom.badImplementation()
   })

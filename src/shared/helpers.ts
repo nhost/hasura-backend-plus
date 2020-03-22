@@ -1,9 +1,11 @@
-import { DEFAULT_USER_ROLE, REFRESH_EXPIRES_IN } from './config'
+import { DEFAULT_USER_ROLE, HIBP_ENABLED, REFRESH_EXPIRES_IN } from './config'
 import { NextFunction, Request, Response } from 'express'
 import { selectUserByEmail, selectUserByTicket, selectUserByUsername } from './queries'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
+import argon2 from 'argon2'
+import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { sign } from './jwt'
 
@@ -116,5 +118,27 @@ export const selectUser = async (httpBody: { [key: string]: string }): Promise<U
     return null
   } catch (err) {
     throw Boom.badImplementation()
+  }
+}
+
+/**
+ * Password hashing function.
+ * @param password Password to hash.
+ */
+export const hashPassword = async (password: string): Promise<string> => {
+  try {
+    return await argon2.hash(password)
+  } catch (err) {
+    throw Boom.badImplementation()
+  }
+}
+
+/**
+ * Checks password against the HIBP API.
+ * @param password Password to check.
+ */
+export const checkHibp = async (password: string): Promise<void> => {
+  if (HIBP_ENABLED && (await pwnedPassword(password))) {
+    throw Boom.badRequest('password is too weak')
   }
 }

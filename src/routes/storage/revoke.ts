@@ -1,10 +1,10 @@
+import { HASURA_GRAPHQL_ADMIN_SECRET, S3_BUCKET } from '@shared/config'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
 import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
 import { v4 as uuidv4 } from 'uuid'
-import { S3_BUCKET, HASURA_GRAPHQL_ADMIN_SECRET } from '@shared/config'
 
 async function revokeFile(req: Request, res: Response): Promise<unknown> {
   const key = req.params[0]
