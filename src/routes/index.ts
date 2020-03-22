@@ -30,8 +30,9 @@ export const router = Router()
 
   .get('/auth/user/activate', activateUser)
   .post('/auth/user/delete', deleteUser)
-  .post('/auth/user/password/forgot', forgotPassword)
-  .post('/auth/user/password/reset', resetPassword)
+
+  .post('/auth/password/forgot', forgotPassword)
+  .post('/auth/password/reset', resetPassword)
 
   .post('/auth/email/forgot', forgotEmail)
   .post('/auth/email/reset', resetEmail)

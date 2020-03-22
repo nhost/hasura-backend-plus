@@ -43,7 +43,7 @@ if (!AUTO_ACTIVATE) {
 
     const { status } = await agent.get(`/auth/user/activate?ticket=${ticket}`)
 
-    expect(status).toEqual(302)
+    expect(status).toBeOneOf([204, 302])
   })
 }
 
@@ -78,11 +78,17 @@ it('should revoke the token', async () => {
   expect(status).toEqual(204)
 })
 
+it('should return successfully', async () => {
+  const { status } = await agent.post('/auth/password/forgot').send({ email })
+
+  expect(status).toEqual(204)
+})
+
 it('should change the password', async () => {
   const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
   const ticket = hasuraData.private_user_accounts[0].user.ticket
 
-  const { status } = await agent.post('/auth/user/password/reset').send({
+  const { status } = await agent.post('/auth/password/reset').send({
     ticket,
     new_password: password
   })
@@ -144,6 +150,24 @@ it('should sign the user in (mfa)', async () => {
 
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should return successfully', async () => {
+  const { status } = await agent.post('/auth/email/forgot').send({
+    email,
+    new_email: email
+  })
+
+  expect(status).toEqual(204)
+})
+
+it('should return successfully', async () => {
+  const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
+  const ticket = hasuraData.private_user_accounts[0].user.ticket
+
+  const { status } = await agent.post('/auth/email/reset').send({ ticket })
+
+  expect(status).toEqual(204)
 })
 
 it('should disable mfa for user', async () => {

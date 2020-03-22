@@ -1,36 +1,16 @@
-import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { HasuraUserData, asyncWrapper, checkHibp, hashPassword } from '@shared/helpers'
 import { Request, Response } from 'express'
 import { resetPasswordWithOldPasswordSchema, resetPasswordWithTicketSchema } from '@shared/schema'
 import { selectUserById, updatePasswordWithTicket, updatePasswordWithUserId } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { HIBP_ENABLED } from '@shared/config'
 import argon2 from 'argon2'
-import { pwnedPassword } from 'hibp'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verify } from '@shared/jwt'
 
 interface HasuraData {
   update_private_user_accounts: { affected_rows: number }
-}
-
-const checkHibp = async (password: string): Promise<void> => {
-  if (HIBP_ENABLED) {
-    const pwned = await pwnedPassword(password)
-
-    if (pwned) {
-      throw Boom.badRequest('Password is too weak.')
-    }
-  }
-}
-
-const hashPassword = async (password: string): Promise<string> => {
-  try {
-    return await argon2.hash(password)
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
 }
 
 /**
@@ -40,7 +20,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
   let password_hash: string
 
   if (body.ticket) {
-    // * Reset the password from { ticket, new_password }
+    // Reset the password from { ticket, new_password }
     const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(body, {})
 
     await checkHibp(new_password)
@@ -81,7 +61,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
 
       // Check the old (current) password
       if (!(await argon2.verify(password_hash, old_password))) {
-        throw Boom.unauthorized('Wrong password.')
+        throw Boom.unauthorized('Incorrect password.')
       }
 
       try {
