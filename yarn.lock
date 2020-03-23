@@ -1217,6 +1217,13 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
 
+"@types/node-fetch@^2.5.5":
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.5.tgz#cd264e20a81f4600a6c52864d38e7fef72485e92"
+  dependencies:
+    "@types/node" "*"
+    form-data "^3.0.0"
+
 "@types/node@*":
   version "13.9.1"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.9.1.tgz#96f606f8cd67fb018847d9b61e93997dabdefc72"
@@ -1502,7 +1509,6 @@
 "@vuepress/plugin-back-to-top@1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-back-to-top/-/plugin-back-to-top-1.4.0.tgz#baca4daf8de469544956bb21903dbeba691d40e4"
-  integrity sha512-tFsFx/jIoCh3hKWIDYioQyqhF+OJ+3QYAyPSJsvIadmOiS1Op33MlPVurWxr+J5hGlsvnOEyQqT9++mGh3N2KA==
   dependencies:
     lodash.debounce "^4.0.8"
 
@@ -2039,7 +2045,6 @@ autoprefixer@^9.5.1:
 aws-sdk@2.643.0:
   version "2.643.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.643.0.tgz#0b4cc49165a25c42ab0503580806d367d32ffb88"
-  integrity sha512-4r7VGQFqshrhXnOCVQdlatAWiK/8kmmtAtY9gbITPNpY5Is+SfIy6k/1BgrnL5H/2sYd27H+Xp8itXZoCnQeTw==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -2817,7 +2822,7 @@ color@^3.0.0:
     color-convert "^1.9.1"
     color-string "^1.5.2"
 
-combined-stream@^1.0.6, combined-stream@~1.0.6:
+combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
   dependencies:
@@ -4394,6 +4399,14 @@ form-data@^2.3.1:
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
+    mime-types "^2.1.12"
+
+form-data@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.0.tgz#31b7e39c85f1355b7139ee0c647cf0de7f83c682"
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
 form-data@~2.3.2:
@@ -6609,7 +6622,6 @@ markdown-it-emoji@^1.4.0:
 markdown-it-multimd-table@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/markdown-it-multimd-table/-/markdown-it-multimd-table-4.0.1.tgz#71b8bc1bc6ab701286a87e3f05ef7bebd932a78e"
-  integrity sha512-ZgRV8LlGz6JXTZ5zd82yCL8IVG5MRastMWxxrc6hQC8aC8kq/7zpp+ksBqVqcdTmTdabnkuSo/7h3SyKM31YCA==
   dependencies:
     markdown-it "^8.4.2"
 
@@ -6996,7 +7008,7 @@ node-fetch@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.1.2.tgz#ab884e8e7e57e38a944753cec706f788d1768bb5"
 
-node-fetch@^2.2.0:
+node-fetch@^2.2.0, node-fetch@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
 
@@ -7088,7 +7100,6 @@ nodemailer@6.4.0:
 nodemailer@6.4.6:
   version "6.4.6"
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.4.6.tgz#d37f504f6560b36616f646a606894fe18819107f"
-  integrity sha512-/kJ+FYVEm2HuUlw87hjSqTss+GU35D4giOpdSfGp7DO+5h6RlJj7R94YaYHOkoxu1CSaM0d3WRBtCzwXrY6MKA==
 
 nodemailer@^6.3.1, nodemailer@^6.4.2:
   version "6.4.5"
@@ -7990,7 +8001,6 @@ prettier-linter-helpers@^1.0.0:
 prettier@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.1.tgz#3f00ac71263be34684b2b2c8d7e7f63737592dac"
-  integrity sha512-piXGBcY1zoFOG0MvHpNE5reAGseLmaCRifQ/fmfF49BcYkInEs/naD/unxGNAeOKFA5+JxVrPyMvMlpzcd20UA==
 
 prettier@^1.18.2:
   version "1.19.1"
@@ -9703,7 +9713,6 @@ ts-node@*:
 ts-node@8.8.0:
   version "8.8.0"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.8.0.tgz#41a301811ac96174db75c24462ec7ebadfa9668b"
-  integrity sha512-cHZpac2e71Df6/kC7AmqXObjHLs+oooxXmBqeiml9TBJk1Car9IsF12iPEeXxYVqwN/b/ZLoAsRcQ587wdwSkw==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
@@ -10155,7 +10164,6 @@ vuepress-plugin-smooth-scroll@^0.0.3:
 vuepress@1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/vuepress/-/vuepress-1.4.0.tgz#308037b15baec6e251b835fe1fff7da507302b6b"
-  integrity sha512-VrBNCCjyrB4EfdIRWTW6uo/xmMzplVsGE/2oGLkgVhWLPCvvSEAcGQhoUKWxRJXk6CdrDCov6jsmu6MA1N3fvw==
   dependencies:
     "@vuepress/core" "^1.4.0"
     "@vuepress/theme-default" "^1.4.0"

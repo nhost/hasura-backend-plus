@@ -6,6 +6,10 @@ services:
       args:
         - NODE_ENV=test
     env_file: .env.test
+    environment:
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_SECURE: 'false'
     volumes:
       - ./coverage:/app/coverage
   mailhog:

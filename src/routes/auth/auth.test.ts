@@ -1,11 +1,16 @@
+/* eslint-disable jest/no-standalone-expect */
 import 'jest-extended'
 
-import { AUTO_ACTIVATE } from '@shared/config'
+import { AUTO_ACTIVATE, HIBP_ENABLED, SMTP_ENABLED, SERVER_URL } from '@shared/config'
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
 import { app } from '../../server'
+import { mailHogSearch, deleteMailHogEmail, createUser } from '@shared/test-utils'
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+console.error = function (): void {} // Disable the errors that will be raised by the tests
 
 /**
  * Store variables in memory.
@@ -15,9 +20,8 @@ let jwtToken: string
 /**
  * Dummy user information.
  */
-const username = 'jfxa8eybqi'
-const email = 'jfxa8eybqi@kg2cuzbqaw.com'
-const password = '1d5e6ceb-f42a-4f2e-b24d-8f1b925971c1'
+const { username, email, password } = createUser()
+console.log(username, email, password)
 
 /**
  * Create agent for global state.
@@ -29,7 +33,7 @@ it('should create an account', async () => {
   expect(status).toEqual(204)
 })
 
-it('should tell me the account already exists', async () => {
+it('should tell the account already exists', async () => {
   const {
     status,
     body: { message }
@@ -39,17 +43,26 @@ it('should tell me the account already exists', async () => {
 })
 
 /**
- * Only run this test if `AUTO_ACTIVATE` is false.
+ * * Only run this test if auto activation is disabled
  */
-// TODO disable AUTO_ACTIVATE for tests
-if (!AUTO_ACTIVATE) {
-  it('should activate the user', async () => {
+const manualActivationIt = !AUTO_ACTIVATE ? it : it.skip
+manualActivationIt('should activate the user', async () => {
+  let activateLink: string
+  if (SMTP_ENABLED) {
+    // Sends the email, checks if it's received and use the link for activation
+    const [message] = await mailHogSearch(email)
+    expect(message).toBeTruthy()
+    expect(message.Content.Headers.Subject).toInclude('Confirm your email address')
+    activateLink = message.Content.Headers['X-Activate-Link'][0].replace(`${SERVER_URL}`, '')
+    await deleteMailHogEmail(message)
+  } else {
     const hasuraData = (await admin(selectUserByUsername, { username })) as HasuraUserData
     const ticket = hasuraData.private_user_accounts[0].user.ticket
-    const { status } = await agent.get(`/auth/user/activate?ticket=${ticket}`)
-    expect(status).toBeOneOf([204, 302])
-  })
-}
+    activateLink = `/auth/user/activate?ticket=${ticket}`
+  }
+  const { status } = await agent.get(activateLink)
+  expect(status).toBeOneOf([204, 302])
+})
 
 it('should sign the user in', async () => {
   const { body, status } = await agent.post('/auth/login').send({ email, password })
@@ -72,7 +85,8 @@ it('should delete the user', async () => {
   expect(status).toEqual(204)
 })
 
-it('should tell me the email has been pwned', async () => {
+const pwndPasswordIt = HIBP_ENABLED ? it : it.skip
+pwndPasswordIt('should tell the email has been pwned', async () => {
   const {
     status,
     body: { message }
