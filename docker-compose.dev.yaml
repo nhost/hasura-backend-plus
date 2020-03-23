@@ -1,8 +1,5 @@
 version: '3.6'
 services:
-  graphql-engine:
-    environment:
-      HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
   hasura-backend-plus:
     build:
       context: .

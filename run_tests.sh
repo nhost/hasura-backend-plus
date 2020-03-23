@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-export HASURA_GRAPHQL_ADMIN_SECRET=$(cat .env.test | sed 's/#.*//g' | grep -o '^HASURA_GRAPHQL_ADMIN_SECRET.*' | xargs)
+HASURA_GRAPHQL_ADMIN_SECRET=$(cat .env.test | sed 's/#.*//g' | grep -o '^HASURA_GRAPHQL_ADMIN_SECRET.*' | xargs)
+export HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_GRAPHQL_ADMIN_SECRET#*=}
 # Create docker services
 docker-compose -p hbp_test -f docker-compose.yaml -f docker-compose.test.yaml up -d
 
