@@ -4,7 +4,8 @@ import {
   SMTP_PORT,
   SMTP_SECURE,
   SMTP_SENDER,
-  SMTP_USER
+  SMTP_USER,
+  SMTP_ENABLED
 } from '@shared/config'
 
 import Email from 'email-templates'
@@ -30,7 +31,7 @@ const transport = nodemailer.createTransport({
 export const emailClient = new Email({
   transport,
   message: { from: SMTP_SENDER },
-  send: process.env.NODE_ENV === 'production',
+  send: SMTP_ENABLED,
   views: {
     root: path.resolve(process.env.PWD || '.', 'custom/emails'),
     options: {

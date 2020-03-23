@@ -41,7 +41,15 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
     if (!AUTO_ACTIVATE && SMTP_ENABLED) {
       await emailClient.send({
         template: 'confirm',
-        message: { to: email },
+        message: {
+          to: email,
+          headers: {
+            'x-activate-link': {
+              prepared: true,
+              value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
+            }
+          }
+        },
         locals: {
           ticket,
           username,

@@ -7,6 +7,10 @@ services:
         - NODE_ENV=development
     command: yarn run dev
     env_file: .env.development
+    environment:
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_SECURE: 'false'
     volumes:
       - .:/app
       - /app/node_modules
