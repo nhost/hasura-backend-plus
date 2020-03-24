@@ -1,11 +1,10 @@
 dist
-.env
-.env.development
+.env*
 *.log
 hasura
+coverage
 config.yaml
 private.pem
 node_modules
 yarn-error.log
 package-lock.json
-coverage

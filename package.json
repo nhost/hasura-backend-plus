@@ -5,14 +5,13 @@
     "url": "git://github.com/nhost/hasura-backend-plus.git",
     "type": "git"
   },
-  "version": "1.2.0",
-  "main": "dist/src/server.js",
+  "version": "2.0.0",
+  "main": "src/start.ts",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
-    "start": "tsc && cross-env NODE_ENV=production node -r ./tscPaths.js dist/src/start.js",
-    "start:ts": "ts-node -r tsconfig-paths/register src/start.ts",
+    "start": "ts-node -r tsconfig-paths/register src/start.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
