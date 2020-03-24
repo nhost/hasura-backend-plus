@@ -60,7 +60,7 @@ export async function createQR(secret: string): Promise<unknown> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asyncWrapper(fn: any) {
-  return function(req: Request, res: Response, next: NextFunction): void {
+  return function (req: Request, res: Response, next: NextFunction): void {
     fn(req, res, next).catch(next)
   }
 }
@@ -139,6 +139,6 @@ export const hashPassword = async (password: string): Promise<string> => {
  */
 export const checkHibp = async (password: string): Promise<void> => {
   if (HIBP_ENABLED && (await pwnedPassword(password))) {
-    throw Boom.badRequest('password is too weak')
+    throw Boom.badRequest('Password is too weak.')
   }
 }
