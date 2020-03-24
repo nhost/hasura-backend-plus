@@ -138,11 +138,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (HIBP_ENABLED) {
-    const pwned = await pwnedPassword(password)
-
-    if (pwned) {
-      throw Boom.badRequest('Password is too weak.')
-    }
+  if (HIBP_ENABLED && (await pwnedPassword(password))) {
+    throw Boom.badRequest('Password is too weak.')
   }
 }

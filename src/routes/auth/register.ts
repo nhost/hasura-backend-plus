@@ -10,21 +10,18 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 async function registerUser({ body }: Request, res: Response): Promise<unknown> {
-  let password_hash: string
-
   const { username, email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
 
   if (user) {
-    throw Boom.badRequest('User is already registered.')
+    throw Boom.badRequest('user already exists')
   }
 
   await checkHibp(password)
-  password_hash = await hashPassword(password)
-
-  const ticket = uuidv4()
 
   try {
+    const ticket = uuidv4()
+    const password_hash = await hashPassword(password)
     await request(insertUser, {
       user: {
         email,
@@ -44,7 +41,15 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
     if (!AUTO_ACTIVATE && SMTP_ENABLED) {
       await emailClient.send({
         template: 'confirm',
-        message: { to: email },
+        message: {
+          to: email,
+          headers: {
+            'x-activate-link': {
+              prepared: true,
+              value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
+            }
+          }
+        },
         locals: {
           ticket,
           username,
@@ -55,7 +60,6 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   } catch (err) {
     throw Boom.badImplementation()
   }
-
   return res.status(204).send()
 }
 

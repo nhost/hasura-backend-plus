@@ -18,7 +18,7 @@
 
 | Name                          | Default | Description |
 | ----------------------------- | ------- | ----------- |
-| `HASURA_GRAPHQL_ENDPOINT`     |         |             |
+| `HASURA_ENDPOINT`             |         |             |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         |             |
 | `SERVER_PORT`                 | 3000    |             |
 | `JWT_SECRET_KEY`              |         |             |

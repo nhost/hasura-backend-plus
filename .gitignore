@@ -1,7 +1,8 @@
 dist
-.env
+.env*
 *.log
 hasura
+coverage
 config.yaml
 private.pem
 node_modules

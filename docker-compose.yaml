@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
+  graphql-engine:
+    image: hasura/graphql-engine:v1.1.0.cli-migrations
+    ports:
+      - '8080:8080'
+    depends_on:
+      - 'postgres'
+    restart: always
+    environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?Environment variable HASURA_GRAPHQL_ADMIN_SECRET is missing.}'
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/postgres
+      HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
+    volumes:
+      - ./migrations:/hasura-migrations
+  hasura-backend-plus:
+    image: nhost/hasura-backend-plus:latest
+    ports:
+      - '3000:3000'
+    environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?Environment variable HASURA_GRAPHQL_ADMIN_SECRET is missing.}'
+      HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
+volumes:
+  db_data:

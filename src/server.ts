@@ -1,5 +1,4 @@
-import { COOKIE_SECRET, SERVER_PORT } from '@shared/config'
-
+import { COOKIE_SECRET } from '@shared/config'
 import cookie from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
@@ -33,6 +32,4 @@ if (COOKIE_SECRET) {
 app.use(router)
 app.use(errors)
 
-export const server = app.listen(SERVER_PORT, () => {
-  console.log(`Running on http://localhost:${SERVER_PORT}`)
-})
+export { app }

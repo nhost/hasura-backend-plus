@@ -22,7 +22,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080/v1/graphql
+      HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
       HASURA_GRAPHQL_ADMIN_SECRET: <hasura-admin-secret>
       JWT_ALGORITHM: RS256
 volumes:

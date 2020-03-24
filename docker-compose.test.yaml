@@ -1,0 +1,19 @@
+version: '3.6'
+services:
+  hasura-backend-plus:
+    build:
+      context: .
+      args:
+        - NODE_ENV=test
+    env_file: .env.test
+    environment:
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_SECURE: 'false'
+    volumes:
+      - ./coverage:/app/coverage
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
