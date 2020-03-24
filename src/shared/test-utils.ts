@@ -1,14 +1,14 @@
-import { SuperTest, Test, agent } from 'supertest'
-
 import { AUTO_ACTIVATE, SMTP_HOST } from '@shared/config'
-import { request as admin } from '@shared/request'
-import { selectUserByUsername } from '@shared/queries'
-import { HasuraUserData } from '@shared/helpers'
+import { SuperTest, Test, agent } from 'supertest'
 import fetch, { Response } from 'node-fetch'
 
+import { HasuraUserData } from '@shared/helpers'
+import { request as admin } from '@shared/request'
 import { app } from '../server'
+import { selectUserByUsername } from '@shared/queries'
 
-export const generateRandomString = () => Math.random().toString(36).replace('0.', '')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const generateRandomString = (): any => Math.random().toString(36).replace('0.', '')
 
 export let request: SuperTest<Test>
 

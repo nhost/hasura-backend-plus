@@ -1,4 +1,4 @@
-import { HASURA_GRAPHQL_ADMIN_SECRET, HASURA_ENDPOINT } from './config'
+import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET } from './config'
 
 import { ASTNode } from 'graphql'
 import { GraphQLClient } from 'graphql-request'

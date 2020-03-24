@@ -1,5 +1,4 @@
 import { COOKIE_SECRET } from '@shared/config'
-
 import cookie from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'

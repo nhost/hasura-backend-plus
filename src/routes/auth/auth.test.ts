@@ -1,13 +1,14 @@
 /* eslint-disable jest/no-standalone-expect */
 import 'jest-extended'
 
-import { AUTO_ACTIVATE, HIBP_ENABLED, SMTP_ENABLED, SERVER_URL } from '@shared/config'
+import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
+import { createUser, deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
+
 import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
+import { app } from '../../server'
 import request from 'supertest'
 import { selectUserByUsername } from '@shared/queries'
-import { app } from '../../server'
-import { mailHogSearch, deleteMailHogEmail, createUser } from '@shared/test-utils'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 console.error = function (): void {} // Disable the errors that will be raised by the tests
@@ -86,13 +87,13 @@ it('should delete the user', async () => {
 })
 
 const pwndPasswordIt = HIBP_ENABLED ? it : it.skip
-pwndPasswordIt('should tell the email has been pwned', async () => {
+pwndPasswordIt('should tell the password has been pwned', async () => {
   const {
     status,
     body: { message }
   } = await agent
     .post('/auth/register')
-    .send({ email: 'test@example.com', password: '123456', username: 'pwnedemail' })
+    .send({ email: 'test@example.com', password: '123456', username: 'pwneduser' })
   expect(status).toEqual(400)
-  expect(message).toEqual('password is too weak')
+  expect(message).toEqual('Password is too weak.')
 })

@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
-import path from 'path'
 import dotenv from 'dotenv'
+import path from 'path'
 
 // Load '.env' file if production mode, '.env.<NODE_ENV>' otherwise
 const envFile =

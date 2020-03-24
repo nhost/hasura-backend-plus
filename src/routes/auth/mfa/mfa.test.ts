@@ -1,6 +1,8 @@
 import 'jest-extended'
-import { authenticator } from 'otplib'
+
 import { request, user } from '@shared/test-utils'
+
+import { authenticator } from 'otplib'
 
 let otpSecret: string
 let userTicket: string

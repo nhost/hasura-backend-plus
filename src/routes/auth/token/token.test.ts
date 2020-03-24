@@ -1,4 +1,5 @@
 import 'jest-extended'
+
 import { request, user } from '@shared/test-utils'
 
 it('should refresh the token', async () => {

@@ -1,11 +1,11 @@
 import {
+  SMTP_ENABLED,
   SMTP_HOST,
   SMTP_PASS,
   SMTP_PORT,
   SMTP_SECURE,
   SMTP_SENDER,
-  SMTP_USER,
-  SMTP_ENABLED
+  SMTP_USER
 } from '@shared/config'
 
 import Email from 'email-templates'

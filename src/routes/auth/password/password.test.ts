@@ -1,8 +1,10 @@
 import 'jest-extended'
-import { request, user, generateRandomString } from '@shared/test-utils'
+
+import { generateRandomString, request, user } from '@shared/test-utils'
+
+import { HasuraUserData } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { selectUserByUsername } from '@shared/queries'
-import { HasuraUserData } from '@shared/helpers'
 
 it('should change the user password from the old password', async () => {
   const new_password = generateRandomString()
