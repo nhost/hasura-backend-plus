@@ -13,15 +13,19 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   const { email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
 
+  console.log('user:')
+  console.log(user);
+
   if (user) {
     throw Boom.badRequest('user already exists')
   }
 
   await checkHibp(password)
 
+  const ticket = uuidv4()
+  const password_hash = await hashPassword(password)
+
   try {
-    const ticket = uuidv4()
-    const password_hash = await hashPassword(password)
     await request(insertUser, {
       user: {
         display_name: email,
@@ -35,8 +39,13 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
         }
       }
     })
+  } catch (err) {
+    console.log(err)
+    throw Boom.badImplementation()
+  }
 
-    if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+  if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+    try {
       await emailClient.send({
         template: 'confirm',
         message: {
@@ -49,16 +58,17 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
           }
         },
         locals: {
-          ticket,
           display_name: '',
+          ticket,
           url: SERVER_URL
         }
       })
+    } catch (err) {
+      console.error(err)
+      throw Boom.badImplementation()
     }
-  } catch (err) {
-    console.log(err)
-    throw Boom.badImplementation()
   }
+
   return res.status(204).send()
 }
 

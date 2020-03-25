@@ -26,7 +26,11 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  user: { id, default_role = DEFAULT_USER_ROLE, roles = [] }
+  user: {
+     id,
+   },
+   default_role = DEFAULT_USER_ROLE,
+   roles = []
 }: UserData): string {
   const userRoles = roles.map(({ role }) => role)
 
@@ -68,19 +72,19 @@ export function asyncWrapper(fn: any) {
 export interface UserData {
   user: {
     id: string
-    active: boolean
-    default_role: string
-    roles: { role: string }[]
-    is_anonymous: boolean
-    ticket?: string
   }
+  active: boolean
+  default_role: string
+  roles: { role: string }[]
+  is_anonymous: boolean
+  ticket?: string
   otp_secret?: string
   mfa_enabled: boolean
   password_hash: string
 }
 
 export interface HasuraUserData {
-  private_user_accounts: UserData[]
+  auth_accounts: UserData[]
 }
 
 /**
@@ -95,16 +99,16 @@ export const selectUser = async (httpBody: { [key: string]: string }): Promise<U
     if (email) {
       const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
 
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
-        return hasuraData.private_user_accounts[0]
+      if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
+        return hasuraData.auth_accounts[0]
       }
     }
 
     if (ticket) {
       const hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
 
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
-        return hasuraData.private_user_accounts[0]
+      if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
+        return hasuraData.auth_accounts[0]
       }
     }
     return null
