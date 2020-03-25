@@ -13,9 +13,6 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   const { email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
 
-  console.log('user:')
-  console.log(user);
-
   if (user) {
     throw Boom.badRequest('user already exists')
   }
