@@ -1,7 +1,0 @@
-- args:
-    cascade: false
-    read_only: false
-    sql: |-
-      alter table users
-      add column new_email citext;
-  type: run_sql
