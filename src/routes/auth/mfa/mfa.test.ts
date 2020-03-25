@@ -1,16 +1,16 @@
 import 'jest-extended'
 
-import { request, user } from '@shared/test-utils'
+import { request, account } from '@shared/test-utils'
 
 import { authenticator } from 'otplib'
 
 let otpSecret: string
-let userTicket: string
+let accountTicket: string
 
 it('should generate a secret', async () => {
   const { body, status } = await request
     .post('/auth/mfa/generate')
-    .set('Authorization', `Bearer ${user.token}`)
+    .set('Authorization', `Bearer ${account.token}`)
 
   /**
    * Save OTP secret to globally scoped variable.
@@ -23,10 +23,10 @@ it('should generate a secret', async () => {
   expect(body.otp_secret).toBeString()
 })
 
-it('should enable mfa for user', async () => {
+it('should enable mfa for account', async () => {
   const { status } = await request
     .post('/auth/mfa/enable')
-    .set('Authorization', `Bearer ${user.token}`)
+    .set('Authorization', `Bearer ${account.token}`)
     .send({ code: authenticator.generate(otpSecret) })
 
   expect(status).toEqual(204)
@@ -35,12 +35,12 @@ it('should enable mfa for user', async () => {
 it('should return a ticket', async () => {
   const { body, status } = await request
     .post('/auth/login')
-    .send({ email: user.email, password: user.password })
+    .send({ email: account.email, password: account.password })
 
   /**
    * Save ticket to globally scoped varaible.
    */
-  userTicket = body.ticket
+  accountTicket = body.ticket
 
   expect(status).toEqual(200)
 
@@ -48,16 +48,16 @@ it('should return a ticket', async () => {
   expect(body.ticket).toBeString()
 })
 
-it('should sign the user in (mfa)', async () => {
+it('should sign the account in (mfa)', async () => {
   const { body, status } = await request.post('/auth/mfa/totp').send({
-    ticket: userTicket,
+    ticket: accountTicket,
     code: authenticator.generate(otpSecret)
   })
 
   /**
    * Save JWT token to globally scoped varaible.
    */
-  user.token = body.jwt_token
+  account.token = body.jwt_token
 
   expect(status).toEqual(200)
 
@@ -65,10 +65,10 @@ it('should sign the user in (mfa)', async () => {
   expect(body.jwt_expires_in).toBeNumber()
 })
 
-it('should disable mfa for user', async () => {
+it('should disable mfa for account', async () => {
   const { status } = await request
     .post('/auth/mfa/disable')
-    .set('Authorization', `Bearer ${user.token}`)
+    .set('Authorization', `Bearer ${account.token}`)
     .send({ code: authenticator.generate(otpSecret) })
 
   expect(status).toEqual(204)

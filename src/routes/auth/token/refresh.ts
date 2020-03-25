@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { UserData, asyncWrapper, createHasuraJwt, newRefreshExpiry } from '@shared/helpers'
+import { AccountData, asyncWrapper, createHasuraJwt, newRefreshExpiry } from '@shared/helpers'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -9,7 +9,7 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 interface HasuraData {
-  private_refresh_tokens: UserData[]
+  auth_refresh_tokens: { account: AccountData }[]
 }
 
 async function refreshToken({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
@@ -26,20 +26,21 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
     throw Boom.badImplementation()
   }
 
-  const refreshTokens = hasuraData.private_refresh_tokens
-
+  const refreshTokens = hasuraData.auth_refresh_tokens
   if (!refreshTokens || !refreshTokens.length) {
     throw Boom.unauthorized('Invalid or expired refresh token.')
   }
 
   const new_refresh_token = uuidv4()
-  const { id } = hasuraData.private_refresh_tokens[0].user
+  const {
+    account: { id }
+  } = hasuraData.auth_refresh_tokens[0]
 
   try {
     await request(updateRefreshToken, {
       old_refresh_token: refresh_token,
       new_refresh_token_data: {
-        user_id: id,
+        account_id: id,
         refresh_token: new_refresh_token,
         expires_at: new Date(newRefreshExpiry())
       }
@@ -55,7 +56,7 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
   })
 
   return res.send({
-    jwt_token: createHasuraJwt(hasuraData.private_refresh_tokens[0]),
+    jwt_token: createHasuraJwt(hasuraData.auth_refresh_tokens[0].account),
     jwt_expires_in: newJwtExpiry
   })
 }

@@ -1,20 +1,20 @@
 import { AUTO_ACTIVATE, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectUser } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
-import { insertUser } from '@shared/queries'
+import { insertAccount } from '@shared/queries'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function registerUser({ body }: Request, res: Response): Promise<unknown> {
+async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
   const { email, password } = await registerSchema.validateAsync(body)
-  const user = await selectUser(body)
+  const account = await selectAccount(body)
 
-  if (user) {
-    throw Boom.badRequest('user already exists')
+  if (account) {
+    throw Boom.badRequest('account already exists')
   }
 
   await checkHibp(password)
@@ -23,21 +23,17 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   const password_hash = await hashPassword(password)
 
   try {
-    await request(insertUser, {
-      user: {
-        display_name: email,
-        accounts: {
-          data: {
-            email,
-            password_hash,
-            ticket,
-            active: AUTO_ACTIVATE
-          }
+    await request(insertAccount, {
+      account: {
+        email,
+        password_hash,
+        ticket,
+        user: {
+          data: { display_name: email }
         }
       }
     })
   } catch (err) {
-    console.log(err)
     throw Boom.badImplementation()
   }
 
@@ -50,7 +46,7 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
           headers: {
             'x-activate-link': {
               prepared: true,
-              value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
+              value: `${SERVER_URL}/auth/account/activate?ticket=${ticket}`
             }
           }
         },
@@ -69,4 +65,4 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   return res.status(204).send()
 }
 
-export default asyncWrapper(registerUser)
+export default asyncWrapper(registerAccount)

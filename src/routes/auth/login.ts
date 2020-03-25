@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectUser } from '@shared/helpers'
+import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectAccount } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import { COOKIE_SECRET } from '@shared/config'
@@ -10,26 +10,23 @@ import { newJwtExpiry } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function loginUser({ body }: Request, res: Response): Promise<unknown> {
+async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
-  const hasuraUser = await selectUser(body)
 
-  if (!hasuraUser) {
-    throw Boom.badRequest('User does not exist.')
+  const account = await selectAccount(body)
+
+  if (!account) {
+    throw Boom.badRequest('Account does not exist.')
   }
 
-  const {
-    mfa_enabled,
-    password_hash,
-    user: { id, active, ticket }
-  } = hasuraUser
+  const { id, mfa_enabled, password_hash, active, ticket } = account
 
   if (mfa_enabled) {
     return res.send({ mfa: true, ticket })
   }
 
   if (!active) {
-    throw Boom.badRequest('User is not activated.')
+    throw Boom.badRequest('Account is not activated.')
   }
 
   if (!(await argon2.verify(password_hash, password))) {
@@ -41,7 +38,7 @@ async function loginUser({ body }: Request, res: Response): Promise<unknown> {
   try {
     await request(insertRefreshToken, {
       refresh_token_data: {
-        user_id: id,
+        account_id: id,
         refresh_token,
         expires_at: new Date(newRefreshExpiry())
       }
@@ -57,9 +54,9 @@ async function loginUser({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createHasuraJwt(hasuraUser),
+    jwt_token: createHasuraJwt(account),
     jwt_expires_in: newJwtExpiry
   })
 }
 
-export default asyncWrapper(loginUser)
+export default asyncWrapper(loginAccount)

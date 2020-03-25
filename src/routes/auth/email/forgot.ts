@@ -1,6 +1,6 @@
-import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { HasuraAccountData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { saveNewEmail, selectUserByEmail } from '@shared/queries'
+import { saveNewEmail, selectAccountByEmail } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { SMTP_ENABLED } from '@shared/config'
@@ -9,23 +9,23 @@ import { emailResetSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
 async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUserData
+  let hasuraData: HasuraAccountData
 
   const { email, new_email } = await emailResetSchema.validateAsync(body)
 
   try {
-    hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
+    hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const hasuraUser = hasuraData.private_user_accounts[0]
+  const account = hasuraData.auth_accounts[0]
 
-  if (!hasuraUser) {
-    throw Boom.badRequest('User does not exist.')
+  if (!account) {
+    throw Boom.badRequest('Account does not exist.')
   }
 
-  const ticket = hasuraUser.user.ticket
+  const ticket = account.ticket
 
   if (SMTP_ENABLED) {
     try {

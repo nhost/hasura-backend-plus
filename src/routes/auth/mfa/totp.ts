@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectUser } from '@shared/helpers'
+import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectAccount } from '@shared/helpers'
 import { insertRefreshToken, rotateTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -12,24 +12,20 @@ import { v4 as uuidv4 } from 'uuid'
 
 async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
   const { ticket, code } = await totpSchema.validateAsync(body)
-  const hasuraUser = await selectUser(body)
+  const account = await selectAccount(body)
 
-  if (!hasuraUser) {
+  if (!account) {
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
-  const {
-    otp_secret,
-    mfa_enabled,
-    user: { id, active }
-  } = hasuraUser
+  const { id, otp_secret, mfa_enabled, active } = account
 
   if (!mfa_enabled) {
     throw Boom.badRequest('MFA is not enabled.')
   }
 
   if (!active) {
-    throw Boom.badRequest('User is not activated.')
+    throw Boom.badRequest('Account is not activated.')
   }
 
   if (!otp_secret) {
@@ -45,14 +41,14 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
   try {
     await request(insertRefreshToken, {
       refresh_token_data: {
-        user_id: id,
+        account_id: id,
         refresh_token,
         expires_at: new Date(newRefreshExpiry())
       }
     })
 
     /**
-     * Rotate user ticket.
+     * Rotate account ticket.
      */
     await request(rotateTicket, {
       ticket,
@@ -70,7 +66,7 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
   })
 
   return res.send({
-    jwt_token: createHasuraJwt(hasuraUser),
+    jwt_token: createHasuraJwt(account),
     jwt_expires_in: newJwtExpiry
   })
 }

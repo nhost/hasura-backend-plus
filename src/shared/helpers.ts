@@ -1,6 +1,6 @@
 import { DEFAULT_USER_ROLE, HIBP_ENABLED, REFRESH_EXPIRES_IN } from './config'
 import { NextFunction, Request, Response } from 'express'
-import { selectUserByEmail, selectUserByTicket, selectUserByUsername } from './queries'
+import { selectAccountByEmail, selectAccountByTicket } from './queries'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
@@ -26,22 +26,20 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  user: {
-     id,
-   },
-   default_role = DEFAULT_USER_ROLE,
-   roles = []
-}: UserData): string {
-  const userRoles = roles.map(({ role }) => role)
+  id,
+  default_role = DEFAULT_USER_ROLE,
+  account_roles = []
+}: AccountData): string {
+  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
-  if (!userRoles.includes(default_role)) {
-    userRoles.push(default_role)
+  if (!accountRoles.includes(default_role)) {
+    accountRoles.push(default_role)
   }
 
   return sign({
     'https://hasura.io/jwt/claims': {
       'x-hasura-user-id': id,
-      'x-hasura-allowed-roles': userRoles,
+      'x-hasura-allowed-roles': accountRoles,
       'x-hasura-default-role': default_role
     }
   })
@@ -69,13 +67,15 @@ export function asyncWrapper(fn: any) {
   }
 }
 
-export interface UserData {
+export interface AccountData {
+  id: string
   user: {
     id: string
+    display_name: string
   }
   active: boolean
   default_role: string
-  roles: { role: string }[]
+  account_roles: { role: string }[]
   is_anonymous: boolean
   ticket?: string
   otp_secret?: string
@@ -83,21 +83,22 @@ export interface UserData {
   password_hash: string
 }
 
-export interface HasuraUserData {
-  auth_accounts: UserData[]
+export interface HasuraAccountData {
+  auth_accounts: AccountData[]
 }
 
 /**
- * Looks for an user in the database, first by email, second by username
+ * Looks for an account in the database, first by email, second by ticket
  * @param httpBody
- * @return user data, null if user is not found
+ * @return account data, null if account is not found
  */
-export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
+export const selectAccount = async (httpBody: {
+  [key: string]: string
+}): Promise<AccountData | null> => {
   const { email, ticket } = httpBody
-
   try {
     if (email) {
-      const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
+      const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
 
       if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
         return hasuraData.auth_accounts[0]
@@ -105,7 +106,7 @@ export const selectUser = async (httpBody: { [key: string]: string }): Promise<U
     }
 
     if (ticket) {
-      const hasuraData = (await request(selectUserByTicket, { ticket })) as HasuraUserData
+      const hasuraData = (await request(selectAccountByTicket, { ticket })) as HasuraAccountData
 
       if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
         return hasuraData.auth_accounts[0]
@@ -138,3 +139,6 @@ export const checkHibp = async (password: string): Promise<void> => {
     throw Boom.badRequest('Password is too weak.')
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const generateRandomString = (): any => Math.random().toString(36).replace('0.', '')

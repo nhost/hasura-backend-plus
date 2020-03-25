@@ -8,11 +8,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/schema'
 
 interface HasuraData {
-  update_users: { affected_rows: number }
+  update_auth_accounts: { affected_rows: number }
 }
 
-interface HasuraUser {
-  users: [{ new_email: string }]
+interface HasuraAccount {
+  auth_accounts: [{ new_email: string }]
 }
 
 async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
@@ -22,8 +22,8 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
 
   try {
     const {
-      users: [{ new_email }]
-    } = (await request(getNewEmailByTicket, { ticket })) as HasuraUser
+      auth_accounts: [{ new_email }]
+    } = (await request(getNewEmailByTicket, { ticket })) as HasuraAccount
 
     hasuraData = (await request(changeEmailByTicket, {
       ticket,
@@ -40,7 +40,7 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.badImplementation()
   }
 
-  if (!hasuraData.update_users.affected_rows) {
+  if (!hasuraData.update_auth_accounts.affected_rows) {
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
