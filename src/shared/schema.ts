@@ -36,7 +36,7 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(6).max(128).required()
+const passwordRule = Joi.string().min(3).max(128).required()
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
@@ -46,8 +46,7 @@ const userSchema = {
 }
 
 export const registerSchema = Joi.object({
-  ...userSchema,
-  username: Joi.string().alphanum().min(2).max(32).required()
+  ...userSchema
 })
 
 const ticketSchema = {

@@ -89,19 +89,11 @@ export interface HasuraUserData {
  * @return user data, null if user is not found
  */
 export const selectUser = async (httpBody: { [key: string]: string }): Promise<UserData | null> => {
-  const { username, email, ticket } = httpBody
+  const { email, ticket } = httpBody
 
   try {
     if (email) {
       const hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
-
-      if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
-        return hasuraData.private_user_accounts[0]
-      }
-    }
-
-    if (username) {
-      const hasuraData = (await request(selectUserByUsername, { username })) as HasuraUserData
 
       if (hasuraData.private_user_accounts && hasuraData.private_user_accounts.length) {
         return hasuraData.private_user_accounts[0]

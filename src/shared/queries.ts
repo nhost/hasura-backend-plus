@@ -70,13 +70,13 @@ export const selectUserById = gql`
 
 export const selectUserByEmail = gql`
   query($email: String!) {
-    private_user_accounts(where: { email: { _eq: $email } }) {
+    auth_accounts(where: { email: { _eq: $email } }) {
       otp_secret
       mfa_enabled
       password_hash
+      ticket
       user {
-        ...userFragment
-        ticket
+        id
       }
     }
   }
@@ -162,9 +162,13 @@ export const deleteAllUsersRefreshTokens = gql`
   }
 `
 
-export const activateUser = gql`
-  mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
-    update_users(
+export const activateAccount = gql`
+  mutation (
+    $ticket: uuid!,
+    $new_ticket: uuid!,
+    $now: timestamptz!
+  ) {
+     update_auth_accounts (
       where: {
         _and: { active: { _eq: false }, ticket: { _eq: $ticket }, ticket_expires_at: { _lt: $now } }
       }

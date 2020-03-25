@@ -2,6 +2,8 @@ import Boom from '@hapi/boom'
 import dotenv from 'dotenv'
 import path from 'path'
 
+console.log(process.env.NODE_ENV)
+
 // Load '.env' file if production mode, '.env.<NODE_ENV>' otherwise
 const envFile =
   process.env.NODE_ENV && process.env.NODE_ENV !== 'production'

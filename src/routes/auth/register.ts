@@ -10,7 +10,7 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 async function registerUser({ body }: Request, res: Response): Promise<unknown> {
-  const { username, email, password } = await registerSchema.validateAsync(body)
+  const { email, password } = await registerSchema.validateAsync(body)
   const user = await selectUser(body)
 
   if (user) {
@@ -24,15 +24,13 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
     const password_hash = await hashPassword(password)
     await request(insertUser, {
       user: {
-        email,
-        ticket,
-        username,
-        active: AUTO_ACTIVATE,
-        user_accounts: {
+        display_name: email,
+        accounts: {
           data: {
             email,
-            username,
-            password_hash
+            password_hash,
+            ticket,
+            active: AUTO_ACTIVATE
           }
         }
       }
@@ -52,12 +50,13 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
         },
         locals: {
           ticket,
-          username,
+          display_name: '',
           url: SERVER_URL
         }
       })
     }
   } catch (err) {
+    console.log(err)
     throw Boom.badImplementation()
   }
   return res.status(204).send()
