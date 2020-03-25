@@ -22,40 +22,45 @@ async function registerUser({ body }: Request, res: Response): Promise<unknown> 
   try {
     const ticket = uuidv4()
     const password_hash = await hashPassword(password)
-    await request(insertUser, {
-      user: {
-        email,
-        ticket,
-        username,
-        active: AUTO_ACTIVATE,
-        user_accounts: {
-          data: {
-            email,
-            username,
-            password_hash
-          }
-        }
-      }
-    })
 
-    if (!AUTO_ACTIVATE && SMTP_ENABLED) {
-      await emailClient.send({
-        template: 'confirm',
-        message: {
-          to: email,
-          headers: {
-            'x-activate-link': {
-              prepared: true,
-              value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
-            }
-          }
-        },
-        locals: {
+    try {
+      await request(insertUser, {
+        user: {
+          email,
           ticket,
           username,
-          url: SERVER_URL
+          active: AUTO_ACTIVATE,
+          user_accounts: {
+            data: {
+              email,
+              username,
+              password_hash
+            }
+          }
         }
       })
+
+      if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+        await emailClient.send({
+          template: 'confirm',
+          message: {
+            to: email,
+            headers: {
+              'x-activate-link': {
+                prepared: true,
+                value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
+              }
+            }
+          },
+          locals: {
+            ticket,
+            username,
+            url: SERVER_URL
+          }
+        })
+      }
+    } catch (err) {
+      throw new Error(err)
     }
   } catch (err) {
     throw Boom.badImplementation()
