@@ -1,14 +1,15 @@
 #!/bin/bash
+source bash-utils.sh
 # Fetch the HASURA_GRAPHQL_ADMIN_SECRET from .env.test so it is used both in the docker-compose and in jest
-HASURA_GRAPHQL_ADMIN_SECRET=$(cat .env.test | sed 's/#.*//g' | grep -o '^HASURA_GRAPHQL_ADMIN_SECRET.*' | xargs)
-export HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_GRAPHQL_ADMIN_SECRET#*=}
+export-dotenv .env.test HASURA_GRAPHQL_ADMIN_SECRET
+# Load the variables required for the Minio service
+export-dotenv .env.development S3_BUCKET
+export-dotenv .env.development S3_ACCESS_KEY_ID
+export-dotenv .env.development S3_SECRET_ACCESS_KEY
+
+# Start docker services
 docker-compose -p hbp_dev -f docker-compose.yaml -f docker-compose.dev.yaml up --build -d
-printf 'Waiting for Hasura Backend Plus to be ready...'
-until $(curl -X GET --output /dev/null --silent --head --fail http://localhost:8080/healthz); do
-    printf '.'
-    sleep 1
-done
-echo
+wait-for http://localhost:8080/healthz "Hasura Backend Plus"
 # Set the Hasura config.yaml file
 printf 'endpoint: http://localhost:8080\nHASURA_GRAPHQL_ADMIN_SECRET: %s\n' $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
 # Run the Hasura console in a detached process, that will we terminated later
