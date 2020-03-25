@@ -242,7 +242,7 @@ Use HTTP POST method.
 
 | Variable        | Type          | Required | Comment              |
 | --------------- | ------------- | -------- | -------------------- |
-| `email`         | `string`      | YES      |                      |
+| `email`         | `string`      | NO       |                      |
 | `username`      | `string`      | YES      | can be same as email |
 | `password`      | `string`      | YES      |                      |
 | `register_data` | `json object` | NO       |                      |
