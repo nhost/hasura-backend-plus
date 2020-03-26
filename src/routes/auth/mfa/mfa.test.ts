@@ -1,6 +1,6 @@
 import 'jest-extended'
 
-import { request, account } from '@shared/test-utils'
+import { account, request } from '@shared/test-utils'
 
 import { authenticator } from 'otplib'
 

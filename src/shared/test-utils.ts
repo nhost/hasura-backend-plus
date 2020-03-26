@@ -1,11 +1,11 @@
-import { AUTO_ACTIVATE } from '@shared/config'
+import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { SuperTest, Test, agent } from 'supertest'
 
-import { HasuraAccountData, generateRandomString } from '@shared/helpers'
+import { AUTO_ACTIVATE } from '@shared/config'
 import { request as admin } from '@shared/request'
 import { app } from '../server'
-import { selectAccountByEmail } from '@shared/queries'
 import { deleteEmailsOfAccount } from '@shared/test-email'
+import { selectAccountByEmail } from '@shared/queries'
 
 export let request: SuperTest<Test>
 

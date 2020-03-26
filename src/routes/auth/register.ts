@@ -14,7 +14,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   const account = await selectAccount(body)
 
   if (account) {
-    throw Boom.badRequest('account already exists')
+    throw Boom.badRequest('Account already exists.')
   }
 
   await checkHibp(password)

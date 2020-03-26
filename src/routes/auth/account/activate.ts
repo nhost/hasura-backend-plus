@@ -38,6 +38,7 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
 
   if (!affected_rows) {
     console.error('Invalid or expired ticket')
+
     if (REDIRECT_URL_ERROR) {
       return res.redirect(302, REDIRECT_URL_ERROR as string)
     }

@@ -1,4 +1,5 @@
 import fetch, { Response } from 'node-fetch'
+
 import { SMTP_HOST } from '@shared/config'
 
 interface MailhogEmailAddress {

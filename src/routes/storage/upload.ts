@@ -11,7 +11,7 @@ import { verify } from '@shared/jwt'
 
 async function uploadFile(req: Request, res: Response): Promise<unknown> {
   if (!req.files?.file) {
-    throw Boom.badRequest('No file')
+    throw Boom.notFound()
   }
 
   // get file being uploaded

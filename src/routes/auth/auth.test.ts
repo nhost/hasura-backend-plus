@@ -1,10 +1,11 @@
 /* eslint-disable jest/no-standalone-expect */
+
 import 'jest-extended'
 
 import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
+import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-email'
 
-import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
 import request from 'supertest'
@@ -40,7 +41,7 @@ it('should tell the account already exists', async () => {
     body: { message }
   } = await agent.post('/auth/register').send({ email, password })
   expect(status).toEqual(400)
-  expect(message).toEqual('account already exists')
+  expect(message).toEqual('Account already exists.')
 })
 
 /**
