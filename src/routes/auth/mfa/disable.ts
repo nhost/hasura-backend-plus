@@ -1,6 +1,6 @@
-import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { HasuraAccountData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { deleteOtpSecret, selectUserById } from '@shared/queries'
+import { deleteOtpSecret, selectAccountById } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
@@ -9,20 +9,20 @@ import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
 async function disableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUserData
+  let hasuraData: HasuraAccountData
 
   const { code } = await mfaSchema.validateAsync(body)
 
   const decodedToken = verify(headers.authorization)
-  const user_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const account_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = (await request(selectUserById, { user_id })) as HasuraUserData
+    hasuraData = (await request(selectAccountById, { account_id })) as HasuraAccountData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const { otp_secret, mfa_enabled } = hasuraData.private_user_accounts[0]
+  const { otp_secret, mfa_enabled } = hasuraData.auth_accounts[0]
 
   if (!mfa_enabled) {
     throw Boom.badRequest('MFA is already disabled.')
@@ -34,7 +34,7 @@ async function disableMfa({ headers, body }: Request, res: Response): Promise<un
   }
 
   try {
-    hasuraData = (await request(deleteOtpSecret, { user_id })) as HasuraUserData
+    hasuraData = (await request(deleteOtpSecret, { account_id })) as HasuraAccountData
   } catch (err) {
     throw Boom.badImplementation()
   }

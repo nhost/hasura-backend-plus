@@ -22,7 +22,7 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
       jwtKey.toPEM(true)
     } catch (error) {
       throw Boom.badImplementation(
-        `Invalid RSA private key in the JWT_SECRET_KEY environment variable.`
+        'Invalid RSA private key in the JWT_SECRET_KEY environment variable.'
       )
     }
   } else {
@@ -36,7 +36,7 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
   }
 } else if (SHA_TYPES.includes(JWT_ALGORITHM)) {
   if (!jwtKey) {
-    throw Boom.badImplementation(`Empty JWT secret key.`)
+    throw Boom.badImplementation('Empty JWT secret key.')
   }
 } else {
   throw Boom.badImplementation(`Invalid JWT algorithm: ${JWT_ALGORITHM}`)
@@ -92,7 +92,7 @@ interface Token {
 export function verify(authorization: string | undefined): Token {
   try {
     if (!authorization) {
-      throw Boom.unauthorized('Missing Authorization header')
+      throw Boom.unauthorized('Missing Authorization header.')
     }
     const token = authorization.replace('Bearer ', '')
     return JWT.verify(token, jwtKey) as Token

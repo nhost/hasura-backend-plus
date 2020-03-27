@@ -3,15 +3,14 @@ endpoints:
   - category: Authentication
     endpoints:
       - path: /auth/register
-        name: User registration
+        name: Account registration
         description: Long description
         request:
           email: hello@example.com
           password: between 6-128 characters
-          username: alphanumeric string between 2-32 in length
         response: 204 No Content
       - path: /auth/login
-        name: User login
+        name: Account login
         description: Long description
         request:
           email: hello@example.com
@@ -23,11 +22,11 @@ endpoints:
 
 | Category                          | Path                                             | Description          |
 | --------------------------------- | ------------------------------------------------ | -------------------- |
-| [Authentication](#authentication) | [POST /auth/register](#registration)             | User registration    |
-| ^^                                | [POST /auth/login](#login)                       | User login           |
-| ^^                                | [POST /auth/user/activate](#activation)          | User activation      |
-| ^^                                | [POST /auth/user/forgot](#forgotten-password)    | Forgotten password   |
-| ^^                                | [POST /auth/user/remove](#remove-user)           | Remove user          |
+| [Authentication](#authentication) | [POST /auth/register](#registration)             | Account registration |
+| ^^                                | [POST /auth/login](#login)                       | Account login        |
+| ^^                                | [POST /auth/account/activate](#activation)       | Account activation   |
+| ^^                                | [POST /auth/account/forgot](#forgotten-password) | Forgotten password   |
+| ^^                                | [POST /auth/account/remove](#remove-account)     | Remove account       |
 | ^^                                | [POST /auth/token/refresh](#refresh-token)       | Refresh token        |
 | ^^                                | [POST /auth/token/revoke](#revoke-token)         | Revoke token         |
 | ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code) | Generate MFA QR code |
@@ -45,8 +44,7 @@ endpoints:
 ```json
 {
   "email": "hello@example.com",
-  "password": "between 6-128 characters",
-  "username": "alphanumeric string between 2-32 in length"
+  "password": "between 6-128 characters"
 }
 ```
 
@@ -116,7 +114,7 @@ Set-Cookie: refresh_token=...
 204 No Content
 ```
 
-### Remove user
+### Remove account
 
 #### Request
 

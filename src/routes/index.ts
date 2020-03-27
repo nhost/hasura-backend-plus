@@ -1,15 +1,15 @@
 import {
-  activateUser,
-  deleteUser,
+  activateAccount,
+  deleteAccount,
   disableMfa,
   enableMfa,
   forgotEmail,
   forgotPassword,
   generateMfa,
   getJwks,
-  loginUser,
+  loginAccount,
   refreshToken,
-  registerUser,
+  registerAccount,
   resetEmail,
   resetPassword,
   revokeToken,
@@ -22,14 +22,14 @@ import { Router } from 'express'
 export const router = Router()
   .get('/auth/jwks', getJwks)
 
-  .post('/auth/login', loginUser)
-  .post('/auth/register', registerUser)
+  .post('/auth/login', loginAccount)
+  .post('/auth/register', registerAccount)
 
   .post('/auth/token/refresh', refreshToken)
   .post('/auth/token/revoke', revokeToken)
 
-  .get('/auth/user/activate', activateUser)
-  .post('/auth/user/delete', deleteUser)
+  .get('/auth/account/activate', activateAccount)
+  .post('/auth/account/delete', deleteAccount)
 
   .post('/auth/password/forgot', forgotPassword)
   .post('/auth/password/reset', resetPassword)

@@ -48,7 +48,7 @@ async function revokeFile(req: Request, res: Response): Promise<unknown> {
   try {
     await s3.copyObject(new_params).promise()
   } catch (e) {
-    throw Boom.badImplementation('Could not generate token')
+    throw Boom.badImplementation('Unable to generate token.')
   }
 
   // return info about the uploaded file

@@ -1,4 +1,4 @@
-import { HasuraUserData, asyncWrapper } from '@shared/helpers'
+import { HasuraAccountData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
@@ -6,29 +6,29 @@ import { SMTP_ENABLED } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/schema'
 import { request } from '@shared/request'
-import { selectUserByEmail } from '@shared/queries'
+import { selectAccountByEmail } from '@shared/queries'
 
 /**
- * * Creates a new temporary ticket in the user account, and optionnaly send the link by email
+ * * Creates a new temporary ticket in the account, and optionnaly send the link by email
  */
 async function forgotPassword({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUserData
+  let hasuraData: HasuraAccountData
 
   const { email } = await forgotSchema.validateAsync(body)
 
   try {
-    hasuraData = (await request(selectUserByEmail, { email })) as HasuraUserData
+    hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
   } catch (err) {
     throw Boom.badImplementation()
   }
 
-  const hasuraUser = hasuraData.private_user_accounts[0]
+  const account = hasuraData.auth_accounts[0]
 
-  if (!hasuraUser) {
-    throw Boom.badRequest('User does not exist.')
+  if (!account) {
+    throw Boom.badRequest('Account does not exist.')
   }
 
-  const ticket = hasuraUser.user.ticket
+  const { ticket } = account
 
   if (SMTP_ENABLED) {
     try {

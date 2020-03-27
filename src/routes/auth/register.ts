@@ -1,71 +1,68 @@
 import { AUTO_ACTIVATE, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectUser } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
-import { insertUser } from '@shared/queries'
+import { insertAccount } from '@shared/queries'
 import { registerSchema } from '@shared/schema'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
-async function registerUser({ body }: Request, res: Response): Promise<unknown> {
-  const { username, email, password } = await registerSchema.validateAsync(body)
-  const user = await selectUser(body)
+async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
+  const { email, password } = await registerSchema.validateAsync(body)
+  const account = await selectAccount(body)
 
-  if (user) {
-    throw Boom.badRequest('user already exists')
+  if (account) {
+    throw Boom.badRequest('Account already exists.')
   }
 
   await checkHibp(password)
 
+  const ticket = uuidv4()
+  const password_hash = await hashPassword(password)
+
   try {
-    const ticket = uuidv4()
-    const password_hash = await hashPassword(password)
-
-    try {
-      await request(insertUser, {
+    await request(insertAccount, {
+      account: {
+        email,
+        password_hash,
+        ticket,
         user: {
-          email,
-          ticket,
-          username,
-          active: AUTO_ACTIVATE,
-          user_accounts: {
-            data: {
-              email,
-              username,
-              password_hash
-            }
-          }
+          data: { display_name: email }
         }
-      })
-
-      if (!AUTO_ACTIVATE && SMTP_ENABLED) {
-        await emailClient.send({
-          template: 'confirm',
-          message: {
-            to: email,
-            headers: {
-              'x-activate-link': {
-                prepared: true,
-                value: `${SERVER_URL}/auth/user/activate?ticket=${ticket}`
-              }
-            }
-          },
-          locals: {
-            ticket,
-            username,
-            url: SERVER_URL
-          }
-        })
       }
-    } catch (err) {
-      throw new Error(err)
-    }
+    })
   } catch (err) {
     throw Boom.badImplementation()
   }
+
+  if (!AUTO_ACTIVATE && SMTP_ENABLED) {
+    try {
+      await emailClient.send({
+        template: 'confirm',
+        message: {
+          to: email,
+          headers: {
+            'x-activate-link': {
+              prepared: true,
+              value: `${SERVER_URL}/auth/account/activate?ticket=${ticket}`
+            }
+          }
+        },
+        locals: {
+          display_name: '',
+          ticket,
+          url: SERVER_URL
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      throw Boom.badImplementation()
+    }
+  }
+
   return res.status(204).send()
 }
 
-export default asyncWrapper(registerUser)
+export default asyncWrapper(registerAccount)

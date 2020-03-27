@@ -10,7 +10,7 @@
 
 ## Checking Pwned Passwords
 
-## User activation emails
+## Account activation emails
 
 ## Rate limiting
 
