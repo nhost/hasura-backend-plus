@@ -113,7 +113,7 @@ router.post('/new-password', async (req, res, next) => {
     $new_secret_token: uuid!
     $now: timestamptz!
   ) {
-    update_user_account_password: update_user_accounts (
+    update_user_account_password: update_auth_user_accounts (
       where: {
         _and: [
           {
