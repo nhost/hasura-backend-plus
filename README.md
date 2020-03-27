@@ -1,12 +1,11 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
-    <img
-      src="docs/.vuepress/public/logo.png"
-      width="250px"
-      alt="HBP"
-    />
+    <img src="docs/.vuepress/public/logo.png" width="250px" alt="HBP" />
   </a>
 </p>
+
+<h3 align="center">Hasura Backend Plus (HBP)</h3>
+<h4 align="center">Auth & Files (S3-Compatible Object Storage) for Hasura</h4>
 
 <p align="center">
   <img
@@ -15,14 +14,25 @@
 
   <a href="LICENSE">
     <img
-      src="https://img.shields.io/badge/License-MIT-yellow.svg"
-      alt="License: MIT"
+      src="https://img.shields.io/badge/license-MIT-yellow.svg"
+      alt="license: MIT"
+    />
+  </a>
+
+  <a href="https://commitizen.github.io/cz-cli">
+    <img
+      src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"
+      alt="commitizen: friendly"
+    />
+  </a>
+
+  <a href="https://prettier.io">
+    <img
+      src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg"
+      alt="code style: prettier"
     />
   </a>
 </p>
-
-<h3 align="center">Hasura Backend Plus (HBP)</h3>
-<h4 align="center">Auth & Files (S3-Compatible Object Storage) for Hasura</h4>
 
 ---
 
