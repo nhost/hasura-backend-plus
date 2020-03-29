@@ -32,8 +32,7 @@ services:
     image: minio/minio
     restart: always
     volumes:
-      - './minio_volume/data:/export'
-      - './minio_volume/config:/root/.minio'
+      - 'minio_data:/data'
     ports:
       - 8000:9000
     environment:
@@ -44,3 +43,4 @@ services:
     command: "-c 'mkdir -p /export/$${S3_BUCKET} && /usr/bin/minio server /export'"
 volumes:
   db_data:
+  minio_data:

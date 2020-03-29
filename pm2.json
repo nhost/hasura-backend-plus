@@ -1,6 +1,0 @@
-{
-  "name": "hasura-backend-plus",
-  "script": "./node_modules/.bin/ts-node",
-  "args": "-r tsconfig-paths/register src/start.ts",
-  "watch": true
-}
