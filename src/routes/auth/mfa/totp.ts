@@ -61,8 +61,9 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
 
   res.cookie('refresh_token', refresh_token, {
     httpOnly: true,
+    maxAge: newRefreshExpiry(),
     signed: Boolean(COOKIE_SECRET),
-    maxAge: newRefreshExpiry()
+    expires: new Date(newRefreshExpiry())
   })
 
   return res.send({
