@@ -15,3 +15,27 @@ wait-for() { # wait-for <url> <service-name(optional)>
     done
     echo
 }
+
+script_args() {
+    while :; do
+        case $1 in
+            -h|-\?|--help)
+                printf "Usage:\n\t$0 [flags]\nFlags:\n\t -b, --build\t\tForce build the docker file\n\t -h, --help\t\tShow help\n"
+                exit
+                ;;
+            -b|--build)
+                build="--build"
+                ;;
+            --)
+                shift
+                break
+                ;;
+            -?*)
+                printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+                ;;
+            *)
+                break
+        esac
+        shift
+    done
+}
