@@ -1,7 +1,7 @@
 import 'jest-extended'
 
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
-import { account, request } from '@shared/test-utils'
+import { account, request } from '@shared/test-mock-account'
 
 import { request as admin } from '@shared/request'
 import { selectAccountByEmail } from '@shared/queries'

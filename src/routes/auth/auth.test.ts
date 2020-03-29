@@ -4,7 +4,7 @@ import 'jest-extended'
 
 import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
-import { deleteMailHogEmail, mailHogSearch } from '@shared/test-email'
+import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
