@@ -11,7 +11,7 @@ export let request: SuperTest<Test>
 
 export let account: TestAccount
 
-// * Code that is executed before any jest test file that imports test-utiles
+// * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {
   request = agent(app) // * Create the SuperTest agent
   // * Create a mock account
