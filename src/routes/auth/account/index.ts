@@ -1,2 +1,6 @@
-export { default as deleteAccount } from './delete'
-export { default as activateAccount } from './activate'
+import { Router } from 'express'
+
+import deleteAccount from './delete'
+import activateAccount from './activate'
+
+export default Router().get('/activate', activateAccount).post('/delete', deleteAccount)
