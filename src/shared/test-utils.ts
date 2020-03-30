@@ -1,55 +1,69 @@
-import { HasuraAccountData, generateRandomString } from '@shared/helpers'
-import { SuperTest, Test, agent } from 'supertest'
+import fetch, { Response } from 'node-fetch'
 
-import { AUTO_ACTIVATE } from '@shared/config'
-import { request as admin } from '@shared/request'
-import { app } from '../server'
-import { deleteEmailsOfAccount } from '@shared/test-email'
-import { selectAccountByEmail } from '@shared/queries'
+import { SMTP_HOST } from '@shared/config'
+import { generateRandomString } from '@shared/helpers'
 
-export let request: SuperTest<Test>
+interface MailhogEmailAddress {
+  Relays: string | null
+  Mailbox: string
+  Domain: string
+  Params: string
+}
+interface MailhogMessage {
+  ID: string
+  From: MailhogEmailAddress
+  To: MailhogEmailAddress[]
+  Content: {
+    Headers: {
+      'Content-Type': string[]
+      Date: string[]
+      From: string[]
+      'MIME-Version': string[]
+      'Message-ID': string[]
+      Received: string[]
+      'Return-Path': string[]
+      Subject: string[]
+      To: string[]
+      [key: string]: string[]
+    }
+    Body: string
+    Size: number
+  }
+  Created: string
+  Raw: {
+    From: string
+    To: string[]
+    Data: string
+  }
+}
 
-interface TestAccount {
+export interface MailhogSearchResult {
+  total: number
+  count: number
+  start: number
+  items: MailhogMessage[]
+}
+
+export interface TestAccount {
   email: string
   password: string
   token?: string
 }
 
-export const createAccount = (): TestAccount => {
-  return {
-    email: `${generateRandomString()}@${generateRandomString()}.com`,
-    password: generateRandomString()
-  }
+export const createAccount = (): TestAccount => ({
+  email: `${generateRandomString()}@${generateRandomString()}.com`,
+  password: generateRandomString()
+})
+
+export const mailHogSearch = async (query: string, fields = 'to'): Promise<MailhogMessage[]> => {
+  const response = await fetch(
+    `http://${SMTP_HOST}:8025/api/v2/search?kind=${fields}&query=${query}`
+  )
+  return ((await response.json()) as MailhogSearchResult).items
 }
 
-export let account: TestAccount
+export const deleteMailHogEmail = async ({ ID }: MailhogMessage): Promise<Response> =>
+  await fetch(`http://${SMTP_HOST}:8025/api/v1/messages/${ID}`, { method: 'DELETE' })
 
-// * Code that is executed before any jest test file that imports test-utiles
-beforeAll(async () => {
-  request = agent(app) // * Create the SuperTest agent
-  // * Create a mock account
-  const { email, password } = createAccount()
-  await request.post('/auth/register').send({ email, password })
-  if (!AUTO_ACTIVATE) {
-    const hasuraData = (await admin(selectAccountByEmail, { email })) as HasuraAccountData
-    const ticket = hasuraData.auth_accounts[0].ticket
-    await request.get(`/auth/account/activate?ticket=${ticket}`)
-  }
-  const {
-    body: { jwt_token: token }
-  } = await request.post('/auth/login').send({ email, password })
-  // * Set the use variable so it is accessible to the jest test file
-  account = {
-    email,
-    password,
-    token
-  }
-})
-
-// * Code that is executed after any jest test file that imports test-utiles
-afterAll(async () => {
-  // * Delete the account
-  await request.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
-  // * Remove any message sent to this account
-  await deleteEmailsOfAccount(account.email)
-})
+export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
+  (await mailHogSearch(email)).forEach(async (message) => await deleteMailHogEmail(message))

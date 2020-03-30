@@ -1,2 +1,4 @@
-export { default as revokeToken } from './revoke'
-export { default as refreshToken } from './refresh'
+import { Router } from 'express'
+import revokeToken from './revoke'
+import refreshToken from './refresh'
+export default Router().post('/refresh', refreshToken).post('/revoke', revokeToken)

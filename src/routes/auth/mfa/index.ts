@@ -1,4 +1,12 @@
-export { default as totpLogin } from './totp'
-export { default as enableMfa } from './enable'
-export { default as disableMfa } from './disable'
-export { default as generateMfa } from './generate'
+import { Router } from 'express'
+
+import totpLogin from './totp'
+import enableMfa from './enable'
+import disableMfa from './disable'
+import generateMfa from './generate'
+
+export default Router()
+  .post('/disable', disableMfa)
+  .post('/enable', enableMfa)
+  .post('/generate', generateMfa)
+  .post('/totp', totpLogin)

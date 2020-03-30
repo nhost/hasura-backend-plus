@@ -15,7 +15,7 @@ services:
       - 'postgres'
     restart: always
     environment:
-      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?Environment variable HASURA_GRAPHQL_ADMIN_SECRET is missing.}'
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/postgres
       HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
     volumes:
@@ -25,7 +25,22 @@ services:
     ports:
       - '3000:3000'
     environment:
-      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?Environment variable HASURA_GRAPHQL_ADMIN_SECRET is missing.}'
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
+      S3_ENDPOINT: http://minio:9000
+  minio:
+    image: minio/minio
+    restart: always
+    volumes:
+      - 'minio_data:/data'
+    ports:
+      - 8000:9000
+    environment:
+      S3_BUCKET: '${S3_BUCKET:-hasura-backend-plus}'
+      MINIO_ACCESS_KEY: '${S3_ACCESS_KEY_ID:?MINIO_ACCESS_KEY}' ## min 8 character
+      MINIO_SECRET_KEY: '${S3_SECRET_ACCESS_KEY:?MINIO_SECRET_KEY}' ## min 8 character
+    entrypoint: sh
+    command: "-c 'mkdir -p /export/$${S3_BUCKET} && /usr/bin/minio server /export'"
 volumes:
   db_data:
+  minio_data:
