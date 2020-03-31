@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+import { USER_FIELDS } from './config'
 
 export const insertAccount = gql`
   mutation($account: auth_accounts_insert_input!) {
@@ -40,6 +41,7 @@ const accountFragment = gql`
     }
     user {
       id
+      ${USER_FIELDS.join('\n\t\t\t')}
     }
     is_anonymous
     ticket
