@@ -50,8 +50,9 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
 
   res.cookie('refresh_token', new_refresh_token, {
     httpOnly: true,
+    maxAge: newRefreshExpiry(),
     signed: Boolean(COOKIE_SECRET),
-    maxAge: newRefreshExpiry()
+    expires: new Date(newRefreshExpiry())
   })
 
   return res.send({

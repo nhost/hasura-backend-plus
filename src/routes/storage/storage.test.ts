@@ -64,4 +64,3 @@ it('should delete file', async () => {
     .set('Authorization', `Bearer ${account.token}`)
     .query({ token: newFileToken })
   expect(status).toEqual(204)
-})
