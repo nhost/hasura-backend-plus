@@ -12,6 +12,9 @@ services:
       SMTP_SECURE: 'false'
     volumes:
       - ./coverage:/app/coverage
+  graphql-engine:
+    volumes:
+      - ./mock-config/migrations/1585679214182_custom_user_column:/hasura-migrations/1585679214182_custom_user_column
   mailhog:
     image: mailhog/mailhog
     ports:
