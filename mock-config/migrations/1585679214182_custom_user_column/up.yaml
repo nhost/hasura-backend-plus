@@ -1,5 +1,5 @@
 - args:
     cascade: false
     read_only: false
-    sql: ALTER TABLE "public"."users" ADD COLUMN "name" text NULL DEFAULT 'mock_name';
+    sql: ALTER TABLE "public"."users" ADD COLUMN "name" text NULL;
   type: run_sql

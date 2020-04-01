@@ -33,7 +33,7 @@ const password = generateRandomString()
 const agent = request(app)
 
 it('should create an account', async () => {
-  const { status } = await agent.post('/auth/register').send({ email, password })
+  const { status } = await agent.post('/auth/register').send({ email, password , user_data: { name: 'Test name' } })
   expect(status).toEqual(204)
 })
 
@@ -86,7 +86,7 @@ it('should decode a valid custom user claim', async () => {
   const decodedJwt = JWT.decode(jwtToken) as Token
   expect(decodedJwt['https://hasura.io/jwt/claims']).toBeObject()
   // Test if the custom claims work
-  expect(decodedJwt['https://hasura.io/jwt/claims']['x-name']).toEqual('mock_name')
+  expect(decodedJwt['https://hasura.io/jwt/claims']['x-name']).toEqual('Test name')
 })
 
 it('should delete the account', async () => {
