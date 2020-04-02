@@ -1,11 +1,10 @@
 {
   "exclude": ["node_modules", "**/*.spec.ts"],
-  "include": ["src", "custom"],
+  "include": ["src"],
   "compilerOptions": {
     "lib": ["dom", "es2020"],
     "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@custom/*": ["custom/*"]
+      "@shared/*": ["src/shared/*"]
     },
     "module": "commonjs",
     "outDir": "dist",

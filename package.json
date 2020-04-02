@@ -128,8 +128,7 @@
     "preset": "ts-jest",
     "verbose": true,
     "moduleNameMapper": {
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1",
-      "^@custom/(.*)$": "<rootDir>/custom/$1"
+      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
     },
     "setupFilesAfterEnv": [
       "jest-extended"
