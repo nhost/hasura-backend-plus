@@ -1,0 +1,13 @@
+functions:
+  isAuthenticated: 'return !!request.auth'
+  isOwner:
+    params:
+      - userId
+    code: "return !!request.auth && userId === request.auth['x-hasura-user-id']"
+  validToken: 'return request.query.token === resource.metadata.token'
+paths:
+  /user/:userId/:fileId:
+    read: 'isOwner(userId) || validToken()'
+    write: 'isOwner(userId)'
+  /upload:
+    create: 'isAuthenticated()'

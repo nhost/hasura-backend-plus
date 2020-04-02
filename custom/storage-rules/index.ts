@@ -10,11 +10,11 @@ import { Claims } from '@shared/jwt'
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function storagePermission(key: string, type: string, claims: Claims): boolean {
-  console.log('Check Storage Permissions')
+  // console.log('Check Storage Permissions')
 
-  console.log(`Key: ${key}`)
-  console.log(`Type: ${type}`)
-  console.log(`Claims:`)
+  // console.log(`Key: ${key}`, )
+  // console.log(`Type: ${type}`)
+  // console.log(`Claims:`)
 
   return true
 }
