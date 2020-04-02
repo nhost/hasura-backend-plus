@@ -1,8 +1,9 @@
 import { Router, NextFunction, Request, Response } from 'express'
 
 import { STORAGE_RULES } from './utils'
-import { upsertFile } from './upsert'
+import { uploadFile } from './upload'
 import { getFile } from './get'
+import { deleteFile } from './delete'
 const router = Router()
 
 const createSecureMiddleware = (fn: Function, rules: (string | undefined)[]) => (
@@ -14,22 +15,21 @@ const createSecureMiddleware = (fn: Function, rules: (string | undefined)[]) => 
 for (const path in STORAGE_RULES.paths) {
   const rule = STORAGE_RULES.paths[path]
   if (rule.create || rule.update || rule.write) {
-    router.post(path, createSecureMiddleware(upsertFile, [rule.create, rule.update, rule.write]))
+    router.post(path, createSecureMiddleware(uploadFile, [rule.create, rule.update, rule.write]))
   }
   if (rule.get || rule.read) {
     router.get(path, createSecureMiddleware(getFile, [rule.get, rule.read]))
   }
-  if (rule.list || rule.read) {
-    router.get(`${path}/`, () => {
-      console.log('TODO')
-    })
-  }
+  // TODO list
+  // if (rule.list || rule.read) {
+  //   router.get(`${path}/`, () => {
+  //     console.log('TODO')
+  //   })
+  // }
   if (rule.delete || rule.write) {
-    router.delete(path, () => {
-      console.log('TODO')
-    })
+    router.delete(path, createSecureMiddleware(deleteFile, [rule.delete, rule.write]))
   }
+  // TODO metadata
 }
 
-// TODO metadata
 export default router

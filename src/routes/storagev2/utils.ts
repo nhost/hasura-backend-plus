@@ -4,6 +4,10 @@ import safeEval, { FunctionFactory } from 'notevil'
 import { verify } from '@shared/jwt'
 import { Request } from 'express'
 import path from 'path'
+import Boom from '@hapi/boom'
+import { S3_BUCKET } from '@shared/config'
+import { s3 } from '@shared/s3'
+import { HeadObjectOutput } from 'aws-sdk/clients/s3'
 
 type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> &
   {
@@ -92,6 +96,18 @@ export const hasPermission = (rules: (string | undefined)[], context: object): b
 
 // Creates an object key that is the path without the first character '/'
 export const getKey = (req: Request): string => req.path.substring(1)
+
+export const getResource = async (req: Request): Promise<HeadObjectOutput> => {
+  const params = {
+    Bucket: S3_BUCKET as string,
+    Key: getKey(req)
+  }
+  try {
+    return await s3.headObject(params).promise()
+  } catch (err) {
+    throw Boom.notFound()
+  }
+}
 
 // * See: https://firebase.google.com/docs/reference/security/storage
 // TODO add timestamps and duration

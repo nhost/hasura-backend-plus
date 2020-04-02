@@ -3,8 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
-import { hasPermission, createContext, getKey } from './utils'
-import { HeadObjectOutput } from 'aws-sdk/clients/s3'
+import { hasPermission, createContext, getKey, getResource } from './utils'
 
 export const getFile = async (
   req: Request,
@@ -12,20 +11,12 @@ export const getFile = async (
   _next: NextFunction,
   rules: (string | undefined)[]
 ): Promise<void> => {
-  const key = getKey(req)
-  console.log(`Get ${key}`)
-  let resource: HeadObjectOutput
   // get file info
   const params = {
     Bucket: S3_BUCKET as string,
-    Key: key
+    Key: getKey(req)
   }
-
-  try {
-    resource = await s3.headObject(params).promise()
-  } catch (err) {
-    throw Boom.notFound()
-  }
+  const resource = await getResource(req)
 
   if (!resource?.Metadata) {
     throw Boom.forbidden()

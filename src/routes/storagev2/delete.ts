@@ -1,27 +1,27 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
-import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
-import { storagePermission } from '@custom/storage-rules'
-import { verify } from '@shared/jwt'
+import { getKey, createContext, hasPermission, getResource } from './utils'
 
-async function deleteFile(req: Request, res: Response): Promise<unknown> {
-  const key = req.params[0]
-
-  // check storage rules if allowed to get meta info of file
-  const jwt_token = verify(req.headers.authorization)
-  const claims = jwt_token['https://hasura.io/jwt/claims']
-
-  if (!storagePermission(key, 'write', claims)) {
-    throw Boom.forbidden()
-  }
-
+export const deleteFile = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+  rules: (string | undefined)[]
+): Promise<unknown> => {
   // get file info
   const params = {
     Bucket: S3_BUCKET as string,
-    Key: key
+    Key: getKey(req)
+  }
+
+  const resource = await getResource(req)
+  const context = createContext(req, resource)
+
+  if (!hasPermission(rules, context)) {
+    throw Boom.forbidden()
   }
 
   try {
@@ -32,5 +32,3 @@ async function deleteFile(req: Request, res: Response): Promise<unknown> {
 
   return res.sendStatus(204)
 }
-
-export default asyncWrapper(deleteFile)

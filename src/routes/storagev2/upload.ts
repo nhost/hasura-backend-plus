@@ -6,16 +6,18 @@ import { UploadedFile } from 'express-fileupload'
 import { s3 } from '@shared/s3'
 import { hasPermission, createContext, getKey } from './utils'
 
-export const upsertFile = async (
+export const uploadFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
   rules: (string | undefined)[]
 ): Promise<unknown> => {
   const key = getKey(req)
+
   if (!req.files?.file) {
     throw Boom.notFound()
   }
+
   const resource = req.files.file as UploadedFile
   const context = createContext(req, resource)
 
