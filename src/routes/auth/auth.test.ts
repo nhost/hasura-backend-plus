@@ -1,6 +1,7 @@
 /* eslint-disable jest/no-standalone-expect */
 
 import 'jest-extended'
+import { JWT } from 'jose'
 
 import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
@@ -10,6 +11,7 @@ import { request as admin } from '@shared/request'
 import { app } from '../../server'
 import request from 'supertest'
 import { selectAccountByEmail } from '@shared/queries'
+import { Token } from '@shared/jwt'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 console.error = function (): void {} // Disable the errors that will be raised by the tests
@@ -31,7 +33,7 @@ const password = generateRandomString()
 const agent = request(app)
 
 it('should create an account', async () => {
-  const { status } = await agent.post('/auth/register').send({ email, password })
+  const { status } = await agent.post('/auth/register').send({ email, password , user_data: { name: 'Test name' } })
   expect(status).toEqual(204)
 })
 
@@ -78,6 +80,13 @@ it('should sign the user in', async () => {
 
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should decode a valid custom user claim', async () => {
+  const decodedJwt = JWT.decode(jwtToken) as Token
+  expect(decodedJwt['https://hasura.io/jwt/claims']).toBeObject()
+  // Test if the custom claims work
+  expect(decodedJwt['https://hasura.io/jwt/claims']['x-name']).toEqual('Test name')
 })
 
 it('should delete the account', async () => {

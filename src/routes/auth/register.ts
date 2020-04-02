@@ -10,7 +10,7 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
 async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
-  const { email, password } = await registerSchema.validateAsync(body)
+  const { email, password, user_data = {} } = await registerSchema.validateAsync(body)
   const account = await selectAccount(body)
 
   if (account) {
@@ -29,7 +29,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
         password_hash,
         ticket,
         user: {
-          data: { display_name: email }
+          data: { display_name: email, ...user_data }
         }
       }
     })

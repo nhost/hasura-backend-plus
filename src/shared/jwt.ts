@@ -66,6 +66,16 @@ export const sign = (payload: object): string =>
     expiresIn: `${JWT_EXPIRES_IN}m`
   })
 
+export type ClaimValueType =
+  | string
+  | string[]
+  | number
+  | number[]
+  | RegExp
+  | RegExp[]
+  | boolean
+  | boolean[]
+
 /**
  * Claims interface.
  */
@@ -73,13 +83,13 @@ export interface Claims {
   'x-hasura-user-id': string
   'x-hasura-default-role': string
   'x-hasura-allowed-roles': string[]
-  [key: string]: string | string[]
+  [key: string]: ClaimValueType
 }
 
 /**
  * Token interface.
  */
-interface Token {
+export interface Token {
   'https://hasura.io/jwt/claims': Claims
   exp: bigint
   iat: bigint

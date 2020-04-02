@@ -1,13 +1,14 @@
 import { DEFAULT_USER_ROLE, HIBP_ENABLED, REFRESH_EXPIRES_IN } from './config'
 import { NextFunction, Request, Response } from 'express'
 import { selectAccountByEmail, selectAccountByTicket } from './queries'
+import kebabCase from 'lodash.kebabcase'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import argon2 from 'argon2'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
-import { sign } from './jwt'
+import { sign, ClaimValueType } from './jwt'
 
 /**
  * New refresh token expiry date.
@@ -28,19 +29,29 @@ export function newRefreshExpiry(): number {
 export function createHasuraJwt({
   id,
   default_role = DEFAULT_USER_ROLE,
-  account_roles = []
+  account_roles = [],
+  user
 }: AccountData): string {
   const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
   if (!accountRoles.includes(default_role)) {
     accountRoles.push(default_role)
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _user_id, ...customFields } = user
   return sign({
     'https://hasura.io/jwt/claims': {
       'x-hasura-user-id': id,
       'x-hasura-allowed-roles': accountRoles,
-      'x-hasura-default-role': default_role
+      'x-hasura-default-role': default_role,
+      // Add custom fields based on the user fields fetched from the GQL query
+      ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
+        (aggr, [key, value]) => ({
+          ...aggr,
+          [`x-${kebabCase(key)}`]: value
+        }),
+        {}
+      )
     }
   })
 }
@@ -71,7 +82,7 @@ export interface AccountData {
   id: string
   user: {
     id: string
-    display_name: string
+    [key: string]: ClaimValueType
   }
   active: boolean
   default_role: string

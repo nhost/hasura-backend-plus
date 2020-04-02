@@ -75,3 +75,11 @@ export const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/p
 if (!HASURA_ENDPOINT) {
   throw Boom.badImplementation('No Hasura GraphQL endpoint found.')
 }
+
+export const USER_CLAIMS_FIELDS = (process.env.USER_CLAIMS_FIELDS || '')
+  .split(',')
+  .map((field) => field.trim())
+
+export const USER_REGISTRATION_FIELDS = (process.env.USER_REGISTRATION_FIELDS || '')
+  .split(',')
+  .map((field) => field.trim())

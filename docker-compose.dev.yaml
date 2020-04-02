@@ -14,6 +14,9 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+  graphql-engine:
+    volumes:
+      - ./mock-config/migrations/1585679214182_custom_user_column:/hasura-migrations/1585679214182_custom_user_column
   mailhog:
     image: mailhog/mailhog
     ports:
