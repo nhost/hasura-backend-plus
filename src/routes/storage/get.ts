@@ -3,7 +3,13 @@ import { Request, Response, NextFunction } from 'express'
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
-import { hasPermission, createContext, getKey, getResource, StoragePermissions } from './utils'
+import {
+  hasPermission,
+  createContext,
+  getKey,
+  getResourceHeaders,
+  StoragePermissions
+} from './utils'
 
 export const getFile = async (
   req: Request,
@@ -13,13 +19,7 @@ export const getFile = async (
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
-  // get file info
-  const params = {
-    Bucket: S3_BUCKET as string,
-    Key: key
-  }
-  const resource = await getResource(req)
-
+  const resource = await getResourceHeaders(req)
   if (!resource?.Metadata) {
     throw Boom.forbidden()
   }
@@ -29,10 +29,13 @@ export const getFile = async (
   if (!hasPermission([rules.get, rules.read], context)) {
     throw Boom.forbidden()
   }
-
   if (isMetadataRequest) {
     return res.status(200).send(resource)
   } else {
+    const params = {
+      Bucket: S3_BUCKET as string,
+      Key: key
+    }
     const stream = s3.getObject(params).createReadStream()
     // forward errors
     stream.on('error', (err) => {

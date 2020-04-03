@@ -9,10 +9,10 @@ paths:
   /user/:userId/:fileId:
     read: 'isOwner(userId) || validToken()'
     write: 'isOwner(userId)'
-    metadata:
-      token: 'request.query.token'
-    meta-path:
+    meta:
       read: 'isOwner(userId)'
       write: 'isOwner(userId)'
+      values:
+        token: 'request.query.token'
   /upload:
     create: 'isAuthenticated()'

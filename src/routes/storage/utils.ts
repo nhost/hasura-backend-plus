@@ -24,9 +24,7 @@ interface StorageRules {
   functions?: { [key: string]: string | { params: string[]; code: string } }
   paths: {
     [key: string]: Partial<StoragePermissions> & {
-      'meta-path': Partial<StoragePermissions>
-    } & {
-      metadata?: { [key: string]: string }
+      meta: Partial<StoragePermissions> & { values?: { [key: string]: string } }
     }
   }
 }
@@ -39,10 +37,10 @@ interface StorageRequest {
   auth?: Claims
 }
 
-// interface StorageResource {
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   metadata: { [key: string]: any } // TODO more details
-// }
+export const containsSomeRule = (
+  rulesDefinition: Partial<StoragePermissions> = {},
+  rules: (string | undefined)[]
+): boolean => Object.keys(rulesDefinition).some((rule) => rules.includes(rule))
 
 type StorageContext = { [key: string]: unknown } & {
   request: StorageRequest
@@ -117,7 +115,7 @@ export const generateMetadata = (metadataParams: object, context: object): objec
 // Creates an object key that is the path without the first character '/'
 export const getKey = (req: Request): string => req.path.substring(1)
 
-export const getResource = async (
+export const getResourceHeaders = async (
   req: Request,
   ignoreErrors = false
 ): Promise<HeadObjectOutput | undefined> => {

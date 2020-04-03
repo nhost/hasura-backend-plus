@@ -48,6 +48,14 @@ it('should get file from the token stored in the file metadata', async () => {
   expect(text).toEqual(fileData)
 })
 
+it(`should update an existing file's metadata`, async () => {
+  const { status } = await request
+    .post(`/storage/meta/user/${getUserId()}/${filePath}`)
+    .set('Authorization', `Bearer ${account.token}`)
+    .query({ token: 'new value' })
+  expect(status).toEqual(200)
+})
+
 it('should get file metadata', async () => {
   const {
     status,
@@ -59,7 +67,7 @@ it('should get file metadata', async () => {
     .set('Authorization', `Bearer ${account.token}`)
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
-  expect(token).toEqual(fileToken)
+  expect(token).toEqual('new value')
 })
 
 it('should delete file', async () => {

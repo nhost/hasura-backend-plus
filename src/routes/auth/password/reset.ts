@@ -49,7 +49,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
   } else {
     // Reset the password from valid JWT and { old_password, new_password }
     const decodedToken = verify(headers.authorization) // Verify the JWT
-    const account_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+    const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
     const { old_password, new_password } = await resetPasswordWithOldPasswordSchema.validateAsync(
       body

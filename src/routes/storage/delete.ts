@@ -3,7 +3,13 @@ import { Request, Response, NextFunction } from 'express'
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
-import { getKey, createContext, hasPermission, getResource, StoragePermissions } from './utils'
+import {
+  getKey,
+  createContext,
+  hasPermission,
+  getResourceHeaders,
+  StoragePermissions
+} from './utils'
 
 export const deleteFile = async (
   req: Request,
@@ -18,7 +24,7 @@ export const deleteFile = async (
     Key: getKey(req)
   }
 
-  const resource = await getResource(req)
+  const resource = await getResourceHeaders(req)
   const context = createContext(req, resource)
 
   if (!hasPermission([rules.delete, rules.write], context)) {

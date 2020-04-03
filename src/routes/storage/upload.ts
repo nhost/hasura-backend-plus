@@ -10,7 +10,7 @@ import {
   getKey,
   generateMetadata,
   StoragePermissions,
-  getResource
+  getResourceHeaders
 } from './utils'
 
 export const uploadFile = async (
@@ -23,31 +23,31 @@ export const uploadFile = async (
 ): Promise<unknown> => {
   const key = getKey(req)
 
-  if (!req.files?.file) {
+  const oldResourceHeaders = await getResourceHeaders(req, true)
+  const isNew = !oldResourceHeaders
+
+  if (isNew && !req.files?.file) {
     throw Boom.notFound()
   }
 
-  const resource = req.files.file as UploadedFile
+  const resource = req.files?.file as UploadedFile
   const context = createContext(req, resource)
 
-  const oldResource = await getResource(req, true)
-  const isNew = !oldResource
   if (!hasPermission(isNew ? [rules.create, rules.write] : [rules.update, rules.write], context)) {
     throw Boom.forbidden()
   }
 
-  if (isMetadataRequest) {
-    throw Boom.notImplemented('Not yet implemented') // TODO
-  } else {
+  if (!isMetadataRequest) {
+    // * Create or update the object
     const upload_params = {
       Bucket: S3_BUCKET as string,
       Key: key,
       Body: resource.data,
       ContentType: resource.mimetype,
       Metadata: {
-        ...(oldResource?.Metadata || {}),
-        ...generateMetadata(metadata, context),
-        filename: resource.name
+        filename: resource.name,
+        ...(oldResourceHeaders?.Metadata || {}),
+        ...generateMetadata(metadata, context)
       }
     }
     try {
@@ -55,14 +55,28 @@ export const uploadFile = async (
     } catch (err) {
       console.log('upload pb')
       console.log(err)
-      throw Boom.badImplementation()
+      throw Boom.badImplementation('Impossible to create or update the object.')
     }
-
-    // return info about the uploaded file
-    return res.status(200).send({
-      path: key,
-      filename: resource.name,
-      mimetype: resource.mimetype
-    })
+  } else if (!isNew) {
+    // * Update the object metadata. Only possible when the object already exists.
+    // As S3 objects are immutable, we need to replace the entire object by its copy
+    const params = {
+      Bucket: S3_BUCKET as string,
+      Key: key,
+      CopySource: `${S3_BUCKET}/${key}`,
+      ContentType: oldResourceHeaders?.ContentType,
+      Metadata: {
+        ...(oldResourceHeaders?.Metadata || {}),
+        ...generateMetadata(metadata, context)
+      },
+      MetadataDirective: 'REPLACE'
+    }
+    try {
+      await s3.copyObject(params).promise()
+    } catch (err) {
+      console.log(err)
+      throw Boom.badImplementation('Impossible to update the object metadata.')
+    }
   }
+  return res.status(200).send(await getResourceHeaders(req))
 }
