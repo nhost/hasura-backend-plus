@@ -3,13 +3,13 @@ import { Request, Response, NextFunction } from 'express'
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
-import { getKey, createContext, hasPermission, getResource } from './utils'
+import { getKey, createContext, hasPermission, getResource, StoragePermissions } from './utils'
 
 export const deleteFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: (string | undefined)[],
+  rules: Partial<StoragePermissions>,
   isMetadataRequest = false
 ): Promise<unknown> => {
   // get file info
@@ -21,7 +21,7 @@ export const deleteFile = async (
   const resource = await getResource(req)
   const context = createContext(req, resource)
 
-  if (!hasPermission(rules, context)) {
+  if (!hasPermission([rules.delete, rules.write], context)) {
     throw Boom.forbidden()
   }
 

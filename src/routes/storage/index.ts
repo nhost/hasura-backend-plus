@@ -8,7 +8,7 @@ const router = Router()
 
 const createSecureMiddleware = (
   fn: Function,
-  rules: (string | undefined)[],
+  rules: Partial<StoragePermissions>,
   isMetadataRequest: boolean,
   metadataParams: object = {}
 ) => (req: Request, res: Response, next: NextFunction): void =>
@@ -21,40 +21,18 @@ const createRoutes = (
   metadataParams: object = {}
 ): Router => {
   const middleware = Router()
-  if (rules.create || rules.update || rules.write) {
-    middleware.post(
-      path,
-      createSecureMiddleware(
-        uploadFile,
-        [rules.create, rules.update, rules.write],
-        isMetadataRequest,
-        metadataParams
-      )
-    )
-  }
-  if (rules.get || rules.read) {
-    middleware.get(
-      path,
-      createSecureMiddleware(getFile, [rules.get, rules.read], isMetadataRequest)
-    )
-  }
+  middleware.post(
+    path,
+    createSecureMiddleware(uploadFile, rules, isMetadataRequest, metadataParams)
+  )
+  middleware.get(path, createSecureMiddleware(getFile, rules, isMetadataRequest))
   // TODO list
-  // if (rules.list || rules.read) {
-  //   router.get(`${path}/`, () => {
-  //     console.log('TODO')
-  //   })
-  // }
-  if (rules.delete || rules.write) {
-    middleware.delete(
-      path,
-      createSecureMiddleware(
-        deleteFile,
-        [rules.delete, rules.write],
-        isMetadataRequest,
-        metadataParams
-      )
-    )
-  }
+  //   router.get(`${path}/`, createSecureMiddleware(listFiles, rules, isMetadataRequest))
+  middleware.delete(
+    path,
+    createSecureMiddleware(deleteFile, rules, isMetadataRequest, metadataParams)
+  )
+
   return middleware
 }
 

@@ -4,13 +4,20 @@ import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { UploadedFile } from 'express-fileupload'
 import { s3 } from '@shared/s3'
-import { hasPermission, createContext, getKey, generateMetadata } from './utils'
+import {
+  hasPermission,
+  createContext,
+  getKey,
+  generateMetadata,
+  StoragePermissions,
+  getResource
+} from './utils'
 
 export const uploadFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: (string | undefined)[],
+  rules: Partial<StoragePermissions>,
   isMetadataRequest = false,
   metadata: object = {}
 ): Promise<unknown> => {
@@ -23,20 +30,22 @@ export const uploadFile = async (
   const resource = req.files.file as UploadedFile
   const context = createContext(req, resource)
 
-  if (!hasPermission(rules, context)) {
+  const oldResource = await getResource(req, true)
+  const isNew = !oldResource
+  if (!hasPermission(isNew ? [rules.create, rules.write] : [rules.update, rules.write], context)) {
     throw Boom.forbidden()
   }
 
   if (isMetadataRequest) {
     throw Boom.notImplemented('Not yet implemented') // TODO
   } else {
-    // TODO on update, keep the former metadata when not changed
     const upload_params = {
       Bucket: S3_BUCKET as string,
       Key: key,
       Body: resource.data,
       ContentType: resource.mimetype,
       Metadata: {
+        ...(oldResource?.Metadata || {}),
         ...generateMetadata(metadata, context),
         filename: resource.name
       }

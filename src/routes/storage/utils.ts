@@ -117,7 +117,10 @@ export const generateMetadata = (metadataParams: object, context: object): objec
 // Creates an object key that is the path without the first character '/'
 export const getKey = (req: Request): string => req.path.substring(1)
 
-export const getResource = async (req: Request): Promise<HeadObjectOutput> => {
+export const getResource = async (
+  req: Request,
+  ignoreErrors = false
+): Promise<HeadObjectOutput | undefined> => {
   const params = {
     Bucket: S3_BUCKET as string,
     Key: getKey(req)
@@ -125,6 +128,9 @@ export const getResource = async (req: Request): Promise<HeadObjectOutput> => {
   try {
     return await s3.headObject(params).promise()
   } catch (err) {
+    if (ignoreErrors) {
+      return
+    }
     throw Boom.notFound()
   }
 }

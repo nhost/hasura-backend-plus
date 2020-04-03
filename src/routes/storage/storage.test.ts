@@ -12,6 +12,7 @@ it('should upload a new file', async () => {
   const { status } = await request
     .post(`/storage/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
+    .query({ token: fileToken })
     .attach('file', filePath)
   expect(status).toEqual(200)
 })
@@ -20,7 +21,6 @@ it('should update an existing file', async () => {
   const { status } = await request
     .post(`/storage/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
-    .query({ token: fileToken })
     .attach('file', filePath)
   expect(status).toEqual(200)
 })

@@ -3,13 +3,13 @@ import { Request, Response, NextFunction } from 'express'
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
-import { hasPermission, createContext, getKey, getResource } from './utils'
+import { hasPermission, createContext, getKey, getResource, StoragePermissions } from './utils'
 
 export const getFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: (string | undefined)[],
+  rules: Partial<StoragePermissions>,
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
@@ -26,7 +26,7 @@ export const getFile = async (
 
   const context = createContext(req, resource)
 
-  if (!hasPermission(rules, context)) {
+  if (!hasPermission([rules.get, rules.read], context)) {
     throw Boom.forbidden()
   }
 
