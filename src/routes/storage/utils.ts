@@ -139,41 +139,26 @@ export const getResourceHeaders = async (
 // TODO string matches
 // TODO isUuid?
 // TODO add param to yaml to define a custom key?
-// ? remove?
-// export const validate = (request: StorageRequest, resource: StorageResource): boolean => {
-//   const currentPath = request.path
-//   const requestContext = {
-//     request,
-//     resource,
-//     ...storageFunctions
-//   }
-//   const invalidList = Object.entries(storageRules.paths).filter(([rulePath, ruleMethodChecks]) => {
-//     const regexpKeys: Key[] | undefined = []
-//     const regexp = pathToRegexp(rulePath, regexpKeys)
-//     const regexpResult = regexp.exec(currentPath)
-//     // Checks if the current request path matches with the rule path
-//     if (regexpResult) {
-//       // Checks if a rule for the method exists
-//       if (ruleMethodChecks[request.method]) {
-//         // TODO 'read' and 'write' cases
-//         const routeParams = regexpKeys.reduce(
-//           (aggr, key, index) => ({ ...aggr, [key.name]: regexpResult[index + 1] }),
-//           {}
-//         )
-//         // If the evaluated rule is true, we remove the rule path from the invalid list. If not, we keep it
-//         return !safeEval(ruleMethodChecks[request.method] as string, {
-//           ...requestContext,
-//           ...routeParams
-//         })
-//       } else {
-//         // No rule definition have been found of the method. As a consequence the rule path is kept in the invalid list
-//         return true
-//       }
-//     } else {
-//       // The path defined in the storage rules does not match with the requested path: the path is removed from the invalid list
-//       return false
-//     }
-//   })
-//   console.log(invalidList)
-//   return invalidList.length === 0
-// }
+ export const replaceMetadata = async (req:Request, keepOldMetadata:boolean, newMetadata:object={}):Promise<void> => {
+  const key = getKey(req)
+  const oldResourceHeaders = await getResourceHeaders(req, true)
+  
+   // As S3 objects are immutable, we need to replace the entire object by its copy
+   const params = {
+    Bucket: S3_BUCKET as string,
+    Key: key,
+    CopySource: `${S3_BUCKET}/${key}`,
+    ContentType: oldResourceHeaders?.ContentType,
+    Metadata: {
+      ...(keepOldMetadata && oldResourceHeaders?.Metadata || {}),
+      ...newMetadata
+    },
+    MetadataDirective: 'REPLACE'
+  }
+  try {
+    await s3.copyObject(params).promise()
+  } catch (err) {
+    console.log(err)
+    throw Boom.badImplementation('Impossible to update the object metadata.')
+  }
+ }

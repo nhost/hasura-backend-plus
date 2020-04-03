@@ -8,7 +8,8 @@ import {
   createContext,
   hasPermission,
   getResourceHeaders,
-  StoragePermissions
+  StoragePermissions,
+  replaceMetadata
 } from './utils'
 
 export const deleteFile = async (
@@ -18,12 +19,6 @@ export const deleteFile = async (
   rules: Partial<StoragePermissions>,
   isMetadataRequest = false
 ): Promise<unknown> => {
-  // get file info
-  const params = {
-    Bucket: S3_BUCKET as string,
-    Key: getKey(req)
-  }
-
   const resource = await getResourceHeaders(req)
   const context = createContext(req, resource)
 
@@ -32,14 +27,19 @@ export const deleteFile = async (
   }
 
   if (isMetadataRequest) {
-    throw Boom.notImplemented('Not yet implemented') // TODO
+    // * Reset the object's metadata
+    await replaceMetadata(req, false)
   } else {
+    // * Delete the object, sharp
+    const params = {
+      Bucket: S3_BUCKET as string,
+      Key: getKey(req)
+    }
     try {
       await s3.deleteObject(params).promise()
     } catch (err) {
       throw Boom.badImplementation()
     }
-
-    return res.sendStatus(204)
   }
+  return res.sendStatus(204)
 }

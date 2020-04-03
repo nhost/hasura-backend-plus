@@ -10,7 +10,8 @@ import {
   getKey,
   generateMetadata,
   StoragePermissions,
-  getResourceHeaders
+  getResourceHeaders,
+  replaceMetadata
 } from './utils'
 
 export const uploadFile = async (
@@ -59,24 +60,7 @@ export const uploadFile = async (
     }
   } else if (!isNew) {
     // * Update the object metadata. Only possible when the object already exists.
-    // As S3 objects are immutable, we need to replace the entire object by its copy
-    const params = {
-      Bucket: S3_BUCKET as string,
-      Key: key,
-      CopySource: `${S3_BUCKET}/${key}`,
-      ContentType: oldResourceHeaders?.ContentType,
-      Metadata: {
-        ...(oldResourceHeaders?.Metadata || {}),
-        ...generateMetadata(metadata, context)
-      },
-      MetadataDirective: 'REPLACE'
-    }
-    try {
-      await s3.copyObject(params).promise()
-    } catch (err) {
-      console.log(err)
-      throw Boom.badImplementation('Impossible to update the object metadata.')
-    }
+    await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
   return res.status(200).send(await getResourceHeaders(req))
 }

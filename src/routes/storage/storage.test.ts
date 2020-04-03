@@ -4,10 +4,15 @@ import { promisify } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 
 import { account, request, getUserId } from '@shared/test-mock-account'
-const readFile = promisify(fs.readFile)
 
+const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 const fileToken = uuidv4()
+
+// TODO shoud get a list of files. Either a duplicate of metadata list, or create a zip file of the listed objects
+// TODO should list metadata
+// TODO test forbidden accesses
+
 it('should upload a new file', async () => {
   const { status } = await request
     .post(`/storage/user/${getUserId()}/${filePath}`)
@@ -24,11 +29,6 @@ it('should update an existing file', async () => {
     .attach('file', filePath)
   expect(status).toEqual(200)
 })
-
-// TODO should update metadata
-// TODO should list metadata
-// TODO should reset metadata
-// TODO shoud get a list of files. Either a duplicate of metadata list, or create a zip file of the listed objects
 
 it('should get file from user authentication', async () => {
   const { status, text } = await request
@@ -68,6 +68,21 @@ it('should get file metadata', async () => {
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
   expect(token).toEqual('new value')
+})
+
+it('should delete file metadata', async () => {
+  const { status } = await request
+    .delete(`/storage/meta/user/${getUserId()}/${filePath}`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(status).toEqual(204)
+  const {
+    status: getStatus,
+    body: { Metadata }
+  } = await request
+    .get(`/storage/meta/user/${getUserId()}/${filePath}`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(getStatus).toEqual(200)
+  expect(Metadata).toBeEmpty()
 })
 
 it('should delete file', async () => {
