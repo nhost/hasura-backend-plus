@@ -4,10 +4,15 @@ functions:
     params:
       - userId
     code: "return !!request.auth && userId === request.auth['x-hasura-user-id']"
-  validToken: 'return request.query.token === resource.metadata.token'
+  validToken: 'return request.query.token === resource.Metadata.token'
 paths:
   /user/:userId/:fileId:
     read: 'isOwner(userId) || validToken()'
     write: 'isOwner(userId)'
+    metadata:
+      token: 'request.query.token'
+    meta-path:
+      read: 'isOwner(userId)'
+      write: 'isOwner(userId)'
   /upload:
     create: 'isAuthenticated()'

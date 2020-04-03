@@ -9,7 +9,8 @@ export const deleteFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: (string | undefined)[]
+  rules: (string | undefined)[],
+  isMetadataRequest = false
 ): Promise<unknown> => {
   // get file info
   const params = {
@@ -24,11 +25,15 @@ export const deleteFile = async (
     throw Boom.forbidden()
   }
 
-  try {
-    await s3.deleteObject(params).promise()
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  if (isMetadataRequest) {
+    throw Boom.notImplemented('Not yet implemented') // TODO
+  } else {
+    try {
+      await s3.deleteObject(params).promise()
+    } catch (err) {
+      throw Boom.badImplementation()
+    }
 
-  return res.sendStatus(204)
+    return res.sendStatus(204)
+  }
 }

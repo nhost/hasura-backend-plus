@@ -1,7 +1,7 @@
 import yaml from 'js-yaml'
 import fs from 'fs'
 import safeEval, { FunctionFactory } from 'notevil'
-import { verify } from '@shared/jwt'
+import { verify, Claims } from '@shared/jwt'
 import { Request } from 'express'
 import path from 'path'
 import Boom from '@hapi/boom'
@@ -9,12 +9,8 @@ import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
 
-type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> &
-  {
-    [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
-  }[Keys]
-
-interface StoragePermissions {
+export const META_PREFIX = '/meta'
+export interface StoragePermissions {
   read: string
   write: string
   get: string
@@ -23,25 +19,35 @@ interface StoragePermissions {
   update: string
   delete: string
 }
-type StorageMethod = 'read' | 'write' | 'get' | 'list' | 'create' | 'update' | 'delete'
+
 interface StorageRules {
   functions?: { [key: string]: string | { params: string[]; code: string } }
   paths: {
-    [key: string]: RequireAtLeastOne<StoragePermissions, StorageMethod>
+    [key: string]: Partial<StoragePermissions> & {
+      'meta-path': Partial<StoragePermissions>
+    } & {
+      metadata?: { [key: string]: string }
+    }
   }
 }
 
-// interface StorageRequest {
-//   path: string
-//   method: StorageMethod
-//   params?: string
-//   auth?: Claims
-// }
+interface StorageRequest {
+  path: string
+  query: unknown
+  method: string
+  params?: string
+  auth?: Claims
+}
 
 // interface StorageResource {
 //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 //   metadata: { [key: string]: any } // TODO more details
 // }
+
+type StorageContext = { [key: string]: unknown } & {
+  request: StorageRequest
+  resource: object
+}
 
 let storageRules: StorageRules = { paths: {} }
 try {
@@ -78,10 +84,12 @@ export const createContext = (
   req: Request,
   resource: object = {} // TODO better resource type
 ): object => {
-  const variables = {
+  const variables: StorageContext = {
     request: {
       path: req.path,
-      auth: verify(req.headers.authorization)['https://hasura.io/jwt/claims']
+      method: req.method,
+      query: req.query,
+      auth: verify(req.headers.authorization, true)?.['https://hasura.io/jwt/claims']
     },
     ...req.params,
     resource
@@ -90,9 +98,21 @@ export const createContext = (
   return { ...functions, ...variables }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
-  return rules.some((rule) => rule && !!safeEval(rule, context))
-}
+export const hasPermission = (rules: (string | undefined)[], context: object): boolean =>
+  rules.some((rule) => rule && !!safeEval(rule, context))
+
+export const generateMetadata = (metadataParams: object, context: object): object =>
+  Object.entries(metadataParams).reduce<{ [key: string]: unknown }>((aggr, [key, jsCode]) => {
+    try {
+      const value = safeEval(jsCode as string, context)
+      if (value) {
+        aggr[key] = value
+      }
+    } catch (err) {
+      throw Boom.badImplementation(`Invalid formula for metadata key ${key}: '${jsCode}'`)
+    }
+    return aggr
+  }, {})
 
 // Creates an object key that is the path without the first character '/'
 export const getKey = (req: Request): string => req.path.substring(1)
