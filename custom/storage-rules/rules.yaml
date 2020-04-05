@@ -14,5 +14,3 @@ paths:
       write: 'isOwner(userId)'
       values:
         token: 'request.query.token'
-  /upload:
-    create: 'isAuthenticated()'

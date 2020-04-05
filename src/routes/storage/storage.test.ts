@@ -9,10 +9,6 @@ const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 const fileToken = uuidv4()
 
-// TODO shoud get a list of files. Either a duplicate of metadata list, or create a zip file of the listed objects
-// TODO should list metadata
-// TODO test forbidden accesses
-
 it('should upload a new file', async () => {
   const { status } = await request
     .post(`/storage/user/${getUserId()}/${filePath}`)
@@ -83,6 +79,23 @@ it('should get file metadata', async () => {
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
   expect(token).toEqual('new value')
+})
+
+it('should get the headers of all the user files', async () => {
+  const { status, body } = await request
+    .get(`/storage/meta/user/${getUserId()}/`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(1)
+})
+
+it('should get a zip that contains all user files', async () => {
+  const { status, text } = await request
+    .get(`/storage/user/${getUserId()}/`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(status).toEqual(200)
+  expect(text).toBeTruthy()
+  // TODO unzip and compare the file(s)
 })
 
 it('should delete file metadata', async () => {
