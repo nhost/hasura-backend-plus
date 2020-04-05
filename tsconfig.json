@@ -1,16 +1,17 @@
 {
   "exclude": ["node_modules", "**/*.spec.ts"],
-  "include": ["src"],
+  "include": ["src/**/*"],
   "compilerOptions": {
     "lib": ["dom", "es2020"],
     "paths": {
+      "*": ["types/*"],
       "@shared/*": ["src/shared/*"]
     },
     "module": "commonjs",
     "outDir": "dist",
     "strict": true,
     "target": "es2019",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "moduleResolution": "node",

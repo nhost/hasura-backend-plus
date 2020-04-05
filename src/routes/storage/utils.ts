@@ -139,18 +139,22 @@ export const getResourceHeaders = async (
 // TODO string matches
 // TODO isUuid?
 // TODO add param to yaml to define a custom key?
- export const replaceMetadata = async (req:Request, keepOldMetadata:boolean, newMetadata:object={}):Promise<void> => {
+export const replaceMetadata = async (
+  req: Request,
+  keepOldMetadata: boolean,
+  newMetadata: object = {}
+): Promise<void> => {
   const key = getKey(req)
   const oldResourceHeaders = await getResourceHeaders(req, true)
-  
-   // As S3 objects are immutable, we need to replace the entire object by its copy
-   const params = {
+
+  // As S3 objects are immutable, we need to replace the entire object by its copy
+  const params = {
     Bucket: S3_BUCKET as string,
     Key: key,
     CopySource: `${S3_BUCKET}/${key}`,
     ContentType: oldResourceHeaders?.ContentType,
     Metadata: {
-      ...(keepOldMetadata && oldResourceHeaders?.Metadata || {}),
+      ...((keepOldMetadata && oldResourceHeaders?.Metadata) || {}),
       ...newMetadata
     },
     MetadataDirective: 'REPLACE'
@@ -161,4 +165,4 @@ export const getResourceHeaders = async (
     console.log(err)
     throw Boom.badImplementation('Impossible to update the object metadata.')
   }
- }
+}

@@ -30,6 +30,14 @@ it('should update an existing file', async () => {
   expect(status).toEqual(200)
 })
 
+it('should not update an hypothetical file of another hypothetical user', async () => {
+  const { status } = await request
+    .post(`/storage/user/another-user/another-file`)
+    .set('Authorization', `Bearer ${account.token}`)
+    .attach('file', filePath)
+  expect(status).toEqual(403)
+})
+
 it('should get file from user authentication', async () => {
   const { status, text } = await request
     .get(`/storage/user/${getUserId()}/${filePath}`)
@@ -47,6 +55,13 @@ it('should get file from the token stored in the file metadata', async () => {
   expect(status).toEqual(200)
   expect(text).toEqual(fileData)
 })
+
+it('should not get file without authentication nor token', async () => {
+  const { status } = await request.get(`/storage/user/${getUserId()}/${filePath}`)
+  expect(status).toEqual(403)
+})
+
+// TODO attempt to get the file from another authenticated user
 
 it(`should update an existing file's metadata`, async () => {
   const { status } = await request
