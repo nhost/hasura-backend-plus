@@ -4,6 +4,8 @@ import { STORAGE_RULES, StoragePermissions, META_PREFIX, containsSomeRule } from
 import { uploadFile } from './upload'
 import { getFile } from './get'
 import { deleteFile } from './delete'
+import { listFile } from './list'
+
 const router = Router()
 
 const createSecureMiddleware = (
@@ -30,8 +32,12 @@ const createRoutes = (
   if (containsSomeRule(rules, ['read', 'get'])) {
     middleware.get(path, createSecureMiddleware(getFile, rules, isMetadataRequest))
   }
-  // TODO list
-  //   router.get(`${path}/`, createSecureMiddleware(listFiles, rules, isMetadataRequest))
+  if (containsSomeRule(rules, ['read', 'list'])) {
+    middleware.get(
+      `${path.substring(0, path.lastIndexOf('/'))}`,
+      createSecureMiddleware(listFile, rules, isMetadataRequest)
+    )
+  }
   if (containsSomeRule(rules, ['write', 'delete'])) {
     middleware.delete(
       path,

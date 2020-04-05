@@ -85,6 +85,23 @@ it('should get file metadata', async () => {
   expect(token).toEqual('new value')
 })
 
+it('should get the headers of all the user files', async () => {
+  const { status, body } = await request
+    .get(`/storage/meta/user/${getUserId()}/`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(1)
+})
+
+it('should get a zip that contains all user files', async () => {
+  const { status, text } = await request
+    .get(`/storage/user/${getUserId()}/`)
+    .set('Authorization', `Bearer ${account.token}`)
+  expect(status).toEqual(200)
+  expect(text).toBeTruthy()
+  // TODO unzip and compare the file(s)
+})
+
 it('should delete file metadata', async () => {
   const { status } = await request
     .delete(`/storage/meta/user/${getUserId()}/${filePath}`)
