@@ -133,12 +133,6 @@ export const getResourceHeaders = async (
   }
 }
 
-// * See: https://firebase.google.com/docs/reference/security/storage
-// TODO add timestamps and duration
-// TODO math?
-// TODO string matches
-// TODO isUuid?
-// TODO add param to yaml to define a custom key?
 export const replaceMetadata = async (
   req: Request,
   keepOldMetadata: boolean,
