@@ -1,36 +1,45 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
-import { asyncWrapper } from '@shared/helpers'
 import { s3 } from '@shared/s3'
-import { storagePermission } from '@custom/storage-rules'
-import { verify } from '@shared/jwt'
+import {
+  getKey,
+  createContext,
+  hasPermission,
+  getHeadObject,
+  StoragePermissions,
+  replaceMetadata
+} from './utils'
 
-async function deleteFile(req: Request, res: Response): Promise<unknown> {
-  const key = req.params[0]
+export const deleteFile = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+  rules: Partial<StoragePermissions>,
+  isMetadataRequest = false
+): Promise<unknown> => {
+  const headObject = await getHeadObject(req)
+  const context = createContext(req, headObject)
 
-  // check storage rules if allowed to get meta info of file
-  const jwt_token = verify(req.headers.authorization)
-  const claims = jwt_token['https://hasura.io/jwt/claims']
-
-  if (!storagePermission(key, 'write', claims)) {
+  if (!hasPermission([rules.delete, rules.write], context)) {
     throw Boom.forbidden()
   }
 
-  // get file info
-  const params = {
-    Bucket: S3_BUCKET as string,
-    Key: key
+  if (isMetadataRequest) {
+    // * Reset the object's metadata
+    await replaceMetadata(req, false)
+  } else {
+    // * Delete the object, sharp
+    const params = {
+      Bucket: S3_BUCKET as string,
+      Key: getKey(req)
+    }
+    try {
+      await s3.deleteObject(params).promise()
+    } catch (err) {
+      throw Boom.badImplementation()
+    }
   }
-
-  try {
-    await s3.deleteObject(params).promise()
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-
   return res.sendStatus(204)
 }
-
-export default asyncWrapper(deleteFile)

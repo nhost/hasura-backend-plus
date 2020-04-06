@@ -99,14 +99,20 @@ export interface Token {
  * Verify JWT token.
  * @param authorization Authorization header.
  */
-export function verify(authorization: string | undefined): Token {
+export function verify(authorization: string | undefined, ignoreErrors = false): Token | undefined {
   try {
     if (!authorization) {
+      if (ignoreErrors) {
+        return
+      }
       throw Boom.unauthorized('Missing Authorization header.')
     }
     const token = authorization.replace('Bearer ', '')
     return JWT.verify(token, jwtKey) as Token
   } catch (err) {
+    if (ignoreErrors) {
+      return
+    }
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
 }

@@ -15,7 +15,7 @@ async function deleteUser({ headers }: Request, res: Response): Promise<unknown>
   let hasuraData: HasuraData
 
   const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
     hasuraData = (await request(deleteAccountById, { account_id })) as HasuraData

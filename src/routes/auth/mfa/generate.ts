@@ -12,7 +12,7 @@ async function generateMfa({ headers }: Request, res: Response): Promise<unknown
   let image_url: string
 
   const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id'] as string
 
   /**
    * Generate OTP secret and key URI.

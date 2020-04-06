@@ -13,8 +13,8 @@ async function disableMfa({ headers, body }: Request, res: Response): Promise<un
 
   const { code } = await mfaSchema.validateAsync(body)
 
-  const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const decodedToken = verify?.(headers.authorization)
+  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
     hasuraData = (await request(selectAccountById, { account_id })) as HasuraAccountData

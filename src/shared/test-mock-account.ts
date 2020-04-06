@@ -6,11 +6,17 @@ import { request as admin } from '@shared/request'
 import { app } from '../server'
 import { deleteEmailsOfAccount, TestAccount, createAccount } from '@shared/test-utils'
 import { selectAccountByEmail } from '@shared/queries'
+import { JWT } from 'jose'
+import { Token } from './jwt'
 
 export let request: SuperTest<Test>
 
 export let account: TestAccount
 
+export const getUserId = (): string => {
+  const decodedJwt = JWT.decode(account.token as string) as Token
+  return decodedJwt['https://hasura.io/jwt/claims']['x-hasura-user-id']
+}
 // * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {
   request = agent(app) // * Create the SuperTest agent
