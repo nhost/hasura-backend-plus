@@ -7,7 +7,7 @@ import {
   getKey,
   createContext,
   hasPermission,
-  getResourceHeaders,
+  getHeadObject,
   StoragePermissions,
   replaceMetadata
 } from './utils'
@@ -19,8 +19,8 @@ export const deleteFile = async (
   rules: Partial<StoragePermissions>,
   isMetadataRequest = false
 ): Promise<unknown> => {
-  const resource = await getResourceHeaders(req)
-  const context = createContext(req, resource)
+  const headObject = await getHeadObject(req)
+  const context = createContext(req, headObject)
 
   if (!hasPermission([rules.delete, rules.write], context)) {
     throw Boom.forbidden()

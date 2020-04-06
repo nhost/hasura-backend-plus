@@ -30,7 +30,7 @@ export const listFile = async (
   }
   const list = await s3.listObjectsV2(params).promise()
   if (list.Contents) {
-    const headersList = (
+    const headObjectsList = (
       await Promise.all(
         list.Contents.map(async ({ Key }) => ({
           key: Key as string,
@@ -44,10 +44,10 @@ export const listFile = async (
       )
     ).filter((resource) => hasPermission([rules.list, rules.read], createContext(req, resource)))
     if (isMetadataRequest) {
-      return res.status(200).send(headersList.map((entry) => entry.head))
+      return res.status(200).send(headObjectsList.map((entry) => entry.head))
     } else {
       const archive = archiver('zip')
-      headersList.forEach((entry) => {
+      headObjectsList.forEach((entry) => {
         const objectStream = s3
           .getObject({ Bucket: S3_BUCKET as string, Key: entry.key })
           .createReadStream()

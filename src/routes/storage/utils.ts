@@ -80,7 +80,7 @@ const storageFunctions = (context: object): { [key: string]: Function } =>
 
 export const createContext = (
   req: Request,
-  resource: object = {} // TODO better resource type
+  s3HeadObject: object = {} // TODO better s3 head object type
 ): object => {
   const variables: StorageContext = {
     request: {
@@ -90,7 +90,7 @@ export const createContext = (
       auth: verify(req.headers.authorization, true)?.['https://hasura.io/jwt/claims']
     },
     ...req.params,
-    resource
+    resource: s3HeadObject
   }
   const functions = storageFunctions(variables)
   return { ...functions, ...variables }
@@ -115,7 +115,7 @@ export const generateMetadata = (metadataParams: object, context: object): objec
 // Creates an object key that is the path without the first character '/'
 export const getKey = (req: Request): string => req.path.substring(1)
 
-export const getResourceHeaders = async (
+export const getHeadObject = async (
   req: Request,
   ignoreErrors = false
 ): Promise<HeadObjectOutput | undefined> => {
@@ -139,16 +139,16 @@ export const replaceMetadata = async (
   newMetadata: object = {}
 ): Promise<void> => {
   const key = getKey(req)
-  const oldResourceHeaders = await getResourceHeaders(req, true)
+  const oldHeadObject = await getHeadObject(req, true)
 
   // As S3 objects are immutable, we need to replace the entire object by its copy
   const params = {
     Bucket: S3_BUCKET as string,
     Key: key,
     CopySource: `${S3_BUCKET}/${key}`,
-    ContentType: oldResourceHeaders?.ContentType,
+    ContentType: oldHeadObject?.ContentType,
     Metadata: {
-      ...((keepOldMetadata && oldResourceHeaders?.Metadata) || {}),
+      ...((keepOldMetadata && oldHeadObject?.Metadata) || {}),
       ...newMetadata
     },
     MetadataDirective: 'REPLACE'

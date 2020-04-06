@@ -10,7 +10,7 @@ import {
   getKey,
   generateMetadata,
   StoragePermissions,
-  getResourceHeaders,
+  getHeadObject,
   replaceMetadata
 } from './utils'
 
@@ -24,8 +24,8 @@ export const uploadFile = async (
 ): Promise<unknown> => {
   const key = getKey(req)
 
-  const oldResourceHeaders = await getResourceHeaders(req, true)
-  const isNew = !oldResourceHeaders
+  const oldHeadObject = await getHeadObject(req, true)
+  const isNew = !oldHeadObject
 
   if (isNew && !req.files?.file) {
     throw Boom.notFound()
@@ -47,7 +47,7 @@ export const uploadFile = async (
       ContentType: resource.mimetype,
       Metadata: {
         filename: resource.name,
-        ...(oldResourceHeaders?.Metadata || {}),
+        ...(oldHeadObject?.Metadata || {}),
         ...generateMetadata(metadata, context)
       }
     }
@@ -62,5 +62,5 @@ export const uploadFile = async (
     // * Update the object metadata. Only possible when the object already exists.
     await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
-  return res.status(200).send(await getResourceHeaders(req))
+  return res.status(200).send(await getHeadObject(req))
 }
