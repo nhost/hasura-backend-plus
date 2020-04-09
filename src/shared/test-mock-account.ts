@@ -1,7 +1,7 @@
 import { HasuraAccountData } from '@shared/helpers'
 import { SuperTest, Test, agent } from 'supertest'
 
-import { AUTO_ACTIVATE } from '@shared/config'
+import { AUTO_ACTIVATE_USER_ON_REGISTRATION } from '@shared/config'
 import { request as admin } from '@shared/request'
 import { app } from '../server'
 import { deleteEmailsOfAccount, TestAccount, createAccount } from '@shared/test-utils'
@@ -23,7 +23,7 @@ beforeAll(async () => {
   // * Create a mock account
   const { email, password } = createAccount()
   await request.post('/auth/register').send({ email, password })
-  if (!AUTO_ACTIVATE) {
+  if (!AUTO_ACTIVATE_USER_ON_REGISTRATION) {
     const hasuraData = (await admin(selectAccountByEmail, { email })) as HasuraAccountData
     const ticket = hasuraData.auth_accounts[0].ticket
     await request.get(`/auth/account/activate?ticket=${ticket}`)
