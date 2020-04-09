@@ -3,9 +3,9 @@
 | Category                          | Path                                              | Description          |
 | --------------------------------- | ------------------------------------------------- | -------------------- |
 | [Authentication](#authentication) | [POST /auth/register](#registration)              | Account registration |
-| ^^                                | [POST /auth/login](#login)                        | Account login        |
-| ^^                                | [POST /auth/jwks](#jwks)                          | JWK Set              |
-| ^^                                | [POST /auth/account/activate](#activation)        | Account activation   |
+| ^^                                | [POST /auth/login](#login)                        | Login                |
+| ^^                                | [GET /auth/jwks](#jwks)                           | JWK Set              |
+| ^^                                | [POST /auth/account/activate](#activation)        | Activate account     |
 | ^^                                | [POST /auth/account/delete](#delete-account)      | Delete account       |
 | ^^                                | [POST /auth/password/forgot](#forgotten-password) | Forgotten password   |
 | ^^                                | [POST /auth/password/reset](#reset-password)      | Reset password       |
@@ -17,7 +17,7 @@
 | ^^                                | [POST /auth/mfa/enable](#enable-mfa)              | Enable MFA           |
 | ^^                                | [POST /auth/mfa/disable](#disable-mfa)            | Disable MFA          |
 | ^^                                | [POST /auth/mfa/totp](#totp)                      | TOTP                 |
-| ^^                                | [GET /storage/<custom-rule>](#)                   |                      |
+| [Storage](storage)                | [GET /storage/<custom-rule>](#)                   |                      |
 | ^^                                | [POST /storage/<custom-rule>](#)                  |                      |
 | ^^                                | [DELETE /storage/<custom-rule>](#)                |                      |
 | ^^                                | [GET /storage/meta/<custom-rule>](#)              |                      |
@@ -256,6 +256,8 @@ Set-Cookie: refresh_token=...
   "jwt_expires_in": 900000
 }
 ```
+
+## Storage
 
 ## Other
 
