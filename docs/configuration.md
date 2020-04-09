@@ -20,7 +20,7 @@
 | ----------------------------- | ------- | ----------- |
 | `HASURA_ENDPOINT`             |         |             |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         |             |
-| `SERVER_PORT`                 | 3000    |             |
+| `PORT`                        | 3000    |             |
 | `JWT_SECRET_KEY`              |         |             |
 | `JWT_ALGORITHM`               | RS256   |             |
 | `JWT_EXPIRES_IN`              | 15      |             |

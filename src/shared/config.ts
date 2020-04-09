@@ -17,7 +17,7 @@ export const {
    * App settings.
    */
   SERVER_URL,
-  SERVER_PORT = 3000,
+  PORT = 3000,
   REDIRECT_URL_ERROR,
   REDIRECT_URL_SUCCESS,
 
@@ -64,7 +64,9 @@ export const {
 // Boolean environment variables are stored as string, we must transform them into booleans.
 const getBooleanEnv = (envVar: string, defaultValue = false): boolean =>
   process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue
-export const AUTO_ACTIVATE = getBooleanEnv('AUTO_ACTIVATE')
+export const AUTO_ACTIVATE_USER_ON_REGISTRATION = getBooleanEnv(
+  'AUTO_ACTIVATE_USER_ON_REGISTRATION'
+)
 export const HIBP_ENABLED = getBooleanEnv('HIBP_ENABLED')
 export const SMTP_ENABLED = getBooleanEnv('SMTP_ENABLED')
 export const SMTP_SECURE = getBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)

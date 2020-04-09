@@ -3,7 +3,12 @@
 import 'jest-extended'
 import { JWT } from 'jose'
 
-import { AUTO_ACTIVATE, HIBP_ENABLED, SERVER_URL, SMTP_ENABLED } from '@shared/config'
+import {
+  AUTO_ACTIVATE_USER_ON_REGISTRATION,
+  HIBP_ENABLED,
+  SERVER_URL,
+  SMTP_ENABLED
+} from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
@@ -33,7 +38,9 @@ const password = generateRandomString()
 const agent = request(app)
 
 it('should create an account', async () => {
-  const { status } = await agent.post('/auth/register').send({ email, password , user_data: { name: 'Test name' } })
+  const { status } = await agent
+    .post('/auth/register')
+    .send({ email, password, user_data: { name: 'Test name' } })
   expect(status).toEqual(204)
 })
 
@@ -49,7 +56,7 @@ it('should tell the account already exists', async () => {
 /**
  * * Only run this test if auto activation is disabled
  */
-const manualActivationIt = !AUTO_ACTIVATE ? it : it.skip
+const manualActivationIt = !AUTO_ACTIVATE_USER_ON_REGISTRATION ? it : it.skip
 manualActivationIt('should activate the account', async () => {
   let activateLink: string
   if (SMTP_ENABLED) {
