@@ -8,10 +8,10 @@ import { verify } from '@shared/jwt'
 
 async function revokeToken({ headers }: Request, res: Response): Promise<unknown> {
   const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    await request(deleteAllAccountRefreshTokens, { account_id })
+    await request(deleteAllAccountRefreshTokens, { user_id })
   } catch (err) {
     throw Boom.badImplementation()
   }

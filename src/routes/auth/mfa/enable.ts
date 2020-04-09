@@ -1,6 +1,6 @@
 import { HasuraAccountData, asyncWrapper } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { selectAccountById, updateOtpStatus } from '@shared/queries'
+import { selectAccountByUserId, updateOtpStatus } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
@@ -14,10 +14,10 @@ async function enableMfa({ headers, body }: Request, res: Response): Promise<unk
   const { code } = await mfaSchema.validateAsync(body)
 
   const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
   try {
-    hasuraData = (await request(selectAccountById, { account_id })) as HasuraAccountData
+    hasuraData = (await request(selectAccountByUserId, { user_id })) as HasuraAccountData
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -37,7 +37,7 @@ async function enableMfa({ headers, body }: Request, res: Response): Promise<unk
   }
 
   try {
-    await request(updateOtpStatus, { account_id, mfa_enabled: true })
+    await request(updateOtpStatus, { user_id, mfa_enabled: true })
   } catch (err) {
     throw Boom.badImplementation()
   }
