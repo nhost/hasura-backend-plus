@@ -1,6 +1,6 @@
 # Configuration
 
-## Custom S3 Rules
+## Custom Storage Rules
 
 ## OAuth Providers
 

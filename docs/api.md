@@ -1,39 +1,29 @@
----
-endpoints:
-  - category: Authentication
-    endpoints:
-      - path: /auth/register
-        name: Account registration
-        description: Long description
-        request:
-          email: hello@example.com
-          password: between 6-128 characters
-        response: 204 No Content
-      - path: /auth/login
-        name: Account login
-        description: Long description
-        request:
-          email: hello@example.com
-          password: between 6-128 characters
-        response: 'Set-Cookie: refresh_token=...'
----
-
 # API
 
-| Category                          | Path                                             | Description          |
-| --------------------------------- | ------------------------------------------------ | -------------------- |
-| [Authentication](#authentication) | [POST /auth/register](#registration)             | Account registration |
-| ^^                                | [POST /auth/login](#login)                       | Account login        |
-| ^^                                | [POST /auth/account/activate](#activation)       | Account activation   |
-| ^^                                | [POST /auth/account/forgot](#forgotten-password) | Forgotten password   |
-| ^^                                | [POST /auth/account/remove](#remove-account)     | Remove account       |
-| ^^                                | [POST /auth/token/refresh](#refresh-token)       | Refresh token        |
-| ^^                                | [POST /auth/token/revoke](#revoke-token)         | Revoke token         |
-| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code) | Generate MFA QR code |
-| ^^                                | [POST /auth/mfa/enable](#enable-mfa)             | Enable MFA           |
-| ^^                                | [POST /auth/mfa/disable](#disable-mfa)           | Disable MFA          |
-| ^^                                | [POST /auth/mfa/totp](#totp)                     | TOTP                 |
-| [Other](#other)                   | [GET /healthz](#health-check)                    | Health Check         |
+| Category                          | Path                                              | Description          |
+| --------------------------------- | ------------------------------------------------- | -------------------- |
+| [Authentication](#authentication) | [POST /auth/register](#registration)              | Account registration |
+| ^^                                | [POST /auth/login](#login)                        | Account login        |
+| ^^                                | [POST /auth/jwks](#jwks)                          | JWK Set              |
+| ^^                                | [POST /auth/account/activate](#activation)        | Account activation   |
+| ^^                                | [POST /auth/account/delete](#delete-account)      | Delete account       |
+| ^^                                | [POST /auth/password/forgot](#forgotten-password) | Forgotten password   |
+| ^^                                | [POST /auth/password/reset](#reset-password)      | Reset password       |
+| ^^                                | [POST /auth/email/forgot](#)                      |                      |
+| ^^                                | [POST /auth/email/reset](#)                       |                      |
+| ^^                                | [POST /auth/token/refresh](#refresh-token)        | Refresh token        |
+| ^^                                | [POST /auth/token/revoke](#revoke-token)          | Revoke token         |
+| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)  | Generate MFA QR code |
+| ^^                                | [POST /auth/mfa/enable](#enable-mfa)              | Enable MFA           |
+| ^^                                | [POST /auth/mfa/disable](#disable-mfa)            | Disable MFA          |
+| ^^                                | [POST /auth/mfa/totp](#totp)                      | TOTP                 |
+| ^^                                | [GET /storage/<custom-rule>](#)                   |                      |
+| ^^                                | [POST /storage/<custom-rule>](#)                  |                      |
+| ^^                                | [DELETE /storage/<custom-rule>](#)                |                      |
+| ^^                                | [GET /storage/meta/<custom-rule>](#)              |                      |
+| ^^                                | [POST /storage/meta/<custom-rule>](#)             |                      |
+| ^^                                | [DELETE /storage/meta/<custom-rule>](#)           |                      |
+| [Other](#other)                   | [GET /healthz](#health-check)                     | Health Check         |
 
 ## Authentication
 
@@ -97,6 +87,26 @@ Set-Cookie: refresh_token=...
 204 No Content
 ```
 
+### JWKS
+
+#### Request
+
+#### Response
+
+### Delete account
+
+#### Request
+
+```
+Authorization: Bearer ...
+```
+
+#### Response
+
+```
+204 No Content
+```
+
 ### Forgotten password
 
 #### Request
@@ -114,12 +124,15 @@ Set-Cookie: refresh_token=...
 204 No Content
 ```
 
-### Remove account
+### Reset password
 
 #### Request
 
-```
-Authorization: Bearer ...
+```json
+{
+  "ticket": "6a135423-85c8-4c99-b9ca-3a0108202255",
+  "new_password": "between 6-128 characters"
+}
 ```
 
 #### Response
