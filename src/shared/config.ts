@@ -62,7 +62,8 @@ export const {
 } = process.env
 
 // Boolean environment variables are stored as string, we must transform them into booleans.
-const getBooleanEnv = (envVar: string): boolean => process.env[envVar]?.toLowerCase() === 'true'
+const getBooleanEnv = (envVar: string, defaultValue = false): boolean =>
+  process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue
 export const AUTO_ACTIVATE_USER_ON_REGISTRATION = getBooleanEnv(
   'AUTO_ACTIVATE_USER_ON_REGISTRATION'
 )

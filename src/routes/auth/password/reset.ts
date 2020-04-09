@@ -2,8 +2,8 @@ import { HasuraAccountData, asyncWrapper, checkHibp, hashPassword } from '@share
 import { Request, Response } from 'express'
 import { resetPasswordWithOldPasswordSchema, resetPasswordWithTicketSchema } from '@shared/schema'
 import {
-  selectAccountById,
-  updatePasswordWithAccountId,
+  selectAccountByUserId,
+  updatePasswordWithUserId,
   updatePasswordWithTicket
 } from '@shared/queries'
 
@@ -49,7 +49,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
   } else {
     // Reset the password from valid JWT and { old_password, new_password }
     const decodedToken = verify(headers.authorization) // Verify the JWT
-    const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
+    const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
     const { old_password, new_password } = await resetPasswordWithOldPasswordSchema.validateAsync(
       body
@@ -58,7 +58,7 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
     await checkHibp(new_password)
 
     // Search the account from the JWT's account id
-    const hasuraData = (await request(selectAccountById, { account_id })) as HasuraAccountData
+    const hasuraData = (await request(selectAccountByUserId, { user_id })) as HasuraAccountData
 
     if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
       const { password_hash } = hasuraData.auth_accounts[0]
@@ -71,8 +71,8 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
       try {
         const newPasswordHash = await hashPassword(new_password)
 
-        await request(updatePasswordWithAccountId, {
-          account_id,
+        await request(updatePasswordWithUserId, {
+          user_id,
           password_hash: newPasswordHash
         })
       } catch (err) {

@@ -12,16 +12,16 @@ async function generateMfa({ headers }: Request, res: Response): Promise<unknown
   let image_url: string
 
   const decodedToken = verify(headers.authorization)
-  const account_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id'] as string
+  const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id'] as string
 
   /**
    * Generate OTP secret and key URI.
    */
   const otp_secret = authenticator.generateSecret()
-  const otpAuth = authenticator.keyuri(account_id, OTP_ISSUER, otp_secret)
+  const otpAuth = authenticator.keyuri(user_id, OTP_ISSUER, otp_secret)
 
   try {
-    await request(updateOtpSecret, { account_id, otp_secret })
+    await request(updateOtpSecret, { user_id, otp_secret })
   } catch (err) {
     throw Boom.badImplementation()
   }
