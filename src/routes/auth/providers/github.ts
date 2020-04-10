@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import passport from 'passport'
 import passportGitHub, { Profile } from 'passport-github2'
+import oauth2 from 'passport-oauth2'
 import Boom from '@hapi/boom'
 import { HasuraAccountProviderData } from '@shared/helpers'
 import { selectAccountProvider, insertAccount } from '@shared/queries'
@@ -35,7 +36,7 @@ passport.use(
       accessToken: string,
       refreshToken: string,
       profile: Profile,
-      done: (error: any, user?: any) => void
+      done: oauth2.VerifyCallback
     ) => {
       const user = {}
 
