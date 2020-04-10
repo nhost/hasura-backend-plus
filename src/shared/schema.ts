@@ -1,4 +1,4 @@
-import { ALLOWED_EMAIL_DOMAINS, USER_REGISTRATION_FIELDS } from './config'
+import { ALLOWED_EMAIL_DOMAINS, USER_REGISTRATION_FIELDS, MIN_PASSWORD_LENGTH } from './config'
 import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
@@ -36,7 +36,7 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(3).max(128).required()
+const passwordRule = Joi.string().min(MIN_PASSWORD_LENGTH).max(128).required()
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 

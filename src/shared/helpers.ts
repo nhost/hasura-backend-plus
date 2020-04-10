@@ -27,7 +27,6 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  id,
   default_role = DEFAULT_USER_ROLE,
   account_roles = [],
   user
@@ -38,7 +37,7 @@ export function createHasuraJwt({
     accountRoles.push(default_role)
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _user_id, ...customFields } = user
+  const { id, ...customFields } = user
   return sign({
     'https://hasura.io/jwt/claims': {
       'x-hasura-user-id': id,

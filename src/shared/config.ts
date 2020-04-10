@@ -17,7 +17,7 @@ export const {
    * App settings.
    */
   SERVER_URL,
-  SERVER_PORT = 3000,
+  PORT = 3000,
   REDIRECT_URL_ERROR,
   REDIRECT_URL_SUCCESS,
 
@@ -79,8 +79,11 @@ export const {
 } = process.env
 
 // Boolean environment variables are stored as string, we must transform them into booleans.
-const getBooleanEnv = (envVar: string): boolean => process.env[envVar]?.toLowerCase() === 'true'
-export const AUTO_ACTIVATE = getBooleanEnv('AUTO_ACTIVATE')
+const getBooleanEnv = (envVar: string, defaultValue = false): boolean =>
+  process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue
+export const AUTO_ACTIVATE_USER_ON_REGISTRATION = getBooleanEnv(
+  'AUTO_ACTIVATE_USER_ON_REGISTRATION'
+)
 export const HIBP_ENABLED = getBooleanEnv('HIBP_ENABLED')
 export const SMTP_ENABLED = getBooleanEnv('SMTP_ENABLED')
 export const SMTP_SECURE = getBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
@@ -88,6 +91,8 @@ export const SMTP_SECURE = getBooleanEnv('SMTP_SECURE') // note: false disables 
 export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
 export const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
 export const KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
+
+export const MIN_PASSWORD_LENGTH = parseInt(process.env.MIN_PASSWORD_LENGTH as string, 10) || 3
 
 if (!HASURA_ENDPOINT) {
   throw Boom.badImplementation('No Hasura GraphQL endpoint found.')

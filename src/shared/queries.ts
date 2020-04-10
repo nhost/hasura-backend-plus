@@ -20,10 +20,10 @@ export const updatePasswordWithTicket = gql`
   }
 `
 
-export const updatePasswordWithAccountId = gql`
-  mutation($account_id: uuid!, $password_hash: String!) {
+export const updatePasswordWithUserId = gql`
+  mutation($user_id: uuid!, $password_hash: String!) {
     update_auth_accounts(
-      where: { id: { _eq: $account_id } }
+      where: { user: { id: { _eq: $user_id } } }
       _set: { password_hash: $password_hash }
     ) {
       affected_rows
@@ -51,9 +51,9 @@ const accountFragment = gql`
   }
 `
 
-export const selectAccountById = gql`
-  query($account_id: uuid!) {
-    auth_accounts(where: { id: { _eq: $account_id } }) {
+export const selectAccountByUserId = gql`
+  query($user_id: uuid!) {
+    auth_accounts(where: { user: { id: { _eq: $user_id } } }) {
       ...accountFragment
     }
   }
@@ -117,8 +117,8 @@ export const updateRefreshToken = gql`
 `
 
 export const deleteAllAccountRefreshTokens = gql`
-  mutation($account_id: uuid!) {
-    delete_auth_refresh_tokens(where: { account_id: { _eq: $account_id } }) {
+  mutation($user_id: uuid!) {
+    delete_auth_refresh_tokens(where: { account: { user: { id: { _eq: $user_id } } } }) {
       affected_rows
     }
   }
@@ -138,17 +138,20 @@ export const activateAccount = gql`
 `
 
 export const updateOtpSecret = gql`
-  mutation($account_id: uuid!, $otp_secret: String!) {
-    update_auth_accounts(where: { id: { _eq: $account_id } }, _set: { otp_secret: $otp_secret }) {
+  mutation($user_id: uuid!, $otp_secret: String!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { otp_secret: $otp_secret }
+    ) {
       affected_rows
     }
   }
 `
 
 export const deleteOtpSecret = gql`
-  mutation($account_id: uuid!) {
+  mutation($user_id: uuid!) {
     update_auth_accounts(
-      where: { id: { _eq: $account_id } }
+      where: { user: { id: { _eq: $user_id } } }
       _set: { otp_secret: null, mfa_enabled: false }
     ) {
       affected_rows
@@ -157,8 +160,11 @@ export const deleteOtpSecret = gql`
 `
 
 export const updateOtpStatus = gql`
-  mutation($account_id: uuid!, $mfa_enabled: Boolean!) {
-    update_auth_accounts(where: { id: { _eq: $account_id } }, _set: { mfa_enabled: $mfa_enabled }) {
+  mutation($user_id: uuid!, $mfa_enabled: Boolean!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { mfa_enabled: $mfa_enabled }
+    ) {
       affected_rows
     }
   }
@@ -175,18 +181,11 @@ export const rotateTicket = gql`
   }
 `
 
-// TODO: review the delete cascades
-export const deleteAccountById = gql`
-  mutation($account_id: uuid) {
-    delete_users(where: { accounts: { id: { _eq: $account_id } } }) {
+export const deleteAccountByUserId = gql`
+  mutation($user_id: uuid) {
+    delete_auth_accounts(where: { user: { id: { _eq: $user_id } } }) {
       affected_rows
     }
-    delete_auth_refresh_tokens(where: { account_id: { _eq: $account_id } }) {
-      affected_rows
-    }
-    # delete_auth_accounts(where: { id: { _eq: $account_id } }) {
-    #   affected_rows
-    # }
   }
 `
 

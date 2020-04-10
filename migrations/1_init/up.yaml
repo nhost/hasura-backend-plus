@@ -1,0 +1,104 @@
+- args:
+    tables:
+    - object_relationships:
+      - name: account
+        using:
+          foreign_key_constraint_on: account_id
+      - name: provider
+        using:
+          foreign_key_constraint_on: auth_provider
+      table:
+        name: account_providers
+        schema: auth
+    - object_relationships:
+      - name: account
+        using:
+          foreign_key_constraint_on: account_id
+      - name: roleByRole
+        using:
+          foreign_key_constraint_on: role
+      table:
+        name: account_roles
+        schema: auth
+    - array_relationships:
+      - name: account_providers
+        using:
+          foreign_key_constraint_on:
+            column: account_id
+            table:
+              name: account_providers
+              schema: auth
+      - name: account_roles
+        using:
+          foreign_key_constraint_on:
+            column: account_id
+            table:
+              name: account_roles
+              schema: auth
+      - name: refresh_tokens
+        using:
+          foreign_key_constraint_on:
+            column: account_id
+            table:
+              name: refresh_tokens
+              schema: auth
+      object_relationships:
+      - name: role
+        using:
+          foreign_key_constraint_on: default_role
+      - name: user
+        using:
+          foreign_key_constraint_on: user_id
+      table:
+        name: accounts
+        schema: auth
+    - array_relationships:
+      - name: account_providers
+        using:
+          foreign_key_constraint_on:
+            column: auth_provider
+            table:
+              name: account_providers
+              schema: auth
+      table:
+        name: providers
+        schema: auth
+    - object_relationships:
+      - name: account
+        using:
+          foreign_key_constraint_on: account_id
+      table:
+        name: refresh_tokens
+        schema: auth
+    - array_relationships:
+      - name: account_roles
+        using:
+          foreign_key_constraint_on:
+            column: role
+            table:
+              name: account_roles
+              schema: auth
+      - name: accounts
+        using:
+          foreign_key_constraint_on:
+            column: default_role
+            table:
+              name: accounts
+              schema: auth
+      table:
+        name: roles
+        schema: auth
+    - object_relationships:
+      - name: account
+        using:
+          manual_configuration:
+            column_mapping:
+              id: user_id
+            remote_table:
+              name: accounts
+              schema: auth
+      table:
+        name: users
+        schema: public
+    version: 2
+  type: replace_metadata
