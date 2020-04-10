@@ -5,7 +5,7 @@ services:
       context: .
       args:
         - NODE_ENV=development
-    command: yarn run dev
+    command: yarn run dev-container
     env_file: .env.development
     environment:
       SMTP_HOST: mailhog

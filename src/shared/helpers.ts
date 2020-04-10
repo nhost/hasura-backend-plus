@@ -98,6 +98,16 @@ export interface HasuraAccountData {
   auth_accounts: AccountData[]
 }
 
+export interface AccountProviderData {
+  user: {
+    id: string
+  }
+}
+
+export interface HasuraAccountProviderData {
+  auth_account_providers: AccountProviderData[]
+}
+
 /**
  * Looks for an account in the database, first by email, second by ticket
  * @param httpBody

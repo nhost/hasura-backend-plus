@@ -38,6 +38,23 @@ export const {
   DEFAULT_USER_ROLE = 'user',
 
   /**
+   * External OAuth provider redirect URLS
+   */
+  PROVIDERS_SUCCESS_REDIRECT,
+  PROVIDERS_FAILURE_REDIRECT,
+
+  /**
+   * Github OAuth provider settings
+   */
+  AUTH_GITHUB_ACTIVE = false,
+  AUTH_GITHUB_CLIENT_ID,
+  AUTH_GITHUB_CLIENT_SECRET,
+  AUTH_GITHUB_CALLBACK_URL,
+  AUTH_GITHUB_AUTHORIZATION_URL = null, // enterprise
+  AUTH_GITHUB_TOKEN_URL = null, // enterprise
+  AUTH_GITHUB_USER_PROFILE_URL = null, // enterprise
+
+  /**
    * Rate limiter.
    */
   MAX_REQUESTS = 100,

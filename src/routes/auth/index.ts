@@ -8,6 +8,7 @@ import account from './account'
 import password from './password'
 import email from './email'
 import mfa from './mfa'
+import providers from './providers'
 
 export default Router()
   .get('/jwks', getJwks)
@@ -18,3 +19,4 @@ export default Router()
   .use('/email', email)
   .use('/password', password)
   .use('/mfa', mfa)
+  .use('/providers', providers)

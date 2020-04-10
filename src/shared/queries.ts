@@ -216,3 +216,22 @@ export const getNewEmailByTicket = gql`
     }
   }
 `
+
+export const selectAccountProvider = gql`
+  query($provider: String!, $profile_id: String!) {
+    auth_account_providers(
+      where: {
+        _and: [
+          { auth_provider: { _eq: $provider } }
+          { auth_provider_unique_id: { _eq: $profile_id } }
+        ]
+      }
+    ) {
+      account {
+        user {
+          id
+        }
+      }
+    }
+  }
+`
