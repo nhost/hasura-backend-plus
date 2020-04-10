@@ -75,6 +75,8 @@ ALTER TABLE ONLY auth.accounts
     ADD CONSTRAINT accounts_email_key UNIQUE (email);
 ALTER TABLE ONLY auth.accounts
     ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY auth.accounts
+    ADD CONSTRAINT accounts_user_id_key UNIQUE (user_id);
 ALTER TABLE ONLY auth.providers
     ADD CONSTRAINT providers_pkey PRIMARY KEY (provider);
 ALTER TABLE ONLY auth.refresh_tokens
@@ -104,7 +106,7 @@ ALTER TABLE ONLY auth.refresh_tokens
     ADD CONSTRAINT refresh_tokens_account_id_fkey FOREIGN KEY (account_id) REFERENCES auth.accounts(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 INSERT INTO auth.roles (role)
-  values ('user'), ('anonymous');
+    VALUES ('user'), ('anonymous');
 
-insert into auth.providers (provider)
-  values ('github'), ('facebook'), ('twitter'), ('google');
+INSERT INTO auth.providers (provider)
+    VALUES ('github'), ('facebook'), ('twitter'), ('google');
