@@ -1,5 +1,6 @@
 module.exports = {
   title: 'Hasura Backend Plus Documentation',
+  base: '/hasura-backend-plus/',
   themeConfig: {
     logo: 'logo.png',
     nav: [
