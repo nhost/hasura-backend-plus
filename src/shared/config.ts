@@ -46,7 +46,6 @@ export const {
   /**
    * Github OAuth provider settings
    */
-  AUTH_GITHUB_ACTIVE = false,
   AUTH_GITHUB_CLIENT_ID,
   AUTH_GITHUB_CLIENT_SECRET,
   AUTH_GITHUB_AUTHORIZATION_URL = null, // enterprise
@@ -86,6 +85,7 @@ export const AUTO_ACTIVATE_USER_ON_REGISTRATION = getBooleanEnv(
 export const HIBP_ENABLED = getBooleanEnv('HIBP_ENABLED')
 export const SMTP_ENABLED = getBooleanEnv('SMTP_ENABLED')
 export const SMTP_SECURE = getBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
+export const AUTH_GITHUB_ENABLE = getBooleanEnv('AUTH_GITHUB_ENABLE')
 
 export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
 export const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15

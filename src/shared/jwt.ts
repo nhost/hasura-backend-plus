@@ -1,8 +1,19 @@
 import { JWK, JWKS, JWT } from 'jose'
-import { JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_SECRET_KEY, KEY_FILE_PATH } from './config'
-
+import { Response } from 'express'
 import Boom from '@hapi/boom'
 import fs from 'fs'
+import { v4 as uuidv4 } from 'uuid'
+
+import {
+  JWT_ALGORITHM,
+  JWT_EXPIRES_IN,
+  JWT_SECRET_KEY,
+  KEY_FILE_PATH,
+  COOKIE_SECRET
+} from './config'
+import { newRefreshExpiry } from './helpers'
+import { request } from './request'
+import { insertRefreshToken } from './queries'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -115,4 +126,30 @@ export function verify(authorization: string | undefined, ignoreErrors = false):
     }
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
+}
+
+export const setRefreshToken = async (
+  response: Response,
+  accountId: string,
+  refresh_token?: string
+): Promise<void> => {
+  if (!refresh_token) refresh_token = uuidv4()
+  try {
+    await request(insertRefreshToken, {
+      refresh_token_data: {
+        account_id: accountId,
+        refresh_token,
+        expires_at: new Date(newRefreshExpiry())
+      }
+    })
+  } catch (err) {
+    throw Boom.badImplementation()
+  }
+  // set refresh token as cookie
+  response.cookie('refresh_token', refresh_token, {
+    httpOnly: true,
+    maxAge: newRefreshExpiry(),
+    signed: Boolean(COOKIE_SECRET),
+    expires: new Date(newRefreshExpiry())
+  })
 }

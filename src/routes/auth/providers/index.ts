@@ -1,5 +1,16 @@
 import { Router } from 'express'
 
-import github from './github'
+import initGitHub from './github'
+import { AUTH_GITHUB_ENABLE } from '@shared/config'
 
-export default Router().use('/github', github)
+const initRoutes = (): Router | undefined => {
+  if (AUTH_GITHUB_ENABLE) {
+    const router = Router()
+    router.use('/github', initGitHub())
+    return router
+  } else {
+    console.log('No OAuth provider is configured')
+  }
+}
+
+export default initRoutes()

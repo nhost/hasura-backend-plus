@@ -10,7 +10,13 @@ import email from './email'
 import mfa from './mfa'
 import providers from './providers'
 
-export default Router()
+const router = Router()
+
+if (providers) {
+  router.use('/providers', providers)
+}
+
+router
   .get('/jwks', getJwks)
   .post('/login', loginAccount)
   .post('/register', registerAccount)
@@ -19,4 +25,5 @@ export default Router()
   .use('/email', email)
   .use('/password', password)
   .use('/mfa', mfa)
-  .use('/providers', providers)
+
+export default router

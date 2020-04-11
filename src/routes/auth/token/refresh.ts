@@ -4,7 +4,7 @@ import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { COOKIE_SECRET } from '@shared/config'
-import { newJwtExpiry } from '@shared/jwt'
+import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -48,12 +48,7 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
     throw Boom.badImplementation()
   }
 
-  res.cookie('refresh_token', new_refresh_token, {
-    httpOnly: true,
-    maxAge: newRefreshExpiry(),
-    signed: Boolean(COOKIE_SECRET),
-    expires: new Date(newRefreshExpiry())
-  })
+  setRefreshToken(res, refresh_token)
 
   return res.send({
     jwt_token: createHasuraJwt(account),

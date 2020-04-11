@@ -1,10 +1,9 @@
 import { Request, Response } from 'express'
-import { changeEmailByTicket, getNewEmailByTicket, rotateTicket } from '@shared/queries'
+import { changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, rotateTicket } from '@shared/helpers'
 import { request } from '@shared/request'
-import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/schema'
 
 interface HasuraData {
@@ -30,12 +29,6 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
       new_email,
       now: new Date()
     })) as HasuraData
-
-    await request(rotateTicket, {
-      ticket,
-      now: new Date(),
-      new_ticket: uuidv4()
-    })
   } catch (err) {
     throw Boom.badImplementation()
   }
@@ -43,6 +36,8 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
   if (!hasuraData.update_auth_accounts.affected_rows) {
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
+
+  await rotateTicket(ticket)
 
   return res.status(204).send()
 }

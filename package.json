@@ -107,16 +107,6 @@
         1,
         "all"
       ],
-      "comma-dangle": [
-        "error",
-        {
-          "arrays": "always-multiline",
-          "objects": "always-multiline",
-          "imports": "always-multiline",
-          "exports": "never",
-          "functions": "ignore"
-        }
-      ],
       "@typescript-eslint/camelcase": "off"
     },
     "parser": "@typescript-eslint/parser",
