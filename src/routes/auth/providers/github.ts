@@ -40,20 +40,15 @@ passport.use(
       scope: ['user:email'],
     },
     async (
-      accessToken: string,
-      refreshToken: string,
+      _: string,
+      __: string,
       profile: Profile,
-      done: (error: null, user: AccountData) => void
+      done: oauth2.VerifyCallback
+      // done: (error: null, user: AccountData) => void
     ) => {
       // TODO: possible check REDIRECT_URLS not undefined?
 
-      console.log('github function')
-      console.log('accessToken:')
-      console.log({ accessToken })
-      console.log('refreshToken:')
-      console.log({ refreshToken })
-      console.log('profile:')
-      console.log({ profile })
+      // account var to send to /callback
       let account
 
       // find or create the user
@@ -62,9 +57,6 @@ passport.use(
         provider: 'github',
         profile_id: profile.id,
       })) as AccountProviderData
-
-      console.log(' hasura data on selectAccountProvider')
-      console.log({ hasuraData })
 
       // IF user is already registerd
       if (hasuraData.auth_account_providers.length > 0) {
@@ -113,7 +105,6 @@ passport.use(
           account: account_data,
         })) as InsertAccountData
       } catch (err) {
-        console.error(err)
         throw Boom.badImplementation()
       }
 
@@ -145,12 +136,8 @@ router.get(
     // However, we send account data.
     const account = req.user as AccountData
 
-    console.log('in call back')
-    console.log('account is now:')
-    console.log({ account })
-
+    // generate new refresh token
     const refresh_token = uuidv4()
-
     try {
       await request(insertRefreshToken, {
         refresh_token_data: {
@@ -163,6 +150,7 @@ router.get(
       throw Boom.badImplementation()
     }
 
+    // set refresh token as cookie
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       maxAge: newRefreshExpiry(),
@@ -170,9 +158,7 @@ router.get(
       expires: new Date(newRefreshExpiry()),
     })
 
-    console.log('redirec to:')
-    console.log(PROVIDERS_SUCCESS_REDIRECT)
-
+    // redirect back user to app url
     res.redirect(PROVIDERS_SUCCESS_REDIRECT as string)
   }
 )
