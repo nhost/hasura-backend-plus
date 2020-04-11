@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express'
 import passport from 'passport'
 import passportGitHub, { Profile } from 'passport-github2'
+import oauth2 from 'passport-oauth2'
 import Boom from '@hapi/boom'
 import {
   AccountProviderData,
