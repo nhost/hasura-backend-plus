@@ -97,14 +97,18 @@ export interface HasuraAccountData {
   auth_accounts: AccountData[]
 }
 
-export interface AccountProviderData {
-  user: {
-    id: string
-  }
+export interface AccountProvider {
+  account: AccountData
 }
 
-export interface HasuraAccountProviderData {
-  auth_account_providers: AccountProviderData[]
+export interface AccountProviderData {
+  auth_account_providers: AccountProvider[]
+}
+
+export interface InsertAccountData {
+  insert_auth_accounts: {
+    returning: AccountData[]
+  }
 }
 
 /**

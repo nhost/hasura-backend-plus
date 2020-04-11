@@ -40,8 +40,8 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
       refresh_token_data: {
         account_id: id,
         refresh_token,
-        expires_at: new Date(newRefreshExpiry())
-      }
+        expires_at: new Date(newRefreshExpiry()),
+      },
     })
   } catch (err) {
     throw Boom.badImplementation()
@@ -51,12 +51,12 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     httpOnly: true,
     maxAge: newRefreshExpiry(),
     signed: Boolean(COOKIE_SECRET),
-    expires: new Date(newRefreshExpiry())
+    expires: new Date(newRefreshExpiry()),
   })
 
   return res.send({
     jwt_token: createHasuraJwt(account),
-    jwt_expires_in: newJwtExpiry
+    jwt_expires_in: newJwtExpiry,
   })
 }
 

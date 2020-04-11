@@ -1,12 +1,36 @@
 import gql from 'graphql-tag'
 import { USER_CLAIMS_FIELDS } from './config'
 
+const accountFragment = gql`
+  fragment accountFragment on auth_accounts {
+    id
+    active
+    default_role
+    account_roles {
+      role
+    }
+    user {
+      id
+      ${USER_CLAIMS_FIELDS.join('\n\t\t\t')}
+    }
+    is_anonymous
+    ticket
+    otp_secret
+    mfa_enabled
+    password_hash
+  }
+`
+
 export const insertAccount = gql`
   mutation($account: auth_accounts_insert_input!) {
     insert_auth_accounts(objects: [$account]) {
       affected_rows
+      returning {
+        ...accountFragment
+      }
     }
   }
+  ${accountFragment}
 `
 
 export const updatePasswordWithTicket = gql`
@@ -28,26 +52,6 @@ export const updatePasswordWithUserId = gql`
     ) {
       affected_rows
     }
-  }
-`
-
-const accountFragment = gql`
-  fragment accountFragment on auth_accounts {
-    id
-    active
-    default_role
-    account_roles {
-      role
-    }
-    user {
-      id
-      ${USER_CLAIMS_FIELDS.join('\n\t\t\t')}
-    }
-    is_anonymous
-    ticket
-    otp_secret
-    mfa_enabled
-    password_hash
   }
 `
 
@@ -227,10 +231,9 @@ export const selectAccountProvider = gql`
       }
     ) {
       account {
-        user {
-          id
-        }
+        ...accountFragment
       }
     }
   }
+  ${accountFragment}
 `
