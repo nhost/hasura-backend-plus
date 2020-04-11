@@ -49,7 +49,6 @@ export const {
   AUTH_GITHUB_ACTIVE = false,
   AUTH_GITHUB_CLIENT_ID,
   AUTH_GITHUB_CLIENT_SECRET,
-  AUTH_GITHUB_CALLBACK_URL,
   AUTH_GITHUB_AUTHORIZATION_URL = null, // enterprise
   AUTH_GITHUB_TOKEN_URL = null, // enterprise
   AUTH_GITHUB_USER_PROFILE_URL = null, // enterprise
@@ -105,3 +104,5 @@ export const USER_CLAIMS_FIELDS = (process.env.USER_CLAIMS_FIELDS || '')
 export const USER_REGISTRATION_FIELDS = (process.env.USER_REGISTRATION_FIELDS || '')
   .split(',')
   .map((field) => field.trim())
+
+export const AUTH_GITHUB_CALLBACK_URL = `${SERVER_URL}/auth/providers/github/callback`
