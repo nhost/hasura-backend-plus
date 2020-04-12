@@ -40,13 +40,12 @@ const passwordRule = Joi.string().min(MIN_PASSWORD_LENGTH).max(128).required()
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
-const accountSchema = {
+const accountFields = {
   email: emailRule,
   password: passwordRule
 }
 
-export const registerSchema = Joi.object({
-  ...accountSchema,
+export const userDataFields = {
   user_data: Joi.object(
     USER_REGISTRATION_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
       (aggr, key) => ({
@@ -62,18 +61,25 @@ export const registerSchema = Joi.object({
       {}
     )
   )
+}
+
+export const registerSchema = Joi.object({
+  ...accountFields,
+  ...userDataFields
 })
 
-const ticketSchema = {
+export const registerUserDataSchema = Joi.object(userDataFields)
+
+const ticketFields = {
   ticket: Joi.string().uuid({ version: 'uuidv4' }).required()
 }
 
-const codeSchema = {
+const codeFields = {
   code: Joi.string().length(6).required()
 }
 
 export const resetPasswordWithTicketSchema = Joi.object({
-  ...ticketSchema,
+  ...ticketFields,
   new_password: passwordRule
 })
 
@@ -87,8 +93,8 @@ export const emailResetSchema = Joi.object({
   new_email: emailRule
 })
 
-export const mfaSchema = Joi.object(codeSchema)
-export const loginSchema = extendedJoi.object(accountSchema)
+export const mfaSchema = Joi.object(codeFields)
+export const loginSchema = extendedJoi.object(accountFields)
 export const forgotSchema = Joi.object({ email: emailRule })
-export const verifySchema = Joi.object({ ...ticketSchema })
-export const totpSchema = Joi.object({ ...codeSchema, ...ticketSchema })
+export const verifySchema = Joi.object({ ...ticketFields })
+export const totpSchema = Joi.object({ ...codeFields, ...ticketFields })

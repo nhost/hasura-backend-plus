@@ -38,6 +38,21 @@ export const {
   DEFAULT_USER_ROLE = 'user',
 
   /**
+   * External OAuth provider redirect URLS
+   */
+  PROVIDERS_SUCCESS_REDIRECT = REDIRECT_URL_SUCCESS,
+  PROVIDERS_FAILURE_REDIRECT = REDIRECT_URL_ERROR,
+
+  /**
+   * Github OAuth provider settings
+   */
+  AUTH_GITHUB_CLIENT_ID,
+  AUTH_GITHUB_CLIENT_SECRET,
+  AUTH_GITHUB_AUTHORIZATION_URL, // enterprise
+  AUTH_GITHUB_TOKEN_URL, // enterprise
+  AUTH_GITHUB_USER_PROFILE_URL, // enterprise
+
+  /**
    * Rate limiter.
    */
   MAX_REQUESTS = 100,
@@ -70,6 +85,7 @@ export const AUTO_ACTIVATE_USER_ON_REGISTRATION = getBooleanEnv(
 export const HIBP_ENABLED = getBooleanEnv('HIBP_ENABLED')
 export const SMTP_ENABLED = getBooleanEnv('SMTP_ENABLED')
 export const SMTP_SECURE = getBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
+export const AUTH_GITHUB_ENABLE = getBooleanEnv('AUTH_GITHUB_ENABLE')
 
 export const REFRESH_EXPIRES_IN = parseInt(process.env.REFRESH_EXPIRES_IN as string, 10) || 43200
 export const JWT_EXPIRES_IN = parseInt(process.env.JWT_EXPIRES_IN as string, 10) || 15
@@ -88,3 +104,5 @@ export const USER_CLAIMS_FIELDS = (process.env.USER_CLAIMS_FIELDS || '')
 export const USER_REGISTRATION_FIELDS = (process.env.USER_REGISTRATION_FIELDS || '')
   .split(',')
   .map((field) => field.trim())
+
+export const AUTH_GITHUB_CALLBACK_URL = `${SERVER_URL}/auth/providers/github/callback`

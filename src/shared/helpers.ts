@@ -1,7 +1,12 @@
 import { DEFAULT_USER_ROLE, HIBP_ENABLED, REFRESH_EXPIRES_IN } from './config'
 import { NextFunction, Request, Response } from 'express'
-import { selectAccountByEmail, selectAccountByTicket } from './queries'
+import {
+  selectAccountByEmail,
+  selectAccountByTicket,
+  rotateTicket as rotateTicketQuery
+} from './queries'
 import kebabCase from 'lodash.kebabcase'
+import { v4 as uuidv4 } from 'uuid'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
@@ -97,6 +102,20 @@ export interface HasuraAccountData {
   auth_accounts: AccountData[]
 }
 
+export interface AccountProvider {
+  account: AccountData
+}
+
+export interface AccountProviderData {
+  auth_account_providers: AccountProvider[]
+}
+
+export interface InsertAccountData {
+  insert_auth_accounts: {
+    returning: AccountData[]
+  }
+}
+
 /**
  * Looks for an account in the database, first by email, second by ticket
  * @param httpBody
@@ -152,3 +171,18 @@ export const checkHibp = async (password: string): Promise<void> => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const generateRandomString = (): any => Math.random().toString(36).replace('0.', '')
+
+export const rotateTicket = async (ticket: string): Promise<void> => {
+  try {
+    /**
+     * Rotate account ticket.
+     */
+    await request(rotateTicketQuery, {
+      ticket,
+      now: new Date(),
+      new_ticket: uuidv4()
+    })
+  } catch (err) {
+    throw Boom.badImplementation()
+  }
+}

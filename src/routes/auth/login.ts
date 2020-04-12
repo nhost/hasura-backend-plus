@@ -1,14 +1,10 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, newRefreshExpiry, selectAccount } from '@shared/helpers'
+import { asyncWrapper, createHasuraJwt, selectAccount } from '@shared/helpers'
 
 import Boom from '@hapi/boom'
-import { COOKIE_SECRET } from '@shared/config'
 import argon2 from 'argon2'
-import { insertRefreshToken } from '@shared/queries'
 import { loginSchema } from '@shared/schema'
-import { newJwtExpiry } from '@shared/jwt'
-import { request } from '@shared/request'
-import { v4 as uuidv4 } from 'uuid'
+import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
@@ -33,26 +29,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     throw Boom.unauthorized('Password does not match.')
   }
 
-  const refresh_token = uuidv4()
-
-  try {
-    await request(insertRefreshToken, {
-      refresh_token_data: {
-        account_id: id,
-        refresh_token,
-        expires_at: new Date(newRefreshExpiry())
-      }
-    })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-
-  res.cookie('refresh_token', refresh_token, {
-    httpOnly: true,
-    maxAge: newRefreshExpiry(),
-    signed: Boolean(COOKIE_SECRET),
-    expires: new Date(newRefreshExpiry())
-  })
+  await setRefreshToken(res, id)
 
   return res.send({
     jwt_token: createHasuraJwt(account),
