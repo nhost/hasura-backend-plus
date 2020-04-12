@@ -18,9 +18,6 @@ import request from 'supertest'
 import { selectAccountByEmail } from '@shared/queries'
 import { Token } from '@shared/jwt'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-console.error = function (): void {} // Disable the errors that will be raised by the tests
-
 /**
  * Store variables in memory.
  */
