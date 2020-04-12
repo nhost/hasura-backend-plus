@@ -8,8 +8,6 @@ const initRoutes = (): Router | undefined => {
     const router = Router()
     router.use('/github', initGitHub())
     return router
-  } else {
-    console.log('No OAuth provider is configured')
   }
 }
 

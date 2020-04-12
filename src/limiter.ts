@@ -16,8 +16,8 @@ interface LimitMessage extends Message {
 export const limiter = rateLimit({
   headers: true,
 
-  max: parseInt(MAX_REQUESTS as string),
-  windowMs: parseInt(TIME_FRAME as string),
+  max: MAX_REQUESTS,
+  windowMs: TIME_FRAME,
 
   /**
    * To use the above created interface, an `unknown`

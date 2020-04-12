@@ -54,8 +54,6 @@ export const uploadFile = async (
     try {
       await s3.upload(upload_params).promise()
     } catch (err) {
-      console.log('upload pb')
-      console.log(err)
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {

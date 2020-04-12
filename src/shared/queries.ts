@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { USER_CLAIMS_FIELDS } from './config'
+import { AUTH_CLAIMS_FIELDS } from './config'
 
 const accountFragment = gql`
   fragment accountFragment on auth_accounts {
@@ -11,7 +11,7 @@ const accountFragment = gql`
     }
     user {
       id
-      ${USER_CLAIMS_FIELDS.join('\n\t\t\t')}
+      ${AUTH_CLAIMS_FIELDS.join('\n\t\t\t')}
     }
     is_anonymous
     ticket

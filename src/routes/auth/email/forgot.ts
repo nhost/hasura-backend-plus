@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { saveNewEmail, selectAccountByEmail } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { SMTP_ENABLED } from '@shared/config'
+import { SMTP_ENABLE } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { emailResetSchema } from '@shared/schema'
 import { request } from '@shared/request'
@@ -27,7 +27,7 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
 
   const ticket = account.ticket
 
-  if (SMTP_ENABLED) {
+  if (SMTP_ENABLE) {
     try {
       await emailClient.send({
         template: 'email',
