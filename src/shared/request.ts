@@ -13,8 +13,10 @@ import { print } from 'graphql/language/printer'
  * https://github.com/prisma-labs/graphql-request/issues/10
  */
 export function request(query: ASTNode, variables?: Variables): Promise<unknown> {
-  const client = new GraphQLClient(HASURA_ENDPOINT as string, {
-    headers: { 'x-hasura-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET as string }
+  const client = new GraphQLClient(HASURA_ENDPOINT, {
+    headers: HASURA_GRAPHQL_ADMIN_SECRET
+      ? { 'x-hasura-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET }
+      : undefined
   })
 
   return client.request(print(query), variables)

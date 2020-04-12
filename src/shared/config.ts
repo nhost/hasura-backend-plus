@@ -25,10 +25,10 @@ export const {
   REDIRECT_URL_ERROR,
   REDIRECT_URL_SUCCESS,
   // Hasura settings.
-  HASURA_ENDPOINT,
   HASURA_GRAPHQL_ADMIN_SECRET
 } = process.env
 export const PORT = castIntEnv('PORT', 3000)
+export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
 
 /**
  * * Rate limiter settings
