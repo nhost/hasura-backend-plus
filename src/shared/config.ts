@@ -2,14 +2,14 @@ import Boom from '@hapi/boom'
 import dotenv from 'dotenv'
 import path from 'path'
 
-// Load '.env' file if production mode, '.env.<NODE_ENV>' otherwise
+// * Load '.env' file if production mode, '.env.<NODE_ENV>' otherwise
 const envFile =
   process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
     ? `.env.${process.env.NODE_ENV}`
     : '.env'
 dotenv.config({ path: envFile })
 
-// Helpers for casting environment variables
+// * Helpers for casting environment variables
 const castBooleanEnv = (envVar: string, defaultValue = false): boolean =>
   process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue
 const castIntEnv = (envVar: string, defaultValue: number): number =>
@@ -18,7 +18,7 @@ const castStringArrayEnv = (envVar: string): string[] =>
   (process.env[envVar] || '').split(',').map((field) => field.trim())
 
 /**
- * Application Settings
+ * * Application Settings
  */
 export const {
   SERVER_URL,
@@ -31,13 +31,13 @@ export const {
 export const PORT = castIntEnv('PORT', 3000)
 
 /**
- * Rate limiter.
+ * * Rate limiter settings
  */
 export const MAX_REQUESTS = castIntEnv('MAX_REQUESTS', 100)
 export const TIME_FRAME = castIntEnv('TIME_FRAME', 15 * 60 * 1000)
 
 /**
- * Authentication settings
+ * * Authentication settings
  */
 export const {
   COOKIE_SECRET,
@@ -77,29 +77,21 @@ export const JWT_EXPIRES_IN = castIntEnv('JWT_EXPIRES_IN', 15)
 export const MIN_PASSWORD_LENGTH = castIntEnv('MIN_PASSWORD_LENGTH', 3)
 
 /**
- * Storage Settings
+ * * Storage Settings
  */
 export const STORAGE_ENABLE = castBooleanEnv('STORAGE_ENABLE', true)
 export const { S3_BUCKET, S3_ENDPOINT, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY } = process.env
 
 /**
- * SMTP Environment Variables
+ * * SMTP Settings
  */
-export const {
-  /**
-   * SMTP settings.
-   */
-  SMTP_PASS,
-  SMTP_HOST,
-  SMTP_USER,
-  SMTP_SENDER = SMTP_USER
-} = process.env
+export const { SMTP_PASS, SMTP_HOST, SMTP_USER, SMTP_SENDER = SMTP_USER } = process.env
 export const SMTP_ENABLE = castBooleanEnv('SMTP_ENABLE')
 export const SMTP_PORT = castIntEnv('SMTP_PORT', 587)
 export const SMTP_SECURE = castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
 
 /**
- * Check required settings, and raise an error if some are missing.
+ * * Check required settings, and raise an error if some are missing.
  */
 if (!HASURA_ENDPOINT) {
   throw Boom.badImplementation('No Hasura GraphQL endpoint found.')
