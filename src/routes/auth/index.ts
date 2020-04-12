@@ -9,11 +9,16 @@ import password from './password'
 import email from './email'
 import mfa from './mfa'
 import providers from './providers'
+import { AUTH_MFA_ENABLE } from '@shared/config'
 
 const router = Router()
 
 if (providers) {
   router.use('/providers', providers)
+}
+
+if (AUTH_MFA_ENABLE) {
+  router.use('/mfa', mfa)
 }
 
 router
@@ -24,6 +29,5 @@ router
   .use('/account', account)
   .use('/email', email)
   .use('/password', password)
-  .use('/mfa', mfa)
 
 export default router

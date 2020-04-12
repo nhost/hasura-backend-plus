@@ -56,11 +56,10 @@ try {
   try {
     storageRules = yaml.safeLoad(fileContents) as StorageRules
   } catch (e) {
-    console.log('Custom storage security rules: invalid YAML file.')
-    console.log(e)
+    throw Boom.badImplementation('Custom storage security rules: invalid YAML file.')
   }
 } catch (e) {
-  console.log('No custom storage security rules found.')
+  console.warn('No custom storage security rules found.')
 }
 
 export const STORAGE_RULES = storageRules
@@ -156,7 +155,6 @@ export const replaceMetadata = async (
   try {
     await s3.copyObject(params).promise()
   } catch (err) {
-    console.log(err)
     throw Boom.badImplementation('Impossible to update the object metadata.')
   }
 }

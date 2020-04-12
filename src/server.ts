@@ -7,7 +7,7 @@ import fileUpload from 'express-fileupload'
 import helmet from 'helmet'
 import { json } from 'body-parser'
 import { limiter } from './limiter'
-import { router } from './routes'
+import router from './routes'
 
 const app = express()
 

@@ -4,10 +4,10 @@ import 'jest-extended'
 import { JWT } from 'jose'
 
 import {
-  AUTO_ACTIVATE_USER_ON_REGISTRATION,
-  HIBP_ENABLED,
+  AUTH_AUTO_ACTIVATE_NEW_USERS,
+  AUTH_HIBP_ENABLE,
   SERVER_URL,
-  SMTP_ENABLED
+  SMTP_ENABLE
 } from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
@@ -17,9 +17,6 @@ import { app } from '../../server'
 import request from 'supertest'
 import { selectAccountByEmail } from '@shared/queries'
 import { Token } from '@shared/jwt'
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-console.error = function (): void {} // Disable the errors that will be raised by the tests
 
 /**
  * Store variables in memory.
@@ -56,10 +53,10 @@ it('should tell the account already exists', async () => {
 /**
  * * Only run this test if auto activation is disabled
  */
-const manualActivationIt = !AUTO_ACTIVATE_USER_ON_REGISTRATION ? it : it.skip
+const manualActivationIt = !AUTH_AUTO_ACTIVATE_NEW_USERS ? it : it.skip
 manualActivationIt('should activate the account', async () => {
   let activateLink: string
-  if (SMTP_ENABLED) {
+  if (SMTP_ENABLE) {
     // Sends the email, checks if it's received and use the link for activation
     const [message] = await mailHogSearch(email)
     expect(message).toBeTruthy()
@@ -103,7 +100,7 @@ it('should delete the account', async () => {
   expect(status).toEqual(204)
 })
 
-const pwndPasswordIt = HIBP_ENABLED ? it : it.skip
+const pwndPasswordIt = AUTH_HIBP_ENABLE ? it : it.skip
 pwndPasswordIt('should tell the password has been pwned', async () => {
   const {
     status,

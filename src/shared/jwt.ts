@@ -8,7 +8,7 @@ import {
   JWT_ALGORITHM,
   JWT_EXPIRES_IN,
   JWT_SECRET_KEY,
-  KEY_FILE_PATH,
+  AUTH_KEY_FILE_PATH,
   COOKIE_SECRET
 } from './config'
 import { newRefreshExpiry } from './helpers'
@@ -38,11 +38,11 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
     }
   } else {
     try {
-      const file = fs.readFileSync(KEY_FILE_PATH)
+      const file = fs.readFileSync(AUTH_KEY_FILE_PATH)
       jwtKey = JWK.asKey(file)
     } catch (error) {
       jwtKey = JWK.generateSync('RSA', 2048, { alg: JWT_ALGORITHM, use: 'sig' }, true)
-      fs.writeFileSync(KEY_FILE_PATH, jwtKey.toPEM(true))
+      fs.writeFileSync(AUTH_KEY_FILE_PATH, jwtKey.toPEM(true))
     }
   }
 } else if (SHA_TYPES.includes(JWT_ALGORITHM)) {
@@ -133,7 +133,9 @@ export const setRefreshToken = async (
   accountId: string,
   refresh_token?: string
 ): Promise<void> => {
-  if (!refresh_token) refresh_token = uuidv4()
+  if (!refresh_token) {
+    refresh_token = uuidv4()
+  }
   try {
     await request(insertRefreshToken, {
       refresh_token_data: {

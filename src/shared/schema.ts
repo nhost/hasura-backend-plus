@@ -1,4 +1,4 @@
-import { ALLOWED_EMAIL_DOMAINS, USER_REGISTRATION_FIELDS, MIN_PASSWORD_LENGTH } from './config'
+import { ALLOWED_EMAIL_DOMAINS, AUTH_REGISTRATION_FIELDS, MIN_PASSWORD_LENGTH } from './config'
 import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
@@ -47,7 +47,7 @@ const accountFields = {
 
 export const userDataFields = {
   user_data: Joi.object(
-    USER_REGISTRATION_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
+    AUTH_REGISTRATION_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
       (aggr, key) => ({
         ...aggr,
         [key]: [

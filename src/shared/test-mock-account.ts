@@ -1,20 +1,24 @@
 import { HasuraAccountData } from '@shared/helpers'
 import { SuperTest, Test, agent } from 'supertest'
 
-import { AUTO_ACTIVATE_USER_ON_REGISTRATION } from '@shared/config'
+import { AUTH_AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
 import { request as admin } from '@shared/request'
 import { app } from '../server'
 import { deleteEmailsOfAccount, TestAccount, createAccount } from '@shared/test-utils'
 import { selectAccountByEmail } from '@shared/queries'
 import { JWT } from 'jose'
 import { Token } from './jwt'
+import Boom from '@hapi/boom'
 
 export let request: SuperTest<Test>
 
 export let account: TestAccount
 
 export const getUserId = (): string => {
-  const decodedJwt = JWT.decode(account.token as string) as Token
+  if (!account.token) {
+    throw Boom.internal('No token found')
+  }
+  const decodedJwt = JWT.decode(account.token) as Token
   return decodedJwt['https://hasura.io/jwt/claims']['x-hasura-user-id']
 }
 // * Code that is executed before any jest test file that imports this file
@@ -23,7 +27,7 @@ beforeAll(async () => {
   // * Create a mock account
   const { email, password } = createAccount()
   await request.post('/auth/register').send({ email, password })
-  if (!AUTO_ACTIVATE_USER_ON_REGISTRATION) {
+  if (!AUTH_AUTO_ACTIVATE_NEW_USERS) {
     const hasuraData = (await admin(selectAccountByEmail, { email })) as HasuraAccountData
     const ticket = hasuraData.auth_accounts[0].ticket
     await request.get(`/auth/account/activate?ticket=${ticket}`)

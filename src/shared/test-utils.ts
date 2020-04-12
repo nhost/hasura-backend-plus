@@ -3,6 +3,9 @@ import fetch, { Response } from 'node-fetch'
 import { SMTP_HOST } from '@shared/config'
 import { generateRandomString } from '@shared/helpers'
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+console.error = function (): void {} // Disable the errors that will be raised by the tests
+
 interface MailhogEmailAddress {
   Relays: string | null
   Mailbox: string
