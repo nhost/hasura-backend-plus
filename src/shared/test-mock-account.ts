@@ -8,13 +8,17 @@ import { deleteEmailsOfAccount, TestAccount, createAccount } from '@shared/test-
 import { selectAccountByEmail } from '@shared/queries'
 import { JWT } from 'jose'
 import { Token } from './jwt'
+import Boom from '@hapi/boom'
 
 export let request: SuperTest<Test>
 
 export let account: TestAccount
 
 export const getUserId = (): string => {
-  const decodedJwt = JWT.decode(account.token as string) as Token
+  if (!account.token) {
+    throw Boom.internal('No token found')
+  }
+  const decodedJwt = JWT.decode(account.token) as Token
   return decodedJwt['https://hasura.io/jwt/claims']['x-hasura-user-id']
 }
 // * Code that is executed before any jest test file that imports this file
