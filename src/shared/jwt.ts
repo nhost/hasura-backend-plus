@@ -1,19 +1,19 @@
-import { JWK, JWKS, JWT } from 'jose'
-import { Response } from 'express'
-import Boom from '@hapi/boom'
-import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'
-
 import {
+  AUTH_KEY_FILE_PATH,
+  COOKIE_SECRET,
   JWT_ALGORITHM,
   JWT_EXPIRES_IN,
-  JWT_SECRET_KEY,
-  AUTH_KEY_FILE_PATH,
-  COOKIE_SECRET
+  JWT_SECRET_KEY
 } from './config'
+import { JWK, JWKS, JWT } from 'jose'
+
+import Boom from '@hapi/boom'
+import { Response } from 'express'
+import fs from 'fs'
+import { insertRefreshToken } from './queries'
 import { newRefreshExpiry } from './helpers'
 import { request } from './request'
-import { insertRefreshToken } from './queries'
+import { v4 as uuidv4 } from 'uuid'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']

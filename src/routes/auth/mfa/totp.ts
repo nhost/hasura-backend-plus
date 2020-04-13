@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, selectAccount, rotateTicket } from '@shared/helpers'
+import { asyncWrapper, createHasuraJwt, rotateTicket, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
-import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
 import { totpSchema } from '@shared/schema'
 
 async function totpLogin({ body }: Request, res: Response): Promise<unknown> {

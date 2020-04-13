@@ -1,5 +1,5 @@
-import gql from 'graphql-tag'
 import { AUTH_CLAIMS_FIELDS } from './config'
+import gql from 'graphql-tag'
 
 const accountFragment = gql`
   fragment accountFragment on auth_accounts {

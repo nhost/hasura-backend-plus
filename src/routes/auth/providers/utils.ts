@@ -1,14 +1,14 @@
+import { AccountData, AccountProviderData, InsertAccountData } from '@shared/helpers'
 import { Request, Response } from 'express'
+import { insertAccount, selectAccountProvider } from '@shared/queries'
+
+import Boom from '@hapi/boom'
+import { PROVIDERS_SUCCESS_REDIRECT } from '@shared/config'
 import { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
-import Boom from '@hapi/boom'
-
-import { insertAccount, selectAccountProvider } from '@shared/queries'
-import { request } from '@shared/request'
-import { InsertAccountData, AccountProviderData, AccountData } from '@shared/helpers'
-import { PROVIDERS_SUCCESS_REDIRECT } from '@shared/config'
-import { setRefreshToken } from '@shared/jwt'
 import { registerUserDataSchema } from '@shared/schema'
+import { request } from '@shared/request'
+import { setRefreshToken } from '@shared/jwt'
 
 type Providers = 'github'
 

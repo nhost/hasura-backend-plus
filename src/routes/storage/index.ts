@@ -1,10 +1,10 @@
-import { Router, NextFunction, Request, Response } from 'express'
+import { META_PREFIX, STORAGE_RULES, StoragePermissions, containsSomeRule } from './utils'
+import { NextFunction, Request, Response, Router } from 'express'
 
-import { STORAGE_RULES, StoragePermissions, META_PREFIX, containsSomeRule } from './utils'
-import { uploadFile } from './upload'
-import { getFile } from './get'
 import { deleteFile } from './delete'
+import { getFile } from './get'
 import { listFile } from './list'
+import { uploadFile } from './upload'
 
 const router = Router()
 

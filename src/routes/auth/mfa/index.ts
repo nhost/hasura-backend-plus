@@ -1,9 +1,8 @@
 import { Router } from 'express'
-
-import totpLogin from './totp'
-import enableMfa from './enable'
 import disableMfa from './disable'
+import enableMfa from './enable'
 import generateMfa from './generate'
+import totpLogin from './totp'
 
 export default Router()
   .post('/disable', disableMfa)

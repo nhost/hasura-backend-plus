@@ -1,18 +1,18 @@
-import { Router } from 'express'
-import passport from 'passport'
-import { Strategy } from 'passport-github2'
-
 import {
-  PROVIDERS_FAILURE_REDIRECT,
+  AUTH_GITHUB_AUTHORIZATION_URL,
+  AUTH_GITHUB_CALLBACK_URL,
   AUTH_GITHUB_CLIENT_ID,
   AUTH_GITHUB_CLIENT_SECRET,
-  AUTH_GITHUB_CALLBACK_URL,
-  AUTH_GITHUB_AUTHORIZATION_URL,
   AUTH_GITHUB_TOKEN_URL,
-  AUTH_GITHUB_USER_PROFILE_URL
+  AUTH_GITHUB_USER_PROFILE_URL,
+  PROVIDERS_FAILURE_REDIRECT
 } from '@shared/config'
 import { manageProviderStrategy, providerCallback } from './utils'
+
 import Boom from '@hapi/boom'
+import { Router } from 'express'
+import { Strategy } from 'passport-github2'
+import passport from 'passport'
 
 const initRoutes = (): Router => {
   if (!AUTH_GITHUB_CLIENT_ID || !AUTH_GITHUB_CLIENT_SECRET || !AUTH_GITHUB_CALLBACK_URL) {

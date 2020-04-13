@@ -1,13 +1,14 @@
-import yaml from 'js-yaml'
-import fs from 'fs'
+import { Claims, verify } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
-import { verify, Claims } from '@shared/jwt'
-import { Request } from 'express'
-import path from 'path'
+
 import Boom from '@hapi/boom'
-import { S3_BUCKET } from '@shared/config'
-import { s3 } from '@shared/s3'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
+import { Request } from 'express'
+import { S3_BUCKET } from '@shared/config'
+import fs from 'fs'
+import path from 'path'
+import { s3 } from '@shared/s3'
+import yaml from 'js-yaml'
 
 export const META_PREFIX = '/meta'
 export interface StoragePermissions {

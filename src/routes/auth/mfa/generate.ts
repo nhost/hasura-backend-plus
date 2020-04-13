@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, createQR } from '@shared/helpers'
 
-import Boom from '@hapi/boom'
 import { AUTH_OTP_ISSUER } from '@shared/config'
+import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 import { updateOtpSecret } from '@shared/queries'

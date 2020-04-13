@@ -103,10 +103,7 @@
   "eslintConfig": {
     "root": true,
     "rules": {
-      "curly": [
-        1,
-        "all"
-      ],
+      "sort-imports": "error",
       "@typescript-eslint/camelcase": "off"
     },
     "parser": "@typescript-eslint/parser",
