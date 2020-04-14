@@ -17,7 +17,7 @@ services:
     environment:
       HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/postgres
-      HASURA_GRAPHQL_JWT_SECRET_KEY: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
+      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/jwks"}'
     volumes:
       - ./migrations:/hasura-migrations
   hasura-backend-plus:
