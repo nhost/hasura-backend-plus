@@ -1,4 +1,5 @@
 import fetch, { Response } from 'node-fetch'
+import request, { SuperTest, Test } from 'supertest'
 
 import { SMTP_HOST } from '@shared/config'
 import { generateRandomString } from '@shared/helpers'
@@ -70,3 +71,21 @@ export const deleteMailHogEmail = async ({ ID }: MailhogMessage): Promise<Respon
 
 export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
   (await mailHogSearch(email)).forEach(async (message) => await deleteMailHogEmail(message))
+
+// Init a superset agent with possibly mocked config constants
+export const initAgent = (
+  config: {
+    [key: string]: boolean | string | number | string[] | undefined
+  } = {}
+): SuperTest<Test> => {
+  jest.mock('@shared/config', () => ({
+    ...jest.requireActual('@shared/config'),
+    ...config
+  }))
+  jest.resetModules() // TODO only reset '../server'
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { app } = require('../server')
+  return request(app)
+}
+
+// TODO Jest sometimes crashes: JavaScript heap out of memory. Most likely superagent is not properly initiated

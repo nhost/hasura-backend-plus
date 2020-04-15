@@ -52,29 +52,43 @@ export const AUTH_CLAIMS_FIELDS = castStringArrayEnv('AUTH_CLAIMS_FIELDS')
 export const AUTH_HIBP_ENABLE = castBooleanEnv('AUTH_HIBP_ENABLE')
 export const AUTH_KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
 export const AUTH_REGISTRATION_FIELDS = castStringArrayEnv('AUTH_REGISTRATION_FIELDS')
+export const REFRESH_EXPIRES_IN = castIntEnv('REFRESH_EXPIRES_IN', 43200)
+export const JWT_EXPIRES_IN = castIntEnv('JWT_EXPIRES_IN', 15)
+export const MIN_PASSWORD_LENGTH = castIntEnv('MIN_PASSWORD_LENGTH', 3)
 
 // Multi-Factor Authentication configuration
 export const AUTH_MFA_ENABLE = castBooleanEnv('AUTH_MFA_ENABLE', true)
 
-// OAuth settings
-export const AUTH_GITHUB_ENABLE = castBooleanEnv('AUTH_GITHUB_ENABLE')
-export const AUTH_GITHUB_CALLBACK_URL = `${SERVER_URL}/auth/providers/github/callback`
+/**
+ * * OAuth settings
+ */
 export const {
   // External OAuth provider redirect URLS
   PROVIDERS_SUCCESS_REDIRECT = REDIRECT_URL_SUCCESS,
-  PROVIDERS_FAILURE_REDIRECT = REDIRECT_URL_ERROR,
-  //Github OAuth provider settings
+  PROVIDERS_FAILURE_REDIRECT = REDIRECT_URL_ERROR
+} = process.env
+
+//Github OAuth provider settings
+export const AUTH_GITHUB_ENABLE = castBooleanEnv('AUTH_GITHUB_ENABLE')
+export const {
   AUTH_GITHUB_CLIENT_ID,
   AUTH_GITHUB_CLIENT_SECRET,
+  AUTH_GITHUB_CALLBACK_URL,
   AUTH_GITHUB_AUTHORIZATION_URL, // enterprise
   AUTH_GITHUB_TOKEN_URL, // enterprise
   AUTH_GITHUB_USER_PROFILE_URL // enterprise
 } = process.env
 
-export const REFRESH_EXPIRES_IN = castIntEnv('REFRESH_EXPIRES_IN', 43200)
-export const JWT_EXPIRES_IN = castIntEnv('JWT_EXPIRES_IN', 15)
-export const MIN_PASSWORD_LENGTH = castIntEnv('MIN_PASSWORD_LENGTH', 3)
+// Google
+export const AUTH_GOOGLE_ENABLE = castBooleanEnv('AUTH_GOOGLE_ENABLE')
+export const {
+  AUTH_GOOGLE_CLIENT_ID,
+  AUTH_GOOGLE_CLIENT_SECRET,
+  AUTH_GOOGLE_CALLBACK_URL
+} = process.env
 
+// Returns true if at least one of the providers is enabled
+export const AUTH_PROVIDERS_ENABLE = AUTH_GITHUB_ENABLE || AUTH_GOOGLE_ENABLE
 /**
  * * Storage Settings
  */
