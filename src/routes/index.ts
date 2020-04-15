@@ -1,8 +1,8 @@
-import { Router } from 'express'
+import { AUTH_ENABLE, STORAGE_ENABLE } from '@shared/config'
 
+import { Router } from 'express'
 import auth from './auth'
 import storage from './storage'
-import { AUTH_ENABLE, STORAGE_ENABLE } from '@shared/config'
 
 const router = Router()
 

@@ -1,3 +1,4 @@
+import { AUTH_GITHUB_ENABLE } from '@shared/config'
 import { Router } from 'express'
 
 import github from './github'

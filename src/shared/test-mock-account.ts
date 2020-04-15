@@ -1,14 +1,14 @@
-import { HasuraAccountData } from '@shared/helpers'
 import { SuperTest, Test, agent } from 'supertest'
+import { TestAccount, createAccount, deleteEmailsOfAccount } from '@shared/test-utils'
 
 import { AUTH_AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
-import { request as admin } from '@shared/request'
-import { app } from '../server'
-import { deleteEmailsOfAccount, TestAccount, createAccount } from '@shared/test-utils'
-import { selectAccountByEmail } from '@shared/queries'
+import Boom from '@hapi/boom'
+import { HasuraAccountData } from '@shared/helpers'
 import { JWT } from 'jose'
 import { Token } from './jwt'
-import Boom from '@hapi/boom'
+import { request as admin } from '@shared/request'
+import { app } from '../server'
+import { selectAccountByEmail } from '@shared/queries'
 
 export let request: SuperTest<Test>
 

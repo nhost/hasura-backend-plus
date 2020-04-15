@@ -1,7 +1,6 @@
 /* eslint-disable jest/no-standalone-expect */
 
 import 'jest-extended'
-import { JWT } from 'jose'
 
 import {
   AUTH_AUTO_ACTIVATE_NEW_USERS,
@@ -12,11 +11,12 @@ import {
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
+import { JWT } from 'jose'
+import { Token } from '@shared/jwt'
 import { request as admin } from '@shared/request'
 import { app } from '../../server'
 import request from 'supertest'
 import { selectAccountByEmail } from '@shared/queries'
-import { Token } from '@shared/jwt'
 
 /**
  * Store variables in memory.

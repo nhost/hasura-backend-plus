@@ -9,6 +9,7 @@ import { request } from '@shared/request'
 import { InsertAccountData, AccountProviderData, AccountData } from '@shared/helpers'
 import { PROVIDERS_SUCCESS_REDIRECT, PROVIDERS_FAILURE_REDIRECT, SERVER_URL } from '@shared/config'
 import * as _config from '@shared/config'
+
 import { setRefreshToken } from '@shared/jwt'
 
 const manageProviderStrategy = (provider: string) => async (

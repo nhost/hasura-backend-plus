@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
+import { asyncWrapper, rotateTicket } from '@shared/helpers'
 import { changeEmailByTicket, getNewEmailByTicket } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { asyncWrapper, rotateTicket } from '@shared/helpers'
 import { request } from '@shared/request'
 import { verifySchema } from '@shared/schema'
 

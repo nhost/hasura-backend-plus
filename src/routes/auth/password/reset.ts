@@ -3,8 +3,8 @@ import { Request, Response } from 'express'
 import { resetPasswordWithOldPasswordSchema, resetPasswordWithTicketSchema } from '@shared/schema'
 import {
   selectAccountByUserId,
-  updatePasswordWithUserId,
-  updatePasswordWithTicket
+  updatePasswordWithTicket,
+  updatePasswordWithUserId
 } from '@shared/queries'
 
 import Boom from '@hapi/boom'

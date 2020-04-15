@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express'
-import Boom from '@hapi/boom'
-import archiver from 'archiver'
+import { NextFunction, Request, Response } from 'express'
+import { StoragePermissions, createContext, getKey, hasPermission } from './utils'
 
+import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
+import archiver from 'archiver'
 import { s3 } from '@shared/s3'
-import { hasPermission, createContext, getKey, StoragePermissions } from './utils'
 
 export const listFile = async (
   req: Request,

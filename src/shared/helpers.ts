@@ -1,19 +1,19 @@
 import { AUTH_DEFAULT_ROLE, AUTH_HIBP_ENABLE, REFRESH_EXPIRES_IN } from './config'
+import { ClaimValueType, sign } from './jwt'
 import { NextFunction, Request, Response } from 'express'
 import {
+  rotateTicket as rotateTicketQuery,
   selectAccountByEmail,
-  selectAccountByTicket,
-  rotateTicket as rotateTicketQuery
+  selectAccountByTicket
 } from './queries'
-import kebabCase from 'lodash.kebabcase'
-import { v4 as uuidv4 } from 'uuid'
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import argon2 from 'argon2'
+import kebabCase from 'lodash.kebabcase'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
-import { sign, ClaimValueType } from './jwt'
+import { v4 as uuidv4 } from 'uuid'
 
 /**
  * New refresh token expiry date.

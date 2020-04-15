@@ -1,9 +1,10 @@
 import 'jest-extended'
+
+import { account, getUserId, request } from '@shared/test-mock-account'
+
 import fs from 'fs'
 import { promisify } from 'util'
 import { v4 as uuidv4 } from 'uuid'
-
-import { account, request, getUserId } from '@shared/test-mock-account'
 
 const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
