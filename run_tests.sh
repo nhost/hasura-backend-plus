@@ -16,7 +16,7 @@ docker-compose -p hbp_test -f docker-compose.yaml -f docker-compose.test.yaml up
 { # 'try' block
     wait-for http://localhost:3000/healthz "Hasura Backend Plus"
     wait-for http://localhost:8080/healthz "Hasura Graphql Engine"
-    docker exec -it hbp_test_hasura-backend-plus_1 yarn test
+    docker exec -i hbp_test_hasura-backend-plus_1 yarn test
 } || { # 'catch' block
     test_failed=true
 }
