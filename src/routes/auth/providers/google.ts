@@ -1,17 +1,17 @@
 import { Router } from 'express'
-import { Strategy } from 'passport-github2'
+import { Strategy } from 'passport-google-oauth20'
 import Boom from '@hapi/boom'
-import { AUTH_PROVIDERS } from '@shared/config'
 import { initProvider } from './utils'
+import { AUTH_PROVIDERS } from '@shared/config'
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.github
+  const options = AUTH_PROVIDERS.google
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {
     // Checks if the strategy has at least a client ID and a client secret
     if (!options.clientID || !options.clientSecret) {
-      throw Boom.badImplementation(`Missing environment variables for GitHub OAuth.`)
+      throw Boom.badImplementation(`Missing environment variables for Google OAuth.`)
     }
-    initProvider(router, 'github', Strategy, { scope: ['user:email'] })
+    initProvider(router, 'google', Strategy, { scope: ['email', 'profile'] })
   }
 }

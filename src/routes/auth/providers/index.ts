@@ -1,11 +1,15 @@
-import { AUTH_GITHUB_ENABLE } from '@shared/config'
+import { AUTH_HAS_ONE_PROVIDER } from '@shared/config'
 import { Router } from 'express'
-import initGitHub from './github'
+
+import github from './github'
+import google from './google'
 
 const initRoutes = (): Router | undefined => {
-  if (AUTH_GITHUB_ENABLE) {
+  if (AUTH_HAS_ONE_PROVIDER) {
+    // Create the middleware only if at least one provider is enabled
     const router = Router()
-    router.use('/github', initGitHub())
+    github(router)
+    google(router)
     return router
   }
 }
