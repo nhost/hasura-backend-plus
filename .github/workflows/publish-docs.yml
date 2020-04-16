@@ -1,9 +1,7 @@
 name: Publish Vuepress documentation to GH pages
-
 on:
   push:
     branches: [v2]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest

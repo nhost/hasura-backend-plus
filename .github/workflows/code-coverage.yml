@@ -1,0 +1,15 @@
+name: Code coverage
+on:
+  push:
+    branches: [v2]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run test script
+        run: ./run_tests.sh
+      - name: Publish report to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage/clover.xml
