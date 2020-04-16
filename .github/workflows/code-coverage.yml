@@ -2,6 +2,8 @@ name: Code coverage
 on:
   push:
     branches: [v2]
+    paths-ignore:
+      - 'docs/**'
 jobs:
   test:
     runs-on: ubuntu-latest

@@ -1,7 +1,9 @@
-name: Publish Vuepress documentation to GH pages
+name: Publish documentation
 on:
   push:
     branches: [v2]
+    paths:
+      - 'docs/**'
 jobs:
   deploy:
     runs-on: ubuntu-latest
