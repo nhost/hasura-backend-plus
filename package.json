@@ -39,12 +39,12 @@
     "@types/lodash.kebabcase": "4.1.6",
     "@types/node": "13.11.1",
     "@types/nodemailer": "6.4.0",
-    "@types/passport": "^1.0.3",
-    "@types/passport-github2": "^1.2.4",
-    "@types/passport-google-oauth20": "^2.0.3",
+    "@types/passport": "1.0.3",
+    "@types/passport-github2": "1.2.4",
+    "@types/passport-google-oauth20": "2.0.3",
     "@types/qrcode": "1.3.4",
     "@types/uuid": "7.0.2",
-    "archiver": "3.1.1",
+    "archiver": "4.0.1",
     "argon2": "0.26.2",
     "aws-sdk": "2.656.0",
     "body-parser": "1.19.0",
@@ -62,15 +62,15 @@
     "graphql-tag": "2.10.3",
     "helmet": "3.22.0",
     "hibp": "9.0.0",
-    "jose": "1.25.0",
+    "jose": "1.26.0",
     "js-yaml": "3.13.1",
     "lodash.kebabcase": "4.1.1",
     "nodemailer": "6.4.6",
     "notevil": "1.3.3",
     "otplib": "12.0.1",
-    "passport": "^0.4.1",
-    "passport-github2": "^0.1.12",
-    "passport-google-oauth20": "^2.0.0",
+    "passport": "0.4.1",
+    "passport-github2": "0.1.12",
+    "passport-google-oauth20": "2.0.0",
     "qrcode": "1.4.4",
     "ts-node": "8.8.2",
     "tsconfig-paths": "3.9.0",
@@ -83,7 +83,7 @@
     "@types/supertest": "2.0.8",
     "@typescript-eslint/eslint-plugin": "2.28.0",
     "@typescript-eslint/parser": "2.28.0",
-    "@vuepress/plugin-back-to-top": "1.4.0",
+    "@vuepress/plugin-back-to-top": "1.4.1",
     "cz-conventional-changelog": "3.1.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
@@ -100,7 +100,7 @@
     "supertest": "4.0.2",
     "ts-jest": "25.3.1",
     "ts-node-dev": "1.0.0-pre.44",
-    "vuepress": "1.4.0"
+    "vuepress": "1.4.1"
   },
   "eslintConfig": {
     "root": true,
@@ -133,7 +133,7 @@
     "preset": "ts-jest",
     "verbose": true,
     "moduleNameMapper": {
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
+      "@shared/(.*)$": "<rootDir>/src/shared/$1"
     },
     "setupFilesAfterEnv": [
       "jest-extended"
