@@ -2,7 +2,7 @@ name: Publish Vuepress documentation to GH pages
 
 on:
   push:
-    branches: [master]
+    branches: [v2]
 
 jobs:
   deploy:
@@ -26,7 +26,9 @@ jobs:
       - run: yarn
       - run: yarn run docs:build
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.vuepress/dist
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/.vuepress/dist
+          BASE_BRANCH: v2
