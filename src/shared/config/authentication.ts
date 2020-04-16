@@ -55,6 +55,17 @@ if (castBooleanEnv('AUTH_GOOGLE_ENABLE')) {
     clientSecret: process.env.AUTH_GOOGLE_CLIENT_SECRET
   }
 }
+
+// Apple OAuth2 provider settings
+if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
+  AUTH_PROVIDERS.apple = {
+    clientID: process.env.AUTH_APPLE_CLIENT_ID,
+    teamID: process.env.AUTH_APPLE_TEAM_ID,
+    keyID: process.env.AUTH_APPLE_KEY_ID,
+    key: process.env.AUTH_APPLE_PRIVATE_KEY,
+    callbackURL: process.env.AUTH_APPLE_CALLBACK_URL // optional
+  }
+}
 export { AUTH_PROVIDERS }
 
 // True if at least one of the providers is enabled

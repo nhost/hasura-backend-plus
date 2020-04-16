@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import express, { Request, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
@@ -25,12 +25,13 @@ const manageProviderStrategy = (provider: string) => async (
   // TODO How do we handle AUTH_REGISTRATION_FIELDS with OAuth?
   // find or create the user
   // check if user exists, using profile.id
+
   const hasuraData = (await request(selectAccountProvider, {
     provider,
     profile_id: profile.id
   })) as AccountProviderData
 
-  // IF user is already registerd
+  // IF user is already registered
   if (hasuraData.auth_account_providers.length > 0) {
     return done(null, hasuraData.auth_account_providers[0].account)
   }
@@ -113,14 +114,28 @@ export const initProvider = <T extends Strategy>(
 
   subRouter.get('/', passport.authenticate(strategyName, { session: false }))
 
-  subRouter.get(
-    '/callback',
-    passport.authenticate(strategyName, {
-      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
-      session: false
-    }),
-    providerCallback
-  )
+  // The Sign in with Apple auth provider requires a POST route for authentication
+  if (strategyName === 'apple') {
+    subRouter.post(
+      '/callback',
+      express.urlencoded(),
+      passport.authenticate(strategyName, {
+        failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+        session: false
+      }),
+      providerCallback
+    )
+  } else {
+    // If it's not a special auth provider we use GET
+    subRouter.get(
+      '/callback',
+      passport.authenticate(strategyName, {
+        failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+        session: false
+      }),
+      providerCallback
+    )
+  }
 
   router.use(`/${strategyName}`, subRouter)
 }
