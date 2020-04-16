@@ -105,7 +105,6 @@
   "eslintConfig": {
     "root": true,
     "rules": {
-      "sort-imports": "error",
       "@typescript-eslint/camelcase": "off"
     },
     "parser": "@typescript-eslint/parser",

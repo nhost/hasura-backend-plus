@@ -1,18 +1,17 @@
 import { Router } from 'express'
 import { Strategy } from 'passport-github2'
+import Boom from '@hapi/boom'
+import { AUTH_PROVIDERS } from '@shared/config'
 import { initProvider } from './utils'
 
-import {
-  AUTH_GITHUB_AUTHORIZATION_URL,
-  AUTH_GITHUB_TOKEN_URL,
-  AUTH_GITHUB_USER_PROFILE_URL,
-  PROVIDERS_FAILURE_REDIRECT
-} from '@shared/config'
-
-export default (router: Router): void =>
-  initProvider(router, 'github', Strategy, {
-    authorizationURL: AUTH_GITHUB_AUTHORIZATION_URL, // optional
-    tokenURL: AUTH_GITHUB_TOKEN_URL, // optional
-    userProfileURL: AUTH_GITHUB_USER_PROFILE_URL, // optional
-    scope: ['user:email']
-  })
+export default (router: Router): void => {
+  const options = AUTH_PROVIDERS.github
+  // Checks if the strategy is enabled. Don't create any route otherwise
+  if (options) {
+    // Checks if the strategy has at least a client ID and a client secret
+    if (!options.clientID || !options.clientSecret) {
+      throw Boom.badImplementation(`Missing environment variables for GitHub OAuth.`)
+    }
+    initProvider(router, 'github', Strategy, { scope: ['user:email'] })
+  }
+}

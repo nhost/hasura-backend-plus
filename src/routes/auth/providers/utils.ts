@@ -4,12 +4,15 @@ import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 import Boom from '@hapi/boom'
 
+import {
+  PROVIDERS_SUCCESS_REDIRECT,
+  PROVIDERS_FAILURE_REDIRECT,
+  SERVER_URL,
+  AUTH_PROVIDERS
+} from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
 import { InsertAccountData, AccountProviderData, AccountData } from '@shared/helpers'
-import { PROVIDERS_SUCCESS_REDIRECT, PROVIDERS_FAILURE_REDIRECT, SERVER_URL } from '@shared/config'
-import * as _config from '@shared/config'
-
 import { setRefreshToken } from '@shared/jwt'
 
 const manageProviderStrategy = (provider: string) => async (
@@ -88,51 +91,36 @@ interface Constructable<T> {
   prototype: T
 }
 
-const config = (_config as unknown) as Record<string, boolean | string>
-
 export const initProvider = <T extends Strategy>(
   router: Router,
   strategyName: string,
   strategy: Constructable<T>,
   options: ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
 ): void => {
-  // Strategy name in capitals, to get the configuration
-  const capsStragegy = strategyName.toUpperCase()
-  // Checks if the strategy is enabled. Don't create any route otherwise
-  if (config[`AUTH_${capsStragegy}_ENABLE`] as boolean) {
-    const clientID = config[`AUTH_${capsStragegy}_CLIENT_ID`]
-    const clientSecret = config[`AUTH_${capsStragegy}_CLIENT_SECRET`]
-    // Checks if the strategy has at least a client ID and a client secret
-    if (!clientID || !clientSecret) {
-      throw Boom.badImplementation(`Missing environment variables for ${strategyName} OAuth.`)
-    }
-
-    passport.use(
-      new strategy(
-        {
-          ...options,
-          clientID,
-          clientSecret,
-          callbackURL:
-            config[`AUTH_${capsStragegy}_CALLBACK_URL`] ||
-            `${SERVER_URL}/auth/providers/${strategyName}/callback`,
-          passReqToCallback: true
-        },
-        manageProviderStrategy(strategyName)
-      )
+  passport.use(
+    new strategy(
+      {
+        ...AUTH_PROVIDERS[strategyName],
+        ...options,
+        callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
+        passReqToCallback: true
+      },
+      manageProviderStrategy(strategyName)
     )
+  )
 
-    const subRouter = Router()
-    subRouter.get('/', passport.authenticate(strategyName, { session: false }))
+  const subRouter = Router()
 
-    subRouter.get(
-      '/callback',
-      passport.authenticate(strategyName, {
-        failureRedirect: PROVIDERS_FAILURE_REDIRECT,
-        session: false
-      }),
-      providerCallback
-    )
-    router.use(`/${strategyName}`, subRouter)
-  }
+  subRouter.get('/', passport.authenticate(strategyName, { session: false }))
+
+  subRouter.get(
+    '/callback',
+    passport.authenticate(strategyName, {
+      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+      session: false
+    }),
+    providerCallback
+  )
+
+  router.use(`/${strategyName}`, subRouter)
 }

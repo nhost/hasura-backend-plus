@@ -75,7 +75,7 @@ export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
 // Init a superset agent with possibly mocked config constants
 export const initAgent = (
   config: {
-    [key: string]: boolean | string | number | string[] | undefined
+    [key: string]: boolean | string | number | string[] | undefined | object
   } = {}
 ): SuperTest<Test> => {
   jest.mock('@shared/config', () => ({
