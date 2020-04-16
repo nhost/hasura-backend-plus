@@ -32,7 +32,7 @@
       alt="code style: prettier"
     />
   </a>
-  <a href="https://codecov.io/gh/nhost/hasura-backend-plus">
+  <a href="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2">
     <img
       src="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg"
     />
