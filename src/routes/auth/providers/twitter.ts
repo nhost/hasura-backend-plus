@@ -13,6 +13,8 @@ export default (router: Router): void => {
     if (!options.consumerKey || !options.consumerSecret) {
       throw Boom.badImplementation(`Missing environment variables for Twitter.`)
     }
-    initProvider(router, 'twitter', Strategy, {})
+    initProvider(router, 'twitter', Strategy, {
+      includeEmail: true
+    })
   }
 }
