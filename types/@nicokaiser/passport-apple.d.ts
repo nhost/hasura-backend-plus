@@ -12,7 +12,7 @@ declare module '@nicokaiser/passport-apple' {
     passport.Profile,
     {
       email: string
-      name: {
+      name?: {
         firstName: string
         lastName: string
       }
