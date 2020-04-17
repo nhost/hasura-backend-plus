@@ -18,6 +18,6 @@ export default (router: Router): void => {
     if (!options.clientID || !options.teamID || !options.keyID || !options.key) {
       throw Boom.badImplementation(`Missing environment variables for Login with Apple OAuth.`)
     }
-    initProvider(router, 'apple', Strategy, { scope: ['name', 'email'] })
+    initProvider(router, 'apple', Strategy, { scope: ['name', 'email'] }, { shouldEncodeUrl: true })
   }
 }

@@ -40,8 +40,10 @@ const manageProviderStrategy = (provider: string) => async (
 
   // If we are coming from the Apple authentication provider we should patch up the profile data
   if (provider == 'apple') {
-    const { firstName, lastName } = profile.name
-    profile.displayName = `${firstName} ${lastName}`
+    if (profile.name) {
+      const { firstName, lastName } = profile.name
+      profile.displayName = `${firstName} ${lastName}`
+    }
 
     // Add email address
     profile.emails = [{ value: profile.email, type: 'home' }]
@@ -105,7 +107,8 @@ export const initProvider = <T extends Strategy>(
   router: Router,
   strategyName: string,
   strategy: Constructable<T>,
-  options: ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
+  options: ConstructorParameters<Constructable<T>>[0],
+  config: { shouldEncodeUrl: boolean } // TODO: Strategy option type is not inferred correctly
 ): void => {
   passport.use(
     new strategy(
@@ -120,31 +123,30 @@ export const initProvider = <T extends Strategy>(
   )
 
   const subRouter = Router()
+  // Dummy middleware when opt in is not needed
+  const dummyMiddleware = () => (req, res, next) => next()
 
   subRouter.get('/', passport.authenticate(strategyName, { session: false }))
 
-  // The Sign in with Apple auth provider requires a POST route for authentication
-  if (strategyName === 'apple') {
-    subRouter.post(
-      '/callback',
-      express.urlencoded(),
-      passport.authenticate(strategyName, {
-        failureRedirect: PROVIDERS_FAILURE_REDIRECT,
-        session: false
-      }),
-      providerCallback
-    )
-  } else {
-    // If it's not a special auth provider we use GET
-    subRouter.get(
-      '/callback',
-      passport.authenticate(strategyName, {
-        failureRedirect: PROVIDERS_FAILURE_REDIRECT,
-        session: false
-      }),
-      providerCallback
-    )
-  }
+  subRouter.post(
+    '/callback',
+    config.shouldEncodeUrl === true ? express.urlencoded() : dummyMiddleware(),
+    passport.authenticate(strategyName, {
+      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+      session: false
+    }),
+    providerCallback
+  )
+
+  // If it's not a special auth provider we use GET
+  subRouter.get(
+    '/callback',
+    passport.authenticate(strategyName, {
+      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+      session: false
+    }),
+    providerCallback
+  )
 
   router.use(`/${strategyName}`, subRouter)
 }
