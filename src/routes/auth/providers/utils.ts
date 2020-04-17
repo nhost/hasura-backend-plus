@@ -15,7 +15,29 @@ import { request } from '@shared/request'
 import { InsertAccountData, AccountProviderData, AccountData } from '@shared/helpers'
 import { setRefreshToken } from '@shared/jwt'
 
-const manageProviderStrategy = (provider: string) => async (
+interface Constructable<T> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new (...args: any[]): T
+  prototype: T
+}
+
+export interface UserData {
+  id: string
+  email?: string
+  display_name: string
+  avatar_url?: string
+}
+
+export type TransformProfileFunction = <T extends Profile>(profile: T) => UserData
+interface InitProviderSettings {
+  transformProfile: TransformProfileFunction
+  callbackMethod: 'GET' | 'POST'
+}
+
+const manageProviderStrategy = (
+  provider: string,
+  transformProfile: TransformProfileFunction
+) => async (
   _req: Request,
   _accessToken: string,
   _refreshToken: string,
@@ -25,10 +47,11 @@ const manageProviderStrategy = (provider: string) => async (
   // TODO How do we handle AUTH_REGISTRATION_FIELDS with OAuth?
   // find or create the user
   // check if user exists, using profile.id
+  const { id, email, display_name, avatar_url } = transformProfile(profile)
 
   const hasuraData = (await request(selectAccountProvider, {
     provider,
-    profile_id: profile.id
+    profile_id: id
   })) as AccountProviderData
 
   // IF user is already registered
@@ -37,35 +60,18 @@ const manageProviderStrategy = (provider: string) => async (
   }
 
   // ELSE, register user
-
-  // If we are coming from the Apple authentication provider we should patch up the profile data
-  if (provider == 'apple') {
-    if (profile.name) {
-      const { firstName, lastName } = profile.name
-      profile.displayName = `${firstName} ${lastName}`
-    }
-
-    // Add email address
-    profile.emails = [{ value: profile.email, type: 'home' }]
-  }
-
   // TODO: why users are auto activated?
   // add account, account_provider and user
   const account_data = {
-    email: profile.emails?.[0].value,
+    email,
     password_hash: null,
     active: true,
-    user: {
-      data: {
-        display_name: profile.displayName,
-        avatar_url: profile.photos?.[0].value
-      }
-    },
+    user: { data: { display_name, avatar_url } },
     account_providers: {
       data: [
         {
           auth_provider: provider,
-          auth_provider_unique_id: profile.id
+          auth_provider_unique_id: id
         }
       ]
     }
@@ -97,19 +103,22 @@ const providerCallback = async (req: Request, res: Response): Promise<void> => {
   res.redirect(PROVIDERS_SUCCESS_REDIRECT as string)
 }
 
-interface Constructable<T> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new (...args: any[]): T
-  prototype: T
-}
-
 export const initProvider = <T extends Strategy>(
   router: Router,
   strategyName: string,
   strategy: Constructable<T>,
-  options: ConstructorParameters<Constructable<T>>[0],
-  config: { shouldEncodeUrl: boolean } // TODO: Strategy option type is not inferred correctly
+  settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
 ): void => {
+  const {
+    transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
+      id,
+      email: emails?.[0].value,
+      display_name: displayName,
+      avatar_url: photos?.[0].value
+    }),
+    callbackMethod = 'GET',
+    ...options
+  } = settings
   passport.use(
     new strategy(
       {
@@ -118,35 +127,27 @@ export const initProvider = <T extends Strategy>(
         callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
         passReqToCallback: true
       },
-      manageProviderStrategy(strategyName)
+      manageProviderStrategy(strategyName, transformProfile)
     )
   )
 
   const subRouter = Router()
-  // Dummy middleware when opt in is not needed
-  const dummyMiddleware = () => (req, res, next) => next()
 
   subRouter.get('/', passport.authenticate(strategyName, { session: false }))
 
-  subRouter.post(
-    '/callback',
-    config.shouldEncodeUrl === true ? express.urlencoded() : dummyMiddleware(),
+  const handlers = [
     passport.authenticate(strategyName, {
       failureRedirect: PROVIDERS_FAILURE_REDIRECT,
       session: false
     }),
     providerCallback
-  )
-
-  // If it's not a special auth provider we use GET
-  subRouter.get(
-    '/callback',
-    passport.authenticate(strategyName, {
-      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
-      session: false
-    }),
-    providerCallback
-  )
+  ]
+  if (callbackMethod === 'POST') {
+    // The Sign in with Apple auth provider requires a POST route for authentication
+    subRouter.post('/callback', express.urlencoded(), ...handlers)
+  } else {
+    subRouter.get('/callback', ...handlers)
+  }
 
   router.use(`/${strategyName}`, subRouter)
 }

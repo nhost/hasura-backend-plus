@@ -1,5 +1,6 @@
-import { castBooleanEnv, castStringArrayEnv, castIntEnv } from './utils'
+import Boom from '@hapi/boom'
 import path from 'path'
+import { castBooleanEnv, castStringArrayEnv, castIntEnv } from './utils'
 import { REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR } from './application'
 
 /**
@@ -35,7 +36,7 @@ export const {
   PROVIDERS_FAILURE_REDIRECT = REDIRECT_URL_ERROR
 } = process.env
 
-const AUTH_PROVIDERS: Record<string, Record<string, unknown>> = {}
+const AUTH_PROVIDERS: Record<string, Record<string, string | undefined>> = {}
 
 // Github OAuth2 provider settings
 if (castBooleanEnv('AUTH_GITHUB_ENABLE')) {
@@ -58,11 +59,18 @@ if (castBooleanEnv('AUTH_GOOGLE_ENABLE')) {
 
 // Apple OAuth2 provider settings
 if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
-  AUTH_PROVIDERS.apple = {
-    clientID: process.env.AUTH_APPLE_CLIENT_ID,
-    teamID: process.env.AUTH_APPLE_TEAM_ID,
-    keyID: process.env.AUTH_APPLE_KEY_ID,
-    key: process.env.AUTH_APPLE_PRIVATE_KEY
+  try {
+    AUTH_PROVIDERS.apple = {
+      clientID: process.env.AUTH_APPLE_CLIENT_ID,
+      teamID: process.env.AUTH_APPLE_TEAM_ID,
+      keyID: process.env.AUTH_APPLE_KEY_ID,
+      key:
+        process.env.AUTH_APPLE_PRIVATE_KEY &&
+        // Convert contents from base64 string to string to avoid issues with line breaks in the environment variable
+        Buffer.from(process.env.AUTH_APPLE_PRIVATE_KEY, 'base64').toString('ascii')
+    }
+  } catch (e) {
+    throw Boom.badImplementation(`Invalid Apple OAuth Key file.`)
   }
 }
 export { AUTH_PROVIDERS }
