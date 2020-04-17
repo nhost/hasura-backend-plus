@@ -62,8 +62,7 @@ if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
     clientID: process.env.AUTH_APPLE_CLIENT_ID,
     teamID: process.env.AUTH_APPLE_TEAM_ID,
     keyID: process.env.AUTH_APPLE_KEY_ID,
-    key: process.env.AUTH_APPLE_PRIVATE_KEY,
-    callbackURL: process.env.AUTH_APPLE_CALLBACK_URL // optional
+    key: process.env.AUTH_APPLE_PRIVATE_KEY
   }
 }
 export { AUTH_PROVIDERS }
