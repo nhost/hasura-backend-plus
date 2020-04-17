@@ -4,15 +4,10 @@ import Boom from '@hapi/boom'
 import { AUTH_PROVIDERS } from '@shared/config'
 import { initProvider, UserData } from './utils'
 
-const transformProfile = ({
-  id,
-  name: { firstName, lastName },
-  email,
-  photos
-}: Profile): UserData => ({
+const transformProfile = ({ id, name, email, photos }: Profile): UserData => ({
   id,
   email,
-  display_name: `${firstName} ${lastName}`,
+  display_name: name ? `${name.firstName} ${name.lastName}` : email,
   avatar_url: photos?.[0].value
 })
 
