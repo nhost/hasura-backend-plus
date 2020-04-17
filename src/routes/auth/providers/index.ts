@@ -3,6 +3,7 @@ import { Router } from 'express'
 
 import github from './github'
 import google from './google'
+import twitter from './twitter'
 
 const initRoutes = (): Router | undefined => {
   if (AUTH_HAS_ONE_PROVIDER) {
@@ -10,6 +11,7 @@ const initRoutes = (): Router | undefined => {
     const router = Router()
     github(router)
     google(router)
+    twitter(router)
     return router
   }
 }

@@ -55,6 +55,15 @@ if (castBooleanEnv('AUTH_GOOGLE_ENABLE')) {
     clientSecret: process.env.AUTH_GOOGLE_CLIENT_SECRET
   }
 }
+
+// Twitter provider settings
+if (castBooleanEnv('AUTH_TWITTER_ENABLE')) {
+  AUTH_PROVIDERS.twitter = {
+    consumerKey: process.env.AUTH_TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.AUTH_TWITTER_CONSUMER_SECRET
+  }
+}
+
 export { AUTH_PROVIDERS }
 
 // True if at least one of the providers is enabled

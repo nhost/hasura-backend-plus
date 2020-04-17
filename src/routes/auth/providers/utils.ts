@@ -30,7 +30,7 @@ const manageProviderStrategy = (provider: string) => async (
     profile_id: profile.id
   })) as AccountProviderData
 
-  // IF user is already registerd
+  // IF user is already registered
   if (hasuraData.auth_account_providers.length > 0) {
     return done(null, hasuraData.auth_account_providers[0].account)
   }
