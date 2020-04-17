@@ -24,6 +24,7 @@
   "dependencies": {
     "@hapi/boom": "9.1.0",
     "@hapi/joi": "17.1.1",
+    "@nicokaiser/passport-apple": "^0.2.1",
     "@types/archiver": "3.1.0",
     "@types/body-parser": "1.19.0",
     "@types/cookie-parser": "1.4.2",
@@ -37,7 +38,7 @@
     "@types/helmet": "0.0.45",
     "@types/js-yaml": "3.12.3",
     "@types/lodash.kebabcase": "4.1.6",
-    "@types/node": "13.11.1",
+    "@types/node": "^13.11.1",
     "@types/nodemailer": "6.4.0",
     "@types/passport": "1.0.3",
     "@types/passport-github2": "1.2.4",
