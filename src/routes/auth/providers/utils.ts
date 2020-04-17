@@ -38,6 +38,15 @@ const manageProviderStrategy = (provider: string) => async (
 
   // ELSE, register user
 
+  // If we are coming from the Apple authentication provider we should patch up the profile data
+  if (provider == 'apple') {
+    const { firstName, lastName } = profile.name
+    profile.displayName = `${firstName} ${lastName}`
+
+    // Add email address
+    profile.emails = [{ value: profile.email, type: 'home' }]
+  }
+
   // TODO: why users are auto activated?
   // add account, account_provider and user
   const account_data = {
