@@ -19,7 +19,7 @@ env:
   POSTGRES_PASSWORD: postgrespassword
   S3_BUCKET: test-bucket
   S3_ACCESS_KEY_ID: 'minio_access_key'
-  S3_SECRET_ACCESS_KEY: 'minio_secret_key' ## min 8 character
+  S3_SECRET_ACCESS_KEY: 'minio_secret_key'
 jobs:
   test:
     runs-on: ubuntu-latest
