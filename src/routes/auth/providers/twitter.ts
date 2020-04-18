@@ -14,6 +14,8 @@ export default (router: Router): void => {
       throw Boom.badImplementation(`Missing environment variables for Twitter.`)
     }
     initProvider(router, 'twitter', Strategy, {
+      userProfileURL:
+        'https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true',
       includeEmail: true
     })
   }
