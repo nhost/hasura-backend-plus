@@ -8103,6 +8103,13 @@ passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
 
+passport-windowslive@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/passport-windowslive/-/passport-windowslive-1.0.2.tgz#383cfee6589ffb5ecc2ad19c3a41ef691462a705"
+  integrity sha1-ODz+5lif+17MKtGcOkHvaRRipwU=
+  dependencies:
+    passport-oauth2 "1.x.x"
+
 passport@0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/passport/-/passport-0.4.1.tgz#941446a21cb92fc688d97a0861c38ce9f738f270"

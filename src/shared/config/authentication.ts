@@ -73,6 +73,15 @@ if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
     throw Boom.badImplementation(`Invalid Apple OAuth Key file.`)
   }
 }
+
+// Microsoft SSO provider settings
+if (castBooleanEnv('AUTH_MICROSOFT_ENABLE')) {
+  AUTH_PROVIDERS.windowslive = {
+    clientID: process.env.AUTH_MICROSOFT_CLIENT_ID,
+    clientSecret: process.env.AUTH_MICROSOFT_CLIENT_SECRET
+  }
+}
+
 export { AUTH_PROVIDERS }
 
 // True if at least one of the providers is enabled
