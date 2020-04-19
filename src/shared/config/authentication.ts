@@ -57,6 +57,13 @@ if (castBooleanEnv('AUTH_GOOGLE_ENABLE')) {
   }
 }
 
+// Twitter provider settings
+if (castBooleanEnv('AUTH_TWITTER_ENABLE')) {
+  AUTH_PROVIDERS.twitter = {
+    consumerKey: process.env.AUTH_TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.AUTH_TWITTER_CONSUMER_SECRET
+  }
+}
 // LinkedIn OAuth2 provider settings
 if (castBooleanEnv('AUTH_LINKEDIN_ENABLE')) {
   AUTH_PROVIDERS.linkedin = {

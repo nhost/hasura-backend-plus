@@ -3,6 +3,7 @@ import { Router } from 'express'
 
 import github from './github'
 import google from './google'
+import twitter from './twitter'
 import apple from './apple'
 import linkedin from './linkedin'
 
@@ -12,6 +13,7 @@ const initRoutes = (): Router | undefined => {
     const router = Router()
     github(router)
     google(router)
+    twitter(router)
     apple(router)
     linkedin(router)
     return router
