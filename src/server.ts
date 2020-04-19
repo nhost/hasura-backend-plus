@@ -9,7 +9,6 @@ import { json } from 'body-parser'
 import { limiter } from './limiter'
 import router from './routes'
 import passport from 'passport'
-import session from 'express-session'
 
 const app = express()
 
@@ -21,12 +20,9 @@ app.use(helmet())
 app.use(json())
 app.use(cors())
 app.use(fileUpload())
+
 if (AUTH_HAS_ONE_PROVIDER) {
   app.use(passport.initialize())
-
-  // TODO consider only enable sessions when the Twitter auth provider is active
-  app.use(session({ secret: COOKIE_SECRET, resave: true, saveUninitialized: true }))
-  app.use(passport.session())
 }
 
 /**
