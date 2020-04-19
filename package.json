@@ -13,8 +13,8 @@
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
-    "test": "./node_modules/.bin/jest --coverage",
-    "test:watch": "./node_modules/.bin/jest --watch"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "config": {
     "commitizen": {
