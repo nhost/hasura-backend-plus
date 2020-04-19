@@ -1,4 +1,4 @@
-import { AUTH_CLAIMS_FIELDS } from './config'
+import { JWT_CUSTOM_FIELDS } from './config'
 import gql from 'graphql-tag'
 
 const accountFragment = gql`
@@ -11,7 +11,7 @@ const accountFragment = gql`
     }
     user {
       id
-      ${AUTH_CLAIMS_FIELDS.join('\n\t\t\t')}
+      ${JWT_CUSTOM_FIELDS.join('\n\t\t\t')}
     }
     is_anonymous
     ticket

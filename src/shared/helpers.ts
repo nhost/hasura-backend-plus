@@ -1,4 +1,4 @@
-import { AUTH_DEFAULT_ROLE, AUTH_HIBP_ENABLE, REFRESH_EXPIRES_IN } from './config'
+import { DEFAULT_USER_ROLE, HIBP_ENABLE, JWT_REFRESH_EXPIRES_IN } from './config'
 import { ClaimValueType, sign } from './jwt'
 import { NextFunction, Request, Response } from 'express'
 import {
@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from 'uuid'
  */
 export function newRefreshExpiry(): number {
   const now = new Date()
-  const days = REFRESH_EXPIRES_IN / 1440
+  const days = JWT_REFRESH_EXPIRES_IN / 1440
 
   return now.setDate(now.getDate() + days)
 }
@@ -32,7 +32,7 @@ export function newRefreshExpiry(): number {
  * @param roles Defaults to ["user"].
  */
 export function createHasuraJwt({
-  default_role = AUTH_DEFAULT_ROLE,
+  default_role = DEFAULT_USER_ROLE,
   account_roles = [],
   user
 }: AccountData): string {
@@ -164,7 +164,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (AUTH_HIBP_ENABLE && (await pwnedPassword(password))) {
+  if (HIBP_ENABLE && (await pwnedPassword(password))) {
     throw Boom.badRequest('Password is too weak.')
   }
 }

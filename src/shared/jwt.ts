@@ -1,10 +1,4 @@
-import {
-  AUTH_KEY_FILE_PATH,
-  COOKIE_SECRET,
-  JWT_ALGORITHM,
-  JWT_EXPIRES_IN,
-  JWT_SECRET_KEY
-} from './config'
+import { JWT_KEY_FILE_PATH, COOKIE_SECRET, JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_KEY } from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
@@ -18,13 +12,13 @@ import { v4 as uuidv4 } from 'uuid'
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
 
-let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = JWT_SECRET_KEY as string
+let jwtKey: string | JWK.RSAKey | JWK.ECKey | JWK.OKPKey | JWK.OctKey = JWT_KEY as string
 
 /**
  * * Sets the JWT Key.
- * * If RSA algorithm, then checks if the PEM has been passed on through the JWT_SECRET_KEY
+ * * If RSA algorithm, then checks if the PEM has been passed on through the JWT_KEY
  * * If not, tries to read the private.pem file, or generates it otherwise
- * * If SHA algorithm, then uses the JWT_SECRET_KEY environment variables
+ * * If SHA algorithm, then uses the JWT_KEY environment variables
  */
 if (RSA_TYPES.includes(JWT_ALGORITHM)) {
   if (jwtKey) {
@@ -32,17 +26,15 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
       jwtKey = JWK.asKey(jwtKey, { alg: JWT_ALGORITHM })
       jwtKey.toPEM(true)
     } catch (error) {
-      throw Boom.badImplementation(
-        'Invalid RSA private key in the JWT_SECRET_KEY environment variable.'
-      )
+      throw Boom.badImplementation('Invalid RSA private key in the JWT_KEY environment variable.')
     }
   } else {
     try {
-      const file = fs.readFileSync(AUTH_KEY_FILE_PATH)
+      const file = fs.readFileSync(JWT_KEY_FILE_PATH)
       jwtKey = JWK.asKey(file)
     } catch (error) {
       jwtKey = JWK.generateSync('RSA', 2048, { alg: JWT_ALGORITHM, use: 'sig' }, true)
-      fs.writeFileSync(AUTH_KEY_FILE_PATH, jwtKey.toPEM(true))
+      fs.writeFileSync(JWT_KEY_FILE_PATH, jwtKey.toPEM(true))
     }
   }
 } else if (SHA_TYPES.includes(JWT_ALGORITHM)) {

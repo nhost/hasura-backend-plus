@@ -1,4 +1,4 @@
-import { AUTH_AUTO_ACTIVATE_NEW_USERS, SERVER_URL, SMTP_ENABLE } from '@shared/config'
+import { AUTO_ACTIVATE_NEW_USERS, SERVER_URL, SMTP_ENABLE } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 
@@ -37,7 +37,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     throw Boom.badImplementation()
   }
 
-  if (!AUTH_AUTO_ACTIVATE_NEW_USERS && SMTP_ENABLE) {
+  if (!AUTO_ACTIVATE_NEW_USERS && SMTP_ENABLE) {
     try {
       await emailClient.send({
         template: 'confirm',
