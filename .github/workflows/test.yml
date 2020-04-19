@@ -104,7 +104,6 @@ jobs:
     needs: test
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    timeout-minutes: 2
     steps:
       - name: Download coverage results
         uses: actions/download-artifact@v1
