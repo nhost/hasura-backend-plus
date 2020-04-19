@@ -43,6 +43,7 @@
     "@types/passport": "1.0.3",
     "@types/passport-github2": "1.2.4",
     "@types/passport-google-oauth20": "2.0.3",
+    "@types/passport-linkedin-oauth2": "^1.5.1",
     "@types/qrcode": "1.3.4",
     "@types/uuid": "7.0.2",
     "archiver": "4.0.1",
