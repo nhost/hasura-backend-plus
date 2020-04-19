@@ -109,4 +109,5 @@ INSERT INTO auth.roles (role)
     VALUES ('user'), ('anonymous');
 
 INSERT INTO auth.providers (provider)
-    VALUES ('github'), ('facebook'), ('twitter'), ('google'), ('apple'),  ('windowslive');
+    VALUES ('github'), ('facebook'), ('twitter'), ('google'), ('apple'),  ('linkedin'), ('windowslive');
+    

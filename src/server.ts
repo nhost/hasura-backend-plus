@@ -20,7 +20,11 @@ app.use(helmet())
 app.use(json())
 app.use(cors())
 app.use(fileUpload())
-if (AUTH_HAS_ONE_PROVIDER) app.use(passport.initialize())
+
+if (AUTH_HAS_ONE_PROVIDER) {
+  app.use(passport.initialize())
+}
+
 /**
  * Set a cookie secret to enable server validation of cookies.
  */

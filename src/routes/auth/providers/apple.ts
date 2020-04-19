@@ -17,7 +17,7 @@ export default (router: Router): void => {
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {
     if (!options.clientID || !options.teamID || !options.keyID || !options.key) {
-      throw Boom.badImplementation(`Missing environment variables for Login with Apple OAuth.`)
+      throw Boom.badImplementation(`Missing environment variables for GitHub OAuth.`)
     }
 
     initProvider(router, 'apple', Strategy, {
