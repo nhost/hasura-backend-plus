@@ -5,6 +5,7 @@ import github from './github'
 import google from './google'
 import twitter from './twitter'
 import apple from './apple'
+import linkedin from './linkedin'
 
 const initRoutes = (): Router | undefined => {
   if (AUTH_HAS_ONE_PROVIDER) {
@@ -14,6 +15,7 @@ const initRoutes = (): Router | undefined => {
     google(router)
     twitter(router)
     apple(router)
+    linkedin(router)
     return router
   }
 }

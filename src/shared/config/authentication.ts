@@ -64,6 +64,13 @@ if (castBooleanEnv('AUTH_TWITTER_ENABLE')) {
     consumerSecret: process.env.AUTH_TWITTER_CONSUMER_SECRET
   }
 }
+// LinkedIn OAuth2 provider settings
+if (castBooleanEnv('AUTH_LINKEDIN_ENABLE')) {
+  AUTH_PROVIDERS.linkedin = {
+    clientID: process.env.AUTH_LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.AUTH_LINKEDIN_CLIENT_SECRET
+  }
+}
 
 // Apple OAuth2 provider settings
 if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
@@ -81,6 +88,7 @@ if (castBooleanEnv('AUTH_APPLE_ENABLE')) {
     throw Boom.badImplementation(`Invalid Apple OAuth Key file.`)
   }
 }
+
 export { AUTH_PROVIDERS }
 
 // True if at least one of the providers is enabled

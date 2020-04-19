@@ -1,0 +1,115 @@
+name: Check push & PR
+on:
+  pull_request:
+    branches: [v2]
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!*.md'
+  push:
+    branches: [v2]
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!*.md'
+env:
+  HASURA_GRAPHQL_ADMIN_SECRET: test_secret_key
+  JWT_ALGORITHM: HS256
+  JWT_SECRET_KEY: never_use_this_secret_key_in_production_this_is_only_for_CI_testing_098hu32r4389ufb4n38994321
+  POSTGRES_PASSWORD: postgrespassword
+  S3_BUCKET: test-bucket
+  S3_ACCESS_KEY_ID: 'minio_access_key'
+  S3_SECRET_ACCESS_KEY: 'minio_secret_key'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: --restart always --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      graphql-engine:
+        image: hasura/graphql-engine:v1.1.0
+        env:
+          HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
+          HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
+          HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_SECRET_KEY }}"}'
+        options: >-
+          --restart always
+          --health-cmd "printf 'GET /healthz HTTP/1.1\r\nHost: graphql-engine\r\n\n' | nc -z graphql-engine 8080 > /dev/null 2>&1 || exit 1"
+          --health-interval 3s
+          --health-timeout 5s
+          --health-retries 5
+      minio:
+        image: bitnami/minio:latest
+        env:
+          MINIO_ACCESS_KEY: ${{ env.S3_ACCESS_KEY_ID }}
+          MINIO_SECRET_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
+          MINIO_DEFAULT_BUCKETS: ${{ env.S3_BUCKET }}
+        options: --restart always
+      mailhog:
+        image: mailhog/mailhog
+    container:
+      image: node:12
+      env:
+        NODE_ENV: test
+        HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
+        HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
+        JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
+        JWT_SECRET_KEY: ${{ env.JWT_SECRET_KEY }}
+        S3_ENDPOINT: http://minio:9000
+        S3_BUCKET: ${{ env.S3_BUCKET }}
+        S3_ACCESS_KEY_ID: ${{ env.S3_ACCESS_KEY_ID }}
+        S3_SECRET_ACCESS_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
+        SMTP_HOST: mailhog
+        SMTP_PORT: 1025
+        SMTP_SECURE: 'false'
+      options: --hostname hasura-backend-plus
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Install Hasura CLI
+        run: yarn global add hasura-cli
+      - name: Create Hasura CLI config
+        run: "printf 'endpoint: http://graphql-engine:8080\nHASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}\n' > config.yaml"
+      - name: Copy mock migrations
+        run: cp -r mock-config/migrations/* migrations/
+      - name: Run migrations
+        run: hasura migrate apply
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: yarn
+      - name: Run Jest tests
+        run: yarn run test
+      - name: Upload test results
+        uses: actions/upload-artifact@v1
+        with:
+          name: coverage
+          path: coverage
+  coverage:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download coverage results
+        uses: actions/download-artifact@v1
+        with:
+          name: coverage
+      - name: Publish to CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage/clover.xml

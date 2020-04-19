@@ -1348,6 +1348,13 @@
     "@types/passport" "*"
     "@types/passport-oauth2" "*"
 
+"@types/passport-linkedin-oauth2@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/passport-linkedin-oauth2/-/passport-linkedin-oauth2-1.5.1.tgz#d3885159c76f9bae6aee3078eae964b9145d6836"
+  dependencies:
+    "@types/express" "*"
+    "@types/passport" "*"
+
 "@types/passport-oauth2@*":
   version "1.4.9"
   resolved "https://registry.yarnpkg.com/@types/passport-oauth2/-/passport-oauth2-1.4.9.tgz#134007c4b505a82548c9cb19094c5baeb2205c92"
@@ -8123,6 +8130,11 @@ passport-oauth1@1.x.x:
     oauth "0.9.x"
     passport-strategy "1.x.x"
     utils-merge "1.x.x"
+passport-linkedin-oauth2@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/passport-linkedin-oauth2/-/passport-linkedin-oauth2-2.0.0.tgz#c320374baa44c1412a9b023590d1d0c1c77cfe73"
+  dependencies:
+    passport-oauth2 "1.x.x"
 
 passport-oauth2@1.x.x:
   version "1.5.0"
