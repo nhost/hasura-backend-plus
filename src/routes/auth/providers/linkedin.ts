@@ -2,10 +2,10 @@ import { Router } from 'express'
 import { Strategy } from 'passport-linkedin-oauth2'
 import Boom from '@hapi/boom'
 import { initProvider } from './utils'
-import { AUTH_PROVIDERS } from '@shared/config'
+import { PROVIDERS } from '@shared/config'
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.linkedin
+  const options = PROVIDERS.linkedin
 
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {

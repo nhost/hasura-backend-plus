@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, createQR } from '@shared/helpers'
 
-import { AUTH_OTP_ISSUER } from '@shared/config'
+import { OTP_ISSUER } from '@shared/config'
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { request } from '@shared/request'
@@ -18,7 +18,7 @@ async function generateMfa({ headers }: Request, res: Response): Promise<unknown
    * Generate OTP secret and key URI.
    */
   const otp_secret = authenticator.generateSecret()
-  const otpAuth = authenticator.keyuri(user_id, AUTH_OTP_ISSUER, otp_secret)
+  const otpAuth = authenticator.keyuri(user_id, OTP_ISSUER, otp_secret)
 
   try {
     await request(updateOtpSecret, { user_id, otp_secret })

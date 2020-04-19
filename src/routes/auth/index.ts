@@ -1,4 +1,4 @@
-import { AUTH_MFA_ENABLE } from '@shared/config'
+import { MFA_ENABLE } from '@shared/config'
 import { Router } from 'express'
 import account from './account'
 import email from './email'
@@ -16,7 +16,7 @@ if (providers) {
   router.use('/providers', providers)
 }
 
-if (AUTH_MFA_ENABLE) {
+if (MFA_ENABLE) {
   router.use('/mfa', mfa)
 }
 

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { Strategy, Profile } from '@nicokaiser/passport-apple'
 import Boom from '@hapi/boom'
-import { AUTH_PROVIDERS } from '@shared/config'
+import { PROVIDERS } from '@shared/config'
 import { initProvider, UserData } from './utils'
 
 const transformProfile = ({ id, name, email, photos }: Profile): UserData => ({
@@ -12,7 +12,7 @@ const transformProfile = ({ id, name, email, photos }: Profile): UserData => ({
 })
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.apple
+  const options = PROVIDERS.apple
 
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {

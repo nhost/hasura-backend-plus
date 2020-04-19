@@ -15,7 +15,7 @@ on:
 env:
   HASURA_GRAPHQL_ADMIN_SECRET: test_secret_key
   JWT_ALGORITHM: HS256
-  JWT_SECRET_KEY: never_use_this_secret_key_in_production_this_is_only_for_CI_testing_098hu32r4389ufb4n38994321
+  JWT_KEY: never_use_this_secret_key_in_production_this_is_only_for_CI_testing_098hu32r4389ufb4n38994321
   POSTGRES_PASSWORD: postgrespassword
   S3_BUCKET: test-bucket
   S3_ACCESS_KEY_ID: 'minio_access_key'
@@ -35,7 +35,7 @@ jobs:
         env:
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
           HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
-          HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_SECRET_KEY }}"}'
+          HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
         options: >-
           --restart always
           --health-cmd "printf 'GET /healthz HTTP/1.1\r\nHost: graphql-engine\r\n\n' | nc -z graphql-engine 8080 > /dev/null 2>&1 || exit 1"
@@ -58,7 +58,7 @@ jobs:
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
         JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
-        JWT_SECRET_KEY: ${{ env.JWT_SECRET_KEY }}
+        JWT_KEY: ${{ env.JWT_KEY }}
         S3_ENDPOINT: http://minio:9000
         S3_BUCKET: ${{ env.S3_BUCKET }}
         S3_ACCESS_KEY_ID: ${{ env.S3_ACCESS_KEY_ID }}

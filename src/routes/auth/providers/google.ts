@@ -2,10 +2,10 @@ import { Router } from 'express'
 import { Strategy } from 'passport-google-oauth20'
 import Boom from '@hapi/boom'
 import { initProvider } from './utils'
-import { AUTH_PROVIDERS } from '@shared/config'
+import { PROVIDERS } from '@shared/config'
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.google
+  const options = PROVIDERS.google
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {
     // Checks if the strategy has at least a client ID and a client secret

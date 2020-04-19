@@ -2,11 +2,11 @@ import { Router } from 'express'
 import { Strategy } from 'passport-twitter'
 import Boom from '@hapi/boom'
 import { initProvider } from './utils'
-import { AUTH_PROVIDERS, COOKIE_SECRET } from '@shared/config'
+import { PROVIDERS, COOKIE_SECRET } from '@shared/config'
 import session from 'express-session'
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.twitter
+  const options = PROVIDERS.twitter
 
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {

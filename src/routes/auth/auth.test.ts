@@ -2,12 +2,7 @@
 
 import 'jest-extended'
 
-import {
-  AUTH_AUTO_ACTIVATE_NEW_USERS,
-  AUTH_HIBP_ENABLE,
-  SERVER_URL,
-  SMTP_ENABLE
-} from '@shared/config'
+import { AUTO_ACTIVATE_NEW_USERS, HIBP_ENABLE, SERVER_URL, SMTP_ENABLE } from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
@@ -53,7 +48,7 @@ it('should tell the account already exists', async () => {
 /**
  * * Only run this test if auto activation is disabled
  */
-const manualActivationIt = !AUTH_AUTO_ACTIVATE_NEW_USERS ? it : it.skip
+const manualActivationIt = !AUTO_ACTIVATE_NEW_USERS ? it : it.skip
 manualActivationIt('should activate the account', async () => {
   let activateLink: string
   if (SMTP_ENABLE) {
@@ -100,7 +95,7 @@ it('should delete the account', async () => {
   expect(status).toEqual(204)
 })
 
-const pwndPasswordIt = AUTH_HIBP_ENABLE ? it : it.skip
+const pwndPasswordIt = HIBP_ENABLE ? it : it.skip
 pwndPasswordIt('should tell the password has been pwned', async () => {
   const {
     status,

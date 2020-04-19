@@ -1,7 +1,7 @@
 import { SuperTest, Test, agent } from 'supertest'
 import { TestAccount, createAccount, deleteEmailsOfAccount } from '@shared/test-utils'
 
-import { AUTH_AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
+import { AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
 import Boom from '@hapi/boom'
 import { HasuraAccountData } from '@shared/helpers'
 import { JWT } from 'jose'
@@ -27,7 +27,7 @@ beforeAll(async () => {
   // * Create a mock account
   const { email, password } = createAccount()
   await request.post('/auth/register').send({ email, password })
-  if (!AUTH_AUTO_ACTIVATE_NEW_USERS) {
+  if (!AUTO_ACTIVATE_NEW_USERS) {
     const hasuraData = (await admin(selectAccountByEmail, { email })) as HasuraAccountData
     const ticket = hasuraData.auth_accounts[0].ticket
     await request.get(`/auth/account/activate?ticket=${ticket}`)

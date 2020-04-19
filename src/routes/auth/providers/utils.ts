@@ -5,10 +5,10 @@ import { Strategy } from 'passport'
 import Boom from '@hapi/boom'
 
 import {
-  PROVIDERS_SUCCESS_REDIRECT,
-  PROVIDERS_FAILURE_REDIRECT,
+  PROVIDER_SUCCESS_REDIRECT,
+  PROVIDER_FAILURE_REDIRECT,
   SERVER_URL,
-  AUTH_PROVIDERS
+  PROVIDERS
 } from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
@@ -44,7 +44,7 @@ const manageProviderStrategy = (
   profile: Profile,
   done: VerifyCallback
 ): Promise<void> => {
-  // TODO How do we handle AUTH_REGISTRATION_FIELDS with OAuth?
+  // TODO How do we handle REGISTRATION_CUSTOM_FIELDS with OAuth?
   // find or create the user
   // check if user exists, using profile.id
   const { id, email, display_name, avatar_url } = transformProfile(profile)
@@ -100,7 +100,7 @@ const providerCallback = async (req: Request, res: Response): Promise<void> => {
   await setRefreshToken(res, account.id)
 
   // redirect back user to app url
-  res.redirect(PROVIDERS_SUCCESS_REDIRECT as string)
+  res.redirect(PROVIDER_SUCCESS_REDIRECT as string)
 }
 
 export const initProvider = <T extends Strategy>(
@@ -122,7 +122,7 @@ export const initProvider = <T extends Strategy>(
   passport.use(
     new strategy(
       {
-        ...AUTH_PROVIDERS[strategyName],
+        ...PROVIDERS[strategyName],
         ...options,
         callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
         passReqToCallback: true
@@ -137,7 +137,7 @@ export const initProvider = <T extends Strategy>(
 
   const handlers = [
     passport.authenticate(strategyName, {
-      failureRedirect: PROVIDERS_FAILURE_REDIRECT,
+      failureRedirect: PROVIDER_FAILURE_REDIRECT,
       session: false
     }),
     providerCallback
