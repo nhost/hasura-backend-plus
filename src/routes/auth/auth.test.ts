@@ -9,7 +9,7 @@ import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 import { JWT } from 'jose'
 import { Token } from '@shared/jwt'
 import { request as admin } from '@shared/request'
-import { app } from '../../server'
+import { server } from '../../start'
 import request from 'supertest'
 import { selectAccountByEmail } from '@shared/queries'
 
@@ -27,7 +27,12 @@ const password = generateRandomString()
 /**
  * Create agent for global state.
  */
-const agent = request(app)
+const agent = request(server)
+// * Code that is executed after any jest test file that imports test-utiles
+
+afterAll(async () => {
+  await server.close()
+})
 
 it('should create an account', async () => {
   const { status } = await agent
