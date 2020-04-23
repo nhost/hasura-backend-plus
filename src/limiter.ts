@@ -18,7 +18,11 @@ export const limiter = rateLimit({
 
   max: MAX_REQUESTS,
   windowMs: TIME_FRAME,
-
+  skip: ({ path }) => {
+    // Don't limit health checks. See https://github.com/nhost/hasura-backend-plus/issues/175
+    if (path === '/healthz') return true
+    return false
+  },
   /**
    * To use the above created interface, an `unknown`
    * conversion for non-overlapping types is necessary.

@@ -1,5 +1,7 @@
 dist
 .env*
+!.env.test
+!.env*.example
 *.log
 hasura
 coverage

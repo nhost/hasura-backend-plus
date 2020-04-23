@@ -7,7 +7,7 @@ import { HasuraAccountData } from '@shared/helpers'
 import { JWT } from 'jose'
 import { Token } from './jwt'
 import { request as admin } from '@shared/request'
-import { app } from '../server'
+import { server } from '../start'
 import { selectAccountByEmail } from '@shared/queries'
 
 export let request: SuperTest<Test>
@@ -23,7 +23,7 @@ export const getUserId = (): string => {
 }
 // * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {
-  request = agent(app) // * Create the SuperTest agent
+  request = agent(server) // * Create the SuperTest agent
   // * Create a mock account
   const { email, password } = createAccount()
   await request.post('/auth/register').send({ email, password })
@@ -49,4 +49,5 @@ afterAll(async () => {
   await request.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
   // * Remove any message sent to this account
   await deleteEmailsOfAccount(account.email)
+  await server.close()
 })

@@ -13,8 +13,8 @@
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test": "NODE_ENV=test jest --coverage --forceExit",
+    "test:watch": "NODE_ENV=test jest --watch"
   },
   "config": {
     "commitizen": {
@@ -45,6 +45,7 @@
     "@types/passport-github2": "1.2.4",
     "@types/passport-google-oauth20": "2.0.3",
     "@types/passport-linkedin-oauth2": "^1.5.1",
+    "@types/passport-twitter": "^1.0.34",
     "@types/qrcode": "1.3.4",
     "@types/uuid": "7.0.2",
     "archiver": "4.0.1",
@@ -84,9 +85,11 @@
     "uuid": "7.0.3"
   },
   "devDependencies": {
+    "@types/expect-puppeteer": "^4.4.1",
     "@types/jest": "25.2.1",
+    "@types/jest-environment-puppeteer": "^4.3.1",
     "@types/node-fetch": "2.5.6",
-    "@types/passport-twitter": "^1.0.34",
+    "@types/puppeteer": "^2.0.1",
     "@types/supertest": "2.0.8",
     "@typescript-eslint/eslint-plugin": "2.28.0",
     "@typescript-eslint/parser": "2.28.0",
@@ -96,6 +99,7 @@
     "eslint-config-prettier": "6.10.1",
     "eslint-plugin-jest": "23.8.2",
     "eslint-plugin-prettier": "3.1.3",
+    "expect-puppeteer": "^4.4.0",
     "husky": "4.2.5",
     "jest": "25.3.0",
     "jest-extended": "0.11.5",
@@ -104,6 +108,9 @@
     "node-fetch": "2.6.0",
     "prettier": "2.0.4",
     "pretty-quick": "2.0.1",
+    "puppeteer": "^3.0.0",
+    "puppeteer-extra": "^3.1.9",
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
     "supertest": "4.0.2",
     "ts-jest": "25.3.1",
     "ts-node-dev": "1.0.0-pre.44",
@@ -129,26 +136,13 @@
   },
   "eslintIgnore": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "*.js"
   ],
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "verbose": true,
-    "moduleNameMapper": {
-      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
-    },
-    "setupFilesAfterEnv": [
-      "jest-extended"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/dist/",
-      "<rootDir>/node_modules/"
-    ]
   },
   "lint-staged": {
     "*.js,*.ts,*.md,*.json": [

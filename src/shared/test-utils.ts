@@ -88,4 +88,4 @@ export const initAgent = (
   return request(app)
 }
 
-// TODO Jest sometimes crashes: JavaScript heap out of memory. Most likely superagent is not properly initiated
+export const itif = (condition: boolean): jest.It => (condition ? it : it.skip)

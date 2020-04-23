@@ -66,6 +66,23 @@ jobs:
         SMTP_HOST: mailhog
         SMTP_PORT: 1025
         SMTP_SECURE: 'false'
+        GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }} # Secrets cannot start with 'GITHUB'
+        GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} # Secrets cannot start with 'GITHUB'
+        GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
+        TWITTER_CONSUMER_KEY: ${{ secrets.AUTH_TWITTER_CONSUMER_KEY }}
+        TWITTER_CONSUMER_SECRET: ${{ secrets.AUTH_TWITTER_CONSUMER_SECRET }}
+        LINKEDIN_CLIENT_ID: ${{ secrets.AUTH_LINKEDIN_CLIENT_ID }}
+        LINKEDIN_CLIENT_SECRET: ${{ secrets.AUTH_LINKEDIN_CLIENT_SECRET }}
+        APPLE_CLIENT_ID: ${{ secrets.AUTH_APPLE_CLIENT_ID }}
+        APPLE_TEAM_ID: ${{ secrets.AUTH_APPLE_TEAM_ID }}
+        APPLE_KEY_ID: ${{ secrets.AUTH_APPLE_KEY_ID }}
+        APPLE_PRIVATE_KEY: ${{ secrets.AUTH_APPLE_PRIVATE_KEY }}
+        # Test accounts
+        TEST_GITHUB_USERNAME: ${{ secrets.AUTH_GITHUB_USERNAME }}
+        TEST_GITHUB_PASSWORD: ${{ secrets.AUTH_GITHUB_PASSWORD }}
+        TEST_GOOGLE_USERNAME: ${{ secrets.AUTH_GOOGLE_USERNAME }}
+        TEST_GOOGLE_PASSWORD: ${{ secrets.AUTH_GOOGLE_PASSWORD }}
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
@@ -73,6 +90,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+      - name: Install Puppeteer dependencies
+        run: apt-get update && apt-get -y install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget
       - name: Install Hasura CLI
         run: yarn global add hasura-cli
       - name: Create Hasura CLI config

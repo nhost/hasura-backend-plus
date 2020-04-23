@@ -1,6 +1,11 @@
-FROM node:12-alpine
+FROM alekzonder/puppeteer:latest
 
-ARG NODE_ENV=production
+# Install git so we can use Jest watch mode
+USER root
+RUN apt-get update && apt-get install -y git
+USER pptruser
+
+ARG NODE_ENV=development
 ENV NODE_ENV $NODE_ENV
 ENV PORT 3000
 
@@ -13,4 +18,4 @@ COPY . .
 
 HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD wget localhost:${PORT}/healthz -q -O - > /dev/null 2>&1
 
-CMD ["yarn", "start"]
+CMD ["yarn", "run", "dev-container"]
