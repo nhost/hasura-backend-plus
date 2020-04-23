@@ -8400,6 +8400,12 @@ passport-twitter@^1.0.4:
     passport-oauth1 "1.x.x"
     xtraverse "0.1.x"
 
+passport-windowslive@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/passport-windowslive/-/passport-windowslive-1.0.2.tgz#383cfee6589ffb5ecc2ad19c3a41ef691462a705"
+  dependencies:
+    passport-oauth2 "1.x.x"
+
 passport@0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/passport/-/passport-0.4.1.tgz#941446a21cb92fc688d97a0861c38ce9f738f270"
@@ -10034,8 +10040,8 @@ source-map-resolve@^0.5.0, source-map-resolve@^0.5.2:
     urix "^0.1.0"
 
 source-map-support@^0.5.12, source-map-support@^0.5.6, source-map-support@~0.5.12:
-  version "0.5.16"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.16.tgz#0ae069e7fe3ba7538c64c98515e35339eac5a042"
+  version "0.5.17"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.17.tgz#29fe1b3c98b9dbd5064ada89052ee8ff070cb46c"
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
