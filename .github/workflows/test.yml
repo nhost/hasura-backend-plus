@@ -66,8 +66,9 @@ jobs:
         SMTP_HOST: mailhog
         SMTP_PORT: 1025
         SMTP_SECURE: 'false'
-        GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }} # Secrets cannot start with 'GITHUB'
-        GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} # Secrets cannot start with 'GITHUB'
+        # Note: secrets cannot start with 'GITHUB'
+        GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
+        GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
         GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
         TWITTER_CONSUMER_KEY: ${{ secrets.AUTH_TWITTER_CONSUMER_KEY }}
