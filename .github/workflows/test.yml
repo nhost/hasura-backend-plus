@@ -54,7 +54,6 @@ jobs:
     container:
       image: node:12
       env:
-        NODE_ENV: test
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
         JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
@@ -66,6 +65,7 @@ jobs:
         SMTP_HOST: mailhog
         SMTP_PORT: 1025
         SMTP_SECURE: 'false'
+        # Authentication providers configuration
         # Note: secrets cannot start with 'GITHUB'
         GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
         GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
@@ -84,6 +84,12 @@ jobs:
         TEST_GITHUB_PASSWORD: ${{ secrets.AUTH_GITHUB_PASSWORD }}
         TEST_GOOGLE_USERNAME: ${{ secrets.AUTH_GOOGLE_USERNAME }}
         TEST_GOOGLE_PASSWORD: ${{ secrets.AUTH_GOOGLE_PASSWORD }}
+        TEST_TWITTER_USERNAME: ${{ secrets.AUTH_TWITTER_USERNAME }}
+        TEST_TWITTER_PASSWORD: ${{ secrets.AUTH_TWITTER_PASSWORD }}
+        TEST_LINKEDIN_USERNAME: ${{ secrets.AUTH_LINKEDIN_USERNAME }}
+        TEST_LINKEDIN_PASSWORD: ${{ secrets.AUTH_LINKEDIN_PASSWORD }}
+        TEST_APPLE_USERNAME: ${{ secrets.AUTH_APPLE_USERNAME }}
+        TEST_APPLE_PASSWORD: ${{ secrets.AUTH_APPLE_PASSWORD }}
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
