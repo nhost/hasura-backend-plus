@@ -2,16 +2,16 @@ import { Router } from 'express'
 import { Strategy } from 'passport-windowslive'
 import Boom from '@hapi/boom'
 import { initProvider } from './utils'
-import { AUTH_PROVIDERS } from '@shared/config'
+import { PROVIDERS } from '@shared/config'
 
 export default (router: Router): void => {
-  const options = AUTH_PROVIDERS.windowslive
+  const options = PROVIDERS.windowslive
 
   // Checks if the strategy is enabled. Don't create any route otherwise
   if (options) {
     // Checks if the strategy has at least a consumer key and a consumer secret
     if (!options.clientID || !options.clientSecret) {
-      throw Boom.badImplementation(`Missing environment variables for Microsoft.`)
+      throw Boom.badImplementation(`Missing environment variables for Windows Live.`)
     }
     initProvider(router, 'windowslive', Strategy, {
       scope: [
