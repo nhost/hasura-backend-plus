@@ -1,24 +1,24 @@
 /* eslint-disable jest/no-standalone-expect */
 import 'jest-extended'
-// import { initAgent } from '@shared/test-utils'
+import { initAgent } from '@shared/test-utils'
 import { SERVER_URL, PROVIDER_SUCCESS_REDIRECT, PROVIDERS } from '@shared/config'
 import { agent } from 'supertest'
 import { server } from '../../../start'
 import { itif } from '@shared/test-utils'
 
-// it('Oauth routes should not exist when disabled', async () => {
-//   const tempAgent = initAgent({ PROVIDERS: {} })
-//   const github = await tempAgent.get('/auth/providers/github')
-//   expect(github.status).toEqual(404)
-//   const google = await tempAgent.get('/auth/providers/google')
-//   expect(google.status).toEqual(404)
-// })
+it('Oauth routes should not exist when disabled', async () => {
+  const tempAgent = initAgent({ PROVIDERS: {} })
+  const github = await tempAgent.get('/auth/providers/github')
+  expect(github.status).toEqual(404)
+  const google = await tempAgent.get('/auth/providers/google')
+  expect(google.status).toEqual(404)
+})
 
-// it('Github Oauth should be configured correctly', async () => {
-//   expect(() => initAgent({ PROVIDERS: { github: { clientSecret: undefined } } })).toThrow(
-//     'Missing environment variables for GitHub OAuth.'
-//   )
-// })
+it('Github Oauth should be configured correctly', async () => {
+  expect(() => initAgent({ PROVIDERS: { github: { clientSecret: undefined } } })).toThrow(
+    'Missing environment variables for GitHub OAuth.'
+  )
+})
 
 // TODO test functions in ./utils.ts
 agent(server) // * Create the SuperTest agent

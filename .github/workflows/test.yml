@@ -65,11 +65,11 @@ jobs:
         SMTP_HOST: mailhog
         SMTP_PORT: 1025
         SMTP_SECURE: 'false'
-        GITHUB_ENABLE: false
-        GOOGLE_ENABLE: false
-        TWITTER_ENABLE: false
-        LINKEDIN_ENABLE: false
-        APPLE_ENABLE: false
+        GITHUB_ENABLE: 'false'
+        GOOGLE_ENABLE: 'false'
+        TWITTER_ENABLE: 'false'
+        LINKEDIN_ENABLE: 'false'
+        APPLE_ENABLE: 'false'
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
