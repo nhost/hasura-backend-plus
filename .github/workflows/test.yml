@@ -65,31 +65,11 @@ jobs:
         SMTP_HOST: mailhog
         SMTP_PORT: 1025
         SMTP_SECURE: 'false'
-        # Authentication providers configuration
-        # Note: secrets cannot start with 'GITHUB'
-        GITHUB_CLIENT_ID: ${{ secrets.AUTH_GITHUB_CLIENT_ID }}
-        GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}
-        GOOGLE_CLIENT_ID: ${{ secrets.AUTH_GOOGLE_CLIENT_ID }}
-        GOOGLE_CLIENT_SECRET: ${{ secrets.AUTH_GOOGLE_CLIENT_SECRET }}
-        TWITTER_CONSUMER_KEY: ${{ secrets.AUTH_TWITTER_CONSUMER_KEY }}
-        TWITTER_CONSUMER_SECRET: ${{ secrets.AUTH_TWITTER_CONSUMER_SECRET }}
-        LINKEDIN_CLIENT_ID: ${{ secrets.AUTH_LINKEDIN_CLIENT_ID }}
-        LINKEDIN_CLIENT_SECRET: ${{ secrets.AUTH_LINKEDIN_CLIENT_SECRET }}
-        APPLE_CLIENT_ID: ${{ secrets.AUTH_APPLE_CLIENT_ID }}
-        APPLE_TEAM_ID: ${{ secrets.AUTH_APPLE_TEAM_ID }}
-        APPLE_KEY_ID: ${{ secrets.AUTH_APPLE_KEY_ID }}
-        APPLE_PRIVATE_KEY: ${{ secrets.AUTH_APPLE_PRIVATE_KEY }}
-        # Test accounts
-        TEST_GITHUB_USERNAME: ${{ secrets.AUTH_GITHUB_USERNAME }}
-        TEST_GITHUB_PASSWORD: ${{ secrets.AUTH_GITHUB_PASSWORD }}
-        TEST_GOOGLE_USERNAME: ${{ secrets.AUTH_GOOGLE_USERNAME }}
-        TEST_GOOGLE_PASSWORD: ${{ secrets.AUTH_GOOGLE_PASSWORD }}
-        TEST_TWITTER_USERNAME: ${{ secrets.AUTH_TWITTER_USERNAME }}
-        TEST_TWITTER_PASSWORD: ${{ secrets.AUTH_TWITTER_PASSWORD }}
-        TEST_LINKEDIN_USERNAME: ${{ secrets.AUTH_LINKEDIN_USERNAME }}
-        TEST_LINKEDIN_PASSWORD: ${{ secrets.AUTH_LINKEDIN_PASSWORD }}
-        TEST_APPLE_USERNAME: ${{ secrets.AUTH_APPLE_USERNAME }}
-        TEST_APPLE_PASSWORD: ${{ secrets.AUTH_APPLE_PASSWORD }}
+        GITHUB_ENABLE: false
+        GOOGLE_ENABLE: false
+        TWITTER_ENABLE: false
+        LINKEDIN_ENABLE: false
+        APPLE_ENABLE: false
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
