@@ -5,6 +5,7 @@ import github from './github'
 import google from './google'
 import twitter from './twitter'
 import apple from './apple'
+import windowslive from './windowslive'
 import linkedin from './linkedin'
 
 const initRoutes = (): Router | undefined => {
@@ -15,6 +16,7 @@ const initRoutes = (): Router | undefined => {
     google(router)
     twitter(router)
     apple(router)
+    windowslive(router)
     linkedin(router)
     return router
   }
