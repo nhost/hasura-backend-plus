@@ -38,7 +38,7 @@ itif(
   await expect(page).toFill('#password', process.env.TEST_GITHUB_PASSWORD as string)
   await expect(page).toClick('[name="commit"]')
   await page.waitForNavigation({ waitUntil: 'networkidle0' })
-  // Wait for the Google Auth redirection
+  // Wait for the OAuth redirection
   if (page.url() !== PROVIDER_SUCCESS_REDIRECT) await page.waitFor(4000)
   expect(page.url()).toBe(PROVIDER_SUCCESS_REDIRECT)
 })
@@ -59,6 +59,8 @@ itif(
   await expect(page).toClick('#passwordNext')
 
   await page.waitForNavigation({ waitUntil: 'networkidle0' })
+  // Wait for the OAuth redirection
+  if (page.url() !== PROVIDER_SUCCESS_REDIRECT) await page.waitFor(4000)
 
   expect(await page.url()).toBe(PROVIDER_SUCCESS_REDIRECT)
 })
