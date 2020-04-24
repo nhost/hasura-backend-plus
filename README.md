@@ -121,7 +121,7 @@ Restart your docker containers
 | -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `PORT`                                 | `3010`                                    | Express server port                                                                                           |
 | `AUTH_ACTIVE`                          | `true`                                    | Activate authentication                                                                                       |
-| `USER_FIELDS`                          | ``                                        | Specify user table fields that should be available as `x-hasura-` JWT claims.                                 |
+| `USER_FIELDS`                          | ``                                        | Specify user table fields (multiple fields as comma-separated) that should be available as `x-hasura-` JWT claims.                                 |
 | `USER_REGISTRATION_AUTO_ACTIVE`        | `false`                                   | Whether new user account should automatically be activated. Accounts that are not active are unable to log in |
 | `JWT_TOKEN_EXPIRES`                    | `15`                                      | Minutes until JWT token expires                                                                               |
 | `REFRESH_TOKEN_EXPIRES`                | `43200` (30 days)                         | Minutes until refresh token expires                                                                           |
@@ -156,7 +156,7 @@ Restart your docker containers
 
 #### USER_FIELDS
 
-If you have some specific fields on your users that you also want to have as a JWT claim you can specify those user fields in the `USER_FIELDS` env var.
+If you have some specific fields on your users that you also want to have as a JWT claim you can specify those user fields in the `USER_FIELDS` env var. Multiple fields can be specified as a comma-separated field names.
 
 So let's say you have a user table with the following columns:
 
