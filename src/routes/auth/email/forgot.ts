@@ -9,15 +9,9 @@ import { emailResetSchema } from '@shared/schema'
 import { request } from '@shared/request'
 
 async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraAccountData
-
   const { email, new_email } = await emailResetSchema.validateAsync(body)
 
-  try {
-    hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
 
   const account = hasuraData.auth_accounts[0]
 
@@ -34,15 +28,14 @@ async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
         locals: { ticket },
         message: { to: email }
       })
-
-      /**
-       * Save the `new_email` in the database.
-       * https://github.com/nhost/hasura-backend-plus/pull/121#discussion_r395464612
-       */
-      await request(saveNewEmail, { email, new_email })
     } catch (err) {
       throw Boom.badImplementation()
     }
+    /**
+     * Save the `new_email` in the database.
+     * https://github.com/nhost/hasura-backend-plus/pull/121#discussion_r395464612
+     */
+    await request(saveNewEmail, { email, new_email })
   }
 
   return res.status(204).send()

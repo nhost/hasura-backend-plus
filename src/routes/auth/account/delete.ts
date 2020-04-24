@@ -11,16 +11,10 @@ interface HasuraData {
 }
 
 async function deleteUser({ headers }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
-
   const decodedToken = verify(headers.authorization)
   const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
-  try {
-    hasuraData = (await request(deleteAccountByUserId, { user_id })) as HasuraData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(deleteAccountByUserId, { user_id })) as HasuraData
 
   if (!hasuraData.delete_auth_accounts.affected_rows) {
     throw Boom.unauthorized('Invalid or expired JWT token.')

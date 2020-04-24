@@ -128,17 +128,13 @@ export const setRefreshToken = async (
   if (!refresh_token) {
     refresh_token = uuidv4()
   }
-  try {
-    await request(insertRefreshToken, {
-      refresh_token_data: {
-        account_id: accountId,
-        refresh_token,
-        expires_at: new Date(newRefreshExpiry())
-      }
-    })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  await request(insertRefreshToken, {
+    refresh_token_data: {
+      account_id: accountId,
+      refresh_token,
+      expires_at: new Date(newRefreshExpiry())
+    }
+  })
   // set refresh token as cookie
   response.cookie('refresh_token', refresh_token, {
     httpOnly: true,

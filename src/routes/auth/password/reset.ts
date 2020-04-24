@@ -30,21 +30,16 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
     await checkHibp(new_password)
     password_hash = await hashPassword(new_password)
 
-    try {
-      const hasuraData = (await request(updatePasswordWithTicket, {
-        ticket,
-        password_hash,
-        now: new Date(),
-        new_ticket: uuidv4()
-      })) as HasuraData
+    const hasuraData = (await request(updatePasswordWithTicket, {
+      ticket,
+      password_hash,
+      now: new Date(),
+      new_ticket: uuidv4()
+    })) as HasuraData
 
-      const { affected_rows } = hasuraData.update_auth_accounts
-
-      if (!affected_rows) {
-        throw Boom.unauthorized('Invalid or expired ticket.')
-      }
-    } catch (err) {
-      throw Boom.badImplementation()
+    const { affected_rows } = hasuraData.update_auth_accounts
+    if (!affected_rows) {
+      throw Boom.unauthorized('Invalid or expired ticket.')
     }
   } else {
     // Reset the password from valid JWT and { old_password, new_password }
@@ -68,16 +63,11 @@ async function resetPassword({ body, headers }: Request, res: Response): Promise
         throw Boom.unauthorized('Incorrect password.')
       }
 
-      try {
-        const newPasswordHash = await hashPassword(new_password)
-
-        await request(updatePasswordWithUserId, {
-          user_id,
-          password_hash: newPasswordHash
-        })
-      } catch (err) {
-        throw Boom.badImplementation()
-      }
+      const newPasswordHash = await hashPassword(new_password)
+      await request(updatePasswordWithUserId, {
+        user_id,
+        password_hash: newPasswordHash
+      })
     } else {
       throw Boom.badImplementation() // Account not found although JWT was valid
     }

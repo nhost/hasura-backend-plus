@@ -25,13 +25,12 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
       new_ticket,
       now: new Date()
     })) as HasuraData
-  } catch (err) {
+  } catch (err) /* istanbul ignore next */ {
     console.error(err)
     if (REDIRECT_URL_ERROR) {
       return res.redirect(302, REDIRECT_URL_ERROR as string)
     }
-
-    throw Boom.badImplementation()
+    throw err
   }
 
   const { affected_rows } = hasuraData.update_auth_accounts
@@ -42,14 +41,14 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     if (REDIRECT_URL_ERROR) {
       return res.redirect(302, REDIRECT_URL_ERROR as string)
     }
-
+    /* istanbul ignore next */
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
   if (REDIRECT_URL_SUCCESS) {
     return res.redirect(302, REDIRECT_URL_SUCCESS as string)
   }
-
+  /* istanbul ignore next */
   res.status(204).send()
 }
 

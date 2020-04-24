@@ -15,23 +15,17 @@ interface HasuraAccount {
 }
 
 async function resetEmail({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
-
   const { ticket } = await verifySchema.validateAsync(body)
 
-  try {
-    const {
-      auth_accounts: [{ new_email }]
-    } = (await request(getNewEmailByTicket, { ticket })) as HasuraAccount
+  const {
+    auth_accounts: [{ new_email }]
+  } = (await request(getNewEmailByTicket, { ticket })) as HasuraAccount
 
-    hasuraData = (await request(changeEmailByTicket, {
-      ticket,
-      new_email,
-      now: new Date()
-    })) as HasuraData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(changeEmailByTicket, {
+    ticket,
+    new_email,
+    now: new Date()
+  })) as HasuraData
 
   if (!hasuraData.update_auth_accounts.affected_rows) {
     throw Boom.unauthorized('Invalid or expired ticket.')

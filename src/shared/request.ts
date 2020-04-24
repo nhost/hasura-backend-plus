@@ -1,5 +1,6 @@
 import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET } from './config'
 
+import Boom from '@hapi/boom'
 import { ASTNode } from 'graphql'
 import { GraphQLClient } from 'graphql-request'
 import { Variables } from 'graphql-request/dist/src/types'
@@ -19,5 +20,9 @@ export function request(query: ASTNode, variables?: Variables): Promise<unknown>
       : undefined
   })
 
-  return client.request(print(query), variables)
+  try {
+    return client.request(print(query), variables)
+  } catch (err) {
+    throw Boom.badImplementation()
+  }
 }

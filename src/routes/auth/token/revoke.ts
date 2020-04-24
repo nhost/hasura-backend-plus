@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 
-import Boom from '@hapi/boom'
 import { asyncWrapper } from '@shared/helpers'
 import { deleteAllAccountRefreshTokens } from '@shared/queries'
 import { request } from '@shared/request'
@@ -10,11 +9,7 @@ async function revokeToken({ headers }: Request, res: Response): Promise<unknown
   const decodedToken = verify(headers.authorization)
   const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
-  try {
-    await request(deleteAllAccountRefreshTokens, { user_id })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  await request(deleteAllAccountRefreshTokens, { user_id })
 
   return res.status(204).send()
 }

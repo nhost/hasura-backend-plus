@@ -125,26 +125,21 @@ export const selectAccount = async (httpBody: {
   [key: string]: string
 }): Promise<AccountData | null> => {
   const { email, ticket } = httpBody
-  try {
-    if (email) {
-      const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
-
-      if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
-        return hasuraData.auth_accounts[0]
-      }
+  if (email) {
+    const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
+    if (hasuraData.auth_accounts?.length) {
+      return hasuraData.auth_accounts[0]
     }
-
-    if (ticket) {
-      const hasuraData = (await request(selectAccountByTicket, { ticket })) as HasuraAccountData
-
-      if (hasuraData.auth_accounts && hasuraData.auth_accounts.length) {
-        return hasuraData.auth_accounts[0]
-      }
-    }
-    return null
-  } catch (err) {
-    throw Boom.badImplementation()
   }
+
+  if (ticket) {
+    const hasuraData = (await request(selectAccountByTicket, { ticket })) as HasuraAccountData
+    if (hasuraData.auth_accounts?.length) {
+      return hasuraData.auth_accounts[0]
+    }
+  }
+
+  return null
 }
 
 /**
@@ -172,17 +167,9 @@ export const checkHibp = async (password: string): Promise<void> => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const generateRandomString = (): any => Math.random().toString(36).replace('0.', '')
 
-export const rotateTicket = async (ticket: string): Promise<void> => {
-  try {
-    /**
-     * Rotate account ticket.
-     */
-    await request(rotateTicketQuery, {
-      ticket,
-      now: new Date(),
-      new_ticket: uuidv4()
-    })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
-}
+export const rotateTicket = async (ticket: string): Promise<unknown> =>
+  await request(rotateTicketQuery, {
+    ticket,
+    now: new Date(),
+    new_ticket: uuidv4()
+  })

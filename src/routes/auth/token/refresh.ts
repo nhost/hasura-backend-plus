@@ -13,18 +13,12 @@ interface HasuraData {
 }
 
 async function refreshToken({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
-
   const { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
 
-  try {
-    hasuraData = (await request(selectRefreshToken, {
-      refresh_token,
-      current_timestamp: new Date()
-    })) as HasuraData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(selectRefreshToken, {
+    refresh_token,
+    current_timestamp: new Date()
+  })) as HasuraData
 
   const refreshTokens = hasuraData.auth_refresh_tokens
 
@@ -35,18 +29,14 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
   const new_refresh_token = uuidv4()
   const { account } = hasuraData.auth_refresh_tokens[0]
 
-  try {
-    await request(updateRefreshToken, {
-      old_refresh_token: refresh_token,
-      new_refresh_token_data: {
-        account_id: account.id,
-        refresh_token: new_refresh_token,
-        expires_at: new Date(newRefreshExpiry())
-      }
-    })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  await request(updateRefreshToken, {
+    old_refresh_token: refresh_token,
+    new_refresh_token_data: {
+      account_id: account.id,
+      refresh_token: new_refresh_token,
+      expires_at: new Date(newRefreshExpiry())
+    }
+  })
 
   res.cookie('refresh_token', new_refresh_token, {
     httpOnly: true,

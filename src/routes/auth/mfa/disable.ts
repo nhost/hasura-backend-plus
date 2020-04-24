@@ -9,18 +9,12 @@ import { request } from '@shared/request'
 import { verify } from '@shared/jwt'
 
 async function disableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraAccountData
-
   const { code } = await mfaSchema.validateAsync(body)
 
   const decodedToken = verify?.(headers.authorization)
   const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
 
-  try {
-    hasuraData = (await request(selectAccountByUserId, { user_id })) as HasuraAccountData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(selectAccountByUserId, { user_id })) as HasuraAccountData
 
   const { otp_secret, mfa_enabled } = hasuraData.auth_accounts[0]
 
@@ -33,11 +27,7 @@ async function disableMfa({ headers, body }: Request, res: Response): Promise<un
     throw Boom.unauthorized('Invalid two-factor code.')
   }
 
-  try {
-    hasuraData = (await request(deleteOtpSecret, { user_id })) as HasuraAccountData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  await request(deleteOtpSecret, { user_id })
 
   return res.status(204).send()
 }

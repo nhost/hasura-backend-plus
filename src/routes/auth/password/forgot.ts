@@ -12,15 +12,9 @@ import { selectAccountByEmail } from '@shared/queries'
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
  */
 async function forgotPassword({ body }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraAccountData
-
   const { email } = await forgotSchema.validateAsync(body)
 
-  try {
-    hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
 
   const account = hasuraData.auth_accounts[0]
 

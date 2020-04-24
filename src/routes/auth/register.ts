@@ -22,20 +22,16 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   const ticket = uuidv4()
   const password_hash = await hashPassword(password)
 
-  try {
-    await request(insertAccount, {
-      account: {
-        email,
-        password_hash,
-        ticket,
-        user: {
-          data: { display_name: email, ...user_data }
-        }
+  await request(insertAccount, {
+    account: {
+      email,
+      password_hash,
+      ticket,
+      user: {
+        data: { display_name: email, ...user_data }
       }
-    })
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+    }
+  })
 
   if (!AUTO_ACTIVATE_NEW_USERS && SMTP_ENABLE) {
     try {

@@ -2,7 +2,6 @@ import express, { Request, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
-import Boom from '@hapi/boom'
 
 import {
   PROVIDER_SUCCESS_REDIRECT,
@@ -77,14 +76,9 @@ const manageProviderStrategy = (
     }
   }
 
-  let hasura_account_provider_data
-  try {
-    hasura_account_provider_data = (await request(insertAccount, {
-      account: account_data
-    })) as InsertAccountData
-  } catch (err) {
-    throw Boom.badImplementation()
-  }
+  const hasura_account_provider_data = (await request(insertAccount, {
+    account: account_data
+  })) as InsertAccountData
 
   return done(null, hasura_account_provider_data.insert_auth_accounts.returning[0])
 }
