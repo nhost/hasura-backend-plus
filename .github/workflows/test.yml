@@ -54,6 +54,7 @@ jobs:
     container:
       image: node:12
       env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
         JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
@@ -78,7 +79,15 @@ jobs:
         with:
           node-version: '12.x'
       - name: Install Puppeteer dependencies
-        run: apt-get update && apt-get -y install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget
+        # run: apt-get update && apt-get -y install gconf-service libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxss1 libxtst6 libappindicator1 libnss3 libasound2 libatk1.0-0 libc6 ca-certificates fonts-liberation lsb-release xdg-utils wget
+        run: apt-get update >
+          -- && apt-get install -y wget gnupg
+          -- && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+          -- && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+          -- && apt-get update
+          -- && apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf
+          -- --no-install-recommends
+          -- && rm -rf /var/lib/apt/lists/*
       - name: Install Hasura CLI
         run: yarn global add hasura-cli
       - name: Create Hasura CLI config
