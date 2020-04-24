@@ -1,8 +1,15 @@
 /* eslint-disable jest/no-standalone-expect */
 
 import 'jest-extended'
+import { v4 as uuidv4 } from 'uuid'
 
-import { AUTO_ACTIVATE_NEW_USERS, HIBP_ENABLE, SERVER_URL, SMTP_ENABLE } from '@shared/config'
+import {
+  AUTO_ACTIVATE_NEW_USERS,
+  HIBP_ENABLE,
+  SERVER_URL,
+  SMTP_ENABLE,
+  REDIRECT_URL_ERROR
+} from '@shared/config'
 import { HasuraAccountData, generateRandomString } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
@@ -50,11 +57,17 @@ it('should tell the account already exists', async () => {
   expect(message).toEqual('Account already exists.')
 })
 
-/**
- * * Only run this test if auto activation is disabled
- */
+// * Only run test if auto activation is disabled
 const manualActivationIt = !AUTO_ACTIVATE_NEW_USERS ? it : it.skip
-manualActivationIt('should activate the account', async () => {
+
+manualActivationIt('should fail to activate an user from a wrong ticket', async () => {
+  const { status, redirect, header } = await agent.get(`/auth/account/activate?ticket=${uuidv4()}`)
+  expect(
+    status === 500 || (status === 302 && redirect && header?.location === REDIRECT_URL_ERROR)
+  ).toBeTrue()
+})
+
+manualActivationIt('should activate the account from a valid ticket', async () => {
   let activateLink: string
   if (SMTP_ENABLE) {
     // Sends the email, checks if it's received and use the link for activation
@@ -74,10 +87,7 @@ manualActivationIt('should activate the account', async () => {
 
 it('should sign the user in', async () => {
   const { body, status } = await agent.post('/auth/login').send({ email, password })
-
-  /**
-   * Save JWT token to globally scoped varaible.
-   */
+  // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
 
   expect(status).toEqual(200)
