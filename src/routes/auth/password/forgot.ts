@@ -29,7 +29,15 @@ async function forgotPassword({ body }: Request, res: Response): Promise<unknown
       await emailClient.send({
         locals: { ticket },
         template: 'forgot',
-        message: { to: email }
+        message: {
+          to: email,
+          headers: {
+            'x-ticket': {
+              prepared: true,
+              value: ticket as string
+            }
+          }
+        }
       })
     } catch (err) {
       throw Boom.badImplementation()

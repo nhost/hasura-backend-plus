@@ -1,10 +1,11 @@
 import 'jest-extended'
 
-import { HasuraAccountData, generateRandomString } from '@shared/helpers'
+import { generateRandomString } from '@shared/helpers'
 import { account, request } from '@shared/test-mock-account'
 
-import { request as admin } from '@shared/request'
-import { selectAccountByEmail } from '@shared/queries'
+import { mailHogSearch, deleteMailHogEmail } from '@shared/test-utils'
+
+let ticket: string
 
 it('should change the password from the old password', async () => {
   const new_password = generateRandomString()
@@ -15,16 +16,26 @@ it('should change the password from the old password', async () => {
   account.password = new_password
   expect(status).toEqual(204)
   // ? check if the hash has been changed in the DB?
-  // expect(body.jwt_token).toBeString()
-  // expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should request a reset ticket to be sent by email', async () => {
+  const { status } = await request
+    .post('/auth/password/forgot')
+    .set('Authorization', `Bearer ${account.token}`)
+    .send({ email: account.email })
+  expect(status).toBe(204)
+})
+
+it('should receive a ticket by email', async () => {
+  const [message] = await mailHogSearch(account.email)
+  expect(message).toBeTruthy()
+  expect(message.Content.Headers.Subject).toInclude('Reset your password')
+  ticket = message.Content.Headers['X-Ticket'][0]
+  expect(ticket).toBeString()
+  await deleteMailHogEmail(message)
 })
 
 it('should change the password from a ticket', async () => {
-  const hasuraData = (await admin(selectAccountByEmail, {
-    email: account.email
-  })) as HasuraAccountData
-  const ticket = hasuraData.auth_accounts[0].ticket
-
   const { status } = await request.post('/auth/password/reset').send({
     ticket,
     new_password: account.password
@@ -32,5 +43,3 @@ it('should change the password from a ticket', async () => {
   // ? check if the hash has been changed in the DB?
   expect(status).toEqual(204)
 })
-
-// TODO check if the email has been sent
