@@ -4,7 +4,7 @@ import { Request, Response } from 'express'
 import Boom from '@hapi/boom'
 import { SMTP_ENABLE } from '@shared/config'
 import { emailClient } from '@shared/email'
-import { forgotSchema } from '@shared/schema'
+import { forgotSchema } from '@shared/validation'
 import {} from '@shared/queries'
 
 /**

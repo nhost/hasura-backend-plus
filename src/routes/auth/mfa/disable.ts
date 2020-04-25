@@ -4,7 +4,7 @@ import { deleteOtpSecret } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
-import { mfaSchema } from '@shared/schema'
+import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { getClaims } from '@shared/jwt'
 

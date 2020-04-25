@@ -5,7 +5,7 @@ import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/he
 import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
-import { registerSchema } from '@shared/schema'
+import { registerSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 

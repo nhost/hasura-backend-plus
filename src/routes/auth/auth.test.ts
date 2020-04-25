@@ -15,7 +15,7 @@ import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
 import { JWT } from 'jose'
-import { Token } from '@shared/jwt'
+import { Token } from '@shared/types'
 import { server } from '../../start'
 import request from 'supertest'
 

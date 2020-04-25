@@ -11,7 +11,7 @@ import {
 } from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
-import { InsertAccountData, AccountProviderData, AccountData, UserData } from '@shared/helpers'
+import { InsertAccountData, QueryAccountProviderData, AccountData, UserData } from '@shared/types'
 import { setRefreshToken } from '@shared/jwt'
 
 interface Constructable<T> {
@@ -41,7 +41,7 @@ const manageProviderStrategy = (
   // check if user exists, using profile.id
   const { id, email, display_name, avatar_url } = transformProfile(profile)
 
-  const hasuraData = await request<AccountProviderData>(selectAccountProvider, {
+  const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
     provider,
     profile_id: id
   })

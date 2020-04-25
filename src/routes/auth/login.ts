@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
+import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
 
 import Boom from '@hapi/boom'
 import bcrypt from 'bcryptjs'
-import { loginSchema } from '@shared/schema'
+import { loginSchema } from '@shared/validation'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)

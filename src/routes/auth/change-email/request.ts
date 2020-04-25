@@ -5,7 +5,7 @@ import { saveNewEmail } from '@shared/queries'
 import Boom from '@hapi/boom'
 import { SMTP_ENABLE } from '@shared/config'
 import { emailClient } from '@shared/email'
-import { emailResetSchema } from '@shared/schema'
+import { emailResetSchema } from '@shared/validation'
 import { request } from '@shared/request'
 
 async function requestChangeEmail({ body }: Request, res: Response): Promise<unknown> {

@@ -1,12 +1,9 @@
-import {
-  asyncWrapper,
-  checkHibp,
-  hashPassword,
-  selectAccountByUserId,
-  HasuraUpdateAccountData
-} from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccountByUserId } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { resetPasswordWithOldPasswordSchema, resetPasswordWithTicketSchema } from '@shared/schema'
+import {
+  resetPasswordWithOldPasswordSchema,
+  resetPasswordWithTicketSchema
+} from '@shared/validation'
 import { updatePasswordWithTicket, updatePasswordWithUserId } from '@shared/queries'
 
 import Boom from '@hapi/boom'
@@ -14,6 +11,7 @@ import bcrypt from 'bcryptjs'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { getClaims } from '@shared/jwt'
+import { UpdateAccountData } from '@shared/types'
 
 /**
  * Reset the password, either from a valid ticket or from a valid JWT and a valid password
@@ -28,7 +26,7 @@ async function changePassword({ body, headers }: Request, res: Response): Promis
     await checkHibp(new_password)
     password_hash = await hashPassword(new_password)
 
-    const hasuraData = await request<HasuraUpdateAccountData>(updatePasswordWithTicket, {
+    const hasuraData = await request<UpdateAccountData>(updatePasswordWithTicket, {
       ticket,
       password_hash,
       now: new Date(),

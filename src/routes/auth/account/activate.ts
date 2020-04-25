@@ -3,20 +3,21 @@ import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
 import { activateAccount } from '@shared/queries'
-import { asyncWrapper, HasuraUpdateAccountData } from '@shared/helpers'
+import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { verifySchema } from '@shared/schema'
+import { verifySchema } from '@shared/validation'
+import { UpdateAccountData } from '@shared/types'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraUpdateAccountData
+  let hasuraData: UpdateAccountData
 
   const { ticket } = await verifySchema.validateAsync(query)
 
   const new_ticket = uuidv4()
 
   try {
-    hasuraData = await request<HasuraUpdateAccountData>(activateAccount, {
+    hasuraData = await request<UpdateAccountData>(activateAccount, {
       ticket,
       new_ticket,
       now: new Date()

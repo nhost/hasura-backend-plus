@@ -1,4 +1,4 @@
-import { Claims, getClaims } from '@shared/jwt'
+import { getClaims } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
 
 import Boom from '@hapi/boom'
@@ -9,6 +9,7 @@ import fs from 'fs'
 import path from 'path'
 import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
+import { Claims } from '@shared/types'
 
 export const META_PREFIX = '/meta'
 export interface StoragePermissions {
