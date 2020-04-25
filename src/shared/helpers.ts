@@ -15,7 +15,7 @@ import {
 
 import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
-import argon2 from 'argon2'
+import bcrypt from 'bcryptjs'
 import kebabCase from 'lodash.kebabcase'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
@@ -186,7 +186,7 @@ export const selectAccount = async (httpBody: {
  */
 export const hashPassword = async (password: string): Promise<string> => {
   try {
-    return await argon2.hash(password)
+    return await bcrypt.hash(password, 10)
   } catch (err) {
     throw Boom.badImplementation()
   }

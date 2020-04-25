@@ -3,7 +3,7 @@ import { asyncWrapper, createHasuraJwt, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
 
 import Boom from '@hapi/boom'
-import argon2 from 'argon2'
+import bcrypt from 'bcryptjs'
 import { loginSchema } from '@shared/schema'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
@@ -21,7 +21,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     throw Boom.badRequest('Account is not activated.')
   }
 
-  if (!(await argon2.verify(password_hash, password))) {
+  if (!(await bcrypt.compare(password, password_hash))) {
     throw Boom.unauthorized('Password does not match.')
   }
 

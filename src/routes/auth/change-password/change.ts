@@ -10,7 +10,7 @@ import { resetPasswordWithOldPasswordSchema, resetPasswordWithTicketSchema } fro
 import { updatePasswordWithTicket, updatePasswordWithUserId } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import argon2 from 'argon2'
+import bcrypt from 'bcryptjs'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { getClaims } from '@shared/jwt'
@@ -51,7 +51,7 @@ async function changePassword({ body, headers }: Request, res: Response): Promis
     // Search the account from the JWT's account id
     const { password_hash } = await selectAccountByUserId(user_id)
     // Check the old (current) password
-    if (!(await argon2.verify(password_hash, old_password))) {
+    if (!(await bcrypt.compare(old_password, password_hash))) {
       throw Boom.unauthorized('Incorrect password.')
     }
 

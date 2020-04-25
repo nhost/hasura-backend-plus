@@ -60,7 +60,6 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ### Core Features:
 
-- 🔐 Secure password hashing with [Argon2](https://github.com/P-H-C/phc-winner-argon2).
 - 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
 - ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
 - 🎨 Fully customizable with sensible defaults.
