@@ -8,17 +8,16 @@ import {
   HIBP_ENABLE,
   SERVER_URL,
   SMTP_ENABLE,
-  REDIRECT_URL_ERROR
+  REDIRECT_URL_ERROR,
+  JWT_CLAIMS_NAMESPACE
 } from '@shared/config'
-import { HasuraAccountData, generateRandomString } from '@shared/helpers'
+import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
 
 import { JWT } from 'jose'
-import { Token } from '@shared/jwt'
-import { request as admin } from '@shared/request'
+import { Token } from '@shared/types'
 import { server } from '../../start'
 import request from 'supertest'
-import { selectAccountByEmail } from '@shared/queries'
 
 /**
  * Store variables in memory.
@@ -77,8 +76,7 @@ manualActivationIt('should activate the account from a valid ticket', async () =
     activateLink = message.Content.Headers['X-Activate-Link'][0].replace(`${SERVER_URL}`, '')
     await deleteMailHogEmail(message)
   } else {
-    const hasuraData = (await admin(selectAccountByEmail, { email })) as HasuraAccountData
-    const ticket = hasuraData.auth_accounts[0].ticket
+    const { ticket } = await selectAccountByEmail(email)
     activateLink = `/auth/account/activate?ticket=${ticket}`
   }
   const { status } = await agent.get(activateLink)
@@ -89,18 +87,16 @@ it('should sign the user in', async () => {
   const { body, status } = await agent.post('/auth/login').send({ email, password })
   // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
-
   expect(status).toEqual(200)
-
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
 })
 
 it('should decode a valid custom user claim', async () => {
   const decodedJwt = JWT.decode(jwtToken) as Token
-  expect(decodedJwt['https://hasura.io/jwt/claims']).toBeObject()
+  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
   // Test if the custom claims work
-  expect(decodedJwt['https://hasura.io/jwt/claims']['x-name']).toEqual('Test name')
+  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-name']).toEqual('Test name')
 })
 
 it('should delete the account', async () => {

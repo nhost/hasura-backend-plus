@@ -6,25 +6,22 @@ import { activateAccount } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { verifySchema } from '@shared/schema'
-
-interface HasuraData {
-  update_auth_accounts: { affected_rows: number }
-}
+import { verifySchema } from '@shared/validation'
+import { UpdateAccountData } from '@shared/types'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
+  let hasuraData: UpdateAccountData
 
   const { ticket } = await verifySchema.validateAsync(query)
 
   const new_ticket = uuidv4()
 
   try {
-    hasuraData = (await request(activateAccount, {
+    hasuraData = await request<UpdateAccountData>(activateAccount, {
       ticket,
       new_ticket,
       now: new Date()
-    })) as HasuraData
+    })
   } catch (err) /* istanbul ignore next */ {
     console.error(err)
     if (REDIRECT_URL_ERROR) {

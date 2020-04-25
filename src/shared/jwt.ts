@@ -1,13 +1,23 @@
-import { JWT_KEY_FILE_PATH, COOKIE_SECRET, JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_KEY } from './config'
+import {
+  JWT_KEY_FILE_PATH,
+  COOKIE_SECRET,
+  JWT_ALGORITHM,
+  JWT_EXPIRES_IN,
+  JWT_KEY,
+  JWT_CLAIMS_NAMESPACE,
+  JWT_REFRESH_EXPIRES_IN,
+  DEFAULT_USER_ROLE
+} from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
 import { Response } from 'express'
 import fs from 'fs'
 import { insertRefreshToken } from './queries'
-import { newRefreshExpiry } from './helpers'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
+import kebabCase from 'lodash.kebabcase'
+import { Claims, Token, AccountData, ClaimValueType } from './types'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -69,55 +79,30 @@ export const sign = (payload: object): string =>
     expiresIn: `${JWT_EXPIRES_IN}m`
   })
 
-export type ClaimValueType =
-  | string
-  | string[]
-  | number
-  | number[]
-  | RegExp
-  | RegExp[]
-  | boolean
-  | boolean[]
-
 /**
- * Claims interface.
- */
-export interface Claims {
-  'x-hasura-user-id': string
-  'x-hasura-default-role': string
-  'x-hasura-allowed-roles': string[]
-  [key: string]: ClaimValueType
-}
-
-/**
- * Token interface.
- */
-export interface Token {
-  'https://hasura.io/jwt/claims': Claims
-  exp: bigint
-  iat: bigint
-}
-
-/**
- * Verify JWT token.
+ * Verify JWT token and return the Hasura claims.
  * @param authorization Authorization header.
  */
-export function verify(authorization: string | undefined, ignoreErrors = false): Token | undefined {
+export const getClaims = (authorization: string | undefined): Claims => {
+  if (!authorization) throw Boom.unauthorized('Missing Authorization header.')
+  const token = authorization.replace('Bearer ', '')
   try {
-    if (!authorization) {
-      if (ignoreErrors) {
-        return
-      }
-      throw Boom.unauthorized('Missing Authorization header.')
-    }
-    const token = authorization.replace('Bearer ', '')
-    return JWT.verify(token, jwtKey) as Token
+    const decodedToken = JWT.verify(token, jwtKey) as Token
+    if (!decodedToken[JWT_CLAIMS_NAMESPACE]) throw Boom.unauthorized('Claims namespace not found.')
+    return decodedToken[JWT_CLAIMS_NAMESPACE]
   } catch (err) {
-    if (ignoreErrors) {
-      return
-    }
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
+}
+
+/**
+ * New refresh token expiry date.
+ */
+export function newRefreshExpiry(): number {
+  const now = new Date()
+  const days = JWT_REFRESH_EXPIRES_IN / 1440
+
+  return now.setDate(now.getDate() + days)
 }
 
 export const setRefreshToken = async (
@@ -141,5 +126,40 @@ export const setRefreshToken = async (
     maxAge: newRefreshExpiry(),
     signed: Boolean(COOKIE_SECRET),
     expires: new Date(newRefreshExpiry())
+  })
+}
+
+/**
+ * Create JWT token.
+ * @param id Required v4 UUID string.
+ * @param defaultRole Defaults to "user".
+ * @param roles Defaults to ["user"].
+ */
+export function createHasuraJwt({
+  default_role = DEFAULT_USER_ROLE,
+  account_roles = [],
+  user
+}: AccountData): string {
+  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
+
+  if (!accountRoles.includes(default_role)) {
+    accountRoles.push(default_role)
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, ...customFields } = user
+  return sign({
+    [JWT_CLAIMS_NAMESPACE]: {
+      'x-hasura-user-id': id,
+      'x-hasura-allowed-roles': accountRoles,
+      'x-hasura-default-role': default_role,
+      // Add custom fields based on the user fields fetched from the GQL query
+      ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
+        (aggr, [key, value]) => ({
+          ...aggr,
+          [`x-${kebabCase(key)}`]: value
+        }),
+        {}
+      )
+    }
   })
 }

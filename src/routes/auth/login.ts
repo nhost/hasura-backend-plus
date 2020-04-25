@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createHasuraJwt, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, setRefreshToken } from '@shared/jwt'
+import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
 
 import Boom from '@hapi/boom'
-import argon2 from 'argon2'
-import { loginSchema } from '@shared/schema'
+import bcrypt from 'bcryptjs'
+import { loginSchema } from '@shared/validation'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   const { password } = await loginSchema.validateAsync(body)
@@ -21,7 +21,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     throw Boom.badRequest('Account is not activated.')
   }
 
-  if (!(await argon2.verify(password_hash, password))) {
+  if (!(await bcrypt.compare(password, password_hash))) {
     throw Boom.unauthorized('Password does not match.')
   }
 

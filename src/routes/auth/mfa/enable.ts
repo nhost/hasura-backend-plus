@@ -1,22 +1,19 @@
-import { HasuraAccountData, asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
 import { Request, Response } from 'express'
-import { selectAccountByUserId, updateOtpStatus } from '@shared/queries'
+import { updateOtpStatus } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
-import { mfaSchema } from '@shared/schema'
+import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
-import { verify } from '@shared/jwt'
+import { getClaims } from '@shared/jwt'
 
 async function enableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
   const { code } = await mfaSchema.validateAsync(body)
 
-  const decodedToken = verify(headers.authorization)
-  const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id']
+  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
 
-  const hasuraData = (await request(selectAccountByUserId, { user_id })) as HasuraAccountData
-
-  const { otp_secret, mfa_enabled } = hasuraData.auth_accounts[0]
+  const { otp_secret, mfa_enabled } = await selectAccountByUserId(user_id)
 
   if (mfa_enabled) {
     throw Boom.badRequest('MFA is already enabled.')

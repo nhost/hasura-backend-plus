@@ -10,7 +10,7 @@ let ticket: string
 it('should change the password from the old password', async () => {
   const new_password = generateRandomString()
   const { status } = await request
-    .post('/auth/password/reset')
+    .post('/auth/change-password/change')
     .set('Authorization', `Bearer ${account.token}`)
     .send({ old_password: account.password, new_password })
   account.password = new_password
@@ -20,7 +20,7 @@ it('should change the password from the old password', async () => {
 
 it('should request a reset ticket to be sent by email', async () => {
   const { status } = await request
-    .post('/auth/password/forgot')
+    .post('/auth/change-password/request')
     .set('Authorization', `Bearer ${account.token}`)
     .send({ email: account.email })
   expect(status).toBe(204)
@@ -36,7 +36,7 @@ it('should receive a ticket by email', async () => {
 })
 
 it('should change the password from a ticket', async () => {
-  const { status } = await request.post('/auth/password/reset').send({
+  const { status } = await request.post('/auth/change-password/change').send({
     ticket,
     new_password: account.password
   })

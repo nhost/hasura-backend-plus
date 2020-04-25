@@ -11,20 +11,13 @@ import {
 } from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
-import { InsertAccountData, AccountProviderData, AccountData } from '@shared/helpers'
+import { InsertAccountData, QueryAccountProviderData, AccountData, UserData } from '@shared/types'
 import { setRefreshToken } from '@shared/jwt'
 
 interface Constructable<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (...args: any[]): T
   prototype: T
-}
-
-export interface UserData {
-  id: string
-  email?: string
-  display_name: string
-  avatar_url?: string
 }
 
 export type TransformProfileFunction = <T extends Profile>(profile: T) => UserData
@@ -48,10 +41,10 @@ const manageProviderStrategy = (
   // check if user exists, using profile.id
   const { id, email, display_name, avatar_url } = transformProfile(profile)
 
-  const hasuraData = (await request(selectAccountProvider, {
+  const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
     provider,
     profile_id: id
-  })) as AccountProviderData
+  })
 
   // IF user is already registered
   if (hasuraData.auth_account_providers.length > 0) {
@@ -76,9 +69,9 @@ const manageProviderStrategy = (
     }
   }
 
-  const hasura_account_provider_data = (await request(insertAccount, {
+  const hasura_account_provider_data = await request<InsertAccountData>(insertAccount, {
     account: account_data
-  })) as InsertAccountData
+  })
 
   return done(null, hasura_account_provider_data.insert_auth_accounts.returning[0])
 }

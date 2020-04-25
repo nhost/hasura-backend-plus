@@ -1,11 +1,11 @@
 import { MFA_ENABLE } from '@shared/config'
 import { Router } from 'express'
 import account from './account'
-import email from './email'
+import changeEmail from './change-email'
 import getJwks from './jwks'
 import loginAccount from './login'
 import mfa from './mfa'
-import password from './password'
+import changePassword from './change-password'
 import providers from './providers'
 import registerAccount from './register'
 import token from './token'
@@ -26,7 +26,7 @@ router
   .post('/register', registerAccount)
   .use('/token', token)
   .use('/account', account)
-  .use('/email', email)
-  .use('/password', password)
+  .use('/change-email', changeEmail)
+  .use('/change-password', changePassword)
 
 export default router
