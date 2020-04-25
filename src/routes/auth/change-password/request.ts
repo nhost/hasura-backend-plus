@@ -2,7 +2,7 @@ import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
-import { SMTP_ENABLE } from '@shared/config'
+import { SMTP_ENABLE, SERVER_URL } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/validation'
 import {} from '@shared/queries'
@@ -18,8 +18,8 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
   if (SMTP_ENABLE) {
     try {
       await emailClient.send({
-        locals: { ticket },
         template: 'change-password',
+        locals: { ticket, url: SERVER_URL },
         message: {
           to: email,
           headers: {

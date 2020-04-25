@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { saveNewEmail } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { SMTP_ENABLE } from '@shared/config'
+import { SMTP_ENABLE, SERVER_URL } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { emailResetSchema } from '@shared/validation'
 import { request } from '@shared/request'
@@ -21,7 +21,7 @@ async function requestChangeEmail({ body }: Request, res: Response): Promise<unk
       try {
         await emailClient.send({
           template: 'change-email',
-          locals: { ticket },
+          locals: { ticket, url: SERVER_URL },
           message: {
             to: email,
             headers: {
