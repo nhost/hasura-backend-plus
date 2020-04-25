@@ -5,11 +5,10 @@ import { OTP_ISSUER } from '@shared/config'
 import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 import { updateOtpSecret } from '@shared/queries'
-import { verify } from '@shared/jwt'
+import { getClaims } from '@shared/jwt'
 
 async function generateMfa({ headers }: Request, res: Response): Promise<unknown> {
-  const decodedToken = verify(headers.authorization)
-  const user_id = decodedToken?.['https://hasura.io/jwt/claims']['x-hasura-user-id'] as string
+  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
 
   /**
    * Generate OTP secret and key URI.
@@ -19,7 +18,7 @@ async function generateMfa({ headers }: Request, res: Response): Promise<unknown
 
   await request(updateOtpSecret, { user_id, otp_secret })
 
-  const image_url = (await createQR(otpAuth)) as string
+  const image_url = await createQR(otpAuth)
 
   return res.send({ image_url, otp_secret })
 }

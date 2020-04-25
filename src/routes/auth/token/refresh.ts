@@ -15,19 +15,17 @@ interface HasuraData {
 async function refreshToken({ cookies, signedCookies }: Request, res: Response): Promise<unknown> {
   const { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
 
-  const hasuraData = (await request(selectRefreshToken, {
+  const { auth_refresh_tokens } = await request<HasuraData>(selectRefreshToken, {
     refresh_token,
     current_timestamp: new Date()
-  })) as HasuraData
+  })
 
-  const refreshTokens = hasuraData.auth_refresh_tokens
-
-  if (!refreshTokens || !refreshTokens.length) {
+  if (!auth_refresh_tokens?.length) {
     throw Boom.unauthorized('Invalid or expired refresh token.')
   }
 
   const new_refresh_token = uuidv4()
-  const { account } = hasuraData.auth_refresh_tokens[0]
+  const { account } = auth_refresh_tokens[0]
 
   await request(updateRefreshToken, {
     old_refresh_token: refresh_token,

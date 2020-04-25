@@ -64,11 +64,11 @@ if (castBooleanEnv('APPLE_ENABLE')) {
   }
 }
 
-// Microsoft SSO provider settings
-if (castBooleanEnv('AUTH_MICROSOFT_ENABLE')) {
+// Microsoft Windows Live SSO provider settings
+if (castBooleanEnv('WINDOWS_LIVE_ENABLE')) {
   PROVIDERS.windowslive = {
-    clientID: process.env.AUTH_MICROSOFT_CLIENT_ID,
-    clientSecret: process.env.AUTH_MICROSOFT_CLIENT_SECRET
+    clientID: process.env.WINDOWS_LIVE_CLIENT_ID,
+    clientSecret: process.env.WINDOWS_LIVE_CLIENT_SECRET
   }
 }
 

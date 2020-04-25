@@ -111,20 +111,11 @@ jobs:
       - name: Run Jest tests
         run: yarn run test
       - name: Upload test results
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v1
         with:
           name: coverage
           path: coverage
-  coverage:
-    needs: test
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download coverage results
-        uses: actions/download-artifact@v1
-        with:
-          name: coverage
-      - name: Publish to CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage/clover.xml
+      - name: Publish Code Coverage report to CodeCov
+        if: github.event_name == 'push'
+        run: yarn run report-coverage

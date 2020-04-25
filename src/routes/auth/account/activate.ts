@@ -3,28 +3,24 @@ import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
 import { activateAccount } from '@shared/queries'
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, HasuraUpdateAccountData } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/schema'
 
-interface HasuraData {
-  update_auth_accounts: { affected_rows: number }
-}
-
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
-  let hasuraData: HasuraData
+  let hasuraData: HasuraUpdateAccountData
 
   const { ticket } = await verifySchema.validateAsync(query)
 
   const new_ticket = uuidv4()
 
   try {
-    hasuraData = (await request(activateAccount, {
+    hasuraData = await request<HasuraUpdateAccountData>(activateAccount, {
       ticket,
       new_ticket,
       now: new Date()
-    })) as HasuraData
+    })
   } catch (err) /* istanbul ignore next */ {
     console.error(err)
     if (REDIRECT_URL_ERROR) {

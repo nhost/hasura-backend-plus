@@ -1,10 +1,16 @@
-import { DEFAULT_USER_ROLE, HIBP_ENABLE, JWT_REFRESH_EXPIRES_IN } from './config'
+import {
+  DEFAULT_USER_ROLE,
+  HIBP_ENABLE,
+  JWT_REFRESH_EXPIRES_IN,
+  JWT_CLAIMS_NAMESPACE
+} from './config'
 import { ClaimValueType, sign } from './jwt'
 import { NextFunction, Request, Response } from 'express'
 import {
   rotateTicket as rotateTicketQuery,
-  selectAccountByEmail,
-  selectAccountByTicket
+  selectAccountByEmail as selectAccountByEmailQuery,
+  selectAccountByTicket as selectAccountByTicketQuery,
+  selectAccountByUserId as selectAccountByUserIdQuery
 } from './queries'
 
 import Boom from '@hapi/boom'
@@ -44,7 +50,7 @@ export function createHasuraJwt({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...customFields } = user
   return sign({
-    'https://hasura.io/jwt/claims': {
+    [JWT_CLAIMS_NAMESPACE]: {
       'x-hasura-user-id': id,
       'x-hasura-allowed-roles': accountRoles,
       'x-hasura-default-role': default_role,
@@ -64,7 +70,7 @@ export function createHasuraJwt({
  * Create QR code.
  * @param secret Required OTP secret.
  */
-export async function createQR(secret: string): Promise<unknown> {
+export async function createQR(secret: string): Promise<string> {
   try {
     return await QRCode.toDataURL(secret)
   } catch (err) {
@@ -82,12 +88,16 @@ export function asyncWrapper(fn: any) {
   }
 }
 
+export interface UserData {
+  [key: string]: ClaimValueType
+  id: string
+  email?: string
+  display_name: string
+  avatar_url?: string
+}
 export interface AccountData {
   id: string
-  user: {
-    id: string
-    [key: string]: ClaimValueType
-  }
+  user: UserData
   active: boolean
   default_role: string
   account_roles: { role: string }[]
@@ -96,13 +106,25 @@ export interface AccountData {
   otp_secret?: string
   mfa_enabled: boolean
   password_hash: string
+  email: string
+  new_email?: string
 }
 
 export interface HasuraAccountData {
   auth_accounts: AccountData[]
 }
 
-export interface AccountProvider {
+export interface HasuraUpdateAccountData {
+  update_auth_accounts: {
+    affected_rows: number
+    // AccountData[]
+  }
+}
+
+export interface HasuraDeleteAccountData {
+  delete_auth_accounts: { affected_rows: number }
+}
+interface AccountProvider {
   account: AccountData
 }
 
@@ -116,6 +138,28 @@ export interface InsertAccountData {
   }
 }
 
+export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
+  const hasuraData = await request<HasuraAccountData>(selectAccountByEmailQuery, { email })
+  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  return hasuraData.auth_accounts[0]
+}
+
+const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
+  const hasuraData = await request<HasuraAccountData>(selectAccountByTicketQuery, { ticket })
+  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  return hasuraData.auth_accounts[0]
+}
+
+// TODO await request returns undefined if no user found!
+export const selectAccountByUserId = async (user_id: string | undefined): Promise<AccountData> => {
+  if (!user_id) {
+    throw Boom.badRequest('Invalid User Id.')
+  }
+  const hasuraData = await request<HasuraAccountData>(selectAccountByUserIdQuery, { user_id })
+  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  return hasuraData.auth_accounts[0]
+}
+
 /**
  * Looks for an account in the database, first by email, second by ticket
  * @param httpBody
@@ -123,23 +167,17 @@ export interface InsertAccountData {
  */
 export const selectAccount = async (httpBody: {
   [key: string]: string
-}): Promise<AccountData | null> => {
+}): Promise<AccountData | undefined> => {
   const { email, ticket } = httpBody
-  if (email) {
-    const hasuraData = (await request(selectAccountByEmail, { email })) as HasuraAccountData
-    if (hasuraData.auth_accounts?.length) {
-      return hasuraData.auth_accounts[0]
+  try {
+    return await selectAccountByEmail(email)
+  } catch {
+    try {
+      return await selectAccountByTicket(ticket)
+    } catch {
+      return undefined
     }
   }
-
-  if (ticket) {
-    const hasuraData = (await request(selectAccountByTicket, { ticket })) as HasuraAccountData
-    if (hasuraData.auth_accounts?.length) {
-      return hasuraData.auth_accounts[0]
-    }
-  }
-
-  return null
 }
 
 /**
@@ -164,8 +202,7 @@ export const checkHibp = async (password: string): Promise<void> => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const generateRandomString = (): any => Math.random().toString(36).replace('0.', '')
+export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
 
 export const rotateTicket = async (ticket: string): Promise<unknown> =>
   await request(rotateTicketQuery, {

@@ -1,4 +1,11 @@
-import { JWT_KEY_FILE_PATH, COOKIE_SECRET, JWT_ALGORITHM, JWT_EXPIRES_IN, JWT_KEY } from './config'
+import {
+  JWT_KEY_FILE_PATH,
+  COOKIE_SECRET,
+  JWT_ALGORITHM,
+  JWT_EXPIRES_IN,
+  JWT_KEY,
+  JWT_CLAIMS_NAMESPACE
+} from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
@@ -78,6 +85,7 @@ export type ClaimValueType =
   | RegExp[]
   | boolean
   | boolean[]
+  | undefined
 
 /**
  * Claims interface.
@@ -92,30 +100,25 @@ export interface Claims {
 /**
  * Token interface.
  */
-export interface Token {
-  'https://hasura.io/jwt/claims': Claims
+export type Token = {
+  [key: string]: Claims
+} & {
   exp: bigint
   iat: bigint
 }
 
 /**
- * Verify JWT token.
+ * Verify JWT token and return the Hasura claims.
  * @param authorization Authorization header.
  */
-export function verify(authorization: string | undefined, ignoreErrors = false): Token | undefined {
+export const getClaims = (authorization: string | undefined): Claims => {
+  if (!authorization) throw Boom.unauthorized('Missing Authorization header.')
+  const token = authorization.replace('Bearer ', '')
   try {
-    if (!authorization) {
-      if (ignoreErrors) {
-        return
-      }
-      throw Boom.unauthorized('Missing Authorization header.')
-    }
-    const token = authorization.replace('Bearer ', '')
-    return JWT.verify(token, jwtKey) as Token
+    const decodedToken = JWT.verify(token, jwtKey) as Token
+    if (!decodedToken[JWT_CLAIMS_NAMESPACE]) throw Boom.unauthorized('Claims namespace not found.')
+    return decodedToken[JWT_CLAIMS_NAMESPACE]
   } catch (err) {
-    if (ignoreErrors) {
-      return
-    }
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
 }

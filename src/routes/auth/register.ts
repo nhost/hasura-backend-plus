@@ -36,7 +36,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   if (!AUTO_ACTIVATE_NEW_USERS && SMTP_ENABLE) {
     try {
       await emailClient.send({
-        template: 'confirm',
+        template: 'activate-account',
         message: {
           to: email,
           headers: {

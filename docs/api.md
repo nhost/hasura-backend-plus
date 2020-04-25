@@ -1,29 +1,29 @@
 # API
 
-| Category                          | Path                                              | Description          |
-| --------------------------------- | ------------------------------------------------- | -------------------- |
-| [Authentication](#authentication) | [POST /auth/register](#registration)              | Account registration |
-| ^^                                | [POST /auth/login](#login)                        | Login                |
-| ^^                                | [GET /auth/jwks](#jwks)                           | JWK Set              |
-| ^^                                | [POST /auth/account/activate](#activation)        | Activate account     |
-| ^^                                | [POST /auth/account/delete](#delete-account)      | Delete account       |
-| ^^                                | [POST /auth/password/forgot](#forgotten-password) | Forgotten password   |
-| ^^                                | [POST /auth/password/reset](#reset-password)      | Reset password       |
-| ^^                                | [POST /auth/email/forgot](#)                      |                      |
-| ^^                                | [POST /auth/email/reset](#)                       |                      |
-| ^^                                | [POST /auth/token/refresh](#refresh-token)        | Refresh token        |
-| ^^                                | [POST /auth/token/revoke](#revoke-token)          | Revoke token         |
-| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)  | Generate MFA QR code |
-| ^^                                | [POST /auth/mfa/enable](#enable-mfa)              | Enable MFA           |
-| ^^                                | [POST /auth/mfa/disable](#disable-mfa)            | Disable MFA          |
-| ^^                                | [POST /auth/mfa/totp](#totp)                      | TOTP                 |
-| [Storage](storage)                | [GET /storage/<custom-rule>](#)                   |                      |
-| ^^                                | [POST /storage/<custom-rule>](#)                  |                      |
-| ^^                                | [DELETE /storage/<custom-rule>](#)                |                      |
-| ^^                                | [GET /storage/meta/<custom-rule>](#)              |                      |
-| ^^                                | [POST /storage/meta/<custom-rule>](#)             |                      |
-| ^^                                | [DELETE /storage/meta/<custom-rule>](#)           |                      |
-| [Other](#other)                   | [GET /healthz](#health-check)                     | Health Check         |
+| Category                          | Path                                                      | Description          |
+| --------------------------------- | --------------------------------------------------------- | -------------------- |
+| [Authentication](#authentication) | [POST /auth/register](#registration)                      | Account registration |
+| ^^                                | [POST /auth/login](#login)                                | Login                |
+| ^^                                | [GET /auth/jwks](#jwks)                                   | JWK Set              |
+| ^^                                | [POST /auth/account/activate](#activation)                | Activate account     |
+| ^^                                | [POST /auth/account/delete](#delete-account)              | Delete account       |
+| ^^                                | [POST /auth/change-password/request](#forgotten-password) | Forgotten password   |
+| ^^                                | [POST /auth/change-password/change](#reset-password)      | Reset password       |
+| ^^                                | [POST /auth/change-email/request](#)                      |                      |
+| ^^                                | [POST /auth/change-email/change](#)                       |                      |
+| ^^                                | [POST /auth/token/refresh](#refresh-token)                | Refresh token        |
+| ^^                                | [POST /auth/token/revoke](#revoke-token)                  | Revoke token         |
+| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)          | Generate MFA QR code |
+| ^^                                | [POST /auth/mfa/enable](#enable-mfa)                      | Enable MFA           |
+| ^^                                | [POST /auth/mfa/disable](#disable-mfa)                    | Disable MFA          |
+| ^^                                | [POST /auth/mfa/totp](#totp)                              | TOTP                 |
+| [Storage](storage)                | [GET /storage/<custom-rule>](#)                           |                      |
+| ^^                                | [POST /storage/<custom-rule>](#)                          |                      |
+| ^^                                | [DELETE /storage/<custom-rule>](#)                        |                      |
+| ^^                                | [GET /storage/meta/<custom-rule>](#)                      |                      |
+| ^^                                | [POST /storage/meta/<custom-rule>](#)                     |                      |
+| ^^                                | [DELETE /storage/meta/<custom-rule>](#)                   |                      |
+| [Other](#other)                   | [GET /healthz](#health-check)                             | Health Check         |
 
 ## Authentication
 

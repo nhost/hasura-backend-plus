@@ -34,6 +34,7 @@ CREATE TABLE auth.accounts (
     user_id uuid NOT NULL,
     active boolean DEFAULT false NOT NULL,
     email public.citext,
+    new_email public.citext,
     password_hash text,
     default_role text DEFAULT 'user'::text NOT NULL,
     is_anonymous boolean DEFAULT false NOT NULL,
@@ -42,7 +43,8 @@ CREATE TABLE auth.accounts (
     mfa_enabled boolean DEFAULT false NOT NULL,
     ticket uuid DEFAULT public.gen_random_uuid() NOT NULL,
     ticket_expires_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT proper_email CHECK ((email OPERATOR(public.~*) '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext))
+    CONSTRAINT proper_email CHECK ((email OPERATOR(public.~*) '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext)),
+    CONSTRAINT proper_new_email CHECK ((new_email OPERATOR(public.~*) '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext))
 );
 CREATE TABLE auth.providers (
     provider text NOT NULL
@@ -73,6 +75,8 @@ ALTER TABLE ONLY auth.account_roles
     ADD CONSTRAINT account_roles_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY auth.accounts
     ADD CONSTRAINT accounts_email_key UNIQUE (email);
+ALTER TABLE ONLY auth.accounts
+    ADD CONSTRAINT accounts_new_email_key UNIQUE (new_email);
 ALTER TABLE ONLY auth.accounts
     ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY auth.accounts
