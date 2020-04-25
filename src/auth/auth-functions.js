@@ -28,15 +28,20 @@ module.exports = {
       user_roles.push(user.default_role);
     }
 
-    return jwt.sign({
-      'https://hasura.io/jwt/claims': {
-        'x-hasura-allowed-roles': user_roles,
-        'x-hasura-default-role': user.default_role,
-        'x-hasura-user-id': user.id.toString(),
-        'x-hasura-is-anonymous': user.is_anonymous.toString(),
-        ...custom_claims,
-      },
-    }, HASURA_GRAPHQL_JWT_SECRET.key, {
+    const claims_namespace = ("claims_namespace" in HASURA_GRAPHQL_JWT_SECRET) 
+      ? HASURA_GRAPHQL_JWT_SECRET.claims_namespace 
+        : 'https://hasura.io/jwt/claims';
+    
+    const claims = {};
+    claims[claims_namespace] = {
+      'x-hasura-allowed-roles': user_roles,
+      'x-hasura-default-role': user.default_role,
+      'x-hasura-user-id': user.id.toString(),
+      'x-hasura-is-anonymous': user.is_anonymous.toString(),
+      ...custom_claims,
+    }
+
+    return jwt.sign(claims, HASURA_GRAPHQL_JWT_SECRET.key, {
       algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
       expiresIn: `${JWT_TOKEN_EXPIRES}m`,
     });
