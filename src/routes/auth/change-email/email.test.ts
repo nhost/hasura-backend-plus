@@ -4,6 +4,9 @@ import { generateRandomString } from '@shared/helpers'
 import { account, request } from '@shared/test-mock-account'
 
 import { mailHogSearch, deleteMailHogEmail } from '@shared/test-utils'
+import { JWT } from 'jose'
+import { Token } from '@shared/types'
+import { JWT_CLAIMS_NAMESPACE, NOTIFY_EMAIL_CHANGE, SMTP_ENABLE } from '@shared/config'
 
 let ticket: string
 const new_email = `${generateRandomString()}@${generateRandomString()}.com`
@@ -12,12 +15,12 @@ it('should request to change email', async () => {
   const { status } = await request
     .post('/auth/change-email/request')
     .set('Authorization', `Bearer ${account.token}`)
-    .send({ email: account.email, new_email })
+    .send({ new_email })
   expect(status).toBe(204)
 })
 
 it('should receive a ticket by email', async () => {
-  const [message] = await mailHogSearch(account.email)
+  const [message] = await mailHogSearch(new_email)
   expect(message).toBeTruthy()
   expect(message.Content.Headers.Subject).toInclude('Change your email address')
   ticket = message.Content.Headers['X-Ticket'][0]
@@ -26,7 +29,36 @@ it('should receive a ticket by email', async () => {
 })
 
 it('should change the email from a ticket', async () => {
-  const { status } = await request.post('/auth/change-email/change').send({ ticket })
+  const { status } = await request
+    .post('/auth/change-email/change')
+    .set('Authorization', `Bearer ${account.token}`)
+    .send({ ticket })
   expect(status).toEqual(204)
-  // ? check if the email has been changed in the DB?
+})
+
+it('should reconnect using the new email', async () => {
+  const {
+    body: { jwt_token, jwt_expires_in },
+    status
+  } = await request.post('/auth/login').send({ email: new_email, password: account.password })
+  expect(status).toEqual(200)
+  expect(jwt_token).toBeString()
+  expect(jwt_expires_in).toBeNumber()
+  const decodedJwt = JWT.decode(jwt_token) as Token
+  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
+  expect(status).toEqual(200)
+  account.token = jwt_token
+})
+
+it('should receive an email notifying the email account has been changed', async () => {
+  console.log(SMTP_ENABLE, NOTIFY_EMAIL_CHANGE)
+  if (SMTP_ENABLE && NOTIFY_EMAIL_CHANGE) {
+    console.log('HERE')
+    const [message] = await mailHogSearch(account.email)
+    expect(message).toBeTruthy()
+    expect(message.Content.Headers.Subject).toInclude(
+      'The email attached to your account has been changed'
+    )
+    await deleteMailHogEmail(message)
+  }
 })

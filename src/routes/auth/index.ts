@@ -1,4 +1,4 @@
-import { MFA_ENABLE } from '@shared/config'
+import { MFA_ENABLE, CHANGE_EMAIL_ENABLE } from '@shared/config'
 import { Router } from 'express'
 import account from './account'
 import changeEmail from './change-email'
@@ -20,13 +20,16 @@ if (MFA_ENABLE) {
   router.use('/mfa', mfa)
 }
 
+if (CHANGE_EMAIL_ENABLE) {
+  router.use('/change-email', changeEmail)
+}
+
 router
   .get('/jwks', getJwks)
   .post('/login', loginAccount)
   .post('/register', registerAccount)
   .use('/token', token)
   .use('/account', account)
-  .use('/change-email', changeEmail)
   .use('/change-password', changePassword)
 
 export default router

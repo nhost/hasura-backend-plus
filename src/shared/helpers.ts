@@ -43,7 +43,7 @@ export const selectAccountByEmail = async (email: string): Promise<AccountData> 
   return hasuraData.auth_accounts[0]
 }
 
-const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
+export const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, { ticket })
   if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
   return hasuraData.auth_accounts[0]
@@ -103,9 +103,12 @@ export const checkHibp = async (password: string): Promise<void> => {
 
 export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
 
-export const rotateTicket = async (ticket: string): Promise<unknown> =>
+export const rotateTicket = async (ticket: string): Promise<string> => {
+  const new_ticket = uuidv4()
   await request(rotateTicketQuery, {
     ticket,
     now: new Date(),
-    new_ticket: uuidv4()
+    new_ticket
   })
+  return new_ticket
+}

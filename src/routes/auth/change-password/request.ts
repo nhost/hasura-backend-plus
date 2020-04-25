@@ -31,6 +31,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
         }
       })
     } catch (err) {
+      console.error(err)
       throw Boom.badImplementation()
     }
   }

@@ -89,7 +89,6 @@ export const resetPasswordWithOldPasswordSchema = Joi.object({
 })
 
 export const emailResetSchema = Joi.object({
-  email: emailRule,
   new_email: emailRule
 })
 
