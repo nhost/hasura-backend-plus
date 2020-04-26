@@ -17,7 +17,7 @@ module.exports = {
         return null;
       }
 
-      custom_claims['x-hasura-' + user_field.replace('_', '-')] = user[user_field] && user[user_field].toString();
+      custom_claims['x-hasura-' + user_field.replace('_', '-')] = user[user_field].toString();
     });
 
     const user_roles = user.user_roles.map(role => {
