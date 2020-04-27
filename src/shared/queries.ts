@@ -15,6 +15,8 @@ const accountFragment = gql`
     }
     is_anonymous
     ticket
+    email
+    new_email
     otp_secret
     mfa_enabled
     password_hash
@@ -134,7 +136,7 @@ export const activateAccount = gql`
       where: {
         _and: { active: { _eq: false }, ticket: { _eq: $ticket }, ticket_expires_at: { _lt: $now } }
       }
-      _set: { active: true, ticket: $new_ticket }
+      _set: { active: true, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
     }
@@ -178,7 +180,7 @@ export const rotateTicket = gql`
   mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
     update_auth_accounts(
       where: { _and: { ticket: { _eq: $ticket }, ticket_expires_at: { _lt: $now } } }
-      _set: { ticket: $new_ticket }
+      _set: { ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
     }
@@ -194,10 +196,10 @@ export const deleteAccountByUserId = gql`
 `
 
 export const changeEmailByTicket = gql`
-  mutation($now: timestamptz, $ticket: uuid!, $new_email: String!) {
+  mutation($now: timestamptz, $ticket: uuid!, $new_email: String, $new_ticket: uuid!) {
     update_auth_accounts(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
-      _set: { email: $new_email, new_email: null }
+      _set: { email: $new_email, new_email: null, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
     }
@@ -208,14 +210,6 @@ export const saveNewEmail = gql`
   mutation($email: String!, $new_email: String!) {
     update_auth_accounts(where: { email: { _eq: $email } }, _set: { new_email: $new_email }) {
       affected_rows
-    }
-  }
-`
-
-export const getNewEmailByTicket = gql`
-  query($ticket: uuid!) {
-    auth_accounts(where: { ticket: { _eq: $ticket } }) {
-      new_email
     }
   }
 `
