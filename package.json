@@ -67,6 +67,7 @@
     "graphql": "15.0.0",
     "graphql-request": "1.8.2",
     "graphql-tag": "2.10.3",
+    "hasura-cli": "^1.1.1",
     "helmet": "3.22.0",
     "hibp": "9.0.0",
     "jose": "1.26.0",
