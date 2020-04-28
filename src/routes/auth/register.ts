@@ -40,9 +40,9 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
         message: {
           to: email,
           headers: {
-            'x-activate-link': {
+            'x-ticket': {
               prepared: true,
-              value: `${SERVER_URL}/auth/account/activate?ticket=${ticket}`
+              value: ticket
             }
           }
         },

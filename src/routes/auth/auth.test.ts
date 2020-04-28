@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   AUTO_ACTIVATE_NEW_USERS,
   HIBP_ENABLE,
-  SERVER_URL,
   SMTP_ENABLE,
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE
@@ -67,19 +66,18 @@ manualActivationIt('should fail to activate an user from a wrong ticket', async 
 })
 
 manualActivationIt('should activate the account from a valid ticket', async () => {
-  let activateLink: string
+  let ticket
   if (SMTP_ENABLE) {
     // Sends the email, checks if it's received and use the link for activation
     const [message] = await mailHogSearch(email)
     expect(message).toBeTruthy()
     expect(message.Content.Headers.Subject).toInclude('Confirm your email address')
-    activateLink = message.Content.Headers['X-Activate-Link'][0].replace(`${SERVER_URL}`, '')
+    ticket = message.Content.Headers['X-Ticket'][0]
     await deleteMailHogEmail(message)
   } else {
-    const { ticket } = await selectAccountByEmail(email)
-    activateLink = `/auth/account/activate?ticket=${ticket}`
+    ticket = (await selectAccountByEmail(email)).ticket
   }
-  const { status } = await agent.get(activateLink)
+  const { status } = await agent.get(`/auth/account/activate?ticket=${ticket}`)
   expect(status).toBeOneOf([204, 302])
 })
 

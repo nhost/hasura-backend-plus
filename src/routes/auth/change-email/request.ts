@@ -1,4 +1,9 @@
-import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
+import {
+  asyncWrapper,
+  selectAccountByEmail,
+  selectAccountByUserId,
+  rotateTicket
+} from '@shared/helpers'
 import { Request, Response } from 'express'
 import { saveNewEmail } from '@shared/queries'
 
@@ -7,10 +12,14 @@ import { SMTP_ENABLE, SERVER_URL } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { emailResetSchema } from '@shared/validation'
 import { request } from '@shared/request'
+import { getClaims } from '@shared/jwt'
 
-async function requestChangeEmail({ body }: Request, res: Response): Promise<unknown> {
-  const { email, new_email } = await emailResetSchema.validateAsync(body)
-  const { ticket } = await selectAccountByEmail(email)
+async function requestChangeEmail({ body, headers }: Request, res: Response): Promise<unknown> {
+  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
+
+  const { new_email } = await emailResetSchema.validateAsync(body)
+  const { email, ticket } = await selectAccountByUserId(user_id)
+  const newTicket = await rotateTicket(ticket as string)
 
   try {
     await selectAccountByEmail(new_email)
@@ -23,16 +32,17 @@ async function requestChangeEmail({ body }: Request, res: Response): Promise<unk
           template: 'change-email',
           locals: { ticket, url: SERVER_URL },
           message: {
-            to: email,
+            to: new_email,
             headers: {
               'x-ticket': {
                 prepared: true,
-                value: ticket as string
+                value: newTicket
               }
             }
           }
         })
       } catch (err) {
+        console.error(err)
         throw Boom.badImplementation()
       }
     }
