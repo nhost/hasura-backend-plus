@@ -36,6 +36,7 @@ while :; do
             ;;
         test)
             mode="test"
+            remove='-v'
             ;;
         dev)
             mode="development"
@@ -95,6 +96,6 @@ fi
 await_console &
 
 # * Start docker services
-docker-compose -p "hbp_{mode" -f docker-compose.yaml -f docker-compose.$mode.yaml run --service-ports --use-aliases hasura-backend-plus $COMMAND
+docker-compose -p "hbp_$mode" -f docker-compose.yaml -f docker-compose.$mode.yaml run --service-ports --use-aliases hasura-backend-plus $COMMAND
 
 clean_exit
