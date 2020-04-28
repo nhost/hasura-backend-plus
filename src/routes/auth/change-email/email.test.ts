@@ -51,9 +51,7 @@ it('should reconnect using the new email', async () => {
 })
 
 it('should receive an email notifying the email account has been changed', async () => {
-  console.log(SMTP_ENABLE, NOTIFY_EMAIL_CHANGE)
   if (SMTP_ENABLE && NOTIFY_EMAIL_CHANGE) {
-    console.log('HERE')
     const [message] = await mailHogSearch(account.email)
     expect(message).toBeTruthy()
     expect(message.Content.Headers.Subject).toInclude(

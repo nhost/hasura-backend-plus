@@ -8,13 +8,18 @@
   "version": "2.0.0",
   "main": "src/start.ts",
   "scripts": {
-    "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
-    "dev-container": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
+    "migrate": "ts-node -r tsconfig-paths/register src/migrate.ts",
+    "dev": "yarn run migrate && yarn run dev-script",
+    "dev:docker": "yarn run migrate && yarn run dev-script:docker",
+    "dev-script": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
+    "dev-script:docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
-    "test": "NODE_ENV=test jest --coverage --forceExit",
-    "test:watch": "NODE_ENV=test jest --watch",
+    "jest": "NODE_ENV=test jest --coverage --forceExit",
+    "jest:watch": "NODE_ENV=test jest --watch",
+    "test": "yarn run migrate && yarn run jest",
+    "test:watch": "yarn run migrate && yarn run jest:watch",
     "report-coverage": "codecov"
   },
   "config": {

@@ -11,4 +11,4 @@ RUN yarn install
 
 COPY . .
 
-CMD ["yarn", "run", "dev-container"]
+CMD ["yarn", "run", "dev:docker"]
