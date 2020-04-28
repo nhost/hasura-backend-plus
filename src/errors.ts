@@ -25,12 +25,8 @@ export async function errors(
 ): Promise<unknown> {
   const code = err?.output?.statusCode || 400
 
-  /**
-   * Log errors in development mode.
-   */
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err)
-  }
+  // log error
+  console.error(err)
 
   /**
    * The default error message looks like this.
