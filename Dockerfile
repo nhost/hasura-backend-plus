@@ -11,6 +11,6 @@ RUN yarn install
 
 COPY . .
 
-HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD wget localhost:${PORT}/healthz -q -O - > /dev/null 2>&1
+HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget localhost:${PORT}/healthz -q -O - > /dev/null 2>&1
 
 CMD ["yarn", "start"]
