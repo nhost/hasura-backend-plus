@@ -1,16 +1,17 @@
 import { SuperTest, Test, agent } from 'supertest'
-import { TestAccount, createAccount, deleteEmailsOfAccount } from '@shared/test-utils'
+import { TestAccount, createAccount, deleteEmailsOfAccount } from '@test/test-utils'
 
-import { AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
-import { getClaims } from './jwt'
-import { server } from '../start'
-import { selectAccountByEmail } from './helpers'
+import { AUTO_ACTIVATE_NEW_USERS, PORT } from '@shared/config'
+import { getClaims } from '../shared/jwt'
+import { app } from '../server'
+import { selectAccountByEmail } from '../shared/helpers'
 
 export let request: SuperTest<Test>
 
 export let account: TestAccount
 
 export const getUserId = (): string => getClaims(account.token)['x-hasura-user-id']
+const server = app.listen(PORT)
 
 // * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {
@@ -40,5 +41,5 @@ afterAll(async () => {
   await request.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
   // * Remove any message sent to this account
   await deleteEmailsOfAccount(account.email)
-  await server.close()
+  server.close()
 })

@@ -42,7 +42,7 @@ while :; do
             mode="development"
             ;;
         watch)
-            mode="watch"
+            mode="test"
             COMMAND="yarn run test:watch"
             ;;
         *)
@@ -93,6 +93,7 @@ if [ -n "$build" ]; then
     docker-compose -p "hbp_$mode" -f docker-compose.yaml -f docker-compose.$mode.yaml build
 fi
 
+# * Start on background in waiting for Hasura to be ready so the console can be launched
 await_console &
 
 # * Start docker services

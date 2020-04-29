@@ -1,10 +1,9 @@
 /* eslint-disable jest/no-standalone-expect */
 import 'jest-extended'
-// import { initAgent } from '@shared/test-utils'
-import { SERVER_URL, PROVIDER_SUCCESS_REDIRECT, PROVIDERS } from '@shared/config'
+import { SERVER_URL, PROVIDER_SUCCESS_REDIRECT, PROVIDERS, PORT } from '@shared/config'
 import { agent } from 'supertest'
-import { server } from '../../../start'
-import { itif } from '@shared/test-utils'
+import { app } from '../../../server'
+import { itif } from '@test/test-utils'
 
 // it('Oauth routes should not exist when disabled', async () => {
 //   const tempAgent = initAgent({ PROVIDERS: {} })
@@ -21,11 +20,11 @@ import { itif } from '@shared/test-utils'
 // })
 
 // TODO test functions in ./utils.ts
-agent(server) // * Create the SuperTest agent
-
+const server = app.listen(PORT)
+agent(server)
 // * Code that is executed after any jest test file that imports test-utiles
 afterAll(async () => {
-  await server.close()
+  server.close()
 })
 
 itif(

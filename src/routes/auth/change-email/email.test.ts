@@ -1,9 +1,9 @@
 import 'jest-extended'
 
 import { generateRandomString } from '@shared/helpers'
-import { account, request } from '@shared/test-mock-account'
+import { account, request } from '@test/test-mock-account'
 
-import { mailHogSearch, deleteMailHogEmail } from '@shared/test-utils'
+import { mailHogSearch, deleteMailHogEmail } from '@test/test-utils'
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { JWT_CLAIMS_NAMESPACE, NOTIFY_EMAIL_CHANGE, SMTP_ENABLE } from '@shared/config'

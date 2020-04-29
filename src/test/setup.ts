@@ -1,12 +1,20 @@
-// setup.js
-const config = require('./puppeteer.config.js')
-const { getPuppeteer } = require('./getPuppeteer.js')
+require('tsconfig-paths/register')
+import config from './puppeteer.config.json'
+import { getPuppeteer } from './getPuppeteer'
 let didAlreadyRunInWatchMode = false
 let browser
+import { Config } from '@jest/types'
+import migrate from '../migrate'
 
-module.exports = async function (jestConfig = {}) {
+export default async (jestConfig: Config.InitialOptions = {}): Promise<void> => {
+  console.log()
+  await migrate()
   const puppeteer = getPuppeteer()
-  browser = await puppeteer.launch(config.launch)
+  try {
+    browser = await puppeteer.launch(config.launch)
+  } catch {
+    browser = await puppeteer.launch({ ...config.launch, executablePath: undefined })
+  }
   process.env.PUPPETEER_WS_ENDPOINT = browser.wsEndpoint()
 
   // If we are in watch mode, - only setupServer() once.

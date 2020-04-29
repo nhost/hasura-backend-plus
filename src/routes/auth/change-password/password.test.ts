@@ -1,9 +1,8 @@
 import 'jest-extended'
 
 import { generateRandomString } from '@shared/helpers'
-import { account, request } from '@shared/test-mock-account'
-
-import { mailHogSearch, deleteMailHogEmail } from '@shared/test-utils'
+import { account, request } from '@test/test-mock-account'
+import { mailHogSearch, deleteMailHogEmail } from '@test/test-utils'
 
 let ticket: string
 
