@@ -27,6 +27,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
       email,
       password_hash,
       ticket,
+      active: AUTO_ACTIVATE_NEW_USERS,
       user: {
         data: { display_name: email, ...user_data }
       }
