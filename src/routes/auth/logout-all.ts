@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
 import { asyncWrapper } from '@shared/helpers'
 import { COOKIE_SECRET } from '@shared/config'
 import { request } from '@shared/request'
