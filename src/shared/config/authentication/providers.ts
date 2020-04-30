@@ -32,6 +32,14 @@ if (castBooleanEnv('GOOGLE_ENABLE')) {
   }
 }
 
+// Google OAuth2 provider settings
+if (castBooleanEnv('FACEBOOK_ENABLE')) {
+  PROVIDERS.facebook = {
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET
+  }
+}
+
 // Twitter provider settings
 if (castBooleanEnv('TWITTER_ENABLE')) {
   PROVIDERS.twitter = {
