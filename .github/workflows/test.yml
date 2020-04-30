@@ -1,4 +1,4 @@
-name: Check push & PR
+name: Jest tests
 on:
   pull_request:
     branches: [v2]
