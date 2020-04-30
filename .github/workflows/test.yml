@@ -54,7 +54,7 @@ jobs:
     container:
       image: node:12
       env:
-        NODE_ENV: CI
+        NODE_ENV: ci
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
