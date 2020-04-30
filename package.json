@@ -14,6 +14,7 @@
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
     "test": "NODE_ENV=test jest --coverage --forceExit",
+    "test:ci": "NODE_ENV=ci jest --coverage --forceExit",
     "test:watch": "NODE_ENV=test jest --watch",
     "report-coverage": "codecov"
   },
