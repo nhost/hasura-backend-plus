@@ -1,9 +1,8 @@
 const express = require('express');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const { graphql_client } = require('../graphql-client');
-const auth_functions = require('./auth-functions');
 
 const {
   AUTH_GITHUB_CLIENT_ID,
@@ -12,15 +11,12 @@ const {
   AUTH_GITHUB_AUTHORIZATION_URL,
   AUTH_GITHUB_TOKEN_URL,
   AUTH_GITHUB_USER_PROFILE_URL,
-  STORAGE_ACTIVE,
-  JWT_TOKEN_EXPIRES,
-  REFRESH_TOKEN_EXPIRES,
   USER_FIELDS,
   PROVIDERS_SUCCESS_REDIRECT,
   PROVIDERS_FAILURE_REDIRECT,
 } = require('../config');
 
-let router = express.Router();
+const router = express.Router();
 
 passport.use(new GitHubStrategy({
   clientID: AUTH_GITHUB_CLIENT_ID,
@@ -180,13 +176,12 @@ router.get('/callback',
     `;
 
     const refresh_token = uuidv4();
-    let hasura_data;
     try {
 
       // only set 5 min exp time. Callback to app should make the app do a instant
       // refresh of this particular token.
 
-      hasura_data = await graphql_client.request(query, {
+      await graphql_client.request(query, {
         refresh_token_data: {
           user_id: user.id,
           refresh_token: refresh_token,

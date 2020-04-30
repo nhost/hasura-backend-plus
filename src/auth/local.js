@@ -1,8 +1,8 @@
 const express = require('express');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const Boom = require('@hapi/boom');
 const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const jwt = require('jsonwebtoken');
 const { graphql_client } = require('../graphql-client');
 const auth_functions = require('./auth-functions');
@@ -11,12 +11,10 @@ const {
   USER_FIELDS,
   USER_REGISTRATION_AUTO_ACTIVE,
   REFRESH_TOKEN_EXPIRES,
-  JWT_TOKEN_EXPIRES,
-  HASURA_GRAPHQL_JWT_SECRET,
   AUTH_ANONYMOUS_USERS_ACTIVE,
 } = require('../config');
 
-let router = express.Router();
+const router = express.Router();
 
 router.post('/register', async (req, res, next) => {
 
@@ -227,7 +225,7 @@ router.post('/login', async (req, res, next) => {
     return next(Boom.unauthorized("Unable to find 'user'"));
   }
 
-  if (hasura_data[`user_accounts`].length === 0) {
+  if (hasura_data.user_accounts.length === 0) {
     // console.error("No user with this 'username'");
     return next(Boom.unauthorized("Invalid 'username' or 'password'"));
   }
@@ -347,7 +345,7 @@ if (AUTH_ANONYMOUS_USERS_ACTIVE) {
     const jwt_token = auth_functions.generateJwtToken(user);
 
     // generate refresh token and put in database
-    query = `
+    const query = `
     mutation (
       $refresh_token_data: auth_refresh_tokens_insert_input!
     ) {

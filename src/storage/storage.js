@@ -1,12 +1,12 @@
 const express = require('express');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const Boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
 const mime = require('mime-types');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 
 const {
   HASURA_GRAPHQL_JWT_SECRET,
@@ -69,7 +69,7 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
 
     const claims = get_claims_from_request(req);
 
-    if (claims === 'undefined') {
+    if (claims === undefined) {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 
@@ -135,7 +135,7 @@ router.delete('/file/*', (req, res, next) => {
 
     const claims = get_claims_from_request(req);
 
-    if (claims === 'undefined') {
+    if (claims === undefined) {
       return next(Boom.unauthorized('Incorrect JWT Token'));
     }
 
