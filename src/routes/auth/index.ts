@@ -5,7 +5,6 @@ import changeEmail from './change-email'
 import getJwks from './jwks'
 import loginAccount from './login'
 import logout from './logout'
-import logoutAll from './logout-all'
 import mfa from './mfa'
 import changePassword from './change-password'
 import providers from './providers'
@@ -30,7 +29,6 @@ router
   .get('/jwks', getJwks)
   .post('/login', loginAccount)
   .post('/logout', logout)
-  .post('/logout-all', logoutAll)
   .post('/register', registerAccount)
   .use('/token', token)
   .use('/account', account)
