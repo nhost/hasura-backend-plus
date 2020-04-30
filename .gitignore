@@ -1,6 +1,6 @@
 dist
 .env*
-!.env.test
+!.env.ci
 !.env*.example
 *.log
 hasura

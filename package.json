@@ -9,7 +9,7 @@
   "main": "src/start.ts",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
-    "dev-container": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
+    "dev:docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
@@ -69,6 +69,7 @@
     "graphql": "15.0.0",
     "graphql-request": "1.8.2",
     "graphql-tag": "2.10.3",
+    "hasura-cli": "^1.1.1",
     "helmet": "3.22.0",
     "hibp": "9.0.0",
     "jose": "1.26.0",

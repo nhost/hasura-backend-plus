@@ -54,6 +54,7 @@ jobs:
     container:
       image: node:12
       env:
+        NODE_ENV: CI
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
@@ -88,14 +89,8 @@ jobs:
           && apt-get update 
           && apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf --no-install-recommends 
           && rm -rf /var/lib/apt/lists/*
-      - name: Install Hasura CLI
-        run: yarn global add hasura-cli
-      - name: Create Hasura CLI config
-        run: "printf 'endpoint: http://graphql-engine:8080\nHASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}\n' > config.yaml"
-      - name: Copy mock migrations
-        run: cp -r mock-config/migrations/* migrations/
-      - name: Run migrations
-        run: hasura migrate apply
+      - name: Copy test migrations
+        run: cp -r test-mocks/migrations/* migrations/
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"

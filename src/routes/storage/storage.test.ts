@@ -1,6 +1,6 @@
 import 'jest-extended'
 
-import { account, getUserId, request } from '@shared/test-mock-account'
+import { account, getUserId, request } from '@test/test-mock-account'
 
 import fs from 'fs'
 import { promisify } from 'util'

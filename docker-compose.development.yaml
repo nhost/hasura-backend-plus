@@ -4,10 +4,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    command: '${COMMAND_LINE:-yarn run dev-container}'
-    env_file: .env.dockerdev
+    env_file: '.env.development'
+    depends_on:
+      - 'mailhog'
     environment:
-      NODE_ENV: '${NODE_ENV:-test}'
+      NODE_ENV: development
       JWT_ALGORITHM: HS256
       JWT_KEY: '${JWT_KEY}'
       SMTP_HOST: mailhog
@@ -16,14 +17,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    tty: true
   graphql-engine:
     ports:
       - '8080:8080'
     environment:
       HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "${JWT_KEY}"}'
-    volumes:
-      - ./mock-config/migrations/1585679214182_custom_user_column:/hasura-migrations/1585679214182_custom_user_column
   minio:
     ports:
       - 8000:9000 # Do not use port 9000 in the host machine as developpers using portainer might already use it
