@@ -36,7 +36,7 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: admin
       HASURA_GRAPHQL_JWT_SECRET: '{"type":"RS256", "key":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA84lx+VqwXzRiMDxIHyfQ\ns5wtalu4FnxnFlht2GR4miParLsqjmQMCqtvxW8StSErYVJlRjwZUuIWsnDA31pG\nBwjpsAV56iyK4xdaHrIluaOBCMbUw1O6O2RAs6pGFvPGi3B2wat7dj6nT+03M+xH\nS+jPZXzXDoh9VgWJ7h9hDllEYedDRbleFwLC7prLLZQTK/lSAQTOn4aPo/3S9LPS\nLgPzoJGVej2OYPlyMzeU4oPxj56FX7dVqpsaQP3tLjrLcWm1l38dVSQhy0gexF+u\navn/gwDsFn4gBqQ7me6FPUkB8/K7pGWDjl1/sPF3vI1zg0/RB89bHv4PmX20bsj1\ncQIDAQAB\n-----END PUBLIC KEY-----\n"}'
   hasura-backend-plus:
-    image: elitan/hasura-backend-plus:v0.0.6-alpha
+    image: elitan/hasura-backend-plus:v1.1.1
     depends_on:
     - "postgres"
     restart: always
