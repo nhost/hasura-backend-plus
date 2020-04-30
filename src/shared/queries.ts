@@ -130,6 +130,14 @@ export const deleteAllAccountRefreshTokens = gql`
   }
 `
 
+export const deleteRefreshToken = gql`
+  mutation($refresh_token: uuid!) {
+    delete_auth_refresh_tokens(where: { refresh_token: { _eq: $refresh_token } }) {
+      affected_rows
+    }
+  }
+`
+
 export const activateAccount = gql`
   mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
     update_auth_accounts(

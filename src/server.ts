@@ -1,5 +1,5 @@
 import { COOKIE_SECRET, AUTH_HAS_ONE_PROVIDER } from '@shared/config'
-import cookie from 'cookie-parser'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
 import express from 'express'
@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'production') {
 app.use(morgan('tiny'))
 app.use(helmet())
 app.use(json())
-app.use(cors())
+app.use(cors({ credentials: true, origin: true }))
 app.use(fileUpload())
 
 if (AUTH_HAS_ONE_PROVIDER) {
@@ -31,9 +31,9 @@ if (AUTH_HAS_ONE_PROVIDER) {
  * Set a cookie secret to enable server validation of cookies.
  */
 if (COOKIE_SECRET) {
-  app.use(cookie(COOKIE_SECRET))
+  app.use(cookieParser(COOKIE_SECRET))
 } else {
-  app.use(cookie())
+  app.use(cookieParser())
 }
 
 app.use(router)

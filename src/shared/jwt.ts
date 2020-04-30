@@ -105,8 +105,31 @@ export function newRefreshExpiry(): number {
   return now.setDate(now.getDate() + days)
 }
 
+/**
+ * Set refresh token as a cookie
+ * @param res Express Response
+ * @param refresh_token Refresh token to be set
+ */
+export const setRefreshTokenAsCookie = (res: Response, refresh_token: string): void => {
+  // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
+  const maxAge = JWT_REFRESH_EXPIRES_IN * 60 * 1000
+
+  // set refresh token as cookie
+  res.cookie('refresh_token', refresh_token, {
+    httpOnly: true,
+    maxAge,
+    signed: Boolean(COOKIE_SECRET)
+  })
+}
+
+/**
+ * Insert new refresh token in database and set new refresh token as cookie.
+ * @param res Express Response
+ * @param accountId Account ID
+ * @param refresh_token (optional) Refresh token to be set
+ */
 export const setRefreshToken = async (
-  response: Response,
+  res: Response,
   accountId: string,
   refresh_token?: string
 ): Promise<void> => {
@@ -120,13 +143,8 @@ export const setRefreshToken = async (
       expires_at: new Date(newRefreshExpiry())
     }
   })
-  // set refresh token as cookie
-  response.cookie('refresh_token', refresh_token, {
-    httpOnly: true,
-    maxAge: newRefreshExpiry(),
-    signed: Boolean(COOKIE_SECRET),
-    expires: new Date(newRefreshExpiry())
-  })
+
+  setRefreshTokenAsCookie(res, refresh_token)
 }
 
 /**
