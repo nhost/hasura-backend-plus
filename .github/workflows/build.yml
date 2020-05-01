@@ -125,7 +125,7 @@ jobs:
           file: ./coverage/clover.xml
   publish:
     needs: test
-    runs-one: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Build and publish to Docker Hub
         uses: docker/build-push-action@v1
