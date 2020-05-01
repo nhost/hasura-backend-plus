@@ -9,7 +9,7 @@ const {
 module.exports = {
   generateJwtToken: function(user) {
 
-    let custom_claims = {};
+    const custom_claims = {};
 
     USER_FIELDS.forEach(user_field => {
 

@@ -1,17 +1,13 @@
 const express = require('express');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const { graphql_client } = require('../graphql-client');
-const auth_functions = require('./auth-functions');
 
 const {
   AUTH_FACEBOOK_CLIENT_ID,
   AUTH_FACEBOOK_CLIENT_SECRET,
   AUTH_FACEBOOK_CALLBACK_URL,
-  STORAGE_ACTIVE,
-  JWT_TOKEN_EXPIRES,
-  REFRESH_TOKEN_EXPIRES,
   USER_FIELDS,
   PROVIDERS_SUCCESS_REDIRECT,
   PROVIDERS_FAILURE_REDIRECT,
@@ -70,7 +66,7 @@ async function(accessToken, refreshToken, profile, cb) {
   }
 
   // if user not yet exists
-  if (hasura_data.user_providers.length == 0) {
+  if (hasura_data.user_providers.length === 0) {
 
     // create the user
     // create user account
@@ -157,8 +153,6 @@ router.get('/callback',
     // generate tokens and redirect back home
 
     const { user } = req;
-
-    const jwt_token = auth_functions.generateJwtToken(user);
 
     // generate refresh token and put in database
     const query = `

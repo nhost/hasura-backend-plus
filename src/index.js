@@ -68,11 +68,15 @@ app.use('/healthz', (req, res) => {
 
 // error handler
 app.use((err, req, res, next) => {
-	if (err) {
-		console.error(err.message);
-		console.error(err.stack);
-		return res.status(err.output.statusCode || 500).json(err.output.payload);
-	}
+  if (err) {
+    if (err.isBoom !== void 0 && err.isBoom === true) {
+      console.error(err.message);
+      console.error(err.stack);
+      return res.status(err.status || err.output ? err.output.statusCode : 500 || 500).json(err.message || err.output.payload);
+    } else {
+      console.log(err);
+    }
+  }
 });
 
 const port = process.env.PORT || 3010;

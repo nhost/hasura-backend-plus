@@ -197,7 +197,7 @@ https://github.com/nhost/hasura-backend-plus/blob/master/src/storage/rules/index
 ```
 /auth/refresh-token
 /auth/activate-account
-/auth/users
+/auth/user
 ```
 
 ### Refresh Token
@@ -210,7 +210,7 @@ Returns a JWT token.
 
 ### Activate Account
 
-`/auth/local/activate-account`
+`/auth/activate-account`
 
 `POST`
 
@@ -358,7 +358,7 @@ Security rules are placed in `storage-tools.js` in the function `validateInterac
 
 `type` = Operation type. Can be one of: `read`, `write`.
 
-`claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['X-Hasura-User-Id']`.
+`claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['X-Hasura-user-Id']`.
 
 
 #### Example:

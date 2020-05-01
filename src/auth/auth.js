@@ -1,8 +1,8 @@
 const express = require('express');
-const Joi = require('joi');
+const Joi = require('@hapi/joi');
 const Boom = require('@hapi/boom');
 const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const jwt = require('jsonwebtoken');
 const { graphql_client } = require('../graphql-client');
 
@@ -75,7 +75,7 @@ router.post('/refresh-token', async (req, res, next) => {
     return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
 
-  if (hasura_data[`refresh_tokens`].length === 0) {
+  if (hasura_data.refresh_tokens.length === 0) {
     console.error('Incorrect user id or refresh token');
     return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
@@ -148,7 +148,7 @@ router.post('/logout', async (req, res, next) => {
   const { refresh_token } = value;
 
   // delete refresh token passed in data
-  let mutation = `
+  const mutation = `
   mutation (
     $refresh_token: uuid!,
   ) {
