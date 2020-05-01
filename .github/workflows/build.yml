@@ -115,6 +115,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Download coverage results
         uses: actions/download-artifact@v1
         with:
@@ -127,6 +128,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Build and publish to Docker Hub
         uses: docker/build-push-action@v1
         with:
