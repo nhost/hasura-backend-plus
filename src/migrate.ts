@@ -48,17 +48,21 @@ export default async (): Promise<void> => {
           // * Set the Hasura CLI config.yaml file
           writeFileSync(
             'config.yaml',
-            `endpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\n`,
+            `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\n`,
             { encoding: 'utf8' }
           )
           // * Apply migrations
-          const { error, stdout } = spawnSync('./node_modules/.bin/hasura', [
+          const migrate_spawn = spawnSync('./node_modules/.bin/hasura', [
             'migrate',
             'apply',
             '--skip-update-check'
           ])
-          if (error) reject(error)
-          console.log(stdout.toString())
+          if (migrate_spawn.error) reject(migrate_spawn.error)
+          console.log(migrate_spawn.stdout.toString())
+          // * Apply migrations
+          const metadata_spawn = spawnSync('./node_modules/.bin/hasura', ['metadata', 'apply'])
+          if (metadata_spawn.error) reject(metadata_spawn.error)
+          console.log(metadata_spawn.stdout.toString())
           server.close()
         })
         server.on('close', () => resolve())
