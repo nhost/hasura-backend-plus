@@ -12,3 +12,4 @@ export const AUTH_ENABLE = castBooleanEnv('AUTH_ENABLE', true)
 export const { COOKIE_SECRET } = process.env
 export const CHANGE_EMAIL_ENABLE = castBooleanEnv('CHANGE_EMAIL_ENABLE', true)
 export const NOTIFY_EMAIL_CHANGE = castBooleanEnv('NOTIFY_EMAIL_CHANGE', false)
+export const AUTH_ANONYMOUS_USERS_ACTIVE = castBooleanEnv('AUTH_ANONYMOUS_USERS_ACTIVE', false)
