@@ -4,6 +4,7 @@ import account from './account'
 import changeEmail from './change-email'
 import getJwks from './jwks'
 import loginAccount from './login'
+import logout from './logout'
 import mfa from './mfa'
 import changePassword from './change-password'
 import providers from './providers'
@@ -27,6 +28,7 @@ if (CHANGE_EMAIL_ENABLE) {
 router
   .get('/jwks', getJwks)
   .post('/login', loginAccount)
+  .post('/logout', logout)
   .post('/register', registerAccount)
   .use('/token', token)
   .use('/account', account)

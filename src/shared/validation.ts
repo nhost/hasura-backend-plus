@@ -92,6 +92,10 @@ export const emailResetSchema = Joi.object({
   new_email: emailRule
 })
 
+export const logoutSchema = Joi.object({
+  all: Joi.boolean()
+})
+
 export const mfaSchema = Joi.object(codeFields)
 export const loginSchema = extendedJoi.object(accountFields)
 export const forgotSchema = Joi.object({ email: emailRule })
