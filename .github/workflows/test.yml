@@ -1,4 +1,4 @@
-name: Test
+name: Build
 on:
   pull_request:
     branches: [v2]
@@ -123,3 +123,15 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage/clover.xml
+  publish:
+    needs: test
+    runs-one: ubuntu-latest
+    steps:
+      - name: Build and publish to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: nhost/hasura-backend-plus
+          tag_with_ref: true
+          tag_with_sha: true
