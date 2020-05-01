@@ -11,7 +11,7 @@ export const {
 } = process.env
 export const PORT = castIntEnv('PORT', 3000)
 export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
-
+export const AUTO_MIGRATE = castBooleanEnv('AUTO_MIGRATE', true)
 /**
  * * Rate limiter settings
  */

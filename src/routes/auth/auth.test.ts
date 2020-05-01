@@ -8,14 +8,15 @@ import {
   HIBP_ENABLE,
   SMTP_ENABLE,
   REDIRECT_URL_ERROR,
-  JWT_CLAIMS_NAMESPACE
+  JWT_CLAIMS_NAMESPACE,
+  PORT
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
-import { deleteMailHogEmail, mailHogSearch } from '@shared/test-utils'
+import { deleteMailHogEmail, mailHogSearch } from '@test/test-utils'
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
-import { server } from '../../start'
+import { app } from '../../server'
 import request from 'supertest'
 
 /**
@@ -32,11 +33,11 @@ const password = generateRandomString()
 /**
  * Create agent for global state.
  */
+const server = app.listen(PORT)
 const agent = request(server)
 // * Code that is executed after any jest test file that imports test-utiles
-
 afterAll(async () => {
-  await server.close()
+  server.close()
 })
 
 it('should create an account', async () => {

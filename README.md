@@ -32,6 +32,11 @@
       alt="code style: prettier"
     />
   </a>
+  <a href="https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush">
+    <img
+      src="https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2"
+    />
+  </a>
   <a href="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2">
     <img
       src="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg"

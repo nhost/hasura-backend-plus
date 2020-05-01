@@ -3,7 +3,7 @@
 const NodeEnvironment = require('jest-environment-node')
 const chalk = require('chalk')
 const { getPuppeteer } = require('./getPuppeteer')
-const config = require('./puppeteer.config.js')
+const config = require('./puppeteer.config.json')
 
 const handleError = (error) => {
   process.emit('uncaughtException', error)

@@ -1373,7 +1373,6 @@
 "@types/morgan@^1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.9.0.tgz#342119ae57fe67d36b91537143fc5aef16c2479f"
-  integrity sha512-warrzirh5dlTMaETytBTKR886pRXwr+SMZD87ZE13gLMR8Pzz69SiYFkvoDaii78qGP1iyBIUYz5GiXyryO//A==
   dependencies:
     "@types/express" "*"
 
@@ -1385,8 +1384,8 @@
     form-data "^3.0.0"
 
 "@types/node@*", "@types/node@^13.11.1":
-  version "13.13.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.0.tgz#30d2d09f623fe32cde9cb582c7a6eda2788ce4a8"
+  version "13.13.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.4.tgz#1581d6c16e3d4803eb079c87d4ac893ee7501c2c"
 
 "@types/nodemailer@*", "@types/nodemailer@6.4.0":
   version "6.4.0"
@@ -1403,6 +1402,13 @@
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
+
+"@types/passport-facebook@^2.1.9":
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/@types/passport-facebook/-/passport-facebook-2.1.9.tgz#0181b40be4e002705f7a29d64da9029c2ab464dc"
+  dependencies:
+    "@types/express" "*"
+    "@types/passport" "*"
 
 "@types/passport-github2@1.2.4":
   version "1.2.4"
@@ -2317,6 +2323,12 @@ aws4@^1.8.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.9.1.tgz#7e33d8f7d449b3f673cd72deb9abdc552dbe528e"
 
+axios@^0.19.0:
+  version "0.19.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
+  dependencies:
+    follow-redirects "1.5.10"
+
 babel-jest@^25.3.0:
   version "25.3.0"
   resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-25.3.0.tgz#999d0c19e8427f66b796bf9ea233eedf087b957c"
@@ -2439,7 +2451,6 @@ base@^0.11.1:
 basic-auth@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/basic-auth/-/basic-auth-2.0.1.tgz#b998279bf47ce38344b4f3cf916d4679bbf51e3a"
-  integrity sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==
   dependencies:
     safe-buffer "5.1.2"
 
@@ -3790,17 +3801,17 @@ debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.9:
   dependencies:
     ms "2.0.0"
 
+debug@=3.1.0, debug@~3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
+  dependencies:
+    ms "2.0.0"
+
 debug@^3.0.0, debug@^3.1.0, debug@^3.1.1, debug@^3.2.5:
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
   dependencies:
     ms "^2.1.1"
-
-debug@~3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
-  dependencies:
-    ms "2.0.0"
 
 decamelize@^1.0.0, decamelize@^1.1.2, decamelize@^1.2.0:
   version "1.2.0"
@@ -4884,6 +4895,12 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
 
+follow-redirects@1.5.10:
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.10.tgz#7b7a9f9aea2fdff36786a94ff643ed07f4ff5e2a"
+  dependencies:
+    debug "=3.1.0"
+
 follow-redirects@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.11.0.tgz#afa14f08ba12a52963140fe43212658897bc0ecb"
@@ -5329,6 +5346,13 @@ hash.js@^1.0.0, hash.js@^1.0.3:
   dependencies:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
+
+hasura-cli@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/hasura-cli/-/hasura-cli-1.2.0.tgz#a1ca61266cbc57141ce4b1d18b230b24b4b32106"
+  dependencies:
+    axios "^0.19.0"
+    chalk "^2.4.2"
 
 he@1.2.0, he@1.2.x, he@^1.1.0, he@^1.2.0:
   version "1.2.0"
@@ -7548,11 +7572,21 @@ mime-db@1.43.0, "mime-db@>= 1.43.0 < 2":
   version "1.43.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.43.0.tgz#0a12e0502650e473d735535050e7c8f4eb4fae58"
 
-mime-types@^2.1.12, mime-types@^2.1.25, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
+mime-db@1.44.0:
+  version "1.44.0"
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.44.0.tgz#fa11c5eb0aca1334b4233cb4d52f10c5a6272f92"
+
+mime-types@^2.1.12, mime-types@~2.1.17, mime-types@~2.1.19, mime-types@~2.1.24:
   version "2.1.26"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.26.tgz#9c921fc09b7e149a65dfdc0da4d20997200b0a06"
   dependencies:
     mime-db "1.43.0"
+
+mime-types@^2.1.25:
+  version "2.1.27"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.27.tgz#47949f98e279ea53119f5722e0f34e529bec009f"
+  dependencies:
+    mime-db "1.44.0"
 
 mime@1.6.0, mime@^1.4.1:
   version "1.6.0"
@@ -7669,7 +7703,6 @@ moment@^2.24.0:
 morgan@^1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.10.0.tgz#091778abc1fc47cd3509824653dae1faab6b17d7"
-  integrity sha512-AbegBVI4sh6El+1gNwvD5YIck7nSA36weD7xvIxG4in80j/UoK8AEGaWnnz8v1GxonMCltmlNs5ZKbGvl9b1XQ==
   dependencies:
     basic-auth "~2.0.1"
     debug "2.6.9"
@@ -8276,6 +8309,12 @@ parseurl@~1.3.2, parseurl@~1.3.3:
 pascalcase@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
+
+passport-facebook@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/passport-facebook/-/passport-facebook-3.0.0.tgz#b16f7314128be55d020a2b75f574c194bd6d9805"
+  dependencies:
+    passport-oauth2 "1.x.x"
 
 passport-github2@0.1.12:
   version "0.1.12"
@@ -9119,8 +9158,8 @@ puppeteer-extra@^3.1.9:
     deepmerge "^4.2.2"
 
 puppeteer@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-3.0.0.tgz#844c714d074c7ea63cfa3744501c1ab6ea60722e"
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-3.0.2.tgz#1d08cdb7c0c2666f5e743221b1cb1946fea493f0"
   dependencies:
     "@types/mime-types" "^2.1.0"
     debug "^4.1.0"
@@ -10815,8 +10854,8 @@ uid2@0.0.3, uid2@0.0.x:
   resolved "https://registry.yarnpkg.com/uid2/-/uid2-0.0.3.tgz#483126e11774df2f71b8b639dcd799c376162b82"
 
 unbzip2-stream@^1.3.3:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/unbzip2-stream/-/unbzip2-stream-1.4.1.tgz#151b104af853df3efdaa135d8b1eca850a44b426"
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/unbzip2-stream/-/unbzip2-stream-1.4.2.tgz#84eb9e783b186d8fb397515fbb656f312f1a7dbf"
   dependencies:
     buffer "^5.2.1"
     through "^2.3.8"
@@ -11499,9 +11538,13 @@ ws@^6.2.1:
   dependencies:
     async-limiter "~1.0.0"
 
-ws@^7.0.0, ws@^7.2.3:
+ws@^7.0.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.3.tgz#a5411e1fb04d5ed0efee76d26d5c46d830c39b46"
+
+ws@^7.2.3:
+  version "7.2.5"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.5.tgz#abb1370d4626a5a9cd79d8de404aa18b3465d10d"
 
 x-xss-protection@1.3.0:
   version "1.3.0"

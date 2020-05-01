@@ -1,6 +1,6 @@
 import 'jest-extended'
 
-import { account, request } from '@shared/test-mock-account'
+import { account, request } from '@test/test-mock-account'
 
 import { authenticator } from 'otplib'
 

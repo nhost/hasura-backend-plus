@@ -7,6 +7,7 @@ export type ClaimValueType =
   | RegExp[]
   | boolean
   | boolean[]
+  | null
   | undefined
 
 /**
