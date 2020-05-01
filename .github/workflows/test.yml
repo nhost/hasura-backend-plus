@@ -91,11 +91,13 @@ jobs:
       - name: Install Hasura CLI
         run: yarn global add hasura-cli
       - name: Create Hasura CLI config
-        run: "printf 'endpoint: http://graphql-engine:8080\nHASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}\n' > config.yaml"
+        run: "printf 'version: 2\nendpoint: http://graphql-engine:8080\nHASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}\nmetadata_directory: metadata' > config.yaml"
       - name: Copy mock migrations
         run: cp -r mock-config/migrations/* migrations/
-      - name: Run migrations
+      - name: Apply hasura migrations
         run: hasura migrate apply
+      - name: Apply hasura metadata
+        run: hasura metadata apply
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
