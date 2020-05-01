@@ -67,7 +67,7 @@ export const selectAccountByUserId = gql`
 `
 
 export const selectAccountByEmail = gql`
-  query($email: String!) {
+  query($email: citext!) {
     auth_accounts(where: { email: { _eq: $email } }) {
       ...accountFragment
     }
