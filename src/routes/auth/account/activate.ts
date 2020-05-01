@@ -45,8 +45,8 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   if (REDIRECT_URL_SUCCESS) {
     return res.redirect(302, REDIRECT_URL_SUCCESS as string)
   }
-  /* istanbul ignore next */
-  res.status(204).send()
+
+  res.status(200).send('Your account has been activated. You can close this window and login')
 }
 
 export default asyncWrapper(activateUser)
