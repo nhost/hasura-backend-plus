@@ -174,7 +174,7 @@ export function createHasuraJwt({
       ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
         (aggr, [key, value]) => ({
           ...aggr,
-          [`x-${kebabCase(key)}`]: JSON.stringify(value ?? null)
+          [`x-${kebabCase(key)}`]: typeof value === 'string' ? value : JSON.stringify(value ?? null)
         }),
         {}
       )
