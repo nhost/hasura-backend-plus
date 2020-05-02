@@ -35,6 +35,17 @@ export const insertAccount = gql`
   ${accountFragment}
 `
 
+export const setNewTicket = gql`
+  mutation($ticket: uuid!, $ticket_expires_at: timestamptz!, $user_id: uuid!) {
+    update_auth_accounts(
+      _set: { ticket: $ticket, ticket_expires_at: $ticket_expires_at }
+      where: { user: { id: { _eq: $user_id } } }
+    ) {
+      affected_rows
+    }
+  }
+`
+
 export const updatePasswordWithTicket = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_auth_accounts(
@@ -67,7 +78,7 @@ export const selectAccountByUserId = gql`
 `
 
 export const selectAccountByEmail = gql`
-  query($email: String!) {
+  query($email: citext!) {
     auth_accounts(where: { email: { _eq: $email } }) {
       ...accountFragment
     }
@@ -204,7 +215,7 @@ export const deleteAccountByUserId = gql`
 `
 
 export const changeEmailByTicket = gql`
-  mutation($now: timestamptz, $ticket: uuid!, $new_email: String, $new_ticket: uuid!) {
+  mutation($now: timestamptz, $ticket: uuid!, $new_email: citext, $new_ticket: uuid!) {
     update_auth_accounts(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
       _set: { email: $new_email, new_email: null, ticket: $new_ticket, ticket_expires_at: $now }
@@ -215,7 +226,7 @@ export const changeEmailByTicket = gql`
 `
 
 export const saveNewEmail = gql`
-  mutation($email: String!, $new_email: String!) {
+  mutation($email: citext!, $new_email: citext!) {
     update_auth_accounts(where: { email: { _eq: $email } }, _set: { new_email: $new_email }) {
       affected_rows
     }
