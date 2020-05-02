@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
   graphql-engine:
-    image: hasura/graphql-engine:v1.1.0.cli-migrations
+    image: hasura/graphql-engine:v1.2.0
     depends_on:
       - 'postgres'
     restart: always
@@ -16,14 +16,14 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/postgres
       HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/auth/jwks"}'
-    volumes:
-      - ./migrations:/hasura-migrations
   hasura-backend-plus:
     image: nhost/hasura-backend-plus:latest
+    depends_on:
+      - 'graphql-engine'
+      - 'minio'
     ports:
-      - '3000:${PORT:-3000}'
+      - '3000:3000'
     environment:
-      PORT: '${PORT:-3000}'
       HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
       S3_ENDPOINT: http://minio:9000

@@ -1,4 +1,4 @@
-name: Check push & PR
+name: Build
 on:
   pull_request:
     branches: [v2]
@@ -31,8 +31,9 @@ jobs:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: --restart always --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       graphql-engine:
-        image: hasura/graphql-engine:v1.1.0
+        image: hasura/graphql-engine:v1.2.0
         env:
+          HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
           HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
           HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
@@ -68,6 +69,7 @@ jobs:
         SMTP_SECURE: 'false'
         GITHUB_ENABLE: false
         GOOGLE_ENABLE: false
+        FACEBOOK_ENABLE: false
         TWITTER_ENABLE: false
         LINKEDIN_ENABLE: false
         APPLE_ENABLE: false
@@ -88,14 +90,6 @@ jobs:
           && apt-get update 
           && apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf --no-install-recommends 
           && rm -rf /var/lib/apt/lists/*
-      - name: Install Hasura CLI
-        run: yarn global add hasura-cli
-      - name: Create Hasura CLI config
-        run: "printf 'endpoint: http://graphql-engine:8080\nHASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}\n' > config.yaml"
-      - name: Copy mock migrations
-        run: cp -r mock-config/migrations/* migrations/
-      - name: Run migrations
-        run: hasura migrate apply
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -109,7 +103,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run Jest tests
-        run: yarn run test
+        run: yarn run test:ci
       - name: Upload test results
         uses: actions/upload-artifact@v1
         with:
@@ -120,6 +114,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Download coverage results
         uses: actions/download-artifact@v1
         with:
@@ -128,3 +123,16 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage/clover.xml
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and publish to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: nhost/hasura-backend-plus
+          tag_with_ref: true
+          tag_with_sha: true
