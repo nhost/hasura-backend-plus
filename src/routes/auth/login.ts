@@ -18,8 +18,6 @@ interface HasuraData {
 }
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
-  console.log('in login')
-
   if (AUTH_ANONYMOUS_USERS_ACTIVE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
