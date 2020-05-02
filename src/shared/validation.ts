@@ -98,9 +98,7 @@ export const logoutSchema = Joi.object({
 
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
-  anonymous: Joi.boolean(),
-  email: Joi.string(), // these will be checked more regeriously in `loginSchema`
-  password: Joi.string() // these will be checked more regeriously in `loginSchema`
+  anonymous: Joi.boolean()
 })
 export const loginSchema = extendedJoi.object(accountFields)
 export const forgotSchema = Joi.object({ email: emailRule })

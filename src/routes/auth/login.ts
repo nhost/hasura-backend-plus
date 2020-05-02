@@ -12,7 +12,7 @@ import { AUTH_ANONYMOUS_USERS_ACTIVE } from '@shared/config'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   if (AUTH_ANONYMOUS_USERS_ACTIVE) {
-    const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
+    const { anonymous } = loginAnonymouslySchema.validate(body).value
 
     // if user tries to sign in anonymously
     if (anonymous) {
