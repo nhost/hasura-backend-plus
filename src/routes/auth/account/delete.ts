@@ -16,6 +16,8 @@ async function deleteUser({ headers }: Request, res: Response): Promise<unknown>
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
 
+  // clear cookie
+  res.clearCookie('refresh_token')
   return res.status(204).send()
 }
 
