@@ -7,25 +7,16 @@ import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
 import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
-import { AccountData } from '@shared/types'
+import { InsertAccountData } from '@shared/types'
 import { AUTH_ANONYMOUS_USERS_ACTIVE } from '@shared/config'
 
-interface HasuraData {
-  insert_auth_accounts: {
-    affected_rows: number
-    returning: AccountData[]
-  }
-}
-
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
-  console.log('in login')
-
   if (AUTH_ANONYMOUS_USERS_ACTIVE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
     if (anonymous) {
-      let hasura_data: HasuraData
+      let hasura_data: InsertAccountData
       try {
         const ticket = uuidv4()
         hasura_data = await request(insertAccount, {
