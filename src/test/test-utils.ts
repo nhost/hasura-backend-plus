@@ -1,8 +1,8 @@
 import fetch, { Response } from 'node-fetch'
 import request, { SuperTest, Test } from 'supertest'
 
-import { SMTP_HOST } from '@shared/config'
-import { generateRandomString } from '@shared/helpers'
+import { SMTP_HOST, AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
+import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 console.error = function (): void {} // Disable the errors that will be raised by the tests
@@ -89,3 +89,30 @@ export const initAgent = (
 }
 
 export const itif = (condition: boolean): jest.It => (condition ? it : it.skip)
+
+export const registerAccount = async (agent: SuperTest<Test>): Promise<TestAccount> => {
+  const { email, password } = createAccount()
+  await agent.post('/auth/register').send({ email, password })
+  if (!AUTO_ACTIVATE_NEW_USERS) {
+    const { ticket } = await selectAccountByEmail(email)
+    await agent.get(`/auth/account/activate?ticket=${ticket}`)
+    await deleteEmailsOfAccount(email)
+  }
+  const res = await agent.post('/auth/login').send({ email, password })
+  // * Set the use variable so it is accessible to the jest test file
+  return {
+    email,
+    password,
+    token: res.body.jwt_token
+  }
+}
+
+export const deleteAccount = async (
+  agent: SuperTest<Test>,
+  account: TestAccount
+): Promise<void> => {
+  // * Delete the account
+  await agent.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
+  // * Remove any message sent to this account
+  await deleteEmailsOfAccount(account.email)
+}
