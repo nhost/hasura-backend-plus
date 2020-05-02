@@ -6,7 +6,6 @@ function help() {
     printf "\t${0} <command> [flags]\n"
     echo "Flags:"
     printf "\t-h, --help\t\tShow help\n"
-    printf "\t-b, --build\t\tForce build the docker file\n"
     printf "\t-r, --remove-volumes\t\Remove all volumes after shuting down\n"
     echo "Commands:"
     printf "\tdev\t Development without runnig any test\n"
@@ -20,9 +19,6 @@ while :; do
     case $1 in
         -h|-\?|--help)
             help $0
-            ;;
-        -b|--build)
-            build="yes"
             ;;
         -r|--remove-volumes)
             remove="-v"
@@ -65,17 +61,20 @@ fi
 await_console() {
     if [ "$mode" != "test" ]; then
         # Wait for Hasura Graphql Engine" before starting the console
-        echo "Waiting for Hasura Graphql Engine to be ready..."
-        until $(curl -X GET --output /dev/null --silent --head --fail http://localhost:8080/healthz); do
+        echo "Waiting for Hasura Backend Plus to be ready..."
+        until $(curl -X GET --output /dev/null --silent --head --fail http://localhost:3000/healthz); do
             sleep 1
         done
         # Set the Hasura config.yaml file
-        printf 'endpoint: http://localhost:8080\nadmin_secret: %s\n' $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
+        printf 'version: 2\nendpoint: http://localhost:8080\nadmin_secret: %s\nmetadata_directory: metadata'  $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
         hasura console
     fi
 }
 
 echo "Running mode '$mode'..."
+
+# * Build the docker images first, if the build option has been passed on
+docker-compose -p "hbp_$mode" -f docker-compose.yaml -f docker-compose.$mode.yaml build
 
 trap clean_exit INT
 clean_exit() {
@@ -87,11 +86,6 @@ clean_exit() {
     docker-compose -p "hbp_${mode}" down $remove --remove-orphans
     exit
 }
-
-# * Build the docker images first, if the build option has been passed on
-if [ -n "$build" ]; then
-    docker-compose -p "hbp_$mode" -f docker-compose.yaml -f docker-compose.$mode.yaml build
-fi
 
 # * Start on background in waiting for Hasura to be ready so the console can be launched
 await_console &

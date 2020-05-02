@@ -17,7 +17,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - ./test-mocks/migrations/1585679214182_custom_user_column:/app/migrations/1585679214182_custom_user_column
   graphql-engine:
     environment:
       HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "${JWT_KEY}"}'
