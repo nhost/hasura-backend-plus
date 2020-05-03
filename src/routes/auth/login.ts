@@ -8,7 +8,7 @@ import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { InsertAccountData } from '@shared/types'
-import { AUTH_ANONYMOUS_USERS_ACTIVE } from '@shared/config'
+import { AUTH_ANONYMOUS_USERS_ACTIVE, DEFAULT_ANONYMOUS_ROLE } from '@shared/config'
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
   if (AUTH_ANONYMOUS_USERS_ACTIVE) {
@@ -26,6 +26,10 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
             ticket,
             active: true,
             is_anonymous: true,
+            default_role: DEFAULT_ANONYMOUS_ROLE,
+            account_roles: {
+              data: [{ role: DEFAULT_ANONYMOUS_ROLE }]
+            },
             user: {
               data: { display_name: 'Anonymous user' }
             }

@@ -57,6 +57,42 @@ export const updatePasswordWithUserId = gql`
   }
 `
 
+export const registerAnonymousUser = gql`
+  mutation(
+    $user_id: uuid!
+    $email: citext!
+    $password_hash: String!
+    $active: Boolean!
+    $user_role: String!
+    $anonymous_role: String!
+    $user_data: users_set_input!
+  ) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: {
+        is_anonymous: false
+        default_role: $user_role
+        email: $email
+        password_hash: $password_hash
+        active: $active
+      }
+    ) {
+      affected_rows
+    }
+    update_auth_account_roles(
+      where: {
+        _and: [{ account: { user: { id: { _eq: $user_id } } } }, { role: { _eq: $anonymous_role } }]
+      }
+      _set: { role: $user_role }
+    ) {
+      affected_rows
+    }
+    update_users_by_pk(pk_columns: { id: $user_id }, _set: $user_data) {
+      affected_rows
+    }
+  }
+`
+
 export const selectAccountByUserId = gql`
   query($user_id: uuid!) {
     auth_accounts(where: { user: { id: { _eq: $user_id } } }) {

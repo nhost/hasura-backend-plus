@@ -6,7 +6,8 @@ import {
   JWT_KEY,
   JWT_CLAIMS_NAMESPACE,
   JWT_REFRESH_EXPIRES_IN,
-  DEFAULT_USER_ROLE
+  DEFAULT_USER_ROLE,
+  DEFAULT_ANONYMOUS_ROLE
 } from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
@@ -153,15 +154,12 @@ export const setRefreshToken = async (
  * @param defaultRole Defaults to "user".
  * @param roles Defaults to ["user"].
  */
-export function createHasuraJwt({
-  default_role = DEFAULT_USER_ROLE,
-  account_roles = [],
-  user
-}: AccountData): string {
+export function createHasuraJwt({ default_role, account_roles = [], user }: AccountData): string {
+  const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
   const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
-  if (!accountRoles.includes(default_role)) {
-    accountRoles.push(default_role)
+  if (!accountRoles.includes(role)) {
+    accountRoles.push(role)
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, ...customFields } = user
@@ -169,7 +167,7 @@ export function createHasuraJwt({
     [JWT_CLAIMS_NAMESPACE]: {
       'x-hasura-user-id': id,
       'x-hasura-allowed-roles': accountRoles,
-      'x-hasura-default-role': default_role,
+      'x-hasura-default-role': role,
       // Add custom fields based on the user fields fetched from the GQL query
       ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
         (aggr, [key, value]) => ({
