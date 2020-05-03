@@ -7,7 +7,7 @@ import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
 import TMP from 'temp-dir'
-import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET, AUTO_MIGRATE, PORT } from '@shared/config'
+import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET, PORT } from '@shared/config'
 import getJwks from './routes/auth/jwks'
 
 const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'ERROR' : 'INFO'
@@ -43,56 +43,60 @@ const hasuraConsole = async (action: string): Promise<void> => {
   }
 }
 
-export default async (path = '.'): Promise<void> => {
-  if (AUTO_MIGRATE) {
-    console.log('Checking migrations and metadata...')
-    await new Promise((resolve, reject) => {
-      const app = express()
-      app.use(helmet())
-      app.use(cors())
-      app.get('/auth/jwks', getJwks)
-      /**
-       * ! See: https://github.com/hasura/graphql-engine/issues/3636
-       * ! When Hasura is set to use jwk_url with HBP, it needs to get the JWKS from HBP to start.
-       * ! As we need Hasura to be up to run the migrations, we provide a temporary server with only the JWKS endpoint.
-       */
-      try {
-        const server = app.listen(PORT, async () => {
-          const { protocol, host } = url.parse(HASURA_ENDPOINT)
-          const hasuraURL = `${protocol}//${host}`
-          // * Wait for GraphQL Engine to be ready
-          await waitFor(`${hasuraURL}/healthz`)
-          // * Empty or create the temporary directory
-          await emptyDir(TEMP_MIGRATION_DIR)
-          // * Set the Hasura CLI config.yaml file
-          writeFileSync(
-            `${TEMP_MIGRATION_DIR}/config.yaml`,
-            `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
-            { encoding: 'utf8' }
-          )
-          const hasMigrations = await pathExists(`${path}/migrations`)
-          if (hasMigrations) {
-            // * Apply migrations
-            console.log('Applying migrations...')
-            await copy(`${path}/migrations`, `${TEMP_MIGRATION_DIR}/migrations`)
-            await hasuraConsole('migrate apply')
-          }
-          if (await pathExists(`${path}/metadata`)) {
-            // * Apply metadata
-            console.log('Applying metadata...')
-            await copy(`${path}/metadata`, `${TEMP_MIGRATION_DIR}/metadata`)
-            await hasuraConsole('metadata apply')
-          } else if (hasMigrations) {
-            console.log('Reloading metadata...')
-            await hasuraConsole('metadata reload')
-          }
-          await remove(TEMP_MIGRATION_DIR)
-          server.close()
-        })
-        server.on('close', () => resolve())
-      } catch (err) {
-        reject(err)
-      }
-    })
-  }
+type Migration = {
+  migrations?: string
+  metadata?: string
+}
+
+export default async (
+  { migrations, metadata }: Migration = { migrations: './migrations', metadata: './metadata' }
+): Promise<void> => {
+  console.log('Checking migrations and metadata...')
+  await new Promise((resolve, reject) => {
+    const app = express()
+    app.use(helmet())
+    app.use(cors())
+    app.get('/auth/jwks', getJwks)
+    /**
+     * ! See: https://github.com/hasura/graphql-engine/issues/3636
+     * ! When Hasura is set to use jwk_url with HBP, it needs to get the JWKS from HBP to start.
+     * ! As we need Hasura to be up to run the migrations, we provide a temporary server with only the JWKS endpoint.
+     */
+    try {
+      const server = app.listen(PORT, async () => {
+        const { protocol, host } = url.parse(HASURA_ENDPOINT)
+        const hasuraURL = `${protocol}//${host}`
+        // * Wait for GraphQL Engine to be ready
+        await waitFor(`${hasuraURL}/healthz`)
+        // * Empty or create the temporary directory
+        await emptyDir(TEMP_MIGRATION_DIR)
+        // * Set the Hasura CLI config.yaml file
+        writeFileSync(
+          `${TEMP_MIGRATION_DIR}/config.yaml`,
+          `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
+          { encoding: 'utf8' }
+        )
+        if (migrations && (await pathExists(migrations))) {
+          // * Apply migrations
+          console.log(`Applying migrations '${migrations}'...`)
+          await copy(migrations, `${TEMP_MIGRATION_DIR}/migrations`)
+          await hasuraConsole('migrate apply')
+        }
+        if (metadata && (await pathExists(metadata))) {
+          // * Apply metadata
+          console.log(`Applying metadata '${metadata}'...`)
+          await copy(metadata, `${TEMP_MIGRATION_DIR}/metadata`)
+          await hasuraConsole('metadata apply')
+        } else if (migrations && (await pathExists(migrations))) {
+          console.log('Reloading metadata...')
+          await hasuraConsole('metadata reload')
+        }
+        await remove(TEMP_MIGRATION_DIR)
+        server.close()
+      })
+      server.on('close', () => resolve())
+    } catch (err) {
+      reject(err)
+    }
+  })
 }

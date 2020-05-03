@@ -9,7 +9,7 @@ import migrate from '../migrate'
 export default async (jestConfig: Config.InitialOptions = {}): Promise<void> => {
   console.log()
   await migrate()
-  await migrate('./test-mocks')
+  await migrate({ migrations: './test-mocks/migrations' })
   const puppeteer = getPuppeteer()
   try {
     browser = await puppeteer.launch(config.launch)
