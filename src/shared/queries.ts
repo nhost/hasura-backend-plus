@@ -225,9 +225,12 @@ export const changeEmailByTicket = gql`
   }
 `
 
-export const saveNewEmail = gql`
-  mutation($email: citext!, $new_email: citext!) {
-    update_auth_accounts(where: { email: { _eq: $email } }, _set: { new_email: $new_email }) {
+export const setNewEmail = gql`
+  mutation($user_id: uuid!, $new_email: citext!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { new_email: $new_email }
+    ) {
       affected_rows
     }
   }
