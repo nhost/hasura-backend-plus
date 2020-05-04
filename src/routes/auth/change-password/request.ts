@@ -11,7 +11,7 @@ import Boom from '@hapi/boom'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
- * Always return status code 204 in order to not leak information about emails in our database
+ * Always return status code 204 in order to not leak information about emails in the database
  */
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
   // smtp must be enabled for request change password to work.
@@ -30,13 +30,18 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
     return res.status(204).send()
   }
 
+  if (!account.active) {
+    console.error('Account is not active')
+    return res.status(204).send()
+  }
+
   // generate new ticket and ticket_expires_at
   const ticket = uuidv4()
   const now = new Date()
   const ticket_expires_at = new Date()
 
-  // ticket active for 30 minutes
-  ticket_expires_at.setTime(now.getTime() + 30 * 60 * 1000)
+  // ticket active for 60 minutes
+  ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000)
 
   // set new ticket
   try {

@@ -49,7 +49,7 @@ export const setNewTicket = gql`
 export const updatePasswordWithTicket = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_auth_accounts(
-      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
+      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }
       _set: { password_hash: $password_hash, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
