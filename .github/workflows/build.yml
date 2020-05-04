@@ -57,22 +57,11 @@ jobs:
       env:
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
-        HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
         JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
         JWT_KEY: ${{ env.JWT_KEY }}
-        S3_ENDPOINT: http://minio:9000
         S3_BUCKET: ${{ env.S3_BUCKET }}
         S3_ACCESS_KEY_ID: ${{ env.S3_ACCESS_KEY_ID }}
         S3_SECRET_ACCESS_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
-        SMTP_HOST: mailhog
-        SMTP_PORT: 1025
-        SMTP_SECURE: 'false'
-        GITHUB_ENABLE: false
-        GOOGLE_ENABLE: false
-        FACEBOOK_ENABLE: false
-        TWITTER_ENABLE: false
-        LINKEDIN_ENABLE: false
-        APPLE_ENABLE: false
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
