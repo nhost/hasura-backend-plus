@@ -19,9 +19,6 @@ async function requestChangeEmail({ body, headers }: Request, res: Response): Pr
   // get current user_id
   const user_id = getClaims(headers.authorization)['x-hasura-user-id']
 
-  console.log('got user id:')
-  console.log({ user_id })
-
   // validate new email
   const { new_email } = await emailResetSchema.validateAsync(body)
 
@@ -44,8 +41,6 @@ async function requestChangeEmail({ body, headers }: Request, res: Response): Pr
     console.error('Unable to set new ticket for user')
     return Boom.badImplementation('Unable to set new ticket')
   }
-
-  console.log('set new ticket OK')
 
   // make sure new_email is not attached to an account yet
   let account_exists = true
