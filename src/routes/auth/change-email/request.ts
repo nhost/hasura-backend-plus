@@ -1,4 +1,4 @@
-import { asyncWrapper, selectAccountByEmail, rotateTicket } from '@shared/helpers'
+import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { Request, Response } from 'express'
 import { setNewTicket, setNewEmail } from '@shared/queries'
 
