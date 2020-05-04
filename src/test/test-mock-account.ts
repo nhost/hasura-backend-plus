@@ -1,10 +1,9 @@
 import { SuperTest, Test, agent } from 'supertest'
-import { TestAccount, createAccount, deleteEmailsOfAccount } from '@test/test-utils'
+import { TestAccount, registerAccount, deleteAccount } from '@test/test-utils'
 
-import { AUTO_ACTIVATE_NEW_USERS, PORT } from '@shared/config'
+import { PORT } from '@shared/config'
 import { getClaims } from '../shared/jwt'
 import { app } from '../server'
-import { selectAccountByEmail } from '../shared/helpers'
 
 export let request: SuperTest<Test>
 
@@ -16,30 +15,11 @@ const server = app.listen(PORT)
 // * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {
   request = agent(server) // * Create the SuperTest agent
-  // * Create a mock account
-  const { email, password } = createAccount()
-  await request.post('/auth/register').send({ email, password })
-  if (!AUTO_ACTIVATE_NEW_USERS) {
-    const { ticket } = await selectAccountByEmail(email)
-    await request.get(`/auth/account/activate?ticket=${ticket}`)
-    await deleteEmailsOfAccount(email)
-  }
-  const {
-    body: { jwt_token: token }
-  } = await request.post('/auth/login').send({ email, password })
-  // * Set the use variable so it is accessible to the jest test file
-  account = {
-    email,
-    password,
-    token
-  }
+  account = await registerAccount(request)
 })
 
 // * Code that is executed after any jest test file that imports this file
 afterAll(async () => {
-  // * Delete the account
-  await request.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
-  // * Remove any message sent to this account
-  await deleteEmailsOfAccount(account.email)
+  await deleteAccount(request, account)
   server.close()
 })

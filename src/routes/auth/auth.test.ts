@@ -9,10 +9,11 @@ import {
   SMTP_ENABLE,
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
-  PORT
+  PORT,
+  AUTH_ANONYMOUS_USERS_ACTIVE
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
-import { deleteMailHogEmail, mailHogSearch } from '@test/test-utils'
+import { deleteMailHogEmail, mailHogSearch, registerAccount, deleteAccount } from '@test/test-utils'
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
@@ -114,3 +115,21 @@ pwndPasswordIt('should tell the password has been pwned', async () => {
   expect(status).toEqual(400)
   expect(message).toEqual('Password is too weak.')
 })
+
+const anonymousAccountIt = AUTH_ANONYMOUS_USERS_ACTIVE ? it : it.skip
+anonymousAccountIt('should login anonymously', async () => {
+  const { body, status } = await agent.post('/auth/login').send({ anonymous: true })
+  expect(status).toEqual(200)
+  expect(body.jwt_token).toBeString()
+  expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should logout', async () => {
+  // TODO : review this test, including cookies
+  const account = await registerAccount(agent)
+  const res = await agent.post('/auth/logout').send()
+  expect(res.status).toBe(204)
+  await deleteAccount(agent, account)
+})
+
+// TODO test cookies

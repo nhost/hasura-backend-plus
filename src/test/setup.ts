@@ -25,25 +25,4 @@ export default async (jestConfig: Config.InitialOptions = {}): Promise<void> => 
   }
 
   // ? Set a superagent server here?
-  //   if (config.server) {
-  //     try {
-  //       await setupServer(config.server)
-  //     } catch (error) {
-  //       if (error.code === ERROR_TIMEOUT) {
-  //         console.log('')
-  //         console.error(chalk.red(error.message))
-  //         console.error(
-  //           chalk.blue(`\n☝️ You can set "server.launchTimeout" in jest-puppeteer.config.js`)
-  //         )
-  //         process.exit(1)
-  //       }
-  //       if (error.code === ERROR_NO_COMMAND) {
-  //         console.log('')
-  //         console.error(chalk.red(error.message))
-  //         console.error(chalk.blue(`\n☝️ You must set "server.command" in jest-puppeteer.config.js`))
-  //         process.exit(1)
-  //       }
-  //       throw error
-  //     }
-  //   }
 }
