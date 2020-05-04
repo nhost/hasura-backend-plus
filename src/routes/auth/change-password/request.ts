@@ -16,9 +16,7 @@ import Boom from '@hapi/boom'
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
   // smtp must be enabled for request change password to work.
   if (!SMTP_ENABLE) {
-    throw Boom.badImplementation(
-      'The change password request function is not activated. No SMTP settings available'
-    )
+    throw Boom.badImplementation('SMTP settings unavailable')
   }
 
   const { email } = await forgotSchema.validateAsync(body)

@@ -21,6 +21,9 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   await checkHibp(password)
 
   const ticket = uuidv4()
+  const now = new Date()
+  const ticket_expires_at = new Date()
+  ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
   const password_hash = await hashPassword(password)
 
   await request<InsertAccountData>(insertAccount, {
@@ -28,6 +31,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
       email,
       password_hash,
       ticket,
+      ticket_expires_at,
       active: AUTO_ACTIVATE_NEW_USERS,
       default_role: DEFAULT_USER_ROLE,
       account_roles: {
