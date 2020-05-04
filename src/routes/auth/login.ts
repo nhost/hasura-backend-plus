@@ -1,12 +1,63 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
-
 import Boom from '@hapi/boom'
 import bcrypt from 'bcryptjs'
-import { loginSchema } from '@shared/validation'
+import { v4 as uuidv4 } from 'uuid'
+import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
+import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
+import { insertAccount } from '@shared/queries'
+import { request } from '@shared/request'
+import { AccountData } from '@shared/types'
+import { AUTH_ANONYMOUS_USERS_ACTIVE } from '@shared/config'
+
+interface HasuraData {
+  insert_auth_accounts: {
+    affected_rows: number
+    returning: AccountData[]
+  }
+}
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
+  if (AUTH_ANONYMOUS_USERS_ACTIVE) {
+    const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
+
+    // if user tries to sign in anonymously
+    if (anonymous) {
+      let hasura_data: HasuraData
+      try {
+        const ticket = uuidv4()
+        hasura_data = await request(insertAccount, {
+          account: {
+            email: null,
+            password_hash: null,
+            ticket,
+            active: true,
+            is_anonymous: true,
+            user: {
+              data: { display_name: 'Anonymous user' }
+            }
+          }
+        })
+      } catch (error) {
+        throw Boom.badImplementation('Unable to create user and sign in user anonymously')
+      }
+
+      if (!hasura_data.insert_auth_accounts.returning.length) {
+        throw Boom.badImplementation('Unable to create user and sign in user anonymously')
+      }
+
+      const account = hasura_data.insert_auth_accounts.returning[0]
+
+      await setRefreshToken(res, account.id)
+
+      return res.send({
+        jwt_token: createHasuraJwt(account),
+        jwt_expires_in: newJwtExpiry
+      })
+    }
+  }
+
+  // else, login users normally
   const { password } = await loginSchema.validateAsync(body)
 
   const account = await selectAccount(body)

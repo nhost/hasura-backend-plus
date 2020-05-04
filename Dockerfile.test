@@ -1,4 +1,4 @@
-FROM node:10-slim
+FROM node:12
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer installs, work.
@@ -13,7 +13,7 @@ RUN apt-get update \
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-ARG NODE_ENV=development
+ARG NODE_ENV=test
 ENV NODE_ENV $NODE_ENV
 ENV PORT 3000
 
