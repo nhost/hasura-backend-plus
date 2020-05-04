@@ -21,7 +21,7 @@ async function changePassword({ body, headers }: Request, res: Response): Promis
 
   if (body.ticket) {
     // Reset the password from { ticket, new_password }
-    const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(body, {})
+    const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(body)
 
     await checkHibp(new_password)
     password_hash = await hashPassword(new_password)

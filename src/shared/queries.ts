@@ -35,10 +35,21 @@ export const insertAccount = gql`
   ${accountFragment}
 `
 
+export const setNewTicket = gql`
+  mutation($ticket: uuid!, $ticket_expires_at: timestamptz!, $user_id: uuid!) {
+    update_auth_accounts(
+      _set: { ticket: $ticket, ticket_expires_at: $ticket_expires_at }
+      where: { user: { id: { _eq: $user_id } } }
+    ) {
+      affected_rows
+    }
+  }
+`
+
 export const updatePasswordWithTicket = gql`
   mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
     update_auth_accounts(
-      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _lt: $now } }] }
+      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }
       _set: { password_hash: $password_hash, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
