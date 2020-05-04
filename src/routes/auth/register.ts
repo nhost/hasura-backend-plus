@@ -1,4 +1,4 @@
-import { AUTO_ACTIVATE_NEW_USERS, SERVER_URL, SMTP_ENABLE } from '@shared/config'
+import { AUTO_ACTIVATE_NEW_USERS, SERVER_URL, SMTP_ENABLE, DEFAULT_USER_ROLE } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 
@@ -8,6 +8,7 @@ import { insertAccount } from '@shared/queries'
 import { registerSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
+import { InsertAccountData } from '@shared/types'
 
 async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
   const { email, password, user_data = {} } = await registerSchema.validateAsync(body)
@@ -22,12 +23,16 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   const ticket = uuidv4()
   const password_hash = await hashPassword(password)
 
-  await request(insertAccount, {
+  await request<InsertAccountData>(insertAccount, {
     account: {
       email,
       password_hash,
       ticket,
       active: AUTO_ACTIVATE_NEW_USERS,
+      default_role: DEFAULT_USER_ROLE,
+      account_roles: {
+        data: [{ role: DEFAULT_USER_ROLE }]
+      },
       user: {
         data: { display_name: email, ...user_data }
       }
