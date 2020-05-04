@@ -44,7 +44,7 @@ CREATE TABLE auth.accounts (
     ticket uuid DEFAULT public.gen_random_uuid() NOT NULL,
     ticket_expires_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT proper_email CHECK ((email OPERATOR(public.~*) '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext)),
-    CONSTRAINT proper_new_email CHECK ((new_email OPERATOR(public.~*) '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext))
+    CONSTRAINT proper_new_email CHECK ((new_email OPERATOR(public.~*) '^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::public.citext))
 );
 CREATE TABLE auth.providers (
     provider text NOT NULL
