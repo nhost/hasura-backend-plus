@@ -27,7 +27,7 @@ export HASURA_GRAPHQL_ADMIN_SECRET=<your Hasura Admin secret>
 docker-compose up -d
 ```
 
-Everything is now up and running. HBP is listening to `http://localhost:3000` and Hasura Graphql Engine is listening to `http://localhost:8080`.
+Everything shoudl be up and running. HBP is listening to `http://localhost:3000` and Hasura Graphql Engine is listening to `http://localhost:8080`.
 
 You can then run the Hasura Console in following the [official instructions](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/hasura_console.html).
 

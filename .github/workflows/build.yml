@@ -5,12 +5,14 @@ on:
     paths:
       - '**'
       - '!docs/**'
+      - '!examples/**'
       - '!*.md'
   push:
     branches: [v2]
     paths:
       - '**'
       - '!docs/**'
+      - '!examples/**'
       - '!*.md'
 env:
   HASURA_GRAPHQL_ADMIN_SECRET: test_secret_key
