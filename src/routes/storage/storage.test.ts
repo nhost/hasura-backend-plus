@@ -4,19 +4,27 @@ import { account, getUserId, request } from '@test/test-mock-account'
 
 import fs from 'fs'
 import { promisify } from 'util'
-import { v4 as uuidv4 } from 'uuid'
 
 const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
-const fileToken = uuidv4()
+let fileToken: string
+const initialDescription = 'description of the file'
 
 it('should upload a new file', async () => {
-  const { status } = await request
+  const {
+    status,
+    body: {
+      Metadata: { token, description }
+    }
+  } = await request
     .post(`/storage/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
-    .query({ token: fileToken })
+    .query({ description: initialDescription })
     .attach('file', filePath)
   expect(status).toEqual(200)
+  expect(token).toBeString()
+  expect(description).toBe(initialDescription)
+  fileToken = token
 })
 
 it('should update an existing file', async () => {
@@ -64,7 +72,7 @@ it(`should update an existing file's metadata`, async () => {
   const { status } = await request
     .post(`/storage/meta/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
-    .query({ token: 'new value' })
+    .query({ description: 'new description' })
   expect(status).toEqual(200)
 })
 
@@ -72,14 +80,14 @@ it('should get file metadata', async () => {
   const {
     status,
     body: {
-      Metadata: { filename, token }
+      Metadata: { filename, description }
     }
   } = await request
     .get(`/storage/meta/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
-  expect(token).toEqual('new value')
+  expect(description).toEqual('new description')
 })
 
 it('should get the headers of all the user files', async () => {
@@ -106,12 +114,16 @@ it('should delete file metadata', async () => {
   expect(status).toEqual(204)
   const {
     status: getStatus,
-    body: { Metadata }
+    body: {
+      Metadata: { filename, token, description }
+    }
   } = await request
     .get(`/storage/meta/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
   expect(getStatus).toEqual(200)
-  expect(Metadata).toBeEmpty()
+  expect(filename).toBeUndefined()
+  expect(token).toBeString()
+  expect(description).toBeUndefined()
 })
 
 it('should delete file', async () => {
