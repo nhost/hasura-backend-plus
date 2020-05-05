@@ -49,6 +49,7 @@ const createRoutes = (
 
 for (const path in STORAGE_RULES.paths) {
   const rules = STORAGE_RULES.paths[path]
+
   router.use(createRoutes(path, rules, false, rules.meta?.values))
   if (
     containsSomeRule(rules.meta, ['read', 'write', 'get', 'create', 'update', 'delete', 'list'])

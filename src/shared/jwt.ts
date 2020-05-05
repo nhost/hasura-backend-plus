@@ -7,7 +7,8 @@ import {
   JWT_CLAIMS_NAMESPACE,
   JWT_REFRESH_EXPIRES_IN,
   DEFAULT_USER_ROLE,
-  DEFAULT_ANONYMOUS_ROLE
+  DEFAULT_ANONYMOUS_ROLE,
+  JWT_CUSTOM_FIELDS
 } from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
@@ -19,6 +20,10 @@ import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
 import { Claims, Token, AccountData, ClaimValueType } from './types'
+
+interface InsertRefreshTokenData {
+  account: AccountData
+}
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -57,6 +62,36 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
 }
 
 export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
+
+/**
+ * Create JWT token.
+ * @param id Required v4 UUID string.
+ * @param defaultRole Defaults to "user".
+ * @param roles Defaults to ["user"].
+ */
+export function getPermissionVariables({
+  default_role,
+  account_roles = [],
+  user
+}: AccountData): string {
+  const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
+  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
+
+  if (!accountRoles.includes(role)) {
+    accountRoles.push(role)
+  }
+
+  return JSON.stringify({
+    'user-id': user.id,
+    'allowed-roles': accountRoles,
+    'default-role': role,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...JWT_CUSTOM_FIELDS.reduce((aggr: any, cursor) => {
+      aggr[`${kebabCase(cursor)}`] = user[cursor]
+      return aggr
+    }, {})
+  })
+}
 
 /**
  * * Creates a JWKS store. Only works with RSA algorithms. Raises an error otherwise
@@ -111,12 +146,23 @@ export function newRefreshExpiry(): number {
  * @param res Express Response
  * @param refresh_token Refresh token to be set
  */
-export const setRefreshTokenAsCookie = (res: Response, refresh_token: string): void => {
+export const setCookie = (
+  res: Response,
+  refresh_token: string,
+  permission_variables: string
+): void => {
   // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
   const maxAge = JWT_REFRESH_EXPIRES_IN * 60 * 1000
 
   // set refresh token as cookie
   res.cookie('refresh_token', refresh_token, {
+    httpOnly: true,
+    maxAge,
+    signed: Boolean(COOKIE_SECRET)
+  })
+
+  // set permission variables cookie
+  res.cookie('permission_variables', permission_variables, {
     httpOnly: true,
     maxAge,
     signed: Boolean(COOKIE_SECRET)
@@ -137,15 +183,20 @@ export const setRefreshToken = async (
   if (!refresh_token) {
     refresh_token = uuidv4()
   }
-  await request(insertRefreshToken, {
+
+  const insert_account_data = (await request(insertRefreshToken, {
     refresh_token_data: {
       account_id: accountId,
       refresh_token,
       expires_at: new Date(newRefreshExpiry())
     }
-  })
+  })) as InsertRefreshTokenData
 
-  setRefreshTokenAsCookie(res, refresh_token)
+  const { account } = insert_account_data
+
+  const permission_variables = getPermissionVariables(account)
+
+  setCookie(res, refresh_token, permission_variables)
 }
 
 /**
@@ -161,21 +212,16 @@ export function createHasuraJwt({ default_role, account_roles = [], user }: Acco
   if (!accountRoles.includes(role)) {
     accountRoles.push(role)
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, ...customFields } = user
   return sign({
     [JWT_CLAIMS_NAMESPACE]: {
-      'x-hasura-user-id': id,
+      'x-hasura-user-id': user.id,
       'x-hasura-allowed-roles': accountRoles,
       'x-hasura-default-role': role,
-      // Add custom fields based on the user fields fetched from the GQL query
-      ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
-        (aggr, [key, value]) => ({
-          ...aggr,
-          [`x-${kebabCase(key)}`]: typeof value === 'string' ? value : JSON.stringify(value ?? null)
-        }),
-        {}
-      )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...JWT_CUSTOM_FIELDS.reduce((aggr: any, cursor) => {
+        aggr[`x-${kebabCase(cursor)}`] = user[cursor]
+        return aggr
+      }, {})
     }
   })
 }
