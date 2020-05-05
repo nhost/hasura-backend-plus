@@ -96,7 +96,7 @@ it('should decode a valid custom user claim', async () => {
   const decodedJwt = JWT.decode(jwtToken) as Token
   expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
   // Test if the custom claims work
-  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-name']).toEqual('Test name')
+  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
 })
 
 it('should delete the account', async () => {

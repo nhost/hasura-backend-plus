@@ -235,7 +235,7 @@ export function createHasuraJwt({ default_role, account_roles = [], user }: Acco
       'x-hasura-default-role': role,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...JWT_CUSTOM_FIELDS.reduce((aggr: any, cursor) => {
-        aggr[`x-${kebabCase(cursor)}`] = user[cursor]
+        aggr[`x-${kebabCase(cursor)}`] = user[cursor]?.toString()
         return aggr
       }, {})
     }
