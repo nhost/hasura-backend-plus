@@ -172,7 +172,8 @@ export function createHasuraJwt({ default_role, account_roles = [], user }: Acco
       ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
         (aggr, [key, value]) => ({
           ...aggr,
-          [`x-${kebabCase(key)}`]: typeof value === 'string' ? value : JSON.stringify(value ?? null)
+          [`x-hasura-${kebabCase(key)}`]:
+            typeof value === 'string' ? value : JSON.stringify(value ?? null)
         }),
         {}
       )
