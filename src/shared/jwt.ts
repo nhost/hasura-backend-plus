@@ -13,16 +13,18 @@ import {
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import fs from 'fs'
 import { insertRefreshToken } from './queries'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
-import { Claims, Token, AccountData, ClaimValueType } from './types'
+import { Claims, Token, AccountData, PermissionVariables } from './types'
 
 interface InsertRefreshTokenData {
-  account: AccountData
+  insert_auth_refresh_tokens_one: {
+    account: AccountData
+  }
 }
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
@@ -69,7 +71,7 @@ export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
  * @param defaultRole Defaults to "user".
  * @param roles Defaults to ["user"].
  */
-export function getPermissionVariables({
+export function generatePermissionVariables({
   default_role,
   account_roles = [],
   user
@@ -91,6 +93,20 @@ export function getPermissionVariables({
       return aggr
     }, {})
   })
+}
+
+/**
+ * getPermissionVariable
+ * @param req Express Request object
+ */
+export const getPermissionVariables = (req: Request): PermissionVariables => {
+  const { signedCookies, cookies } = req
+
+  const { permission_variables } = COOKIE_SECRET ? signedCookies : cookies
+
+  const permission_variables_object = JSON.parse(permission_variables) as PermissionVariables
+
+  return permission_variables_object
 }
 
 /**
@@ -192,9 +208,9 @@ export const setRefreshToken = async (
     }
   })) as InsertRefreshTokenData
 
-  const { account } = insert_account_data
+  const { account } = insert_account_data.insert_auth_refresh_tokens_one
 
-  const permission_variables = getPermissionVariables(account)
+  const permission_variables = generatePermissionVariables(account)
 
   setCookie(res, refresh_token, permission_variables)
 }

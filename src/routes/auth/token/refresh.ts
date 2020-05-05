@@ -9,7 +9,7 @@ import {
   newRefreshExpiry,
   createHasuraJwt,
   setCookie,
-  getPermissionVariables
+  generatePermissionVariables
 } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -55,7 +55,7 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
     throw Boom.badImplementation('Unable to set new refresh token')
   }
 
-  const permission_variables = getPermissionVariables(account)
+  const permission_variables = generatePermissionVariables(account)
 
   setCookie(res, new_refresh_token, permission_variables)
 

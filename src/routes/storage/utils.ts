@@ -1,4 +1,4 @@
-import { getClaims } from '@shared/jwt'
+import { getPermissionVariables } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
 
 import Boom from '@hapi/boom'
@@ -9,7 +9,7 @@ import fs from 'fs'
 import path from 'path'
 import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
-import { Claims } from '@shared/types'
+import { PermissionVariables } from '@shared/types'
 
 export const META_PREFIX = '/meta'
 export interface StoragePermissions {
@@ -36,7 +36,7 @@ interface StorageRequest {
   query: unknown
   method: string
   params?: string
-  auth?: Claims
+  auth?: PermissionVariables
 }
 
 export const containsSomeRule = (
@@ -85,10 +85,11 @@ export const createContext = (
 ): object => {
   let auth
   try {
-    auth = getClaims(req.headers.authorization)
-  } catch {
+    auth = getPermissionVariables(req)
+  } catch (err) {
     auth = undefined
   }
+
   const variables: StorageContext = {
     request: {
       path: req.path,
