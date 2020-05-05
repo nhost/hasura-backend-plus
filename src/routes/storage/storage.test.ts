@@ -9,6 +9,7 @@ const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 let fileToken: string
 const initialDescription = 'description of the file'
+const newDescription = 'new description'
 
 it('should upload a new file', async () => {
   const {
@@ -72,7 +73,7 @@ it(`should update an existing file's metadata`, async () => {
   const { status } = await request
     .post(`/storage/meta/user/${getUserId()}/${filePath}`)
     .set('Authorization', `Bearer ${account.token}`)
-    .query({ description: 'new description' })
+    .query({ description: newDescription })
   expect(status).toEqual(200)
 })
 
@@ -87,7 +88,7 @@ it('should get file metadata', async () => {
     .set('Authorization', `Bearer ${account.token}`)
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
-  expect(description).toEqual('new description')
+  expect(description).toEqual(newDescription)
 })
 
 it('should get the headers of all the user files', async () => {
