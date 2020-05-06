@@ -19,7 +19,7 @@ import { insertRefreshToken } from './queries'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
-import { Claims, Token, AccountData, PermissionVariables } from './types'
+import { Claims, Token, AccountData, PermissionVariables, ClaimValueType } from './types'
 
 interface InsertRefreshTokenData {
   insert_auth_refresh_tokens_one: {
@@ -66,16 +66,15 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
 export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
 
 /**
- * Create JWT token.
- * @param id Required v4 UUID string.
- * @param defaultRole Defaults to "user".
- * @param roles Defaults to ["user"].
+ * Create an object that contains all the permission variables of the user,
+ * i.e. user-id, allowed-roles, default-role and the kebab-cased columns
+ * of the public.tables columns defined in JWT_CUSTOM_FIELDS
+ * @param prefix defaults to '', needs to be set as 'x-hasura-' when generating the JWT
  */
-export function generatePermissionVariables({
-  default_role,
-  account_roles = [],
-  user
-}: AccountData): string {
+export function generatePermissionVariables(
+  { default_role, account_roles = [], user }: AccountData,
+  prefix = ''
+): { [key: string]: ClaimValueType } {
   const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
   const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
@@ -83,16 +82,16 @@ export function generatePermissionVariables({
     accountRoles.push(role)
   }
 
-  return JSON.stringify({
-    'user-id': user.id,
-    'allowed-roles': accountRoles,
-    'default-role': role,
+  return {
+    [`${prefix}user-id`]: user.id,
+    [`${prefix}allowed-roles`]: accountRoles,
+    [`${prefix}default-role`]: role,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...JWT_CUSTOM_FIELDS.reduce((aggr: any, cursor) => {
-      aggr[`${kebabCase(cursor)}`] = user[cursor]
+    ...JWT_CUSTOM_FIELDS.reduce<{ [key: string]: ClaimValueType }>((aggr: any, cursor) => {
+      aggr[`${prefix}${kebabCase(cursor)}`] = user[cursor]
       return aggr
     }, {})
-  })
+  }
 }
 
 /**
@@ -210,34 +209,15 @@ export const setRefreshToken = async (
 
   const { account } = insert_account_data.insert_auth_refresh_tokens_one
 
-  const permission_variables = generatePermissionVariables(account)
+  const permission_variables = JSON.stringify(generatePermissionVariables(account))
 
   setCookie(res, refresh_token, permission_variables)
 }
 
 /**
  * Create JWT token.
- * @param id Required v4 UUID string.
- * @param defaultRole Defaults to "user".
- * @param roles Defaults to ["user"].
  */
-export function createHasuraJwt({ default_role, account_roles = [], user }: AccountData): string {
-  const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
-  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
-
-  if (!accountRoles.includes(role)) {
-    accountRoles.push(role)
-  }
-  return sign({
-    [JWT_CLAIMS_NAMESPACE]: {
-      'x-hasura-user-id': user.id,
-      'x-hasura-allowed-roles': accountRoles,
-      'x-hasura-default-role': role,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...JWT_CUSTOM_FIELDS.reduce((aggr: any, cursor) => {
-        aggr[`x-${kebabCase(cursor)}`] = user[cursor]?.toString()
-        return aggr
-      }, {})
-    }
+export const createHasuraJwt = (accountData: AccountData): string =>
+  sign({
+    [JWT_CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, 'x-hasura-')
   })
-}

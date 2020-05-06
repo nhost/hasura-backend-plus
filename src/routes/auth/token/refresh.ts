@@ -55,7 +55,7 @@ async function refreshToken({ cookies, signedCookies }: Request, res: Response):
     throw Boom.badImplementation('Unable to set new refresh token')
   }
 
-  const permission_variables = generatePermissionVariables(account)
+  const permission_variables = JSON.stringify(generatePermissionVariables(account))
 
   setCookie(res, new_refresh_token, permission_variables)
 
