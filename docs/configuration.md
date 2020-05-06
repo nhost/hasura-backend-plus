@@ -8,7 +8,7 @@ By default, accounts are automatically activated on registration. You may want t
 
 To deactivate autoactivation, set the environment variable `AUTO_ACTIVATE_NEW_USERS=false`
 
-In addition to this, you can send a verification email with an activation link. You will then need to [configure a proper SMTP server](#sending-emails).
+In addition to this, you can send a verification email with an activation link. You will then need to [configure the connection to a SMTP server](#enable-emails).
 
 If SMTP is enabled, then the user will receive an email with an activation link. If the activation succeeds, the user is redirected to the url found in the `REDIRECT_URL_SUCCESS` environment variable. If it fails, they will redirected to the url given by the `REDIRECT_URL_ERROR` environment variable.
 
@@ -57,7 +57,7 @@ Any given column must exist, otherwise registration will fail.
 
 <!-- TODO link to JWT custom claims -->
 
-## Sending emails
+## Enable emails
 
 ## Custom configuration files
 
@@ -74,10 +74,6 @@ Any given column must exist, otherwise registration will fail.
 ## Custom User Schema
 
 ## Two-factor Authentication
-
-## Checking Pwned Passwords
-
-## Account activation emails
 
 ## Rate limiting
 

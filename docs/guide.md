@@ -60,7 +60,7 @@ cp .env.example .env
 yarn start
 ```
 
-## User registration
+## Registration
 
 By default, anyone can register with an email address and a password:
 
@@ -81,3 +81,19 @@ You can however add some safeguards and limitations to the registration process.
 ### Login
 
 ### Disable
+
+## Refresh token
+
+## Enable an OAuth provider
+
+## Change email
+
+<!-- TODO in configuration? -->
+
+## Reset password
+
+<!-- TODO in configuration? -->
+
+## Unregister
+
+## Logout
