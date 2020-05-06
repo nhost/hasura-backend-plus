@@ -49,7 +49,7 @@ it('should get file', async () => {
   expect(text).toEqual(fileData)
 })
 
-describe('Tests as an authenticated user', () => {
+describe('Tests as an unauthenticated user', () => {
   beforeAll(async () => {
     await request.post(`/auth/logout`)
   })
@@ -114,8 +114,7 @@ it('should delete file metadata', async () => {
     body: {
       Metadata: { filename, token, description }
     }
-  } = await request
-    .get(`/storage/meta/user/${getUserId()}/${filePath}`)
+  } = await request.get(`/storage/meta/user/${getUserId()}/${filePath}`)
   expect(getStatus).toEqual(200)
   expect(filename).toBeUndefined()
   expect(token).toBeString()
