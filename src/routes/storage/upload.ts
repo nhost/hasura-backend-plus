@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 import {
   StoragePermissions,
   createContext,
@@ -47,6 +48,7 @@ export const uploadFile = async (
       ContentType: resource.mimetype,
       Metadata: {
         filename: resource.name,
+        token: uuidv4(),
         ...(oldHeadObject?.Metadata || {}),
         ...generateMetadata(metadata, context)
       }

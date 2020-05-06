@@ -1,5 +1,6 @@
 import { getPermissionVariables } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
+import { v4 as uuidv4 } from 'uuid'
 
 import Boom from '@hapi/boom'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
@@ -156,7 +157,9 @@ export const replaceMetadata = async (
     CopySource: `${S3_BUCKET}/${key}`,
     ContentType: oldHeadObject?.ContentType,
     Metadata: {
-      ...((keepOldMetadata && oldHeadObject?.Metadata) || {}),
+      ...((keepOldMetadata && oldHeadObject?.Metadata) || {
+        token: uuidv4()
+      }),
       ...newMetadata
     },
     MetadataDirective: 'REPLACE'

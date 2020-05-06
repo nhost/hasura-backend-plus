@@ -13,4 +13,4 @@ paths:
       read: 'isOwner(userId)'
       write: 'isOwner(userId)'
       values:
-        token: 'request.query.token'
+        description: 'request.query.description'
