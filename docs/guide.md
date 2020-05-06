@@ -82,7 +82,13 @@ You can however add some safeguards and limitations to the registration process 
 
 ### Disable
 
-## Refresh token
+## JWT
+
+<!-- TODO Explain here:
+- How JWT is structured
+- How JWT is refreshed
+- How to get the JWT
+-> link to cookie specs in the configuration page -->
 
 ## Enable an OAuth provider
 

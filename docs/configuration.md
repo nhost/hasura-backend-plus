@@ -1,5 +1,25 @@
 # Configuration
 
+## General
+
+<!-- TODO AUTH_ENABLE and STORAGE_ENABLE -->
+<!-- TODO SERVER_URL, PORT -->
+<!-- TODO REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR -->
+
+## Configure Hasura
+
+<!-- TODO HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET -->
+<!-- TODO JWT config must be the same -->
+<!-- TODO - JWKS endpoint -->
+<!-- TODO - link to JWK options -->
+
+## JWT Options
+
+## Migrations
+
+<!-- TODO AUTO_MIGRATE, true, false, v1 -->
+<!-- TODO BIG WARNING -->
+
 ## Registration
 
 ### Activate accounts
@@ -31,10 +51,10 @@ By default, clients can register with a password of at least three characters. Y
 MIN_PASSWORD_LENGTH=6
 ```
 
-You can ask HBP to check on [Have I Been Pwned](https://haveibeenpwned.com/Passwords) if the password has been previously exposed in data breaches. If so, the registration will fail. This option is disabled by default.
+You can ask HBP to check on [Have I Been Pwned](https://haveibeenpwned.com/Passwords) if the password has been previously exposed in data breaches. If so, the registration will fail. This option is disabled by default. You can change it to:
 
 ```
-HIBP_ENABLE=false
+HIBP_ENABLE=true
 ```
 
 ### Additional registration fields
@@ -55,6 +75,12 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 <!-- TODO link to JWT custom claims -->
 
+## Authentication
+
+### OAuth Providers
+
+### Two-factor Authentication
+
 ## Enable emails
 
 ## Custom configuration files
@@ -67,13 +93,11 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 ### Private key
 
-## OAuth Providers
-
 ## Custom User Schema
 
-## Two-factor Authentication
-
 ## Rate limiting
+
+<!-- TODO MAX_REQUESTS, TIME_FRAME, healthz -->
 
 ## Environment Variables
 
