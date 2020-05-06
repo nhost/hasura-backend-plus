@@ -2,7 +2,7 @@
 
 ## Registration
 
-### Account activation
+### Activate accounts
 
 By default, accounts are automatically activated on registration. You may want to change this so you add a step to the registration process.
 
@@ -23,7 +23,7 @@ You can limit registration to ranges of emails that are only part of a whitelist
 ALLOWED_EMAIL_DOMAINS=gmail.com,yourorganisation.com
 ```
 
-### Minimum password length
+### Password constraints
 
 By default, clients can register with a password of at least three characters. You can change this in setting a higher value:
 
@@ -31,15 +31,13 @@ By default, clients can register with a password of at least three characters. Y
 MIN_PASSWORD_LENGTH=6
 ```
 
-### Check password simplicity against Have I Been Pwned
-
 You can ask HBP to check on [Have I Been Pwned](https://haveibeenpwned.com/Passwords) if the password has been previously exposed in data breaches. If so, the registration will fail. This option is disabled by default.
 
 ```
 HIBP_ENABLE=false
 ```
 
-### Add registration fields
+### Additional registration fields
 
 You may want to extend the `public.users` table with your own fields and relations, and to expect the client to set some of them when registering. It is possible to set a list of columns in the `REGISTRATION_CUSTOM_FIELDS` environment value.
 
