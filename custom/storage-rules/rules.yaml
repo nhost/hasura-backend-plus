@@ -3,7 +3,7 @@ functions:
   isOwner:
     params:
       - userId
-    code: "return !!request.auth && userId === request.auth['x-hasura-user-id']"
+    code: "return !!request.auth && userId === request.auth['user-id']"
   validToken: 'return request.query.token === resource.Metadata.token'
 paths:
   /user/:userId/:fileId:
