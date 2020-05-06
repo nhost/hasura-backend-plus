@@ -68,7 +68,7 @@ By default, anyone can register with an email address and a password:
 curl -d '{"email":"real@emailadress.com", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/register`
 ```
 
-You can however add some safeguards and limitations to the registration process. More information is available in the [registration configuration chapter](configuration.md#registration)
+You can however add some safeguards and limitations to the registration process like email verification, constraints on emails and passwords, or setting additional registration fields from your custom database schema. More information is available in the [registration configuration chapter](configuration.md#registration).
 
 ## Login
 

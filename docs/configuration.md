@@ -50,7 +50,7 @@ Here is an example on the way to proceed to add a `nickname` value to the regist
 3. The registration endpoint now expects a `nickname` value in addition to `email` and `password`
 
 ::: warning
-Any given column must exist, otherwise registration will fail.
+Any given field must exist in the `users` GraphQL type that corresponds to the `public.users` PostgreSQL table, or registration will fail.
 :::
 
 <!-- TODO link to JWT custom claims -->
