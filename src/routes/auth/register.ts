@@ -1,4 +1,10 @@
-import { AUTO_ACTIVATE_NEW_USERS, SERVER_URL, SMTP_ENABLE, DEFAULT_USER_ROLE } from '@shared/config'
+import {
+  AUTO_ACTIVATE_NEW_USERS,
+  SERVER_URL,
+  SMTP_ENABLE,
+  DEFAULT_USER_ROLE,
+  VERIFY_EMAILS
+} from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 
@@ -43,7 +49,11 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     }
   })
 
-  if (!AUTO_ACTIVATE_NEW_USERS && SMTP_ENABLE) {
+  if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
+    if (!SMTP_ENABLE) {
+      throw Boom.badImplementation('SMTP settings unavailable')
+    }
+
     try {
       await emailClient.send({
         template: 'activate-account',
