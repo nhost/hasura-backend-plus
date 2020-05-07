@@ -1,6 +1,6 @@
 FROM node:12-alpine
 
-ARG NODE_ENV=development
+ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 ENV PORT 3000
 
