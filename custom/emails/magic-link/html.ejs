@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    Hi! 👋<br />
+    <p>You asked us to send you a log in link for quickly signing into <%= domain %>.</p>
+    <p>- this link expires in 24 hours. After that you will need to request another link.</p>
+    <p>- this link can only be used once. After you click the link it will no longer work.</p>
+    <p>- you can always request another link!</p>
+    <p>
+      <a href="<%= url %>/v1/auth/providers/magiclink?ticket=<%= ticket %>" target="_blank"
+        >==> Click here to access your <%= domain %> account</a
+      >
+    </p>
+    <p>
+      This link expires in 24 hours and can only be used once. You can always request another link
+      to be sent if this one has been used or is expired.
+    </p>
+  </body>
+</html>

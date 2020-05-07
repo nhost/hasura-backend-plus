@@ -1,5 +1,5 @@
 import Boom from '@hapi/boom'
-import { castBooleanEnv } from '../utils'
+import { castBooleanEnv, castStringArrayEnv } from '../utils'
 import { REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR } from '../application'
 
 /**
@@ -11,7 +11,7 @@ export const {
   PROVIDER_FAILURE_REDIRECT = REDIRECT_URL_ERROR
 } = process.env
 
-const PROVIDERS: Record<string, Record<string, string | undefined>> = {}
+const PROVIDERS: Record<string, Record<string, string | string[] | undefined>> = {}
 
 // Github OAuth2 provider settings
 if (castBooleanEnv('GITHUB_ENABLE')) {
@@ -77,6 +77,16 @@ if (castBooleanEnv('WINDOWS_LIVE_ENABLE')) {
   PROVIDERS.windowslive = {
     clientID: process.env.WINDOWS_LIVE_CLIENT_ID,
     clientSecret: process.env.WINDOWS_LIVE_CLIENT_SECRET
+  }
+}
+
+// Automatically logging into the application using Magic links
+if (castBooleanEnv('MAGICLINK_ENABLE')) {
+  PROVIDERS.magiclink = {
+    secret: process.env.MAGICLINK_SECRET,
+    userFields: castStringArrayEnv('MAGICLINK_USER_FIELDS'),
+    tokenField: process.env.MAGICLINK_TOKEN_FIELD,
+    ttl: process.env.MAGICLINK_TTL as string
   }
 }
 

@@ -24,7 +24,10 @@ interface Constructable<T> {
 export type TransformProfileFunction = <T extends Profile>(profile: T) => UserData
 interface InitProviderSettings {
   transformProfile: TransformProfileFunction
-  callbackMethod: 'GET' | 'POST'
+  callbackMethod: ['GET' | 'POST']
+  circuitBreakerMiddleware: (req: Request, res: Response, next: Function) => Promise<void>
+  providerMiddlewares: []
+  callbackMiddlewares: []
 }
 
 const manageProviderStrategy = (
@@ -108,36 +111,56 @@ export const initProvider = <T extends Strategy>(
       display_name: displayName,
       avatar_url: photos?.[0].value
     }),
-    callbackMethod = 'GET',
+    callbackMethods = ['GET'],
+    providerAuthenticateConfig = {},
+    providerCallbackConfig = {},
+    circuitBreakerMiddleware = (req: Request, res: Response, next: Function) => next(),
+    providerMiddlewares = [],
+    callbackMiddlewares = [],
     ...options
   } = settings
+
+  const combinedStrategyOptions = {
+    ...PROVIDERS[strategyName],
+    ...options
+  }
+
   passport.use(
     new strategy(
       {
-        ...PROVIDERS[strategyName],
-        ...options,
+        ...combinedStrategyOptions,
         callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
         passReqToCallback: true
       },
+      ...providerMiddlewares,
       manageProviderStrategy(strategyName, transformProfile)
     )
   )
 
   const subRouter = Router()
 
-  subRouter.get('/', passport.authenticate(strategyName, { session: false }))
+  subRouter.get(
+    '/',
+    passport.authenticate(strategyName, { session: false, ...providerAuthenticateConfig }),
+    circuitBreakerMiddleware
+  )
 
   const handlers = [
+    ...callbackMiddlewares,
     passport.authenticate(strategyName, {
       failureRedirect: PROVIDER_FAILURE_REDIRECT,
-      session: false
+      session: false,
+      ...providerCallbackConfig
     }),
     providerCallback
   ]
-  if (callbackMethod === 'POST') {
+
+  if (callbackMethods.includes('POST')) {
     // The Sign in with Apple auth provider requires a POST route for authentication
     subRouter.post('/callback', express.urlencoded(), ...handlers)
-  } else {
+  }
+
+  if (callbackMethods.includes('GET')) {
     subRouter.get('/callback', ...handlers)
   }
 
