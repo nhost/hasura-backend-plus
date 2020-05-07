@@ -63,11 +63,16 @@ export default (router: Router): void => {
             const accountData = await selectAccount({ email: user.email })
             if (accountData) {
               // send email with the magic link
-              console.log('token: ', token)
+
+              const generatedMagiclinkUrl = `${SERVER_URL}/auth/providers/magiclink?${options.tokenField}=${token}`
               try {
-                await emailClient.send({
+                const result = await emailClient.send({
                   template: 'magic-link',
-                  locals: { ticket: token, url: SERVER_URL, domain: 'DOMAIN_ENV_VAR' },
+                  locals: {
+                    ticket: token,
+                    magiclink_url: generatedMagiclinkUrl,
+                    domain: options.domain
+                  },
                   message: {
                     to: user.email,
                     headers: {
@@ -78,6 +83,7 @@ export default (router: Router): void => {
                     }
                   }
                 })
+                console.log(result)
               } catch (err) {
                 console.error('Unable to send email')
                 throw Boom.badImplementation()

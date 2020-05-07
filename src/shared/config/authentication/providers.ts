@@ -86,7 +86,8 @@ if (castBooleanEnv('MAGICLINK_ENABLE')) {
     secret: process.env.MAGICLINK_SECRET,
     userFields: castStringArrayEnv('MAGICLINK_USER_FIELDS'),
     tokenField: process.env.MAGICLINK_TOKEN_FIELD,
-    ttl: process.env.MAGICLINK_TTL as string
+    ttl: process.env.MAGICLINK_TTL as string,
+    domain: process.env.MAGICLINK_DOMAIN || 'Hasura Backend Plus'
   }
 }
 
