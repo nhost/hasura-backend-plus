@@ -115,7 +115,10 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
 
 export const getPermissionVariablesFromCookie = (
   req: Request
-): { [key: string]: ClaimValueType } => {
+): {
+  ['user-id']: string | number
+  [key: string]: ClaimValueType
+} => {
   const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
   return JSON.parse(permission_variables)
 }

@@ -1,18 +1,17 @@
 import { Request } from 'express'
-import { selectAccountByEmail } from '@shared/helpers'
+import { selectAccountByEmail, getPermissionVariablesFromCookie } from '@shared/helpers'
 import { emailResetSchema } from '@shared/validation'
-import { getClaims } from '@shared/jwt'
 import Boom from '@hapi/boom'
 
-export const getRequestInfo = async ({
-  body,
-  headers
-}: Request): Promise<{ user_id: string; new_email: string }> => {
+export const getRequestInfo = async (
+  req: Request
+): Promise<{ user_id: string | number; new_email: string }> => {
   // get current user_id
-  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
+  const permission_variables = getPermissionVariablesFromCookie(req)
+  const user_id = permission_variables['user-id']
 
   // validate new email
-  const { new_email } = await emailResetSchema.validateAsync(body)
+  const { new_email } = await emailResetSchema.validateAsync(req.body)
 
   // make sure new_email is not attached to an account yet
   let account_exists = true
@@ -27,5 +26,8 @@ export const getRequestInfo = async ({
   if (account_exists) {
     throw Boom.badRequest('Cannot use this email.')
   }
-  return { user_id, new_email }
+  return {
+    user_id: permission_variables['user-id'],
+    new_email
+  }
 }
