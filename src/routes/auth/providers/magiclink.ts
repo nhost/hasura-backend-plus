@@ -66,7 +66,7 @@ export default (router: Router): void => {
 
               const generatedMagiclinkUrl = `${SERVER_URL}/auth/providers/magiclink?${options.tokenField}=${token}`
               try {
-                const result = await emailClient.send({
+                await emailClient.send({
                   template: 'magic-link',
                   locals: {
                     ticket: token,
@@ -83,7 +83,6 @@ export default (router: Router): void => {
                     }
                   }
                 })
-                console.log(result)
               } catch (err) {
                 console.error('Unable to send email')
                 throw Boom.badImplementation()
@@ -96,8 +95,6 @@ export default (router: Router): void => {
         },
         // Method which gets triggered by the auth provider to verify user details are valid
         async (_request: Request, user: { email: string }): Promise<AccountData> => {
-          console.log('verifyUser() user: ', user)
-
           // The user data which was stored in the Magic link ticket which we wil use to lookup the account information associated
           try {
             const accountData = await selectAccount({ email: user.email })
