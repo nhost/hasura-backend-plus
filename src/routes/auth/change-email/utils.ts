@@ -27,7 +27,7 @@ export const getRequestInfo = async (
     throw Boom.badRequest('Cannot use this email.')
   }
   return {
-    user_id: permission_variables['user-id'],
+    user_id,
     new_email
   }
 }
