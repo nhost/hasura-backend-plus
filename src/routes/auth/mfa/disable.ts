@@ -1,4 +1,8 @@
-import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
+import {
+  asyncWrapper,
+  selectAccountByUserId,
+  getPermissionVariablesFromCookie
+} from '@shared/helpers'
 import { Request, Response } from 'express'
 import { deleteOtpSecret } from '@shared/queries'
 
@@ -6,12 +10,12 @@ import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
-import { getClaims } from '@shared/jwt'
 
-async function disableMfa({ headers, body }: Request, res: Response): Promise<unknown> {
-  const { code } = await mfaSchema.validateAsync(body)
+async function disableMfa(req: Request, res: Response): Promise<unknown> {
+  const { code } = await mfaSchema.validateAsync(req.body)
 
-  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
+  const permission_variables = getPermissionVariablesFromCookie(req)
+  const user_id = permission_variables['user-id']
 
   const { otp_secret, mfa_enabled } = await selectAccountByUserId(user_id)
 
