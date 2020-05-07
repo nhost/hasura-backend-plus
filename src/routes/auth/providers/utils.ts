@@ -145,6 +145,12 @@ export const initProvider = <T extends Strategy>(
     circuitBreakerMiddleware
   )
 
+  subRouter.post(
+    '/',
+    passport.authenticate(strategyName, { session: false, ...providerAuthenticateConfig }),
+    circuitBreakerMiddleware
+  )
+
   const handlers = [
     ...callbackMiddlewares,
     passport.authenticate(strategyName, {
