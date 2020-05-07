@@ -10,7 +10,6 @@ if (!AUTO_ACTIVATE_NEW_USERS) {
 }
 
 if (ALLOW_USER_SELF_DELETE) {
-  console.log('allow delete')
   router.get('/delete', deleteAccount)
 }
 
