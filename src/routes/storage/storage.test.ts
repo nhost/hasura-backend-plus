@@ -99,7 +99,7 @@ it('should get the headers of all the user files', async () => {
 })
 
 it('should get a zip that contains all user files', async () => {
-  const { status, text } = await request.get(`/storage/user/${getUserId()}/`)
+  const { status, text } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
   expect(text).toBeTruthy()
   // TODO unzip and compare the file(s)
@@ -121,6 +121,6 @@ it('should delete file metadata', async () => {
 })
 
 it('should delete file', async () => {
-  const { status } = await request.delete(`/storage/user/${getUserId()}/${filePath}`)
+  const { status } = await request.delete(`/storage/m/user/${getUserId()}/${filePath}`)
   expect(status).toEqual(204)
 })

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import {
-  StoragePermissions,
+  PathConfig,
   createContext,
   getHeadObject,
   getKey,
@@ -16,7 +16,7 @@ export const deleteFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: Partial<StoragePermissions>,
+  rules: Partial<PathConfig>,
   isMetadataRequest = false
 ): Promise<unknown> => {
   const headObject = await getHeadObject(req)

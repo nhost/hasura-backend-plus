@@ -10,7 +10,7 @@ if (!AUTO_ACTIVATE_NEW_USERS) {
 }
 
 if (ALLOW_USER_SELF_DELETE) {
-  router.get('/delete', deleteAccount)
+  router.post('/delete', deleteAccount)
 }
 
 export default router

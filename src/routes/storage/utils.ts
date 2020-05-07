@@ -1,4 +1,3 @@
-import { getPermissionVariables } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -11,10 +10,11 @@ import path from 'path'
 import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
 import { PermissionVariables } from '@shared/types'
+import { getPermissionVariablesFromCookie } from '@shared/helpers'
 
 export const OBJECT_PREFIX = '/o'
 export const META_PREFIX = '/m'
-export interface StoragePermissions {
+export interface PathConfig {
   read: string
   write: string
   get: string
@@ -22,14 +22,13 @@ export interface StoragePermissions {
   create: string
   update: string
   delete: string
+  metadata?: { [key: string]: string }
 }
 
 interface StorageRules {
   functions?: { [key: string]: string | { params: string[]; code: string } }
   paths: {
-    [key: string]: Partial<StoragePermissions> & {
-      meta: Partial<StoragePermissions> & { values?: { [key: string]: string } }
-    }
+    [key: string]: Partial<PathConfig>
   }
 }
 
@@ -42,7 +41,7 @@ interface StorageRequest {
 }
 
 export const containsSomeRule = (
-  rulesDefinition: Partial<StoragePermissions> = {},
+  rulesDefinition: Partial<PathConfig> = {},
   rules: (string | undefined)[]
 ): boolean => Object.keys(rulesDefinition).some((rule) => rules.includes(rule))
 
@@ -87,7 +86,7 @@ export const createContext = (
 ): object => {
   let auth
   try {
-    auth = getPermissionVariables(req)
+    auth = getPermissionVariablesFromCookie(req)
   } catch (err) {
     auth = undefined
   }

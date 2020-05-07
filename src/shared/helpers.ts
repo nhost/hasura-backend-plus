@@ -13,7 +13,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, ClaimValueType } from './types'
+import { AccountData, QueryAccountData, PermissionVariables } from './types'
 
 /**
  * Create QR code.
@@ -113,12 +113,8 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
   return new_ticket
 }
 
-export const getPermissionVariablesFromCookie = (
-  req: Request
-): {
-  ['user-id']: string
-  [key: string]: ClaimValueType
-} => {
+export const getPermissionVariablesFromCookie = (req: Request): PermissionVariables => {
   const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
+  if (!permission_variables) throw Boom.unauthorized()
   return JSON.parse(permission_variables)
 }

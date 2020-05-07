@@ -6,3 +6,5 @@ paths:
   /user/:userId/:fileId:
     read: 'isOwner(userId) || validToken()'
     write: 'isOwner(userId)'
+    metadata:
+      description: 'request.query.description'

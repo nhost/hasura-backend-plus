@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import {
-  StoragePermissions,
+  PathConfig,
   createContext,
   generateMetadata,
   getHeadObject,
@@ -19,7 +19,7 @@ export const uploadFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: Partial<StoragePermissions>,
+  rules: Partial<PathConfig>,
   isMetadataRequest = false,
   metadata: object = {}
 ): Promise<unknown> => {

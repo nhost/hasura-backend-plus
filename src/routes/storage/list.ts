@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { StoragePermissions, createContext, getKey, hasPermission } from './utils'
+import { PathConfig, createContext, getKey, hasPermission } from './utils'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
@@ -10,7 +10,7 @@ export const listFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: Partial<StoragePermissions>,
+  rules: Partial<PathConfig>,
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)

@@ -112,7 +112,7 @@ export const deleteAccount = async (
   account: TestAccount
 ): Promise<void> => {
   // * Delete the account
-  await agent.post('/auth/account/delete').set('Authorization', `Bearer ${account.token}`)
+  await agent.post('/auth/account/delete')
   // * Remove any message sent to this account
   await deleteEmailsOfAccount(account.email)
 }

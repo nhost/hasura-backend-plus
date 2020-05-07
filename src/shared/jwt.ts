@@ -13,13 +13,13 @@ import {
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import fs from 'fs'
 import { insertRefreshToken } from './queries'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
-import { Claims, Token, AccountData, PermissionVariables, ClaimValueType } from './types'
+import { Claims, Token, AccountData, ClaimValueType } from './types'
 
 interface InsertRefreshTokenData {
   insert_auth_refresh_tokens_one: {
@@ -97,20 +97,6 @@ export function generatePermissionVariables(
       return aggr
     }, {})
   }
-}
-
-/**
- * getPermissionVariable
- * @param req Express Request object
- */
-export const getPermissionVariables = (req: Request): PermissionVariables => {
-  const { signedCookies, cookies } = req
-
-  const { permission_variables } = COOKIE_SECRET ? signedCookies : cookies
-
-  const permission_variables_object = JSON.parse(permission_variables) as PermissionVariables
-
-  return permission_variables_object
 }
 
 /**
