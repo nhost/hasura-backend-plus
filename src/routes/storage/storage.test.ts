@@ -12,7 +12,6 @@ const initialDescription = 'description of the file'
 const newDescription = 'new description'
 
 it('should upload a new file', async () => {
-  await request.post('/auth/login').send({ email: account.email, password: account.password })
   const {
     status,
     body: {
