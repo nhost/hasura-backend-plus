@@ -69,12 +69,13 @@ export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
  * Create an object that contains all the permission variables of the user,
  * i.e. user-id, allowed-roles, default-role and the kebab-cased columns
  * of the public.tables columns defined in JWT_CUSTOM_FIELDS
- * @param prefix defaults to '', needs to be set as 'x-hasura-' when generating the JWT
+ * @param jwt if true, add a 'x-hasura-' prefix to the property names, and stringifies the values (required by Hasura)
  */
 export function generatePermissionVariables(
   { default_role, account_roles = [], user }: AccountData,
-  prefix = ''
+  jwt = false
 ): { [key: string]: ClaimValueType } {
+  const prefix = jwt ? 'x-hasura-' : ''
   const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
   const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
@@ -88,7 +89,11 @@ export function generatePermissionVariables(
     [`${prefix}default-role`]: role,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...JWT_CUSTOM_FIELDS.reduce<{ [key: string]: ClaimValueType }>((aggr: any, cursor) => {
-      aggr[`${prefix}${kebabCase(cursor)}`] = user[cursor]
+      aggr[`${prefix}${kebabCase(cursor)}`] = jwt
+        ? typeof user[cursor] === 'string'
+          ? user[cursor]
+          : JSON.stringify(user[cursor] ?? null)
+        : user[cursor]
       return aggr
     }, {})
   }
@@ -219,5 +224,5 @@ export const setRefreshToken = async (
  */
 export const createHasuraJwt = (accountData: AccountData): string =>
   sign({
-    [JWT_CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, 'x-hasura-')
+    [JWT_CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true)
   })
