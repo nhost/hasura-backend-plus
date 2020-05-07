@@ -1,4 +1,4 @@
-import { AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
+import { AUTO_ACTIVATE_NEW_USERS, ALLOW_USER_SELF_DELETE } from '@shared/config'
 import { Router } from 'express'
 import activateAccount from './activate'
 import deleteAccount from './delete'
@@ -9,6 +9,9 @@ if (!AUTO_ACTIVATE_NEW_USERS) {
   router.get('/activate', activateAccount)
 }
 
-router.post('/delete', deleteAccount)
+if (ALLOW_USER_SELF_DELETE) {
+  console.log('allow delete')
+  router.get('/delete', deleteAccount)
+}
 
 export default router
