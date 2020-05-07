@@ -12,7 +12,7 @@ import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
 
 async function enableMfa(req: Request, res: Response): Promise<unknown> {
-  const { code } = await mfaSchema.validateAsync(body)
+  const { code } = await mfaSchema.validateAsync(req.body)
 
   const permission_variables = getPermissionVariablesFromCookie(req)
   const user_id = permission_variables['user-id']
