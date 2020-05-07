@@ -24,7 +24,7 @@ export const getFile = async (
     throw Boom.forbidden()
   }
   if (isMetadataRequest) {
-    return res.status(200).send(headObject)
+    return res.status(200).send({ key, ...headObject })
   } else {
     const params = {
       Bucket: S3_BUCKET as string,

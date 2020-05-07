@@ -12,7 +12,8 @@ import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
 import { PermissionVariables } from '@shared/types'
 
-export const META_PREFIX = '/meta'
+export const OBJECT_PREFIX = '/o'
+export const META_PREFIX = '/m'
 export interface StoragePermissions {
   read: string
   write: string
@@ -101,12 +102,15 @@ export const createContext = (
     ...req.params,
     resource: s3HeadObject
   }
+
   const functions = storageFunctions(variables)
+
   return { ...functions, ...variables }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: object): boolean =>
-  rules.some((rule) => rule && !!safeEval(rule, context))
+export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
+  return rules.some((rule) => rule && !!safeEval(rule, context))
+}
 
 export const generateMetadata = (metadataParams: object, context: object): object =>
   Object.entries(metadataParams).reduce<{ [key: string]: unknown }>((aggr, [key, jsCode]) => {

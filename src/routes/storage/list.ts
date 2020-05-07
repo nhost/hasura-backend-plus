@@ -14,21 +14,16 @@ export const listFile = async (
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
-  try {
-    const context = createContext(req)
-    if (!hasPermission([rules.list, rules.read], context)) {
-      throw Boom.forbidden()
-    }
-  } catch (err) {
-    console.log(
-      'List validation did not apply to a directory (without object context). Will anyway run validation for each object in the list.'
-    )
+  const context = createContext(req)
+  if (!hasPermission([rules.list, rules.read], context)) {
+    throw Boom.forbidden()
   }
   const params = {
     Bucket: S3_BUCKET as string,
     Prefix: key.slice(0, -1)
   }
   const list = await s3.listObjectsV2(params).promise()
+
   if (list.Contents) {
     const headObjectsList = (
       await Promise.all(
@@ -43,8 +38,16 @@ export const listFile = async (
         }))
       )
     ).filter((resource) => hasPermission([rules.list, rules.read], createContext(req, resource)))
+
     if (isMetadataRequest) {
-      return res.status(200).send(headObjectsList.map((entry) => entry.head))
+      return res.status(200).send(
+        headObjectsList.map((entry) => {
+          return {
+            Key: entry.key,
+            ...entry.head
+          }
+        })
+      )
     } else {
       const archive = archiver('zip')
       headObjectsList.forEach((entry) => {

@@ -1,9 +1,14 @@
-import { META_PREFIX, STORAGE_RULES, StoragePermissions, containsSomeRule } from './utils'
+import {
+  OBJECT_PREFIX,
+  META_PREFIX,
+  STORAGE_RULES,
+  StoragePermissions,
+  containsSomeRule
+} from './utils'
 import { NextFunction, Request, Response, Router } from 'express'
 
 import { deleteFile } from './delete'
-import { getFile } from './get'
-import { listFile } from './list'
+import { listGet } from './list_get'
 import { uploadFile } from './upload'
 
 const router = Router()
@@ -23,39 +28,39 @@ const createRoutes = (
   metadataParams: object = {}
 ): Router => {
   const middleware = Router()
+
+  // write, create, update
   if (containsSomeRule(rules, ['write', 'create', 'update'])) {
     middleware.post(
       path,
       createSecureMiddleware(uploadFile, rules, isMetadataRequest, metadataParams)
     )
   }
-  if (containsSomeRule(rules, ['read', 'get'])) {
-    middleware.get(path, createSecureMiddleware(getFile, rules, isMetadataRequest))
+
+  // read, get, list
+  if (containsSomeRule(rules, ['read', 'get', 'list'])) {
+    middleware.get(path, createSecureMiddleware(listGet, rules, isMetadataRequest))
   }
-  if (containsSomeRule(rules, ['read', 'list'])) {
-    middleware.get(
-      `${path.substring(0, path.lastIndexOf('/'))}`,
-      createSecureMiddleware(listFile, rules, isMetadataRequest)
-    )
-  }
+
+  // write, delete
   if (containsSomeRule(rules, ['write', 'delete'])) {
     middleware.delete(
       path,
       createSecureMiddleware(deleteFile, rules, isMetadataRequest, metadataParams)
     )
   }
+
   return middleware
 }
 
 for (const path in STORAGE_RULES.paths) {
   const rules = STORAGE_RULES.paths[path]
 
-  router.use(createRoutes(path, rules, false, rules.meta?.values))
-  if (
-    containsSomeRule(rules.meta, ['read', 'write', 'get', 'create', 'update', 'delete', 'list'])
-  ) {
-    router.use(META_PREFIX, createRoutes(path, rules.meta, true, rules.meta?.values))
-  }
+  // create object data paths
+  router.use(OBJECT_PREFIX, createRoutes(path, rules, false))
+
+  // create meta data paths
+  router.use(META_PREFIX, createRoutes(path, rules, true))
 }
 
 export default router
