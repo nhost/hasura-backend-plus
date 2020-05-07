@@ -1,18 +1,103 @@
 # Configuration
 
-## Custom Storage Rules
+## General
 
-## OAuth Providers
+<!-- TODO AUTH_ENABLE and STORAGE_ENABLE -->
+<!-- TODO SERVER_URL, PORT -->
+<!-- TODO REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR -->
+
+## Configure Hasura
+
+<!-- TODO HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET -->
+<!-- TODO JWT config must be the same -->
+<!-- TODO - JWKS endpoint -->
+<!-- TODO - link to JWK options -->
+
+## JWT Options
+
+## Migrations
+
+<!-- TODO AUTO_MIGRATE, true, false, v1 -->
+<!-- TODO BIG WARNING -->
+
+## Registration
+
+### Activate accounts
+
+By default, accounts are automatically activated on registration. You may want to change this so you add a step to the registration process.
+
+To deactivate autoactivation, set the environment variable `AUTO_ACTIVATE_NEW_USERS=false`
+
+In addition to this, you can send a verification email with an activation link. You will then need to [configure the connection to a SMTP server](#enable-emails).
+
+If SMTP is enabled, then the user will receive an email with an activation link. If the activation succeeds, the user is redirected to the url found in the `REDIRECT_URL_SUCCESS` environment variable. If it fails, they will redirected to the url given by the `REDIRECT_URL_ERROR` environment variable.
+
+You can change the default email templates. In order to do so, you can mount [custom configuration files](#custom-configuration-files) when using docker, or change files in the [custom directory](https://github.com/nhost/hasura-backend-plus/tree/master/custom) when running HBP from the source code.
+Other email templates are available and described [here](#email-templates)
+
+### Limit email domains
+
+You can limit registration to ranges of emails that are only part of a whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
+
+```
+ALLOWED_EMAIL_DOMAINS=gmail.com,yourorganisation.com
+```
+
+### Password constraints
+
+By default, clients can register with a password of at least three characters. You can change this in setting a higher value:
+
+```
+MIN_PASSWORD_LENGTH=6
+```
+
+You can ask HBP to check on [Have I Been Pwned](https://haveibeenpwned.com/Passwords) if the password has been previously exposed in data breaches. If so, the registration will fail. This option is disabled by default. You can change it to:
+
+```
+HIBP_ENABLE=true
+```
+
+### Additional registration fields
+
+You may want to extend the `public.users` table with your own fields and relations, and to expect the client to set some of them when registering. It is possible to set a list of columns in the `REGISTRATION_CUSTOM_FIELDS` environment value.
+
+<!-- TODO link to the page on schema -->
+
+Here is an example on the way to proceed to add a `nickname` value to the registration:
+
+1. Add a column `nickname` of type text to the `public.users` table
+2. Set the environment variable `REGISTRATION_CUSTOM_FIELDS=nickname`
+3. The registration endpoint now expects a `nickname` value in addition to `email` and `password`
+
+::: warning
+Any given field must exist in the `users` GraphQL type that corresponds to the `public.users` PostgreSQL table, or registration will fail.
+:::
+
+<!-- TODO link to JWT custom claims -->
+
+## Authentication
+
+### OAuth Providers
+
+### Two-factor Authentication
+
+## Enable emails
+
+## Custom configuration files
+
+<!-- TODO explain the contents of the configuration files, and how to mount them with a docker volume -->
+
+### Storage Rules
+
+### Email templates
+
+### Private key
 
 ## Custom User Schema
 
-## Two-factor Authentication
-
-## Checking Pwned Passwords
-
-## Account activation emails
-
 ## Rate limiting
+
+<!-- TODO MAX_REQUESTS, TIME_FRAME, healthz -->
 
 ## Environment Variables
 

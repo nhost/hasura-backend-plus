@@ -4,8 +4,7 @@ module.exports = {
   themeConfig: {
     logo: 'logo.png',
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/' },
+      { text: 'Getting started', link: '/guide/' },
       { text: 'Configuration', link: '/configuration/' },
       { text: 'Recipes', link: '/recipes/' },
       { text: 'API', link: '/api/' }

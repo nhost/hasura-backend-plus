@@ -8,7 +8,7 @@ import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData } from '@shared/types'
-import { AUTH_ANONYMOUS_USERS_ACTIVE, DEFAULT_ANONYMOUS_ROLE } from '@shared/config'
+import { ANONYMOUS_USERS_ENABLE, DEFAULT_ANONYMOUS_ROLE } from '@shared/config'
 
 interface HasuraData {
   insert_auth_accounts: {
@@ -18,7 +18,7 @@ interface HasuraData {
 }
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
-  if (AUTH_ANONYMOUS_USERS_ACTIVE) {
+  if (ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously

@@ -10,7 +10,7 @@ import {
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
   PORT,
-  AUTH_ANONYMOUS_USERS_ACTIVE
+  ANONYMOUS_USERS_ENABLE
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch, registerAccount, deleteAccount } from '@test/test-utils'
@@ -116,7 +116,7 @@ pwndPasswordIt('should tell the password has been pwned', async () => {
   expect(message).toEqual('Password is too weak.')
 })
 
-const anonymousAccountIt = AUTH_ANONYMOUS_USERS_ACTIVE ? it : it.skip
+const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
 anonymousAccountIt('should login anonymously', async () => {
   const { body, status } = await agent.post('/auth/login').send({ anonymous: true })
   expect(status).toEqual(200)
