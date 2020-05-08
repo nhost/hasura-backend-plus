@@ -56,7 +56,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
   // send email
   try {
     await emailClient.send({
-      template: 'change-password',
+      template: 'lost-password',
       locals: { ticket, url: SERVER_URL },
       message: {
         to: email,
