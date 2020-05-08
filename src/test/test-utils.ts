@@ -95,7 +95,7 @@ export const registerAccount = async (agent: SuperTest<Test>): Promise<TestAccou
   await agent.post('/auth/register').send({ email, password })
   if (!AUTO_ACTIVATE_NEW_USERS) {
     const { ticket } = await selectAccountByEmail(email)
-    await agent.get(`/auth/account/activate?ticket=${ticket}`)
+    await agent.get(`/auth/activate?ticket=${ticket}`)
     await deleteEmailsOfAccount(email)
   }
   const res = await agent.post('/auth/login').send({ email, password })
@@ -112,7 +112,7 @@ export const deleteAccount = async (
   account: TestAccount
 ): Promise<void> => {
   // * Delete the account
-  await agent.post('/auth/account/delete')
+  await agent.post('/auth/delete')
   // * Remove any message sent to this account
   await deleteEmailsOfAccount(account.email)
 }
