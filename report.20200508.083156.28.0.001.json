@@ -1,0 +1,503 @@
+
+{
+  "header": {
+    "reportVersion": 2,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20200508.083156.28.0.001.json",
+    "dumpEventTime": "2020-05-08T08:31:56Z",
+    "dumpEventTimeStamp": "1588926716912",
+    "processId": 28,
+    "threadId": null,
+    "cwd": "/app",
+    "commandLine": [
+      "/usr/local/bin/node",
+      "/app/node_modules/.bin/jest",
+      "--watch"
+    ],
+    "nodejsVersion": "v12.16.3",
+    "glibcVersionRuntime": "2.24",
+    "glibcVersionCompiler": "2.17",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "node": "12.16.3",
+      "v8": "7.8.279.23-node.35",
+      "uv": "1.34.2",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.16.0",
+      "modules": "72",
+      "nghttp2": "1.40.0",
+      "napi": "5",
+      "llhttp": "2.0.4",
+      "http_parser": "2.9.3",
+      "openssl": "1.1.1g",
+      "cldr": "36.0",
+      "icu": "65.1",
+      "tz": "2019c",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "lts": "Erbium",
+      "headersUrl": "https://nodejs.org/download/release/v12.16.3/node-v12.16.3-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.16.3/node-v12.16.3.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "4.19.76-linuxkit",
+    "osVersion": "#1 SMP Fri Apr 3 15:53:26 UTC 2020",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Core(TM) i5-5287U CPU @ 2.90GHz",
+        "speed": 0,
+        "user": 3996900,
+        "nice": 0,
+        "sys": 3772200,
+        "idle": 29104200,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-5287U CPU @ 2.90GHz",
+        "speed": 0,
+        "user": 4233100,
+        "nice": 0,
+        "sys": 4575000,
+        "idle": 28370900,
+        "irq": 0
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "lo",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "eth0",
+        "internal": false,
+        "mac": "02:42:ac:17:00:06",
+        "address": "172.23.0.6",
+        "netmask": "255.255.0.0",
+        "family": "IPv4"
+      }
+    ],
+    "host": "cbfe850abaa4"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000b46955",
+      "symbol": "report::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::string const&, v8::Local<v8::String>) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000a09c8f",
+      "symbol": "node::OnFatalError(char const*, char const*) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b7d71e",
+      "symbol": "v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b7da99",
+      "symbol": "v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d2a1f5",
+      "symbol": " [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d2a886",
+      "symbol": "v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d37105",
+      "symbol": "v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::GCCallbackFlags) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d37fb5",
+      "symbol": "v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d3aa6c",
+      "symbol": "v8::internal::Heap::AllocateRawWithRetryOrFail(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x0000000000d0163b",
+      "symbol": "v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x000000000104300e",
+      "symbol": "v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/local/bin/node]"
+    },
+    {
+      "pc": "0x00000000013c5b79",
+      "symbol": " [/usr/local/bin/node]"
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 1807273984,
+    "totalCommittedMemory": 1806302960,
+    "usedMemory": 1765304176,
+    "availableMemory": 46466080,
+    "memoryLimit": 1851785216,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 262144,
+        "committedMemory": 33088,
+        "capacity": 32808,
+        "used": 32808,
+        "available": 0
+      },
+      "new_space": {
+        "memorySize": 2097152,
+        "committedMemory": 1757448,
+        "capacity": 1047456,
+        "used": 173648,
+        "available": 873808
+      },
+      "old_space": {
+        "memorySize": 1587159040,
+        "committedMemory": 1587087584,
+        "capacity": 1550211584,
+        "used": 1550178000,
+        "available": 33584
+      },
+      "code_space": {
+        "memorySize": 7770112,
+        "committedMemory": 7445216,
+        "capacity": 6563552,
+        "used": 6563552,
+        "available": 0
+      },
+      "map_space": {
+        "memorySize": 63967232,
+        "committedMemory": 63961320,
+        "capacity": 63678640,
+        "used": 63678640,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 142528512,
+        "committedMemory": 142528512,
+        "capacity": 141418424,
+        "used": 141418424,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 3489792,
+        "committedMemory": 3489792,
+        "capacity": 3259104,
+        "used": 3259104,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 1047456,
+        "used": 0,
+        "available": 1047456
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 365.145,
+    "kernelCpuSeconds": 115.879,
+    "cpuConsumptionPercent": 16.61,
+    "maxRss": 1976868864,
+    "pageFaults": {
+      "IORequired": 40,
+      "IONotRequired": 1897910
+    },
+    "fsActivity": {
+      "reads": 621792,
+      "writes": 4464
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 211.927,
+    "kernelCpuSeconds": 94.4162,
+    "cpuConsumptionPercent": 10.5781,
+    "fsActivity": {
+      "reads": 618952,
+      "writes": 3760
+    }
+  },
+  "libuv": [
+  ],
+  "workers": [
+  ],
+  "environmentVariables": {
+    "npm_package_eslintIgnore_0": "dist",
+    "npm_package_eslintConfig_root": "true",
+    "npm_package_devDependencies__types_supertest": "^2.0.8",
+    "npm_package_dependencies__types_express_session": "^1.17.0",
+    "npm_package_scripts_dev_docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
+    "npm_package_eslintIgnore_1": "node_modules",
+    "npm_package_dependencies_passport_google_oauth20": "2.0.0",
+    "npm_package_dependencies__types_body_parser": "1.19.0",
+    "JWT_KEY": "a_long_custom_jwt_key_that_should_never_be_used_in_production",
+    "npm_package_eslintIgnore_2": "*.js",
+    "npm_package_devDependencies_jest": "25.3.0",
+    "npm_package_dependencies_express_fileupload": "1.1.7-alpha.3",
+    "npm_package_dependencies_bcryptjs": "^2.4.3",
+    "npm_package_dependencies__hapi_boom": "9.1.0",
+    "npm_package_scripts_docs_build": "vuepress build docs",
+    "npm_config_version_commit_hooks": "true",
+    "npm_config_user_agent": "yarn/1.22.4 npm/? node/v12.16.3 linux x64",
+    "REDIRECT_URL_ERROR": "http://localhost:3000/error",
+    "NODE_VERSION": "12.16.3",
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
+    "npm_package_dependencies_graphql_request": "1.8.2",
+    "npm_package_dependencies__types_uuid": "7.0.2",
+    "npm_package_dependencies__types_js_yaml": "3.12.3",
+    "npm_package_dependencies__types_ejs": "3.0.2",
+    "npm_package_dependencies__types_cors": "2.8.6",
+    "npm_config_bin_links": "true",
+    "HOSTNAME": "cbfe850abaa4",
+    "VERIFY_EMAILS": "true",
+    "YARN_VERSION": "1.22.4",
+    "npm_node_execpath": "/usr/local/bin/node",
+    "npm_package_devDependencies_puppeteer": "^3.0.0",
+    "npm_config_init_version": "1.0.0",
+    "PROVIDER_FAILURE_REDIRECT": "http://localhost:3000/error",
+    "SMTP_PORT": "1025",
+    "npm_package_dependencies_otplib": "12.0.1",
+    "PORT": "3000",
+    "HOME": "/root",
+    "npm_package_eslintConfig_parser": "@typescript-eslint/parser",
+    "npm_package_devDependencies__typescript_eslint_parser": "2.28.0",
+    "npm_package_dependencies_passport_linkedin_oauth2": "^2.0.0",
+    "HASURA_ENDPOINT": "http://graphql-engine:8080/v1/graphql",
+    "npm_package_devDependencies_expect_puppeteer": "^4.4.0",
+    "npm_package_devDependencies_eslint_config_prettier": "6.10.1",
+    "npm_package_dependencies_notevil": "1.3.3",
+    "npm_package_dependencies_express_rate_limit": "5.1.1",
+    "npm_package_dependencies__types_qrcode": "1.3.4",
+    "npm_package_dependencies_hibp": "9.0.0",
+    "npm_package_dependencies__types_helmet": "0.0.45",
+    "npm_config_init_license": "MIT",
+    "YARN_WRAP_OUTPUT": "false",
+    "npm_package_prettier_printWidth": "100",
+    "npm_package_dependencies_email_templates": "7.0.4",
+    "npm_config_version_tag_prefix": "v",
+    "npm_package_devDependencies_jest_extended": "0.11.5",
+    "npm_package_dependencies_graphql_tag": "2.10.3",
+    "npm_package_dependencies__types_cookie_parser": "1.4.2",
+    "HIBP_ENABLE": "true",
+    "npm_package_devDependencies_husky": "4.2.5",
+    "npm_package_dependencies_dotenv": "8.2.0",
+    "SMTP_SENDER": "hbp@hbp.com",
+    "npm_package_description": "The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfectly configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.",
+    "npm_package_dependencies_temp_dir": "^2.0.0",
+    "npm_package_dependencies_archiver": "4.0.1",
+    "npm_package_dependencies__types_passport_twitter": "^1.0.34",
+    "npm_package_dependencies__types_passport_facebook": "^2.1.9",
+    "npm_package_dependencies__hapi_joi": "17.1.1",
+    "npm_package_readmeFilename": "README.md",
+    "npm_package_dependencies_passport": "0.4.1",
+    "npm_package_dependencies__types_morgan": "^1.9.0",
+    "npm_package_scripts_test_ci": "NODE_ENV=ci jest --coverage --forceExit --runInBand",
+    "S3_BUCKET": "minio_test",
+    "npm_package_devDependencies_prettier": "2.0.4",
+    "npm_package_scripts_dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
+    "npm_package_dependencies__types_passport_google_oauth20": "2.0.3",
+    "npm_package_scripts_report_coverage": "codecov",
+    "npm_package_eslintConfig_rules__typescript_eslint_camelcase": "off",
+    "npm_package_devDependencies_ts_jest": "25.3.1",
+    "npm_package_devDependencies__types_jest": "25.2.1",
+    "npm_package_dependencies_hasura_cli": "1.2.1",
+    "npm_package_dependencies_express": "4.17.1",
+    "npm_package_dependencies__types_express_fileupload": "1.1.3",
+    "npm_package_dependencies__types_bcryptjs": "^2.4.2",
+    "npm_package_devDependencies__typescript_eslint_eslint_plugin": "2.28.0",
+    "npm_config_registry": "https://registry.yarnpkg.com",
+    "TERM": "xterm",
+    "SMTP_SECURE": "false",
+    "npm_package_prettier_trailingComma": "none",
+    "npm_package_devDependencies_node_fetch": "2.6.0",
+    "npm_package_devDependencies__types_puppeteer": "^2.0.1",
+    "npm_package_devDependencies__types_jest_environment_puppeteer": "^4.3.1",
+    "JWT_ALGORITHM": "HS256",
+    "npm_package_devDependencies__vuepress_plugin_back_to_top": "1.4.1",
+    "npm_package_scripts_start": "ts-node -r tsconfig-paths/register src/start.ts",
+    "npm_config_ignore_scripts": "",
+    "npm_config_version": "1.22.4",
+    "AUTO_ACTIVATE_NEW_USERS": "false",
+    "S3_ACCESS_KEY_ID": "minio_access_key",
+    "npm_package_devDependencies_eslint_plugin_jest": "23.8.2",
+    "npm_package_dependencies_fs_extra": "^9.0.0",
+    "npm_package_dependencies__types_passport_linkedin_oauth2": "^1.5.1",
+    "npm_package_dependencies__nicokaiser_passport_apple": "^0.2.1",
+    "PATH": "/tmp/yarn--1588913857383-0.04542740743059004:/app/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "NODE": "/usr/local/bin/node",
+    "S3_ENDPOINT": "http://minio:9000",
+    "S3_SECRET_ACCESS_KEY": "test_s3_secret_access_key",
+    "npm_package_devDependencies__types_expect_puppeteer": "^4.4.1",
+    "npm_package_dependencies_passport_github2": "0.1.12",
+    "npm_package_dependencies_nodemailer": "6.4.6",
+    "npm_package_dependencies_cross_env": "7.0.2",
+    "npm_package_dependencies__types_express_rate_limit": "5.0.0",
+    "npm_package_repository_type": "git",
+    "npm_package_name": "hasura-backend-plus",
+    "PROVIDER_SUCCESS_REDIRECT": "http://localhost:3000/healthz",
+    "npm_package_devDependencies_pretty_quick": "2.0.1",
+    "npm_package_dependencies_jose": "1.26.0",
+    "npm_package_devDependencies_puppeteer_extra": "^3.1.9",
+    "npm_package_devDependencies_cz_conventional_changelog": "3.1.0",
+    "npm_package_dependencies_lodash_kebabcase": "4.1.1",
+    "npm_package_dependencies__types_email_templates": "6.0.3",
+    "REGISTRATION_CUSTOM_FIELDS": "name",
+    "npm_package_devDependencies_ts_node_dev": "1.0.0-pre.44",
+    "npm_package_devDependencies_eslint": "6.8.0",
+    "SMTP_ENABLE": "true",
+    "npm_lifecycle_script": "NODE_ENV=test jest --watch",
+    "npm_package_eslintConfig_extends_0": "eslint:recommended",
+    "npm_package_devDependencies_supertest": "4.0.2",
+    "npm_package_dependencies_ts_node": "8.8.2",
+    "npm_package_dependencies_express_session": "^1.17.1",
+    "npm_package_dependencies_aws_sdk": "2.656.0",
+    "npm_package_dependencies__types_node": "^13.11.1",
+    "npm_package_main": "src/start.ts",
+    "npm_package_eslintConfig_extends_1": "plugin:@typescript-eslint/eslint-recommended",
+    "npm_package_devDependencies_puppeteer_extra_plugin_stealth": "^2.4.9",
+    "npm_package_dependencies_body_parser": "1.19.0",
+    "npm_package_dependencies__types_temp_dir": "^2.0.2",
+    "npm_package_dependencies__types_hapi__joi": "16.0.12",
+    "npm_package_dependencies__types_archiver": "3.1.0",
+    "npm_package_scripts_test": "NODE_ENV=test jest --coverage --forceExit",
+    "npm_config_version_git_message": "v%s",
+    "npm_lifecycle_event": "test:watch",
+    "npm_package_husky_hooks_pre_commit": "lint-staged",
+    "npm_package_eslintConfig_extends_2": "plugin:@typescript-eslint/recommended",
+    "npm_package_dependencies__types_passport": "1.0.3",
+    "npm_package_scripts_docs_dev": "vuepress dev docs",
+    "npm_package_version": "2.0.0",
+    "npm_package_repository_url": "git://github.com/nhost/hasura-backend-plus.git",
+    "npm_config_argv": "{\"remain\":[],\"cooked\":[\"run\",\"test:watch\"],\"original\":[\"run\",\"test:watch\"]}",
+    "npm_package_eslintConfig_extends_3": "prettier/@typescript-eslint",
+    "npm_package_devDependencies_vuepress": "1.4.1",
+    "npm_package_devDependencies_lint_staged": "10.1.3",
+    "npm_package_dependencies_uuid": "7.0.3",
+    "npm_package_dependencies_js_yaml": "3.13.1",
+    "npm_package_dependencies_graphql": "15.0.0",
+    "npm_package_dependencies_ejs": "3.0.2",
+    "npm_package_dependencies_cors": "2.8.5",
+    "REDIRECT_URL_SUCCESS": "http://localhost:3000/healthz",
+    "npm_package_eslintConfig_extends_4": "plugin:jest/recommended",
+    "npm_package_config_commitizen_path": "./node_modules/cz-conventional-changelog",
+    "SMTP_PASS": "password",
+    "ALLOW_USER_SELF_DELETE": "true",
+    "npm_package_prettier_singleQuote": "true",
+    "npm_package_devDependencies_codecov": "^3.6.5",
+    "npm_package_dependencies__types_express": "4.17.6",
+    "npm_config_version_git_tag": "true",
+    "npm_config_version_git_sign": "",
+    "SERVER_URL": "http://localhost:3000",
+    "npm_package_license": "MIT",
+    "npm_config_strict_ssl": "true",
+    "GOOGLE_ENABLE": "false",
+    "npm_package_eslintConfig_plugins_0": "@typescript-eslint",
+    "npm_package_devDependencies_eslint_plugin_prettier": "3.1.3",
+    "npm_package_devDependencies__types_node_fetch": "2.5.6",
+    "npm_package_dependencies_qrcode": "1.4.4",
+    "npm_package_dependencies_passport_windowslive": "^1.0.2",
+    "npm_package_scripts_test_watch": "NODE_ENV=test jest --watch",
+    "HASURA_GRAPHQL_ADMIN_SECRET": "a_long_secret_that_should_never_be_used_in_production",
+    "PWD": "/app",
+    "npm_execpath": "/opt/yarn-v1.22.4/bin/yarn.js",
+    "npm_package_prettier_semi": "false",
+    "npm_package_eslintConfig_plugins_1": "jest",
+    "npm_package_dependencies_helmet": "3.22.0",
+    "npm_package_dependencies__types_fs_extra": "^8.1.0",
+    "COOKIE_SECRET": "a_cookie_secret_1234",
+    "npm_package_dependencies_cookie_parser": "1.4.5",
+    "npm_package_dependencies__types_passport_github2": "1.2.4",
+    "npm_package_dependencies__types_nodemailer": "6.4.0",
+    "npm_config_save_prefix": "^",
+    "npm_config_ignore_optional": "",
+    "npm_package_lint_staged___js___ts___md___json_0": "eslint --fix",
+    "npm_package_dependencies_tsconfig_paths": "3.9.0",
+    "JWT_CUSTOM_FIELDS": "name",
+    "SMTP_HOST": "mailhog",
+    "NODE_ENV": "test",
+    "npm_package_lint_staged___js___ts___md___json_1": "prettier --write",
+    "npm_package_devDependencies_markdown_it_multimd_table": "4.0.1",
+    "npm_package_dependencies_typescript": "3.8.3",
+    "npm_package_dependencies_passport_twitter": "^1.0.4",
+    "npm_package_dependencies_passport_facebook": "^3.0.0",
+    "npm_package_dependencies__types_lodash_kebabcase": "4.1.6",
+    "INIT_CWD": "/app",
+    "ANONYMOUS_USERS_ENABLE": "true",
+    "GITHUB_ENABLE": "false",
+    "SMTP_USER": "user",
+    "npm_package_dependencies_morgan": "^1.10.0",
+    "PUPPETEER_WS_ENDPOINT": "ws://127.0.0.1:45773/devtools/browser/dbfd6b43-f1cb-4218-8863-78111f4cb583",
+    "JEST_WORKER_ID": "1"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": 0,
+      "hard": "unlimited"
+    },
+    "data_seg_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 83968000,
+      "hard": 83968000
+    },
+    "max_memory_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 1048576,
+      "hard": 1048576
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "virtual_memory_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "linux-vdso.so.1",
+    "/lib/x86_64-linux-gnu/libdl.so.2",
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2",
+    "/lib/x86_64-linux-gnu/libnss_files.so.2",
+    "/lib/x86_64-linux-gnu/libnss_dns.so.2",
+    "/lib/x86_64-linux-gnu/libresolv.so.2"
+  ]
+}
