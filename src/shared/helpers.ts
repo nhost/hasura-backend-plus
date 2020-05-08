@@ -1,4 +1,4 @@
-import { HIBP_ENABLE } from './config'
+import { HIBP_ENABLE, COOKIE_SECRET } from './config'
 import { NextFunction, Request, Response } from 'express'
 import {
   rotateTicket as rotateTicketQuery,
@@ -13,7 +13,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData } from './types'
+import { AccountData, QueryAccountData, PermissionVariables } from './types'
 
 /**
  * Create QR code.
@@ -111,4 +111,10 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
     new_ticket
   })
   return new_ticket
+}
+
+export const getPermissionVariablesFromCookie = (req: Request): PermissionVariables => {
+  const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
+  if (!permission_variables) throw Boom.unauthorized()
+  return JSON.parse(permission_variables)
 }

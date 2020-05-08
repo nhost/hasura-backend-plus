@@ -21,6 +21,16 @@ export interface Claims {
 }
 
 /**
+ * PermissionVariables interface.
+ */
+export interface PermissionVariables {
+  'user-id': string
+  'default-role': string
+  'allowed-roles': string[]
+  [key: string]: ClaimValueType
+}
+
+/**
  * Token interface.
  */
 export type Token = {

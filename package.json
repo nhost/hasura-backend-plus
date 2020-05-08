@@ -14,7 +14,7 @@
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
     "test": "NODE_ENV=test jest --coverage --forceExit",
-    "test:ci": "NODE_ENV=ci jest --coverage --forceExit",
+    "test:ci": "NODE_ENV=ci jest --coverage --forceExit --runInBand",
     "test:watch": "NODE_ENV=test jest --watch",
     "report-coverage": "codecov"
   },
@@ -73,7 +73,7 @@
     "graphql": "15.0.0",
     "graphql-request": "1.8.2",
     "graphql-tag": "2.10.3",
-    "hasura-cli": "1.2.0",
+    "hasura-cli": "1.2.1",
     "helmet": "3.22.0",
     "hibp": "9.0.0",
     "jose": "1.26.0",

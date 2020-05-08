@@ -1,14 +1,13 @@
 import { Request, Response } from 'express'
-import { asyncWrapper, createQR } from '@shared/helpers'
-
+import { asyncWrapper, createQR, getPermissionVariablesFromCookie } from '@shared/helpers'
 import { OTP_ISSUER } from '@shared/config'
 import { authenticator } from 'otplib'
 import { request } from '@shared/request'
 import { updateOtpSecret } from '@shared/queries'
-import { getClaims } from '@shared/jwt'
 
-async function generateMfa({ headers }: Request, res: Response): Promise<unknown> {
-  const user_id = getClaims(headers.authorization)['x-hasura-user-id']
+async function generateMfa(req: Request, res: Response): Promise<unknown> {
+  const permission_variables = getPermissionVariablesFromCookie(req)
+  const user_id = permission_variables['user-id']
 
   /**
    * Generate OTP secret and key URI.

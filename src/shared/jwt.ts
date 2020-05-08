@@ -7,7 +7,8 @@ import {
   JWT_CLAIMS_NAMESPACE,
   JWT_REFRESH_EXPIRES_IN,
   DEFAULT_USER_ROLE,
-  DEFAULT_ANONYMOUS_ROLE
+  DEFAULT_ANONYMOUS_ROLE,
+  JWT_CUSTOM_FIELDS
 } from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
@@ -19,6 +20,12 @@ import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
 import { Claims, Token, AccountData, ClaimValueType } from './types'
+
+interface InsertRefreshTokenData {
+  insert_auth_refresh_tokens_one: {
+    account: AccountData
+  }
+}
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -57,6 +64,40 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
 }
 
 export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
+
+/**
+ * Create an object that contains all the permission variables of the user,
+ * i.e. user-id, allowed-roles, default-role and the kebab-cased columns
+ * of the public.tables columns defined in JWT_CUSTOM_FIELDS
+ * @param jwt if true, add a 'x-hasura-' prefix to the property names, and stringifies the values (required by Hasura)
+ */
+export function generatePermissionVariables(
+  { default_role, account_roles = [], user }: AccountData,
+  jwt = false
+): { [key: string]: ClaimValueType } {
+  const prefix = jwt ? 'x-hasura-' : ''
+  const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
+  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
+
+  if (!accountRoles.includes(role)) {
+    accountRoles.push(role)
+  }
+
+  return {
+    [`${prefix}user-id`]: user.id,
+    [`${prefix}allowed-roles`]: accountRoles,
+    [`${prefix}default-role`]: role,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...JWT_CUSTOM_FIELDS.reduce<{ [key: string]: ClaimValueType }>((aggr: any, cursor) => {
+      aggr[`${prefix}${kebabCase(cursor)}`] = jwt
+        ? typeof user[cursor] === 'string'
+          ? user[cursor]
+          : JSON.stringify(user[cursor] ?? null)
+        : user[cursor]
+      return aggr
+    }, {})
+  }
+}
 
 /**
  * * Creates a JWKS store. Only works with RSA algorithms. Raises an error otherwise
@@ -111,12 +152,23 @@ export function newRefreshExpiry(): number {
  * @param res Express Response
  * @param refresh_token Refresh token to be set
  */
-export const setRefreshTokenAsCookie = (res: Response, refresh_token: string): void => {
+export const setCookie = (
+  res: Response,
+  refresh_token: string,
+  permission_variables: string
+): void => {
   // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
   const maxAge = JWT_REFRESH_EXPIRES_IN * 60 * 1000
 
   // set refresh token as cookie
   res.cookie('refresh_token', refresh_token, {
+    httpOnly: true,
+    maxAge,
+    signed: Boolean(COOKIE_SECRET)
+  })
+
+  // set permission variables cookie
+  res.cookie('permission_variables', permission_variables, {
     httpOnly: true,
     maxAge,
     signed: Boolean(COOKIE_SECRET)
@@ -137,46 +189,26 @@ export const setRefreshToken = async (
   if (!refresh_token) {
     refresh_token = uuidv4()
   }
-  await request(insertRefreshToken, {
+
+  const insert_account_data = (await request(insertRefreshToken, {
     refresh_token_data: {
       account_id: accountId,
       refresh_token,
       expires_at: new Date(newRefreshExpiry())
     }
-  })
+  })) as InsertRefreshTokenData
 
-  setRefreshTokenAsCookie(res, refresh_token)
+  const { account } = insert_account_data.insert_auth_refresh_tokens_one
+
+  const permission_variables = JSON.stringify(generatePermissionVariables(account))
+
+  setCookie(res, refresh_token, permission_variables)
 }
 
 /**
  * Create JWT token.
- * @param id Required v4 UUID string.
- * @param defaultRole Defaults to "user".
- * @param roles Defaults to ["user"].
  */
-export function createHasuraJwt({ default_role, account_roles = [], user }: AccountData): string {
-  const role = user.is_anonymous ? DEFAULT_ANONYMOUS_ROLE : default_role || DEFAULT_USER_ROLE
-  const accountRoles = account_roles.map(({ role: roleName }) => roleName)
-
-  if (!accountRoles.includes(role)) {
-    accountRoles.push(role)
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, ...customFields } = user
-  return sign({
-    [JWT_CLAIMS_NAMESPACE]: {
-      'x-hasura-user-id': id,
-      'x-hasura-allowed-roles': accountRoles,
-      'x-hasura-default-role': role,
-      // Add custom fields based on the user fields fetched from the GQL query
-      ...Object.entries(customFields).reduce<{ [k: string]: ClaimValueType }>(
-        (aggr, [key, value]) => ({
-          ...aggr,
-          [`x-hasura-${kebabCase(key)}`]:
-            typeof value === 'string' ? value : JSON.stringify(value ?? null)
-        }),
-        {}
-      )
-    }
+export const createHasuraJwt = (accountData: AccountData): string =>
+  sign({
+    [JWT_CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true)
   })
-}

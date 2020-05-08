@@ -1,4 +1,10 @@
-import { asyncWrapper, checkHibp, hashPassword, selectAccountByUserId } from '@shared/helpers'
+import {
+  asyncWrapper,
+  checkHibp,
+  hashPassword,
+  selectAccountByUserId,
+  getPermissionVariablesFromCookie
+} from '@shared/helpers'
 import { Request, Response } from 'express'
 import {
   resetPasswordWithOldPasswordSchema,
@@ -10,18 +16,17 @@ import Boom from '@hapi/boom'
 import bcrypt from 'bcryptjs'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { getClaims } from '@shared/jwt'
 import { UpdateAccountData } from '@shared/types'
 
 /**
  * Reset the password, either from a valid ticket or from a valid JWT and a valid password
  */
-async function changePassword({ body, headers }: Request, res: Response): Promise<unknown> {
+async function changePassword(req: Request, res: Response): Promise<unknown> {
   let password_hash: string
 
-  if (body.ticket) {
+  if (req.body.ticket) {
     // Reset the password from { ticket, new_password }
-    const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(body)
+    const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(req.body)
 
     await checkHibp(new_password)
     password_hash = await hashPassword(new_password)
@@ -39,10 +44,11 @@ async function changePassword({ body, headers }: Request, res: Response): Promis
     }
   } else {
     // Reset the password from valid JWT and { old_password, new_password }
-    const user_id = getClaims(headers.authorization)['x-hasura-user-id']
+    const permission_variables = getPermissionVariablesFromCookie(req)
+    const user_id = permission_variables['user-id']
 
     const { old_password, new_password } = await resetPasswordWithOldPasswordSchema.validateAsync(
-      body
+      req.body
     )
 
     await checkHibp(new_password)

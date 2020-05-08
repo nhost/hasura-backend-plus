@@ -1,4 +1,3 @@
-import { getClaims } from '@shared/jwt'
 import safeEval, { FunctionFactory } from 'notevil'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -10,10 +9,12 @@ import fs from 'fs'
 import path from 'path'
 import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
-import { Claims } from '@shared/types'
+import { PermissionVariables } from '@shared/types'
+import { getPermissionVariablesFromCookie } from '@shared/helpers'
 
-export const META_PREFIX = '/meta'
-export interface StoragePermissions {
+export const OBJECT_PREFIX = '/o'
+export const META_PREFIX = '/m'
+export interface PathConfig {
   read: string
   write: string
   get: string
@@ -21,14 +22,13 @@ export interface StoragePermissions {
   create: string
   update: string
   delete: string
+  metadata?: { [key: string]: string }
 }
 
 interface StorageRules {
   functions?: { [key: string]: string | { params: string[]; code: string } }
   paths: {
-    [key: string]: Partial<StoragePermissions> & {
-      meta: Partial<StoragePermissions> & { values?: { [key: string]: string } }
-    }
+    [key: string]: Partial<PathConfig>
   }
 }
 
@@ -37,11 +37,11 @@ interface StorageRequest {
   query: unknown
   method: string
   params?: string
-  auth?: Claims
+  auth?: PermissionVariables
 }
 
 export const containsSomeRule = (
-  rulesDefinition: Partial<StoragePermissions> = {},
+  rulesDefinition: Partial<PathConfig> = {},
   rules: (string | undefined)[]
 ): boolean => Object.keys(rulesDefinition).some((rule) => rules.includes(rule))
 
@@ -86,10 +86,11 @@ export const createContext = (
 ): object => {
   let auth
   try {
-    auth = getClaims(req.headers.authorization)
-  } catch {
+    auth = getPermissionVariablesFromCookie(req)
+  } catch (err) {
     auth = undefined
   }
+
   const variables: StorageContext = {
     request: {
       path: req.path,
@@ -100,12 +101,15 @@ export const createContext = (
     ...req.params,
     resource: s3HeadObject
   }
+
   const functions = storageFunctions(variables)
+
   return { ...functions, ...variables }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: object): boolean =>
-  rules.some((rule) => rule && !!safeEval(rule, context))
+export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
+  return rules.some((rule) => rule && !!safeEval(rule, context))
+}
 
 export const generateMetadata = (metadataParams: object, context: object): object =>
   Object.entries(metadataParams).reduce<{ [key: string]: unknown }>((aggr, [key, jsCode]) => {

@@ -5,8 +5,8 @@
 | [Authentication](#authentication) | [POST /auth/register](#registration)                      | Account registration |
 | ^^                                | [POST /auth/login](#login)                                | Login                |
 | ^^                                | [GET /auth/jwks](#jwks)                                   | JWK Set              |
-| ^^                                | [POST /auth/account/activate](#activation)                | Activate account     |
-| ^^                                | [POST /auth/account/delete](#delete-account)              | Delete account       |
+| ^^                                | [POST /auth/activate](#activation)                        | Activate account     |
+| ^^                                | [POST /auth/delete](#delete-account)                      | Delete account       |
 | ^^                                | [POST /auth/change-password/request](#forgotten-password) | Forgotten password   |
 | ^^                                | [POST /auth/change-password/change](#reset-password)      | Reset password       |
 | ^^                                | [POST /auth/change-email/request](#)                      |                      |

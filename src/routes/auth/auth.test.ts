@@ -13,12 +13,12 @@ import {
   ANONYMOUS_USERS_ENABLE
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
-import { deleteMailHogEmail, mailHogSearch, registerAccount, deleteAccount } from '@test/test-utils'
+import { deleteMailHogEmail, mailHogSearch, deleteAccount } from '@test/test-utils'
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { app } from '../../server'
-import request from 'supertest'
+import { SuperTest, Test, agent } from 'supertest'
 
 /**
  * Store variables in memory.
@@ -31,18 +31,31 @@ let jwtToken: string
 const email = `${generateRandomString()}@${generateRandomString()}.com`
 const password = generateRandomString()
 
-/**
- * Create agent for global state.
- */
+let request: SuperTest<Test>
+
 const server = app.listen(PORT)
-const agent = request(server)
+
+beforeAll(async () => {
+  request = agent(server) // * Create the SuperTest agent
+})
+
 // * Code that is executed after any jest test file that imports test-utiles
 afterAll(async () => {
   server.close()
 })
 
+const pwndPasswordIt = HIBP_ENABLE ? it : it.skip
+pwndPasswordIt('should tell the password has been pwned', async () => {
+  const {
+    status,
+    body: { message }
+  } = await request.post('/auth/register').send({ email: 'test@example.com', password: '123456' })
+  expect(status).toEqual(400)
+  expect(message).toEqual('Password is too weak.')
+})
+
 it('should create an account', async () => {
-  const { status } = await agent
+  const { status } = await request
     .post('/auth/register')
     .send({ email, password, user_data: { name: 'Test name' } })
   expect(status).toEqual(204)
@@ -52,7 +65,7 @@ it('should tell the account already exists', async () => {
   const {
     status,
     body: { message }
-  } = await agent.post('/auth/register').send({ email, password })
+  } = await request.post('/auth/register').send({ email, password })
   expect(status).toEqual(400)
   expect(message).toEqual('Account already exists.')
 })
@@ -61,7 +74,7 @@ it('should tell the account already exists', async () => {
 const manualActivationIt = !AUTO_ACTIVATE_NEW_USERS ? it : it.skip
 
 manualActivationIt('should fail to activate an user from a wrong ticket', async () => {
-  const { status, redirect, header } = await agent.get(`/auth/account/activate?ticket=${uuidv4()}`)
+  const { status, redirect, header } = await request.get(`/auth/activate?ticket=${uuidv4()}`)
   expect(
     status === 500 || (status === 302 && redirect && header?.location === REDIRECT_URL_ERROR)
   ).toBeTrue()
@@ -79,12 +92,12 @@ manualActivationIt('should activate the account from a valid ticket', async () =
   } else {
     ticket = (await selectAccountByEmail(email)).ticket
   }
-  const { status } = await agent.get(`/auth/account/activate?ticket=${ticket}`)
+  const { status } = await request.get(`/auth/activate?ticket=${ticket}`)
   expect(status).toBeOneOf([204, 302])
 })
 
 it('should sign the user in', async () => {
-  const { body, status } = await agent.post('/auth/login').send({ email, password })
+  const { body, status } = await request.post('/auth/login').send({ email, password })
   // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
   expect(status).toEqual(200)
@@ -99,37 +112,17 @@ it('should decode a valid custom user claim', async () => {
   expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
 })
 
-it('should delete the account', async () => {
-  const { status } = await agent
-    .post('/auth/account/delete')
-    .set('Authorization', `Bearer ${jwtToken}`)
-  expect(status).toEqual(204)
-})
-
-const pwndPasswordIt = HIBP_ENABLE ? it : it.skip
-pwndPasswordIt('should tell the password has been pwned', async () => {
-  const {
-    status,
-    body: { message }
-  } = await agent.post('/auth/register').send({ email: 'test@example.com', password: '123456' })
-  expect(status).toEqual(400)
-  expect(message).toEqual('Password is too weak.')
+it('should logout', async () => {
+  const res = await request.post('/auth/logout').send()
+  expect(res.status).toBe(204)
+  await request.post('/auth/login').send({ email, password })
+  await deleteAccount(request, { email, password })
 })
 
 const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
 anonymousAccountIt('should login anonymously', async () => {
-  const { body, status } = await agent.post('/auth/login').send({ anonymous: true })
+  const { body, status } = await request.post('/auth/login').send({ anonymous: true })
   expect(status).toEqual(200)
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
 })
-
-it('should logout', async () => {
-  // TODO : review this test, including cookies
-  const account = await registerAccount(agent)
-  const res = await agent.post('/auth/logout').send()
-  expect(res.status).toBe(204)
-  await deleteAccount(agent, account)
-})
-
-// TODO test cookies

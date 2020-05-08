@@ -1,16 +1,10 @@
 functions:
   isAuthenticated: 'return !!request.auth'
-  isOwner:
-    params:
-      - userId
-    code: "return !!request.auth && userId === request.auth['x-hasura-user-id']"
+  isOwner: "return !!request.auth && userId === request.auth['user-id']"
   validToken: 'return request.query.token === resource.Metadata.token'
 paths:
   /user/:userId/:fileId:
     read: 'isOwner(userId) || validToken()'
     write: 'isOwner(userId)'
-    meta:
-      read: 'isOwner(userId)'
-      write: 'isOwner(userId)'
-      values:
-        description: 'request.query.description'
+    metadata:
+      description: 'request.query.description'
