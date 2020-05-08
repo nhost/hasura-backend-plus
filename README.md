@@ -320,12 +320,40 @@ You can also use open source self-hosted private cloud storage solutions like [M
 
 ### Uploads
 
-Upload a file blob to `/storage/upload`. Will return `key`, `originalname` and `mimetype`. You can upload one file at a time.
+Upload a file blob to `/storage/upload`. Will return `encoding`, `extension`, `key`, `originalname`, `mimetype` and `token`. You can upload one file at a time.
 
+Upload example using axios
+
+```
+let blob = <IMAGE BLOB>
+let formData = new FormData()
+formData.append('file', blob)
+
+axios.post(<HOST>/storage/upload, formData, {
+  headers: {
+    'x-path': 'path/to/file.jpg', // key
+    'content-type': 'multipart/form-data',
+    'Authorization': TOKEN // authorization token including Bearer
+  }
+})
+```
+
+Returns 
+
+```
+
+encoding: "7bit"
+extension: "jpeg"
+key: "path/to/file.jpg"
+mimetype: "image/jpeg"
+originalname: "blob"
+token: "token"
+
+```
 ### Download (get)
 
 `GET`
-`storage/file/{key}`
+`storage/file/{key}?token={token}`
 
 ### Delete (get)
 
