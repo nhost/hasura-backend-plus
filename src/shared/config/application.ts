@@ -11,7 +11,13 @@ export const {
 } = process.env
 export const PORT = castIntEnv('PORT', 3000)
 export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
-export const AUTO_MIGRATE = castBooleanEnv('AUTO_MIGRATE', true)
+
+const autoMigrateSettings = (envVal?: string): boolean | string => {
+  if (envVal?.toLowerCase() === 'false') return false
+  if (envVal?.toLowerCase() === 'v1') return 'v1'
+  return true
+}
+export const AUTO_MIGRATE = autoMigrateSettings(process.env.AUTO_MIGRATE)
 /**
  * * Rate limiter settings
  */
