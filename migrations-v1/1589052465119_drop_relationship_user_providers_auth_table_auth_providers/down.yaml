@@ -1,0 +1,12 @@
+- args:
+    name: user_providers
+    table:
+      name: auth_providers
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: auth_provider
+        table:
+          name: user_providers
+          schema: auth
+  type: create_array_relationship

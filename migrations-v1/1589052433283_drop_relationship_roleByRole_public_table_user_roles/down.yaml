@@ -1,0 +1,8 @@
+- args:
+    name: roleByRole
+    table:
+      name: user_roles
+      schema: public
+    using:
+      foreign_key_constraint_on: role
+  type: create_object_relationship

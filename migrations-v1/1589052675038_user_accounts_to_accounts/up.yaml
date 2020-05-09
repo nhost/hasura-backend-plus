@@ -1,0 +1,11 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: "INSERT INTO auth.accounts (\n    id, \n    created_at, \n    updated_at,
+      \n    user_id, \n    active,\n    email,\n    password_hash,\n    default_role,\n
+      \   is_anonymous,\n    custom_register_data\n  ) \n  SELECT \n    user_accounts.id,\n
+      \   user_accounts.created_at,\n    user_accounts.updated_at,\n    users.id,\n
+      \   users.active,\n    user_accounts.email,\n    user_accounts.password,\n    users.default_role,\n
+      \   users.is_anonymous,\n    users.register_data\n  FROM \n    auth.user_accounts
+      AS user_accounts\n  JOIN users on users.id = user_accounts.user_id\n;"
+  type: run_sql

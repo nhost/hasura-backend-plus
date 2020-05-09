@@ -1,0 +1,5 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: "INSERT INTO auth.roles (role) \n  SELECT role FROM public.roles;"
+  type: run_sql

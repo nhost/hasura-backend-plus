@@ -1,0 +1,6 @@
+- args:
+    relationship: roleByRole
+    table:
+      name: user_roles
+      schema: public
+  type: drop_relationship

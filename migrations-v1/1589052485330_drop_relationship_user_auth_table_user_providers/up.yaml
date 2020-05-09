@@ -1,0 +1,6 @@
+- args:
+    relationship: user
+    table:
+      name: user_providers
+      schema: auth
+  type: drop_relationship

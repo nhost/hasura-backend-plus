@@ -1,0 +1,9 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: "INSERT INTO auth.account_roles (id, created_at, account_id, role) \n  SELECT
+      \n    user_roles.id,\n    user_roles.created_at,\n    user_accounts.id,\n    user_roles.role\n
+      \  FROM public.user_roles AS user_roles\n   JOIN public.users AS users ON users.id
+      = user_roles.user_id\n   JOIN auth.user_accounts AS user_accounts ON user_accounts.user_id
+      = users.id;"
+  type: run_sql

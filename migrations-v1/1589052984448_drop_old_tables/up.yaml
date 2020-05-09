@@ -1,0 +1,6 @@
+- args:
+    cascade: false
+    read_only: false
+    sql: DROP TABLE public.roles, public.user_roles, auth.auth_providers, auth.user_accounts,
+      auth.user_providers;
+  type: run_sql
