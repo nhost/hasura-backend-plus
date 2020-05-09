@@ -9,7 +9,7 @@
 ## Connect to Hasura
 
 In order to connect HBP to Hasura, you need to provide the Hasura GraphQL endpoint in the `HASURA_ENDPOINT` environment variable. Note that this should include the full path of the GraphQL endpoint, usually ending with `/v1/graphql`.
-For example, in the [default docker-compose file of the HBP repository](https://github.com/nhost/hasura-backend-plus/blob/master/docker-compose.yaml), `HASURA_ENDPOINT` is `http://graphql-engine:8080/v1/graphql`.
+For example, in the [default docker-compose file of the HBP repository](https://github.com/nhost/hasura-backend-plus/blob/master/docker-compose.yaml), `HASURA_ENDPOINT` equals `http://graphql-engine:8080/v1/graphql`.
 
 You also need to provide a valid Hasura admin secret key in the `HASURA_GRAPHQL_ADMIN_SECRET` environment variable. Note that this variable is mandatory for HBP to work, i.e. HBP won't work if your Hasura instance is not secured with such an admin key. You can find further reading about admin secret keys in the [Hasura documentation](https://hasura.io/docs/1.0/graphql/manual/deployment/production-checklist.html#set-an-admin-secret).
 
@@ -41,7 +41,7 @@ You can disable this automatic check and migration system in setting then `AUTO_
 
 Hasura Backend Plus v2 introduces some brand new features, coming with some breaking changes:
 
-- While all the existing v1 features exist, the [API endpoints](api) have been modified. You may need to change your frontend applications accordingly.
+- While all the former v1 features exist in v2, the [API endpoints](api) have been modified, and some may behave slightly differently. You may need to change your frontend applications accordingly.
 - The Storage module have been completely rewritten. <!-- TODO link to storage -->
 - The refresh token is now stored in an [HTTP cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) <!-- TODO link to refresh token / cookies system -->
 
