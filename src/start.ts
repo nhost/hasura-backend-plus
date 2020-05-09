@@ -6,7 +6,7 @@ const start = async (): Promise<void> => {
   if (AUTO_MIGRATE) {
     const migrationSetup = {
       migrations: AUTO_MIGRATE === 'v1' ? './migrations-v1' : './migrations',
-      metadata: './metadata'
+      // metadata: './metadata'
     }
     await migrate(migrationSetup)
   }

@@ -66,7 +66,9 @@ await_console() {
             sleep 1
         done
         # Set the Hasura config.yaml file
-        printf 'version: 2\nendpoint: http://localhost:8080\nadmin_secret: %s\nmetadata_directory: metadata'  $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
+        # * HBP uses config v1 so far
+        # printf 'version: 2\nendpoint: http://localhost:8080\nadmin_secret: %s\nmetadata_directory: metadata'  $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
+        printf 'version: 1\nendpoint: http://localhost:8080\nadmin_secret: %s\nmetadata_directory: metadata'  $HASURA_GRAPHQL_ADMIN_SECRET > config.yaml
         hasura console
     fi
 }
