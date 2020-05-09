@@ -6,19 +6,54 @@
 <!-- TODO SERVER_URL, PORT -->
 <!-- TODO REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR -->
 
-## Configure Hasura
+## Connect to Hasura
 
-<!-- TODO HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET -->
-<!-- TODO JWT config must be the same -->
+In order to connect HBP to Hasura, you need to provide the Hasura GraphQL endpoint in the `HASURA_ENDPOINT` environment variable. Note that this should include the full path of the GraphQL endpoint, usually ending with `/v1/graphql`.
+For example, in the [default docker-compose file of the HBP repository](https://github.com/nhost/hasura-backend-plus/blob/master/docker-compose.yaml), `HASURA_ENDPOINT` is `http://graphql-engine:8080/v1/graphql`.
+
+You also need to provide a valid Hasura admin secret key in the `HASURA_GRAPHQL_ADMIN_SECRET` environment variable. Note that this variable is mandatory for HBP to work, i.e. HBP won't work if your Hasura instance is not secured with such an admin key. You can find further reading about admin secret keys in the [Hasura documentation](https://hasura.io/docs/1.0/graphql/manual/deployment/production-checklist.html#set-an-admin-secret).
+
+The last point of attention is to make sure both HBP and Hasura are using the same JWT configuration: as HBP will generate the JWT used for authentication in Hasura, it is very important that JWT is configured in a way that Hasura understands it. You will find more information on how to configure JWT in HBP.
+
+## Configure JWT
+
 <!-- TODO - JWKS endpoint -->
-<!-- TODO - link to JWK options -->
-
-## JWT Options
 
 ## Migrations
 
-<!-- TODO AUTO_MIGRATE, true, false, v1 -->
-<!-- TODO BIG WARNING -->
+By default, HBP checks when starting if its schema is already present in the database. If not, it runs the necessary SQL migrations and loads the related Hasura metadata, while keeping the existing database and Hasura metadata unchanged.
+
+::: warning
+Before running migrations on any sort, it is recommended to make a backup of your database.
+:::
+
+<!-- TODO link to the database schema -->
+
+The HBP migration system is planned to automatically apply migrations further to v2.
+
+::: tip
+The HBP migration system relies on [Hasura CLI](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/index.html) and uses a [v1 migrations/metadata configuration](https://hasura.io/docs/1.0/graphql/manual/migrations/config-v1/index.html), as the config v2 doesn't allow metadata incremental change (yet?).
+:::
+
+You can disable this automatic check and migration system in setting then `AUTO_MIGRATE` environment variable to `false`.
+
+### Migrating from HBP v1
+
+Hasura Backend Plus v2 introduces some brand new features, coming with some breaking changes:
+
+- While all the existing v1 features exist, the [API endpoints](api) have been modified. You may need to change your frontend applications accordingly.
+- The Storage module have been completely rewritten. <!-- TODO link to storage -->
+- The refresh token is now stored in an [HTTP cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) <!-- TODO link to refresh token / cookies system -->
+
+If you are upgrading HBP v1 to v2, you need to set `AUTO_MIGRATE` accordingly:
+
+```sh
+AUTO_MIGRATE=v1
+```
+
+The first time HBP starts, it will then transform the legacy HBP v1 schema and metadata into the v2 ones, and load the account data.
+
+Please note that your users will be disconnected during the process.
 
 ## Registration
 
