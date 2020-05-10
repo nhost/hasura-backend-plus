@@ -1,18 +1,30 @@
-<center>
+<p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
     <img src="docs/.vuepress/public/logo.png" width="250px" alt="HBP" />
   </a>
+</p>
+<h1 align="center">Hasura Backend Plus (HBP)</h1>
+<h2 align="center">Authentication & Storage for Hasura</h2>
 
-  <h1>Hasura Backend Plus (HBP)</h1>
-  <h2>Authentication & Storage for Hasura</h2>
-</center>
-
-[![version: 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/nhost/hasura-backend-plus/releases)
-[![license: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![commitizen: friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](https://commitizen.github.io/cz-cli)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
-[![CI](https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2)](https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush)
-[![code coverage](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg)](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2)
+<p align="center">
+  <img src="https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="license: MIT" />
+  </a>
+  <a href="https://commitizen.github.io/cz-cli">
+    <img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="commitizen: friendly" />
+  </a>
+  <a href="https://prettier.io">
+    <img src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" alt="code style: prettier" />
+  </a>
+  <a href="https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush">
+    <img src="https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2"/>
+  </a>
+  <a href="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2">
+    <img src="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg"
+    />
+  </a>
+</p>
 
 For detailed usage and installation instructions check out the [documentation](https://nhost.github.io/hasura-backend-plus/).
 
