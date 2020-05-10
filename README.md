@@ -1,12 +1,10 @@
-<p align="center">
-  <a href="https://github.com/nhost/hasura-backend-plus">
-    <img src="docs/.vuepress/public/logo.png" width="250px" alt="HBP" />
-  </a>
-</p>
+<center>
 
-# <center>Hasura Backend Plus (HBP)</center>
+[![HBP](docs/.vuepress/public/logo.png)](https://nhost.github.io/hasura-backend-plus/)
 
-## <center>Authentication & Storage for Hasura</center>
+# Hasura Backend Plus (HBP)
+
+## Authentication & Storage for Hasura
 
 [![version: 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/nhost/hasura-backend-plus/releases)
 [![license: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
@@ -14,6 +12,8 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
 [![CI](https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2)](https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush)
 [![code coverage](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg)](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2)
+
+</center>
 
 For detailed usage and installation instructions check out the [documentation](https://nhost.github.io/hasura-backend-plus/).
 
