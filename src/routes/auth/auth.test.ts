@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   AUTO_ACTIVATE_NEW_USERS,
   HIBP_ENABLE,
-  SMTP_ENABLE,
+  EMAILS_ENABLE,
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
   PORT,
@@ -82,7 +82,7 @@ manualActivationIt('should fail to activate an user from a wrong ticket', async 
 
 manualActivationIt('should activate the account from a valid ticket', async () => {
   let ticket
-  if (SMTP_ENABLE) {
+  if (EMAILS_ENABLE) {
     // Sends the email, checks if it's received and use the link for activation
     const [message] = await mailHogSearch(email)
     expect(message).toBeTruthy()

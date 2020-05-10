@@ -24,7 +24,7 @@ The last point of attention is to make sure both HBP and Hasura are using the sa
 By default, HBP checks when starting if its schema is already present in the database. If not, it runs the necessary SQL migrations and loads the related Hasura metadata, while keeping the existing database and Hasura metadata unchanged.
 
 ::: warning
-Before running migrations on any sort, it is recommended to make a backup of your database.
+Before running migrations on any sort, it is recommended to make a backup of your database. Moreover there is no rollback migration available.
 :::
 
 <!-- TODO link to the database schema -->
@@ -164,7 +164,7 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 | `REDIRECT_URL_ERROR`         |                         |                                                                                                                                                                                              |
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
 | `JWT_REFRESH_EXPIRES_IN`     | 43200                   |                                                                                                                                                                                              |
-| `SMTP_ENABLE`                | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
+| `EMAILS_ENABLE`              | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
 | `SMTP_HOST`                  |                         | SMTP server path to use for sending emails.                                                                                                                                                  |
 | `SMTP_PASS`                  |                         | Password to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_USER`                  |                         | Username to authenticate on the SMTP server.                                                                                                                                                 |

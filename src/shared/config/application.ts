@@ -34,6 +34,6 @@ export const {
   SMTP_SENDER = SMTP_USER,
   SMTP_AUTH_METHOD = 'PLAIN'
 } = process.env
-export const SMTP_ENABLE = castBooleanEnv('SMTP_ENABLE')
+export const EMAILS_ENABLE = castBooleanEnv('EMAILS_ENABLE')
 export const SMTP_PORT = castIntEnv('SMTP_PORT', 587)
 export const SMTP_SECURE = castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
