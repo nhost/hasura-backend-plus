@@ -1,8 +1,0 @@
-- args:
-    name: authProviderByAuthProvider
-    table:
-      name: user_providers
-      schema: auth
-    using:
-      foreign_key_constraint_on: auth_provider
-  type: create_object_relationship
