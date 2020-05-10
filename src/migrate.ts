@@ -49,6 +49,7 @@ type Migration = {
 }
 
 export default async (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { migrations, metadata }: Migration = { migrations: './migrations', metadata: './metadata' }
 ): Promise<void> => {
   console.log('Checking migrations and metadata...')
@@ -73,7 +74,9 @@ export default async (
         // * Set the Hasura CLI config.yaml file
         writeFileSync(
           `${TEMP_MIGRATION_DIR}/config.yaml`,
-          `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
+          // * HBP uses config v1 so far
+          // `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
+          `version: 1\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
           { encoding: 'utf8' }
         )
         if (migrations && (await pathExists(migrations))) {
@@ -82,15 +85,16 @@ export default async (
           await copy(migrations, `${TEMP_MIGRATION_DIR}/migrations`)
           await hasuraConsole('migrate apply')
         }
-        if (metadata && (await pathExists(metadata))) {
-          // * Apply metadata
-          console.log(`Applying metadata '${metadata}'...`)
-          await copy(metadata, `${TEMP_MIGRATION_DIR}/metadata`)
-          await hasuraConsole('metadata apply')
-        } else if (migrations && (await pathExists(migrations))) {
-          console.log('Reloading metadata...')
-          await hasuraConsole('metadata reload')
-        }
+        // * Metadata is used in config v2. HBP uses config v1 so far
+        // if (metadata && (await pathExists(metadata))) {
+        //   // * Apply metadata
+        //   console.log(`Applying metadata '${metadata}'...`)
+        //   await copy(metadata, `${TEMP_MIGRATION_DIR}/metadata`)
+        //   await hasuraConsole('metadata apply')
+        // } else if (migrations && (await pathExists(migrations))) {
+        console.log('Reloading metadata...')
+        await hasuraConsole('metadata reload')
+        // }
         await remove(TEMP_MIGRATION_DIR)
         server.close()
       })
