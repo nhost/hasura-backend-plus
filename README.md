@@ -4,49 +4,31 @@
   </a>
 </p>
 
-<h3 align="center">Hasura Backend Plus (HBP)</h3>
-<h4 align="center">Auth & Files (S3-Compatible Object Storage) for Hasura</h4>
+# <center>Hasura Backend Plus (HBP)</center>
 
-<p align="center">
-  <img
-    src="https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000"
-  />
+## <center>Authentication & Storage for Hasura</center>
 
-  <a href="LICENSE">
-    <img
-      src="https://img.shields.io/badge/license-MIT-yellow.svg"
-      alt="license: MIT"
-    />
-  </a>
+[![version: 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/nhost/hasura-backend-plus/releases)
+[![license: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![commitizen: friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](https://commitizen.github.io/cz-cli)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
+[![CI](https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2)](https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush)
+[![code coverage](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg)](https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2)
 
-  <a href="https://commitizen.github.io/cz-cli">
-    <img
-      src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"
-      alt="commitizen: friendly"
-    />
-  </a>
-
-  <a href="https://prettier.io">
-    <img
-      src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg"
-      alt="code style: prettier"
-    />
-  </a>
-  <a href="https://github.com/nhost/hasura-backend-plus/actions?query=workflow%Build+branch%3Av2+event%3Apush">
-    <img
-      src="https://github.com/nhost/hasura-backend-plus/workflows/Build/badge.svg?branch=v2"
-    />
-  </a>
-  <a href="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2">
-    <img
-      src="https://codecov.io/gh/nhost/hasura-backend-plus/branch/v2/graph/badge.svg"
-    />
-  </a>
-</p>
+For detailed usage and installation instructions check out the [documentation](https://nhost.github.io/hasura-backend-plus/).
 
 ---
 
-# Nhost
+## Core Features:
+
+- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 🎨 Fully customizable with sensible defaults.
+- 📈 Rate limit your API endpoints by default.
+- 🚀 Easy to setup, can be deployed anywhere.
+- 🔑 Two-factor authentication support.
+
+## Nhost
 
 The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfectly configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
 
@@ -58,19 +40,6 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
     width="200px"
   />
 </a>
-
-[https://nhost.io](https://nhost.io)
-
----
-
-### Core Features:
-
-- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
-- 🎨 Fully customizable with sensible defaults.
-- 📈 Rate limit your API endpoints by default.
-- 🚀 Easy to setup, can be deployed anywhere.
-- 🔑 Two-factor authentication support.
 
 ## 🤝 Contributing
 
