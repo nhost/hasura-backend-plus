@@ -83,7 +83,7 @@ export const resetPasswordWithTicketSchema = Joi.object({
   new_password: passwordRule
 })
 
-export const resetPasswordWithOldPasswordSchema = Joi.object({
+export const changePasswordFromOldSchema = Joi.object({
   old_password: passwordRule,
   new_password: passwordRule
 })

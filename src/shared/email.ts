@@ -1,5 +1,5 @@
 import {
-  SMTP_ENABLE,
+  EMAILS_ENABLE,
   SMTP_HOST,
   SMTP_PASS,
   SMTP_PORT,
@@ -33,7 +33,7 @@ const transport = nodemailer.createTransport({
 export const emailClient = new Email({
   transport,
   message: { from: SMTP_SENDER },
-  send: SMTP_ENABLE,
+  send: EMAILS_ENABLE,
   views: {
     root: path.resolve(process.env.PWD || '.', 'custom/emails'),
     options: {

@@ -1,7 +1,7 @@
 import {
   AUTO_ACTIVATE_NEW_USERS,
   SERVER_URL,
-  SMTP_ENABLE,
+  EMAILS_ENABLE,
   DEFAULT_USER_ROLE,
   VERIFY_EMAILS
 } from '@shared/config'
@@ -50,7 +50,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   })
 
   if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
-    if (!SMTP_ENABLE) {
+    if (!EMAILS_ENABLE) {
       throw Boom.badImplementation('SMTP settings unavailable')
     }
 

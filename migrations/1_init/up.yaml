@@ -1,0 +1,169 @@
+- args:
+    name: account_providers
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: account_roles
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: accounts
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: providers
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: refresh_tokens
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: roles
+    schema: auth
+  type: add_existing_table_or_view
+- args:
+    name: users
+    schema: public
+  type: add_existing_table_or_view
+- args:
+    name: account
+    table:
+      name: account_providers
+      schema: auth
+    using:
+      foreign_key_constraint_on: account_id
+  type: create_object_relationship
+- args:
+    name: provider
+    table:
+      name: account_providers
+      schema: auth
+    using:
+      foreign_key_constraint_on: auth_provider
+  type: create_object_relationship
+- args:
+    name: account
+    table:
+      name: account_roles
+      schema: auth
+    using:
+      foreign_key_constraint_on: account_id
+  type: create_object_relationship
+- args:
+    name: roleByRole
+    table:
+      name: account_roles
+      schema: auth
+    using:
+      foreign_key_constraint_on: role
+  type: create_object_relationship
+- args:
+    name: role
+    table:
+      name: accounts
+      schema: auth
+    using:
+      foreign_key_constraint_on: default_role
+  type: create_object_relationship
+- args:
+    name: user
+    table:
+      name: accounts
+      schema: auth
+    using:
+      foreign_key_constraint_on: user_id
+  type: create_object_relationship
+- args:
+    name: account_providers
+    table:
+      name: accounts
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: account_id
+        table:
+          name: account_providers
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: account_roles
+    table:
+      name: accounts
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: account_id
+        table:
+          name: account_roles
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: refresh_tokens
+    table:
+      name: accounts
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: account_id
+        table:
+          name: refresh_tokens
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: account_providers
+    table:
+      name: providers
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: auth_provider
+        table:
+          name: account_providers
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: account
+    table:
+      name: refresh_tokens
+      schema: auth
+    using:
+      foreign_key_constraint_on: account_id
+  type: create_object_relationship
+- args:
+    name: account_roles
+    table:
+      name: roles
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: role
+        table:
+          name: account_roles
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: accounts
+    table:
+      name: roles
+      schema: auth
+    using:
+      foreign_key_constraint_on:
+        column: default_role
+        table:
+          name: accounts
+          schema: auth
+  type: create_array_relationship
+- args:
+    name: account
+    table:
+      name: users
+      schema: public
+    using:
+      manual_configuration:
+        column_mapping:
+          id: user_id
+        remote_table:
+          name: accounts
+          schema: auth
+  type: create_object_relationship

@@ -1,13 +1,13 @@
-import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { Request, Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
+import Boom from '@hapi/boom'
 
-import { SMTP_ENABLE, SERVER_URL } from '@shared/config'
+import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
+import { EMAILS_ENABLE, SERVER_URL } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
-import { v4 as uuidv4 } from 'uuid'
-import Boom from '@hapi/boom'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
@@ -15,7 +15,7 @@ import Boom from '@hapi/boom'
  */
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
   // smtp must be enabled for request change password to work.
-  if (!SMTP_ENABLE) {
+  if (!EMAILS_ENABLE) {
     throw Boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -56,7 +56,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
   // send email
   try {
     await emailClient.send({
-      template: 'change-password',
+      template: 'lost-password',
       locals: { ticket, url: SERVER_URL },
       message: {
         to: email,
