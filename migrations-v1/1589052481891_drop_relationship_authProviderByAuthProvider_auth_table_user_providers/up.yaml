@@ -1,6 +1,0 @@
-- args:
-    relationship: authProviderByAuthProvider
-    table:
-      name: user_providers
-      schema: auth
-  type: drop_relationship

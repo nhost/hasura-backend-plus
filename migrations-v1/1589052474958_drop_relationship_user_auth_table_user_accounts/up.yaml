@@ -1,6 +1,0 @@
-- args:
-    relationship: user
-    table:
-      name: user_accounts
-      schema: auth
-  type: drop_relationship

@@ -1,7 +1,0 @@
-- args:
-    cascade: false
-    read_only: false
-    sql: "ALTER TABLE users\n  DROP COLUMN active, \n  DROP COLUMN default_role, \n
-      \ DROP COLUMN email, \n  DROP COLUMN secret_token, \n  DROP COLUMN secret_token_expires_at,
-      \n  DROP COLUMN register_data, \n  DROP COLUMN is_anonymous;"
-  type: run_sql
