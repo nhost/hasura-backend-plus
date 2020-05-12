@@ -21,21 +21,29 @@ The last point of attention is to make sure both HBP and Hasura are using the sa
 
 ## Migrations
 
-By default, HBP checks when starting if its schema is already present in the database. If not, it runs the necessary SQL migrations and loads the related Hasura metadata, while keeping the existing database and Hasura metadata unchanged.
-
 ::: warning
-Before running migrations on any sort, it is recommended to make a backup of your database. Moreover there is no rollback migration available.
+Before running migrations on any sort, it is HIGHLY recommended to make a backup of your database.
 :::
 
-<!-- TODO link to the database schema -->
+To get HBP running correctly we must configure Hasura and PostgreSQL. This configurations is done using Hasura migrations and will add the correct database configuration and apply the correct Hasura metadata.
 
-The HBP migration system is planned to automatically apply migrations further to v2.
+### Apply migrations for a new installation
 
-::: tip
-The HBP migration system relies on [Hasura CLI](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/index.html) and uses a [v1 migrations/metadata configuration](https://hasura.io/docs/1.0/graphql/manual/migrations/config-v1/index.html), as the config v2 doesn't allow metadata incremental change (yet?).
-:::
+For a complete new installation you can have Hasura apply the migrations automatically for you, using Docker. This is an example in docker-compose.
 
-You can disable this automatic check and migration system in setting then `AUTO_MIGRATE` environment variable to `false`.
+```yaml
+graphql-engine:
+  image: hasura/graphql-engine:v1.2.1.cli-migrations-v2
+  depends_on:
+    - 'postgres'
+  restart: always
+  env_file: .env
+  ports:
+    - '8080:8080'
+  volumes:
+    - [path-to]/hasura-backend-plus/migrations:/hasura-migrations
+    - [path-to]/hasura-backend-plus/metadata:/hasura-metadata
+```
 
 ### Migrating from HBP v1
 
@@ -45,15 +53,70 @@ Hasura Backend Plus v2 introduces some brand new features, coming with some brea
 - The Storage module have been completely rewritten. <!-- TODO link to storage -->
 - The refresh token is now stored in an [HTTP cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) <!-- TODO link to refresh token / cookies system -->
 
-If you are upgrading HBP v1 to v2, you need to set `AUTO_MIGRATE` accordingly:
+To upgrade from v1 to v2:
+
+::: tip
+We'll be using the [Hasura CLI](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/index.html). Make sure it's installed on your computer.
+:::
+
+::: tip
+All user and account data will be copied to the new v2 schema and work out of the box.
+:::
+
+1. Make sure you have backed up your database!
+
+2. Download HBP locally and change directory
 
 ```sh
-AUTO_MIGRATE=v1
+git clone git@github.com:nhost/hasura-backend-plus.git
+cd hasura-backend-plus
 ```
 
-The first time HBP starts, it will then transform the legacy HBP v1 schema and metadata into the v2 ones, and load the account data.
+3. Create empty `config.yaml` file.
 
-Please note that your users will be disconnected during the process.
+```sh
+touch config.yaml
+```
+
+4. Re order the directories so we'll be using the `migrations-v1` directory.
+
+```sh
+rm -rf migrations
+mv migrations-v1 migrations
+```
+
+5. Apply migrations
+
+Note: `[endpoint]` should not include `/v1/graphql`.
+
+```sh
+hasura migrate apply --endpoint=[endpoint] --admin-secret=[admin-secret]
+```
+
+6. Clean up
+
+```sh
+cd ..
+rm -rf hasura-backend-plus
+```
+
+You have now migrated from HBP v1 to HBP v2 schema. You can no start using HBP v2!
+
+### Experimental
+
+HBP can apply migrations automatically on startup. Both from a zero to version 2. And from version 1 to version 2. However, this is a experimental feature and it's not recommended to be used in production since it could lead to unwanted side effects.
+
+::: tip
+The HBP migration system relies on [Hasura CLI](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/index.html) and uses a [v1 migrations/metadata configuration](https://hasura.io/docs/1.0/graphql/manual/migrations/config-v1/index.html), as the config v2 doesn't allow metadata incremental change (yet?).
+:::
+
+By default, HBP does not checks when starting if its schema is already present in the database. If not, it runs the necessary SQL migrations and loads the related Hasura metadata, while keeping the existing database and Hasura metadata unchanged.
+
+<!-- TODO link to the database schema -->
+
+You can disable this automatic check and migration system by setting `AUTO_MIGRATE=false`.
+
+If you want to upgrading HBP v1 to v2, you can set `AUTO_MIGRATE=v1` and restart HBP. HBP will then upgrade the database and Hasura for HBPv2. All user and account data will be placed correctly in the new v2 schema.
 
 ## Registration
 

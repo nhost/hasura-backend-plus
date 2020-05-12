@@ -92,6 +92,8 @@ ALTER TABLE ONLY auth.refresh_tokens
 
 INSERT INTO auth.providers (provider)
     VALUES ('github'), ('facebook'), ('twitter'), ('google'), ('apple'),  ('linkedin'), ('windowslive');
+INSERT INTO auth.roles (role) 
+  SELECT role FROM public.roles;
 INSERT INTO auth.accounts (
     id, 
     created_at, 
@@ -138,8 +140,6 @@ INSERT INTO auth.account_providers (
     auth.user_providers AS user_providers
   JOIN auth.user_accounts AS user_accounts ON user_accounts.user_id = user_providers.user_id
 ;
-INSERT INTO auth.roles (role) 
-  SELECT role FROM public.roles;
 INSERT INTO auth.account_roles (id, created_at, account_id, role) 
   SELECT 
     user_roles.id,
