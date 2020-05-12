@@ -13,7 +13,7 @@ export const PORT = castIntEnv('PORT', 3000)
 export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
 
 const autoMigrateSettings = (envVal?: string): boolean | string => {
-  if (envVal?.toLowerCase() === 'false') return false
+  if (envVal?.toLowerCase() === 'true') return true
   if (envVal?.toLowerCase() === 'v1') return 'v1'
   return false
 }
