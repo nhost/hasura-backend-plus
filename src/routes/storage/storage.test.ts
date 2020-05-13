@@ -8,22 +8,16 @@ import { promisify } from 'util'
 const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 let fileToken: string
-const initialDescription = 'description of the file'
-const newDescription = 'new description'
 
 it('should upload a new file', async () => {
   const {
     status,
     body: {
-      Metadata: { token, description }
+      Metadata: { token }
     }
-  } = await request
-    .post(`/storage/o/user/${getUserId()}/${filePath}`)
-    .query({ description: initialDescription })
-    .attach('file', filePath)
+  } = await request.post(`/storage/o/user/${getUserId()}/${filePath}`).attach('file', filePath)
   expect(status).toEqual(200)
   expect(token).toBeString()
-  expect(description).toBe(initialDescription)
   fileToken = token
 })
 
@@ -73,23 +67,23 @@ describe('Tests as an unauthenticated user', () => {
   // TODO attempt to get the file from another authenticated user
 })
 
-it(`should update an existing file's metadata`, async () => {
-  const { status } = await request
-    .post(`/storage/m/user/${getUserId()}/${filePath}`)
-    .query({ description: newDescription })
-  expect(status).toEqual(200)
-})
+// it(`should update an existing file's metadata`, async () => {
+//   const { status } = await request
+//     .post(`/storage/m/user/${getUserId()}/${filePath}`)
+//     .query({ description: newDescription })
+//   expect(status).toEqual(200)
+// })
 
 it('should get file metadata', async () => {
   const {
     status,
     body: {
-      Metadata: { filename, description }
+      Metadata: { filename, token }
     }
   } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
   expect(status).toEqual(200)
   expect(filename).toEqual(filePath)
-  expect(description).toEqual(newDescription)
+  expect(token).toEqual(fileToken)
 })
 
 it('should get the headers of all the user files', async () => {
@@ -105,20 +99,20 @@ it('should get a zip that contains all user files', async () => {
   // TODO unzip and compare the file(s)
 })
 
-it('should delete file metadata', async () => {
-  const { status } = await request.delete(`/storage/m/user/${getUserId()}/${filePath}`)
-  expect(status).toEqual(204)
-  const {
-    status: getStatus,
-    body: {
-      Metadata: { filename, token, description }
-    }
-  } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
-  expect(getStatus).toEqual(200)
-  expect(filename).toBeUndefined()
-  expect(token).toBeString()
-  expect(description).toBeUndefined()
-})
+// it('should delete file metadata', async () => {
+//   const { status } = await request.delete(`/storage/m/user/${getUserId()}/${filePath}`)
+//   expect(status).toEqual(204)
+//   const {
+//     status: getStatus,
+//     body: {
+//       Metadata: { filename, token, description }
+//     }
+//   } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
+//   expect(getStatus).toEqual(200)
+//   expect(filename).toBeUndefined()
+//   expect(token).toBeString()
+//   expect(description).toBeUndefined()
+// })
 
 it('should delete file', async () => {
   const { status } = await request.delete(`/storage/m/user/${getUserId()}/${filePath}`)
