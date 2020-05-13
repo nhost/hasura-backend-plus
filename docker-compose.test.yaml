@@ -1,6 +1,7 @@
 version: '3.6'
 services:
   hasura-backend-plus:
+    command: yarn run test
     build:
       context: .
       dockerfile: Dockerfile.dev
