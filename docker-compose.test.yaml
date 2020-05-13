@@ -3,7 +3,7 @@ services:
   hasura-backend-plus:
     build:
       context: .
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.dev
     env_file: '.env.test'
     depends_on:
       - 'mailhog'
