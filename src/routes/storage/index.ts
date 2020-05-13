@@ -2,8 +2,7 @@ import { OBJECT_PREFIX, META_PREFIX, STORAGE_RULES, PathConfig, containsSomeRule
 import { NextFunction, Request, Response, Router } from 'express'
 
 import { deleteFile } from './delete'
-import { listFile } from './list'
-import { getFile } from './get'
+import { listGet } from './list_get'
 import { uploadFile } from './upload'
 
 const router = Router()
@@ -29,15 +28,7 @@ const createRoutes = (
 
   // read, get, list
   if (containsSomeRule(rules, ['read', 'get', 'list'])) {
-    if (path.endsWith('/')) {
-      middleware.get(path, createSecureMiddleware(listFile, rules, isMetadataRequest))
-    } else {
-      middleware.get(path, createSecureMiddleware(getFile, rules, isMetadataRequest))
-      middleware.get(
-        path.substring(0, path.lastIndexOf('/')),
-        createSecureMiddleware(listFile, rules, isMetadataRequest)
-      )
-    }
+    middleware.get(path, createSecureMiddleware(listGet, rules, isMetadataRequest))
   }
 
   // write, delete
