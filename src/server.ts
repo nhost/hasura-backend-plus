@@ -10,11 +10,11 @@ import morgan from 'morgan'
 import { limiter } from './limiter'
 import router from './routes'
 import passport from 'passport'
-import listEndpoints from 'express-list-endpoints'
 
 const app = express()
 
 if (process.env.NODE_ENV === 'production') {
+  console.log('limit on!!!??')
   app.use(limiter)
 }
 
@@ -39,7 +39,5 @@ if (COOKIE_SECRET) {
 
 app.use(router)
 app.use(errors)
-
-console.log(listEndpoints(app))
 
 export { app }

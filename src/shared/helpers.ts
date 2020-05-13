@@ -115,14 +115,6 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
 
 export const getPermissionVariablesFromCookie = (req: Request): PermissionVariables => {
   const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
-
-  console.log(req.signedCookies)
-  console.log(req.cookies)
-
   if (!permission_variables) throw Boom.unauthorized()
-
-  console.log('Permission variables:')
-  console.log(permission_variables)
-
   return JSON.parse(permission_variables)
 }
