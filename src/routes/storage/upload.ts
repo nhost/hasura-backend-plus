@@ -39,7 +39,7 @@ export const uploadFile = async (
       ContentType: resource.mimetype,
       Metadata: {
         filename: resource.name,
-        token: uuidv4()
+        token: oldHeadObject?.Metadata?.token || uuidv4()
       }
     }
     try {
@@ -49,7 +49,7 @@ export const uploadFile = async (
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {
-    throw Boom.badRequest('Setting metadata is not implemented')
+    throw Boom.notImplemented('Setting metadata is not implemented')
     // await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
   return res.status(200).send(await getHeadObject(req))
