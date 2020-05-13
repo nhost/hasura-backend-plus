@@ -14,7 +14,6 @@ import passport from 'passport'
 const app = express()
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('limit on!!!??')
   app.use(limiter)
 }
 
