@@ -86,8 +86,11 @@ export const createContext = (
 ): object => {
   let auth
   try {
+    console.log('trying to get permission variables from cookie')
+
     auth = getPermissionVariablesFromCookie(req)
   } catch (err) {
+    console.log('auth undefined')
     auth = undefined
   }
 
@@ -108,6 +111,13 @@ export const createContext = (
 }
 
 export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
+  console.log(rules)
+
+  rules.forEach((rule) => {
+    console.log({ rule })
+    console.log({ context })
+  })
+
   return rules.some((rule) => rule && !!safeEval(rule, context))
 }
 

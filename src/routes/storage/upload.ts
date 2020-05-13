@@ -23,6 +23,8 @@ export const uploadFile = async (
   isMetadataRequest = false,
   metadata: object = {}
 ): Promise<unknown> => {
+  console.log({ metadata })
+
   const key = getKey(req)
 
   const oldHeadObject = await getHeadObject(req, true)
@@ -34,6 +36,9 @@ export const uploadFile = async (
 
   const resource = req.files?.file as UploadedFile
   const context = createContext(req, resource)
+
+  console.log({ isNew })
+  console.log({ context })
 
   if (!hasPermission(isNew ? [rules.create, rules.write] : [rules.update, rules.write], context)) {
     throw Boom.forbidden()
@@ -61,6 +66,8 @@ export const uploadFile = async (
     }
   } else if (!isNew) {
     // * Update the object metadata. Only possible when the object already exists.
+    console.log('file is not new')
+
     await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
   return res.status(200).send(await getHeadObject(req))
