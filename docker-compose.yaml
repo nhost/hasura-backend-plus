@@ -1,0 +1,46 @@
+version: '3.6'
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
+  graphql-engine:
+    image: hasura/graphql-engine:v1.2.1
+    depends_on:
+      - 'postgres'
+    restart: always
+    environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/postgres
+      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/auth/jwks"}'
+  hasura-backend-plus:
+    image: nhost/hasura-backend-plus:latest
+    depends_on:
+      - 'graphql-engine'
+      - 'minio'
+    ports:
+      - '3000:3000'
+    environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: '${HASURA_GRAPHQL_ADMIN_SECRET:?HASURA_GRAPHQL_ADMIN_SECRET}'
+      HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: '${S3_BUCKET:-hasura-backend-plus}'
+      S3_ACCESS_KEY_ID: '${S3_ACCESS_KEY_ID:-minio_access_key}'
+      S3_SECRET_ACCESS_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}'
+  minio:
+    image: minio/minio
+    restart: always
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      S3_BUCKET: '${S3_BUCKET:-hasura-backend-plus}'
+      MINIO_ACCESS_KEY: '${S3_ACCESS_KEY_ID:-minio_access_key}' ## min 8 character
+      MINIO_SECRET_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}' ## min 8 character
+    entrypoint: sh
+    command: "-c 'mkdir -p /export/$${S3_BUCKET:-hasura-backend-plus} && /usr/bin/minio server /export'"
+volumes:
+  db_data:
+  minio_data:
