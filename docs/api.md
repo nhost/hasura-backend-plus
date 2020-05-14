@@ -1,40 +1,47 @@
 # API
 
-| Category                          | Path                                                      | Description          |
-| --------------------------------- | --------------------------------------------------------- | -------------------- |
-| [Authentication](#authentication) | [POST /auth/register](#registration)                      | Account registration |
-| ^^                                | [POST /auth/login](#login)                                | Login                |
-| ^^                                | [GET /auth/jwks](#jwks)                                   | JWK Set              |
-| ^^                                | [POST /auth/activate](#activation)                        | Activate account     |
-| ^^                                | [POST /auth/delete](#delete-account)                      | Delete account       |
-| ^^                                | [POST /auth/change-password/request](#forgotten-password) | Forgotten password   |
-| ^^                                | [POST /auth/change-password/change](#reset-password)      | Reset password       |
-| ^^                                | [POST /auth/change-email/request](#)                      |                      |
-| ^^                                | [POST /auth/change-email/change](#)                       |                      |
-| ^^                                | [POST /auth/token/refresh](#refresh-token)                | Refresh token        |
-| ^^                                | [POST /auth/token/revoke](#revoke-token)                  | Revoke token         |
-| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)          | Generate MFA QR code |
-| ^^                                | [POST /auth/mfa/enable](#enable-mfa)                      | Enable MFA           |
-| ^^                                | [POST /auth/mfa/disable](#disable-mfa)                    | Disable MFA          |
-| ^^                                | [POST /auth/mfa/totp](#totp)                              | TOTP                 |
-| [Storage](storage)                | [GET /storage/<custom-rule>](#)                           |                      |
-| ^^                                | [POST /storage/<custom-rule>](#)                          |                      |
-| ^^                                | [DELETE /storage/<custom-rule>](#)                        |                      |
-| ^^                                | [GET /storage/meta/<custom-rule>](#)                      |                      |
-| ^^                                | [POST /storage/meta/<custom-rule>](#)                     |                      |
-| ^^                                | [DELETE /storage/meta/<custom-rule>](#)                   |                      |
-| [Other](#other)                   | [GET /healthz](#health-check)                             | Health Check         |
+| Category                          | Endpoint                                                       | Description                               |
+| --------------------------------- | -------------------------------------------------------------- | ----------------------------------------- |
+| [Authentication](#authentication) | [POST /auth/register](#registration)                           | Account registration                      |
+| ^^                                | [POST /auth/login](#login)                                     | Login                                     |
+| ^^                                | [POST /auth/logout](#logout)                                   | Logout                                    |
+| ^^                                | [GET /auth/jwks](#jwks)                                        | JWK Set                                   |
+| ^^                                | [POST /auth/activate](#activate-account)                       | Activate account                          |
+| ^^                                | [POST /auth/delete](#delete-account)                           | Delete account                            |
+| ^^                                | [POST /auth/change-password/](#change-password)                | Change password                           |
+| ^^                                | [POST /auth/change-password/request](#change-password-request) | Request to change password password       |
+| ^^                                | [POST /auth/change-password/change](#change-password-change)   | Change password                           |
+| ^^                                | [POST /auth/change-email/](#)                                  | Change email (without email verification) |
+| ^^                                | [POST /auth/change-email/request](#)                           | Request email change                      |
+| ^^                                | [POST /auth/change-email/change](#)                            | Change email                              |
+| ^^                                | [POST /auth/token/refresh](#refresh-token)                     | Get new refresh token                     |
+| ^^                                | [POST /auth/token/revoke](#revoke-refresh-token)               | Revoke tokens                             |
+| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)               | Generate MFA QR code                      |
+| ^^                                | [POST /auth/mfa/enable](#enable-mfa)                           | Enable MFA                                |
+| ^^                                | [POST /auth/mfa/disable](#disable-mfa)                         | Disable MFA                               |
+| ^^                                | [POST /auth/mfa/totp](#totp)                                   | TOTP                                      |
+| [Storage](storage)                | [GET /storage/o/\<rule-path\>](#)                              | Get file                                  |
+| ^^                                | [GET /storage/m/\<rule-path\>](#)                              | Get metadata of file                      |
+| ^^                                | [GET /storage/o/\<rule-path\>/](#)                             | Get zip of all files in directory         |
+| ^^                                | [GET /storage/m/\<rule-path\>/](#)                             | Get metadata of all files in direcotry    |
+| ^^                                | [POST /storage/\<rule-path\>](#)                               | Upload a file                             |
+| ^^                                | [DELETE /storage/\<rule-path\>](#)                             | Delete a file                             |
+| [Other](#other)                   | [GET /healthz](#health-check)                                  | Health Check                              |
 
 ## Authentication
 
 ### Registration
+
+Register a new user.
+
+`POST /auth/register`
 
 #### Request
 
 ```json
 {
   "email": "hello@example.com",
-  "password": "between 6-128 characters"
+  "password": "between MIN_PASSWORD_LENGTH-128 characters"
 }
 ```
 
@@ -44,14 +51,20 @@
 204 No Content
 ```
 
+---
+
 ### Login
 
-###### Request
+Login a user.
+
+`POST /auth/login`
+
+#### Request
 
 ```json
 {
   "email": "hello@example.com",
-  "password": "between 6-128 characters"
+  "password": "secretpassword"
 }
 ```
 
@@ -59,19 +72,77 @@
 
 ```
 Set-Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
 ```
 
 ```json
 {
+  "mfa": false,
   "jwt_token": "...",
   "jwt_expires_in": 900000
 }
 ```
 
-> If MFA is enabled for the account, a `ticket` is returned in the JSON response.<br />
-> Proceed authentication by requesting the `/auth/mfa/totp` endpoint (see below).
+If Multi Factor Authentication (MFA) is enabled for the account the following response body is returned:
 
-### Activation
+```json
+{
+  "mfa": true,
+  "ticket": "..."
+}
+```
+
+For login with MFA, proceed authentication by requesting the [TOTP](#totp) `/auth/mfa/totp` endpoint.
+
+---
+
+### Logout
+
+Logout a user.
+
+`POST /auth/logout`
+
+#### Request
+
+```
+<empty>
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+---
+
+### JWK
+
+JWK. This endpoint is active if env var `JWT_ALGORITHM` is one of `['RS256', 'RS384', 'RS512']`.
+
+`GET /auth/jwks`
+
+#### Request
+
+```
+<empty>
+```
+
+#### Response
+
+```json
+{
+  "keys": [...]
+}
+```
+
+---
+
+### Activate account
+
+Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=false` (default `true`).
+
+`POST /auth/activate`
 
 #### Request
 
@@ -87,18 +158,18 @@ Set-Cookie: refresh_token=...
 204 No Content
 ```
 
-### JWKS
+---
 
-#### Request
+### Delete Account
 
-#### Response
+Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true` (default `false`).
 
-### Delete account
+`POST /auth/delete`
 
 #### Request
 
 ```
-Authorization: Bearer ...
+<empty>
 ```
 
 #### Response
@@ -107,14 +178,20 @@ Authorization: Bearer ...
 204 No Content
 ```
 
-### Forgotten password
+---
+
+### Change password
+
+Change password of an account. The user must be logged in for this endpoint to work.
+
+`POST /auth/change-password/`
 
 #### Request
 
 ```json
 {
-  "ticket": "6a135423-85c8-4c99-b9ca-3a0108202255",
-  "new_password": "between 6-128 characters"
+  "old_password": "secretpassword",
+  "new_password": "newsecretpassword"
 }
 ```
 
@@ -124,14 +201,106 @@ Authorization: Bearer ...
 204 No Content
 ```
 
-### Reset password
+---
+
+### Change Password Request
+
+Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+
+::: warning
+This endpoint will always return HTTP status code 204 in order to not leak information about the database.
+:::
+
+`POST /auth/change-password/request`
 
 #### Request
 
 ```json
 {
-  "ticket": "6a135423-85c8-4c99-b9ca-3a0108202255",
-  "new_password": "between 6-128 characters"
+  "email": "hello@example.com"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+### Change Password Change
+
+Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+
+`POST /auth/change-password/change`
+
+#### Request
+
+```json
+{
+  "ticket": "uuid",
+  "new_password": "newsecretpassword"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+---
+
+### Change Email
+
+Change email without email verification as a logged in user. This endpoint is only active if env var `VARIFY_EMAILS=false` (default ``).
+
+`POST /auth/change-email/`
+
+#### Request
+
+```json
+{
+  "new_email": "new-hello@example.com"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+### Change Email Request
+
+Send request for the new email that the account wants to change to. This endpoint is only active if `VERIFY_EMAILS=true`.
+
+`POST /auth/change-email/request`
+
+#### Request
+
+```json
+{
+  "new_email": "new-hello@example.com"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+### Change Email Change
+
+Change email to the new email that you specified in [Change Email Request](#change-email-request). This endpoint is only active if `VERIFY_EMAILS=true`.
+
+`POST /auth/change-email/change`
+
+#### Request
+
+```json
+{
+  "ticket": "uuid-ticket"
 }
 ```
 
@@ -142,6 +311,10 @@ Authorization: Bearer ...
 ```
 
 ### Refresh token
+
+Get new refresh token. The browser will send the cookie automatically.
+
+`POST /auth/token/refresh`
 
 #### Request
 
@@ -157,17 +330,23 @@ Set-Cookie: refresh_token=...
 
 ```json
 {
-  "jwt_token": "...",
+  "jwt_token": "token",
   "jwt_expires_in": 900000
 }
 ```
 
-### Revoke token
+---
+
+### Revoke Refresh Token
+
+Revoke a refresh token.
+
+`POST /auth/token/revoke/`
 
 #### Request
 
 ```
-Authorization: Bearer ...
+Cookie: refresh_token=...
 ```
 
 #### Response
@@ -176,30 +355,30 @@ Authorization: Bearer ...
 204 No Content
 ```
 
+---
+
 ### Generate MFA QR code
 
 #### Request
 
 ```
-Authorization: Bearer ...
+<empty>
 ```
 
 #### Response
 
 ```json
 {
-  "image_url": "...",
+  "image_url": "base64_data_image_of_qe_code",
   "otp_secret": "..."
 }
 ```
 
 ### Enable MFA
 
-#### Request
+Enable Multi Factor Authentication.
 
-```
-Authorization: Bearer ...
-```
+#### Request
 
 ```json
 {
@@ -215,15 +394,13 @@ Authorization: Bearer ...
 
 ### Disable MFA
 
-#### Request
+Disable Multi Facetor Authentication.
 
-```
-Authorization: Bearer ...
-```
+#### Request
 
 ```json
 {
-  "code": "109509"
+  "code": "code-from-mfa-client"
 }
 ```
 
@@ -235,12 +412,14 @@ Authorization: Bearer ...
 
 ### TOTP
 
+Time-based One-time Password. Use the `ticket` from [Login](#login) that is returned if the account has activated MFA.
+
 #### Request
 
 ```json
 {
-  "code": "364124",
-  "ticket": "259878d6-87be-4729-a3cc-53548f7ff72c"
+  "code": "code-from-mfa-client",
+  "ticket": "uuid-ticket"
 }
 ```
 
@@ -252,21 +431,25 @@ Set-Cookie: refresh_token=...
 
 ```json
 {
-  "jwt_token": "...",
+  "jwt_token": "jwt-token",
   "jwt_expires_in": 900000
 }
 ```
 
 ## Storage
 
-## Other
+TODO
+
+---
 
 ### Health Check
 
 Simple health check.
 
+`GET /healthz`
+
 #### Response
 
 ```
-OK
+200 OK
 ```
