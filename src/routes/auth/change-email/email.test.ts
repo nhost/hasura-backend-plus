@@ -12,10 +12,7 @@ let ticket: string
 const new_email = `${generateRandomString()}@${generateRandomString()}.com`
 
 it('should request to change email', async () => {
-  const { status } = await request
-    .post('/auth/change-email/request')
-    .set('Authorization', `Bearer ${account.token}`)
-    .send({ new_email })
+  const { status } = await request.post('/auth/change-email/request').send({ new_email })
   expect(status).toBe(204)
 })
 
@@ -29,10 +26,7 @@ it('should receive a ticket by email', async () => {
 })
 
 it('should change the email from a ticket', async () => {
-  const { status } = await request
-    .post('/auth/change-email/change')
-    .set('Authorization', `Bearer ${account.token}`)
-    .send({ ticket })
+  const { status } = await request.post('/auth/change-email/change').send({ ticket })
   expect(status).toEqual(204)
 })
 

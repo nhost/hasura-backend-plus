@@ -1,15 +1,14 @@
 module.exports = {
-  globalSetup: './src/test/setup.ts',
-  globalTeardown: './src/test/teardown.ts',
-  testEnvironment: './src/test/puppeteer_environment.js',
+  globalSetup: './src/test/jest-global-setup.ts',
   verbose: true,
   moduleNameMapper: {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@test/(.*)$': '<rootDir>/src/test/$1'
   },
   testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/'],
-  setupFilesAfterEnv: ['expect-puppeteer', 'jest-extended'],
-  transform: {
-    '^.+\\.ts?$': 'ts-jest'
-  }
+  setupFilesAfterEnv: ['jest-extended'],
+  // transform: {
+  //   '^.+\\.ts?$': 'ts-jest'
+  // }
+  preset: 'ts-jest'
 }

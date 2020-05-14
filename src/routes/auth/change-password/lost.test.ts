@@ -11,7 +11,6 @@ describeIfSecurePasswordChange('Reset lost password', () => {
   it('should request a reset ticket to be sent by email', async () => {
     const { status } = await request
       .post('/auth/change-password/lost')
-      .set('Authorization', `Bearer ${account.token}`)
       .send({ email: account.email })
     expect(status).toBe(204)
   })
