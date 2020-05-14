@@ -117,7 +117,7 @@ it('should get the headers of all the user files', async () => {
 })
 
 it('should get a zip that contains all user files', async () => {
-  const { status, text } = await request.get(`/storage/m/user/${getUserId()}/`)
+  const { status, text } = await request.get(`/storage/o/user/${getUserId()}/`)
   expect(status).toEqual(200)
   expect(text).toBeTruthy()
   // TODO unzip and compare the file(s)
