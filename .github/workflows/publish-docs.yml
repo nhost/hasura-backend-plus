@@ -1,7 +1,7 @@
 name: Publish documentation
 on:
   push:
-    branches: [v2]
+    branches: [master]
     paths:
       - 'docs/**'
 jobs:
@@ -31,4 +31,4 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: docs/.vuepress/dist
-          BASE_BRANCH: v2
+          BASE_BRANCH: master
