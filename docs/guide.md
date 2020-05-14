@@ -31,7 +31,7 @@ Everything should be up and running. HBP is listening to `http://localhost:3000`
 
 You can then run the Hasura Console in following the [official instructions](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/hasura_console.html).
 
-If you want to get a more advanced example in using an S3-compatible Object Storage, see the [Minio example](recipes#minio) in the recipes.
+<!-- If you want to get a more advanced example in using an S3-compatible Object Storage, see the [Minio example](recipes#minio) in the recipes. -->
 
 ### Standalone
 
