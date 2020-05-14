@@ -7,7 +7,6 @@ it('should change the password from the old password', async () => {
   const new_password = generateRandomString()
   const { status } = await request
     .post('/auth/change-password')
-    .set('Authorization', `Bearer ${account.token}`)
     .send({ old_password: account.password, new_password })
   account.password = new_password
   expect(status).toEqual(204)

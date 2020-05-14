@@ -13,7 +13,7 @@
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "ts-node -r tsconfig-paths/register src/start.ts",
-    "test": "NODE_ENV=test jest --coverage --forceExit",
+    "test": "NODE_ENV=test jest --coverage --forceExit --runInBand",
     "test:ci": "NODE_ENV=ci jest --coverage --forceExit --runInBand",
     "test:watch": "NODE_ENV=test jest --watch",
     "report-coverage": "codecov"

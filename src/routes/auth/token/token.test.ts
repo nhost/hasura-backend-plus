@@ -1,6 +1,6 @@
 import 'jest-extended'
 
-import { account, request } from '@test/test-mock-account'
+import { request } from '@test/test-mock-account'
 
 it('should refresh the token', async () => {
   const { body, status } = await request.post('/auth/token/refresh')
@@ -12,9 +12,7 @@ it('should refresh the token', async () => {
 })
 
 it('should revoke the token', async () => {
-  const { status } = await request
-    .post('/auth/token/revoke')
-    .set('Authorization', `Bearer ${account.token}`)
+  const { status } = await request.post('/auth/token/revoke')
 
   expect(status).toEqual(204)
 })
