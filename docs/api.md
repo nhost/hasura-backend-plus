@@ -20,23 +20,23 @@
 | ^^                                | [POST /auth/mfa/enable](#enable-mfa)                           | Enable MFA                                |
 | ^^                                | [POST /auth/mfa/disable](#disable-mfa)                         | Disable MFA                               |
 | ^^                                | [POST /auth/mfa/totp](#totp)                                   | TOTP                                      |
-| [Storage](storage)                | [GET /storage/o/\<rule-path\>](#)                              | Get file                                  |
-| ^^                                | [GET /storage/m/\<rule-path\>](#)                              | Get metadata of file                      |
-| ^^                                | [GET /storage/o/\<rule-path\>/](#)                             | Get zip of all files in directory         |
-| ^^                                | [GET /storage/m/\<rule-path\>/](#)                             | Get metadata of all files in direcotry    |
-| ^^                                | [POST /storage/o/\<rule-path\>](#)                             | Upload a file                             |
-| ^^                                | [DELETE /storage/o/\<rule-path\>](#)                           | Delete a file                             |
+| [Storage](storage)                | [GET /storage/o/\<rule-path\>](#file)                          | Get file                                  |
+| ^^                                | [GET /storage/m/\<rule-path\>](#file-metadata)                 | Get metadata of file                      |
+| ^^                                | [GET /storage/o/\<rule-path\>/](#file-directory)               | Get zip of all files in directory         |
+| ^^                                | [GET /storage/m/\<rule-path\>/](#file-directory-metadata)      | Get metadata of all files in direcotry    |
+| ^^                                | [POST /storage/o/\<rule-path\>](#upload-file)                  | Upload a file                             |
+| ^^                                | [DELETE /storage/o/\<rule-path\>](#delete-file)                | Delete a file                             |
 | [Other](#other)                   | [GET /healthz](#health-check)                                  | Health Check                              |
 
 ## Authentication
 
 ### Registration
 
-Register a new user.
-
-`POST /auth/register`
+Register a new account.
 
 #### Request
+
+`POST /auth/register`
 
 ```json
 {
@@ -55,11 +55,11 @@ Register a new user.
 
 ### Login
 
-Login a user.
-
-`POST /auth/login`
+Login an account.
 
 #### Request
+
+`POST /auth/login`
 
 ```json
 {
@@ -98,11 +98,11 @@ For login with MFA, proceed authentication by requesting the [TOTP](#totp) `/aut
 
 ### Logout
 
-Logout a user.
-
-`POST /auth/logout`
+Logout an account.
 
 #### Request
+
+`POST /auth/logout`
 
 ```
 <empty>
@@ -120,9 +120,9 @@ Logout a user.
 
 JWK. This endpoint is active if env var `JWT_ALGORITHM` is one of `['RS256', 'RS384', 'RS512']`.
 
-`GET /auth/jwks`
-
 #### Request
+
+`GET /auth/jwks`
 
 ```
 <empty>
@@ -142,9 +142,9 @@ JWK. This endpoint is active if env var `JWT_ALGORITHM` is one of `['RS256', 'RS
 
 Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=false` (default `true`).
 
-`POST /auth/activate`
-
 #### Request
+
+`POST /auth/activate`
 
 ```json
 {
@@ -164,9 +164,9 @@ Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=fa
 
 Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true` (default `false`).
 
-`POST /auth/delete`
-
 #### Request
+
+`POST /auth/delete`
 
 ```
 <empty>
@@ -182,11 +182,11 @@ Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true`
 
 ### Change password
 
-Change password of an account. The user must be logged in for this endpoint to work.
-
-`POST /auth/change-password/`
+Change password of an account. The account must be logged in for this endpoint to work.
 
 #### Request
+
+`POST /auth/change-password/`
 
 ```json
 {
@@ -211,9 +211,9 @@ Request to change password. This endpoint is active if env var `LOST_PASSWORD_EN
 This endpoint will always return HTTP status code 204 in order to not leak information about the database.
 :::
 
-`POST /auth/change-password/request`
-
 #### Request
+
+`POST /auth/change-password/request`
 
 ```json
 {
@@ -231,9 +231,9 @@ This endpoint will always return HTTP status code 204 in order to not leak infor
 
 Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
 
-`POST /auth/change-password/change`
-
 #### Request
+
+`POST /auth/change-password/change`
 
 ```json
 {
@@ -252,11 +252,11 @@ Change password based on a ticket. This endpoint is active if env var `LOST_PASS
 
 ### Change Email
 
-Change email without email verification as a logged in user. This endpoint is only active if env var `VARIFY_EMAILS=false` (default ``).
-
-`POST /auth/change-email/`
+Change email without email verification as a logged in account. This endpoint is only active if env var `VARIFY_EMAILS=false` (default ``).
 
 #### Request
+
+`POST /auth/change-email/`
 
 ```json
 {
@@ -274,9 +274,9 @@ Change email without email verification as a logged in user. This endpoint is on
 
 Send request for the new email that the account wants to change to. This endpoint is only active if `VERIFY_EMAILS=true`.
 
-`POST /auth/change-email/request`
-
 #### Request
+
+`POST /auth/change-email/request`
 
 ```json
 {
@@ -294,9 +294,9 @@ Send request for the new email that the account wants to change to. This endpoin
 
 Change email to the new email that you specified in [Change Email Request](#change-email-request). This endpoint is only active if `VERIFY_EMAILS=true`.
 
-`POST /auth/change-email/change`
-
 #### Request
+
+`POST /auth/change-email/change`
 
 ```json
 {
@@ -314,9 +314,9 @@ Change email to the new email that you specified in [Change Email Request](#chan
 
 Get new refresh token. The browser will send the cookie automatically.
 
-`POST /auth/token/refresh`
-
 #### Request
+
+`POST /auth/token/refresh`
 
 ```
 Cookie: refresh_token=...
@@ -341,9 +341,9 @@ Set-Cookie: refresh_token=...
 
 Revoke a refresh token.
 
-`POST /auth/token/revoke/`
-
 #### Request
+
+`POST /auth/token/revoke/`
 
 ```
 Cookie: refresh_token=...
@@ -360,6 +360,8 @@ Cookie: refresh_token=...
 ### Generate MFA QR code
 
 #### Request
+
+`POST /auth/mfa/generate`
 
 ```
 <empty>
@@ -380,6 +382,8 @@ Enable Multi Factor Authentication.
 
 #### Request
 
+`POST /auth/mfa/enable`
+
 ```json
 {
   "code": "892723"
@@ -398,6 +402,8 @@ Disable Multi Facetor Authentication.
 
 #### Request
 
+`POST /auth/mfa/disable`
+
 ```json
 {
   "code": "code-from-mfa-client"
@@ -415,6 +421,8 @@ Disable Multi Facetor Authentication.
 Time-based One-time Password. Use the `ticket` from [Login](#login) that is returned if the account has activated MFA.
 
 #### Request
+
+`POST /auth/mfa/totp`
 
 ```json
 {
@@ -438,13 +446,156 @@ Set-Cookie: refresh_token=...
 
 ## Storage
 
-TODO
+### File
+
+Get file
+
+#### Request
+
+`GET /storage/o/<path-to-file>`
+
+#### Response
+
+```
+<file>
+```
+
+---
+
+### File metadata
+
+Get file metadata.
+
+#### Request
+
+`GET /storage/m/<path-to-file>`
+
+#### Response
+
+```json
+{
+  "key": "<path-to-file>",
+  "AcceptRanges": "bytes",
+  "LastModified": "2020-01-01T01:02:03.000Z",
+  "ContentLength": 12345,
+  "ETag": "Etag",
+  "ContentType": "<content-type>",
+  "Metadata": {
+    "filename": "<original-file-name>",
+    "token": "<auto-generated-access-token-uuid>"
+  }
+}
+```
+
+---
+
+### File directory
+
+Get zip of all files in directory.
+
+#### Request
+
+`GET /storage/o/<path-to-folder>/`
+
+#### Response
+
+```
+Downloadable list.zip file
+```
+
+---
+
+---
+
+### File directory metadata
+
+Get zip of all files in directory.
+
+#### Request
+
+`GET /storage/m/<path-to-folder>/`
+
+#### Response
+
+```json
+[
+  {
+    "key": "<path-to-file>",
+    "AcceptRanges": "bytes",
+    "LastModified": "2020-01-01T01:02:03.000Z",
+    "ContentLength": 12345,
+    "ETag": "Etag",
+    "ContentType": "<content-type>",
+    "Metadata": {
+      "filename": "<original-file-name>",
+      "token": "<auto-generated-access-token-uuid>"
+    }
+  },
+  {
+    "key": "<other-path-to-file>",
+    "AcceptRanges": "bytes",
+    "LastModified": "2020-05-04T03:02:01.000Z",
+    "ContentLength": 54321,
+    "ETag": "Etag",
+    "ContentType": "<content-type>",
+    "Metadata": {
+      "filename": "<other-original-file-name>",
+      "token": "<auto-generated-access-token-uuid>"
+    }
+  }
+]
+```
+
+---
+
+### Upload file
+
+Upload, or overwrite, a file.
+
+#### Request
+
+`POST /storage/o/<path-to-file>/`
+
+#### Response
+
+```json
+{
+  "key": "<path-to-file>",
+  "AcceptRanges": "bytes",
+  "LastModified": "2020-01-01T01:02:03.000Z",
+  "ContentLength": 12345,
+  "ETag": "Etag",
+  "ContentType": "<content-type>",
+  "Metadata": {
+    "filename": "<original-file-name>",
+    "token": "<auto-generated-access-token-uuid>"
+  }
+}
+```
+
+---
+
+### Delete file
+
+Delete a file.
+
+#### Request
+
+`DELETE /storage/o/<path-to-file>/`
+
+#### Response
+
+```json
+204 No Content
+```
 
 ---
 
 ### Health Check
 
 Simple health check.
+
+#### Request
 
 `GET /healthz`
 
@@ -453,5 +604,3 @@ Simple health check.
 ```
 200 OK
 ```
-
-test
