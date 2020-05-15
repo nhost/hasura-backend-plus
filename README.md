@@ -32,12 +32,17 @@ For detailed usage and installation instructions check out the [documentation](h
 
 ## Core Features:
 
-- 👨‍💻 Codebase is written in 100% [TypeScript](https://www.typescriptlang.org).
-- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
 - 🎨 Fully customizable with sensible defaults.
-- 📈 Rate limit your API endpoints by default.
 - 🚀 Easy to setup, can be deployed anywhere.
 - 🔑 Two-factor authentication support.
+- 🔑 Third-party OAuth providers: Google, GitHub, Facebook, Apple, Twitter, Microsoft Live, Linkedin.
+- 📁 Highly customisable storage rules on any S3-compatible instance.
+- 📨 Optional email account verification.
+- 📨 Secure email and password change.
+- 🔑 JWKS endpoint.
+- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- 📈 Rate limiting.
+- 👨‍💻 Written 100% in [TypeScript](https://www.typescriptlang.org).
 
 ## Nhost
 

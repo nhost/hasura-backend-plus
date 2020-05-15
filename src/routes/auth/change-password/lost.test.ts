@@ -10,7 +10,7 @@ describeIfSecurePasswordChange('Reset lost password', () => {
 
   it('should request a reset ticket to be sent by email', async () => {
     const { status } = await request
-      .post('/auth/change-password/lost')
+      .post('/auth/change-password/request')
       .send({ email: account.email })
     expect(status).toBe(204)
   })
@@ -25,7 +25,7 @@ describeIfSecurePasswordChange('Reset lost password', () => {
   })
 
   it('should change the password from a ticket', async () => {
-    const { status } = await request.post('/auth/change-password/reset').send({
+    const { status } = await request.post('/auth/change-password/change').send({
       ticket,
       new_password: account.password
     })

@@ -24,19 +24,22 @@ Then start the services:
 
 ```shell
 export HASURA_GRAPHQL_ADMIN_SECRET=<your Hasura Admin secret>
+export S3_SECRET_ACCESS_KEY=<your Minio access key>
 docker-compose up -d
 ```
 
-Everything should be up and running. HBP is listening to `http://localhost:3000` and Hasura Graphql Engine is listening to `http://localhost:8080`.
+Everything should be up and running. HBP is listening to `http://localhost:3000`, Hasura Graphql Engine is listening to `http://localhost:8080`.
 
 You can then run the Hasura Console in following the [official instructions](https://hasura.io/docs/1.0/graphql/manual/hasura-cli/hasura_console.html).
 
-If you want to get a more advanced example in using an S3-compatible Object Storage, see the [Minio example](recipes#minio) in the recipes.
+<!-- If you want to get a more advanced example in using an S3-compatible Object Storage, see the [Minio example](recipes#minio) in the recipes. -->
 
 ### Standalone
 
 You can also install HBP without any other service, and connect it to an existing Hasura server, and/or an S3 instance if you plan to use the storage features.
 The easiest way is to pull and run a Docker container, but you can also run the service from the source code.
+
+You will also need to make sure the HBP migrations and metadata are loaded in your Hasura instance, either in using the `AUTO_MIGRATE=true` environment variable, or in loading the migrations manually. Please see the [related configuration chapter](configuration.md#migrations) for further details.
 
 #### Using Docker
 
