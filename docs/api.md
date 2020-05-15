@@ -24,8 +24,8 @@
 | ^^                                | [GET /storage/m/\<rule-path\>](#)                              | Get metadata of file                      |
 | ^^                                | [GET /storage/o/\<rule-path\>/](#)                             | Get zip of all files in directory         |
 | ^^                                | [GET /storage/m/\<rule-path\>/](#)                             | Get metadata of all files in direcotry    |
-| ^^                                | [POST /storage/\<rule-path\>](#)                               | Upload a file                             |
-| ^^                                | [DELETE /storage/\<rule-path\>](#)                             | Delete a file                             |
+| ^^                                | [POST /storage/o/\<rule-path\>](#)                             | Upload a file                             |
+| ^^                                | [DELETE /storage/o/\<rule-path\>](#)                           | Delete a file                             |
 | [Other](#other)                   | [GET /healthz](#health-check)                                  | Health Check                              |
 
 ## Authentication
