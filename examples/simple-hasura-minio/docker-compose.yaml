@@ -3,6 +3,8 @@ services:
   postgres:
     image: postgres:12
     restart: always
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
     volumes:
       - db_data:/var/lib/postgresql/data
   graphql-engine:

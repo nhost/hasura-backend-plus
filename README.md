@@ -40,7 +40,7 @@ For detailed usage and installation instructions check out the [documentation](h
 - 📨 Optional email account verification.
 - 📨 Secure email and password change.
 - 🔑 JWKS endpoint.
-- ✅ Optional checking for [Pwned Passwords](#pwned-passwords).
+- ✅ Optional checking for [Pwned Passwords](https://haveibeenpwned.com/Passwords).
 - 📈 Rate limiting.
 - 👨‍💻 Written 100% in [TypeScript](https://www.typescriptlang.org).
 
