@@ -316,7 +316,7 @@ Get new refresh token. The browser will send the cookie automatically.
 
 #### Request
 
-`POST /auth/token/refresh`
+`GET /auth/token/refresh`
 
 ```
 Cookie: refresh_token=...
