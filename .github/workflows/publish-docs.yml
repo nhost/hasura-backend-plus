@@ -4,6 +4,7 @@ on:
     branches: [master]
     paths:
       - 'docs/**'
+      - 'examples/**'
 jobs:
   deploy:
     runs-on: ubuntu-latest
