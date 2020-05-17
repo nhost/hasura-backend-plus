@@ -3,7 +3,7 @@ import 'jest-extended'
 import { request } from '@test/test-mock-account'
 
 it('should refresh the token', async () => {
-  const { body, status } = await request.post('/auth/token/refresh')
+  const { body, status } = await request.get('/auth/token/refresh')
 
   expect(status).toEqual(200)
 

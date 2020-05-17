@@ -14,7 +14,7 @@
 | ^^                                | [POST /auth/change-email/](#)                                  | Change email (without email verification) |
 | ^^                                | [POST /auth/change-email/request](#)                           | Request email change                      |
 | ^^                                | [POST /auth/change-email/change](#)                            | Change email                              |
-| ^^                                | [POST /auth/token/refresh](#refresh-token)                     | Get new refresh token                     |
+| ^^                                | [GET /auth/token/refresh](#refresh-token)                      | Get new refresh token                     |
 | ^^                                | [POST /auth/token/revoke](#revoke-refresh-token)               | Revoke tokens                             |
 | ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)               | Generate MFA QR code                      |
 | ^^                                | [POST /auth/mfa/enable](#enable-mfa)                           | Enable MFA                                |
