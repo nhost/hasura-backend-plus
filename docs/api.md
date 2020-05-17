@@ -320,12 +320,14 @@ Get new refresh token. The browser will send the cookie automatically.
 
 ```
 Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
 ```
 
 #### Response
 
 ```
 Set-Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
 ```
 
 ```json
@@ -347,6 +349,7 @@ Revoke a refresh token.
 
 ```
 Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
 ```
 
 #### Response
@@ -435,6 +438,7 @@ Time-based One-time Password. Use the `ticket` from [Login](#login) that is retu
 
 ```
 Set-Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
 ```
 
 ```json
