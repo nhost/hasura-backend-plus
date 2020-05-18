@@ -4,4 +4,6 @@ export const castBooleanEnv = (envVar: string, defaultValue = false): boolean =>
 export const castIntEnv = (envVar: string, defaultValue: number): number =>
   parseInt(process.env[envVar] as string, 10) || defaultValue
 export const castStringArrayEnv = (envVar: string): string[] =>
-  (process.env[envVar] || '').split(',').map((field) => field.trim())
+  process.env[envVar]?.length
+    ? (process.env[envVar] as string).split(',').map((field) => field.trim())
+    : []
