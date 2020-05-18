@@ -1,9 +1,8 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
-    <img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/logo.png" width="250px" alt="HBP" />
+    <img src="https://github.com/nhost/hasura-backend-plus/raw/v1/assets/logo.png" width="250px" alt="HBP" />
   </a>
 </p>
-
 
 <h3 align="center">Hasura Backend Plus (HBP)</h3>
 <h4 align="center">Auth & Files (S3-compatible Object Storage) for Hasura</h4>
@@ -15,7 +14,6 @@
 The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfect configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
 
 All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
-
 
 [<img src="https://github.com/nhost/hasura-backend-plus/raw/master/assets/nhost-register-button.png" width="200px">](https://nhost.io/register)
 
@@ -117,42 +115,41 @@ Restart your docker containers
 
 ### ENV VARIABLES:
 
-| Name                                   | Default                                   | Description                                                                                                   |
-| -------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `PORT`                                 | `3010`                                    | Express server port                                                                                           |
-| `AUTH_ACTIVE`                          | `true`                                    | Activate authentication                                                                                       |
-| `USER_FIELDS`                          | ``                                        | Specify user table fields (multiple fields as comma-separated) that should be available as `x-hasura-` JWT claims.                                 |
-| `USER_REGISTRATION_AUTO_ACTIVE`        | `false`                                   | Whether new user account should automatically be activated. Accounts that are not active are unable to log in |
-| `JWT_TOKEN_EXPIRES`                    | `15`                                      | Minutes until JWT token expires                                                                               |
-| `REFRESH_TOKEN_EXPIRES`                | `43200` (30 days)                         | Minutes until refresh token expires                                                                           |
-| `AUTH_LOCAL_ACTIVE`                    | `false`                                   | Activate authentication for local accounts                                                                    |
-| `AUTH_ANONYMOUS_USERS_ACTIVE`                    | `false`                                   | Allow anonymous users |
-| `PROVIDERS_SUCCESS_REDIRECT`           | ``                                        | The URL the user should be redirected to on successful signin/signup with a OAuth provider.                   |
-| `PROVIDERS_FAILURE_REDIRECT`           | ``                                        | The URL the user should be redirected to on failed signin/signup with a OAuth provider.                       |
-| `AUTH_GITHUB_ACTIVE`                   | `false`                                   | Activate Github as an OAuth provider                                                                          |
-| `AUTH_GITHUB_CLIENT_ID`                | ``                                        | Github OAuth app Client ID                                                                                    |
-| `AUTH_GITHUB_CLIENT_SECRET`            | ``                                        | Github OAuth app Client Secret                                                                                |
-| `AUTH_GITHUB_CALLBACK_URL`             | ``                                        | Github OAuth app authorization callback URL                                                                   |
-| `AUTH_GITHUB_AUTHORIZATION_URL`        | ``                                        | Github (enterprise) OAuth app authorization url                                                               |
-| `AUTH_GITHUB_TOKEN_URL`                | ``                                        | Github (enterprise) OAuth app token url                                                                       |
-| `AUTH_GITHUB_USER_PROFILE_URL`         | ``                                        | Github (enterprise) OAuth app user profile url                                                                |
-| `AUTH_GOOGLE_ACTIVE`                   | `false`                                   | Activate Google as an OAuth provider                                                                          |
-| `AUTH_GOOGLE_CLIENT_ID`                | ``                                        | Google OAuth app Client ID                                                                                    |
-| `AUTH_GOOGLE_CLIENT_SECRET`            | ``                                        | Google OAuth app Client Secret                                                                                |
-| `AUTH_GOOGLE_CALLBACK_URL`             | ``                                        | Google OAuth app authorization callback URL                                                                   |
-| `AUTH_FACEBOOK_ACTIVE`                 | `false`                                   | Activate Facebook as an OAuth provider                                                                        |
-| `AUTH_FACEBOOK_CLIENT_ID`              | ``                                        | Facebook OAuth app Client ID                                                                                  |
-| `AUTH_FACEBOOK_CLIENT_SECRET`          | ``                                        | Facebook OAuth app Client Secret                                                                              |
-| `AUTH_FACEBOOK_CALLBACK_URL`           | ``                                        | Facebook OAuth app authorization callback URL                                                                 |
-| `STORAGE_ACTIVE`                       | `true`                                    | Activate storage                                                                                              |
-| `HASURA_GRAPHQL_ENDPOINT`              | `http://graphql-engine:8080/v1/graphql`   | Hasura GraphQL endpoint                                                                                       |
-| `HASURA_GRAPHQL_ADMIN_SECRET`          | ``                                        | Hasura GraphQL admin secret                                                                                   |
-| `HASURA_GRAPHQL_JWT_SECRET`            | `{ 'type': 'HS256', 'key': 'secretkey' }` | Shared JWT secret. Must be same as Hasura's `HASURA_GRAPHQL_JWT_SECRET`                                        |
-| `S3_ACCESS_KEY_ID`                     | ``                                        | S3 access key id                                                                                              |
-| `S3_SECRET_ACCESS_KEY`                 | ``                                        | S3 secret access key                                                                                          |
-| `S3_ENDPOINT`                          | ``                                        | S3 endpoint                                                                                                   |
-| `S3_BUCKET`                            | ``                                        | S3 bucket name                                                                                                |
-
+| Name                            | Default                                                                                                                 | Description                                                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `PORT`                          | `3010`                                                                                                                  | Express server port                                                                                           |
+| `AUTH_ACTIVE`                   | `true`                                                                                                                  | Activate authentication                                                                                       |
+| `USER_FIELDS`                   | `` | Specify user table fields (multiple fields as comma-separated) that should be available as `x-hasura-` JWT claims. |
+| `USER_REGISTRATION_AUTO_ACTIVE` | `false`                                                                                                                 | Whether new user account should automatically be activated. Accounts that are not active are unable to log in |
+| `JWT_TOKEN_EXPIRES`             | `15`                                                                                                                    | Minutes until JWT token expires                                                                               |
+| `REFRESH_TOKEN_EXPIRES`         | `43200` (30 days)                                                                                                       | Minutes until refresh token expires                                                                           |
+| `AUTH_LOCAL_ACTIVE`             | `false`                                                                                                                 | Activate authentication for local accounts                                                                    |
+| `AUTH_ANONYMOUS_USERS_ACTIVE`   | `false`                                                                                                                 | Allow anonymous users                                                                                         |
+| `PROVIDERS_SUCCESS_REDIRECT`    | `` | The URL the user should be redirected to on successful signin/signup with a OAuth provider.                        |
+| `PROVIDERS_FAILURE_REDIRECT`    | `` | The URL the user should be redirected to on failed signin/signup with a OAuth provider.                            |
+| `AUTH_GITHUB_ACTIVE`            | `false`                                                                                                                 | Activate Github as an OAuth provider                                                                          |
+| `AUTH_GITHUB_CLIENT_ID`         | `` | Github OAuth app Client ID                                                                                         |
+| `AUTH_GITHUB_CLIENT_SECRET`     | `` | Github OAuth app Client Secret                                                                                     |
+| `AUTH_GITHUB_CALLBACK_URL`      | `` | Github OAuth app authorization callback URL                                                                        |
+| `AUTH_GITHUB_AUTHORIZATION_URL` | `` | Github (enterprise) OAuth app authorization url                                                                    |
+| `AUTH_GITHUB_TOKEN_URL`         | `` | Github (enterprise) OAuth app token url                                                                            |
+| `AUTH_GITHUB_USER_PROFILE_URL`  | `` | Github (enterprise) OAuth app user profile url                                                                     |
+| `AUTH_GOOGLE_ACTIVE`            | `false`                                                                                                                 | Activate Google as an OAuth provider                                                                          |
+| `AUTH_GOOGLE_CLIENT_ID`         | `` | Google OAuth app Client ID                                                                                         |
+| `AUTH_GOOGLE_CLIENT_SECRET`     | `` | Google OAuth app Client Secret                                                                                     |
+| `AUTH_GOOGLE_CALLBACK_URL`      | `` | Google OAuth app authorization callback URL                                                                        |
+| `AUTH_FACEBOOK_ACTIVE`          | `false`                                                                                                                 | Activate Facebook as an OAuth provider                                                                        |
+| `AUTH_FACEBOOK_CLIENT_ID`       | `` | Facebook OAuth app Client ID                                                                                       |
+| `AUTH_FACEBOOK_CLIENT_SECRET`   | `` | Facebook OAuth app Client Secret                                                                                   |
+| `AUTH_FACEBOOK_CALLBACK_URL`    | `` | Facebook OAuth app authorization callback URL                                                                      |
+| `STORAGE_ACTIVE`                | `true`                                                                                                                  | Activate storage                                                                                              |
+| `HASURA_GRAPHQL_ENDPOINT`       | `http://graphql-engine:8080/v1/graphql`                                                                                 | Hasura GraphQL endpoint                                                                                       |
+| `HASURA_GRAPHQL_ADMIN_SECRET`   | `` | Hasura GraphQL admin secret                                                                                        |
+| `HASURA_GRAPHQL_JWT_SECRET`     | `{ 'type': 'HS256', 'key': 'secretkey' }`                                                                               | Shared JWT secret. Must be same as Hasura's `HASURA_GRAPHQL_JWT_SECRET`                                       |
+| `S3_ACCESS_KEY_ID`              | `` | S3 access key id                                                                                                   |
+| `S3_SECRET_ACCESS_KEY`          | `` | S3 secret access key                                                                                               |
+| `S3_ENDPOINT`                   | `` | S3 endpoint                                                                                                        |
+| `S3_BUCKET`                     | `` | S3 bucket name                                                                                                     |
 
 #### USER_FIELDS
 
@@ -160,11 +157,11 @@ If you have some specific fields on your users that you also want to have as a J
 
 So let's say you have a user table with the following columns:
 
-* id
-* email
-* password
-* role
-* **company_id**
+- id
+- email
+- password
+- role
+- **company_id**
 
 And you want to include the `company_id` as a JWT claim. You can specify `USER_FIELDS=company_id`.
 
@@ -185,6 +182,7 @@ Then you will have a JWT a little something like this:
   "exp": 1549527743
 }
 ```
+
 This enables you to make permissions using `x-hasura-company-id` for insert/select/update/delete in on tables in your Hasura console.
 Like this: `{"seller_company_id":{"_eq":"X-Hasura-Company-Id"}}`
 
@@ -194,6 +192,7 @@ https://github.com/nhost/hasura-backend-plus/blob/master/src/storage/rules/index
 # HASURA_GRAPHQL_ENDPOINT
 
 ## Auth
+
 ```
 /auth/refresh-token
 /auth/activate-account
@@ -270,6 +269,7 @@ Use HTTP POST method.
 | `password`     | `text` | YES      |
 
 ## Register your first user
+
 ```sh
 curl -X POST \
   http://localhost:3010/auth/local/register \
@@ -280,9 +280,11 @@ curl -X POST \
 	"password": "test"
 }'
 ```
+
 The response is: `OK!`
 
 ## Login using that user
+
 ```sh
 curl -X POST \
   http://localhost:3010/auth/local/login \
@@ -298,9 +300,9 @@ This will have a valid token in the response:
 
 ```json
 {
-    "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
-    "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
-    "user_id": 1
+  "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IjEifSwiaWF0IjoxNTYxMzY0NTY1LCJleHAiOjE1NjEzNjU0NjV9.j4Jvf_hzxStrs80PQyda9RwM3XClCymHHX_uE-y7Nhc",
+  "refresh_token": "b760234c-f36b-47ff-8044-b32e40ee1ad2",
+  "user_id": 1
 }
 ```
 
@@ -315,7 +317,7 @@ This will have a valid token in the response:
 
 Will act as a proxy between your client and a S3 compatible block storage service (for example: AWS S3, Digital Ocean Spaces, Minio).
 HBP can handle read, write and security permissions.
-Digital Ocean offers S3-compatible object storage for $5/month, with 250 GB of storage and 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
+Digital Ocean offers S3-compatible object storage for \$5/month, with 250 GB of storage and 1TB outbound transfer. https://www.digitalocean.com/products/spaces/.
 You can also use open source self-hosted private cloud storage solutions like [Minio](https://minio.io/).
 
 ### Uploads
@@ -338,7 +340,7 @@ axios.post(<HOST>/storage/upload, formData, {
 })
 ```
 
-Returns 
+Returns
 
 ```
 
@@ -350,6 +352,7 @@ originalname: "blob"
 token: "token"
 
 ```
+
 ### Download (get)
 
 `GET`
@@ -360,7 +363,6 @@ token: "token"
 `DELETE`
 `/storage/file/{key}`
 
-
 ### Get download token
 
 `GET`
@@ -370,7 +372,7 @@ Returns:
 
 ```json
 {
-  "token": "cce1193c-a299-400b-9e70-2b33b11fd113",
+  "token": "cce1193c-a299-400b-9e70-2b33b11fd113"
 }
 ```
 
@@ -387,7 +389,6 @@ Security rules are placed in `storage-tools.js` in the function `validateInterac
 `type` = Operation type. Can be one of: `read`, `write`.
 
 `claims` = JWT claims coming `https://hasura.io/jwt/claims` custom claims in the Hasura JWT token. Ex: `claims['X-Hasura-user-Id']`.
-
 
 #### Example:
 
