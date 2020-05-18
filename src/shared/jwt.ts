@@ -89,6 +89,7 @@ export function generatePermissionVariables(
     [`${prefix}default-role`]: role,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...JWT_CUSTOM_FIELDS.reduce<{ [key: string]: ClaimValueType }>((aggr: any, cursor) => {
+      if (!cursor) return
       aggr[`${prefix}${kebabCase(cursor)}`] = jwt
         ? typeof user[cursor] === 'string'
           ? user[cursor]
