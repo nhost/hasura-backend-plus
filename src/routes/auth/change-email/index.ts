@@ -11,7 +11,11 @@ if (NOTIFY_EMAIL_CHANGE && !EMAILS_ENABLE)
 
 const router = Router()
 
-if (VERIFY_EMAILS) router.post('/request', requestVerification).post('/change', changeVerified)
-else router.post('/', directChange)
+if (VERIFY_EMAILS) {
+  router.post('/request', requestVerification)
+  router.post('/change', changeVerified)
+} else {
+  router.post('/', directChange)
+}
 
 export default router
