@@ -27,7 +27,7 @@ async function basicPasswordChange(req: Request, res: Response): Promise<unknown
   const { password_hash } = await selectAccountByUserId(user_id)
   // Check the old (current) password
   if (!(await bcrypt.compare(old_password, password_hash))) {
-    throw Boom.unauthorized('Incorrect password.')
+    throw Boom.unauthorized('Incorrect current password.')
   }
 
   const newPasswordHash = await hashPassword(new_password)
