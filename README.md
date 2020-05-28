@@ -48,7 +48,7 @@ For detailed usage and installation instructions check out the [documentation](h
 
 The easiest way to deploy HBP is with our official [Nhost](https://nhost.io) managed service. Get your perfectly configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
 
-All [Nhost](https://nhost.io) projects are built on open source software so you can make real-time web and mobile apps fast 🚀
+All [Nhost](https://nhost.io) projects are built on open source software so you can make real-time web and mobile apps fast 🚀.
 
 <a href="https://nhost.io/register">
   <img
