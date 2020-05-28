@@ -12,3 +12,4 @@
 - refactor(auth): change token endpoint from HTTP POST to GET
 - ci(docs): trigger publish docs when changes are done to the examples directory
 - docs(auth): login, mfa, jwt
+- server: Added support for multiple default allowed user roles (#246)
