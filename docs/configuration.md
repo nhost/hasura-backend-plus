@@ -241,7 +241,8 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 | Name                   | Default | Description |
 | ---------------------- | ------- | ----------- |
-| `S3_ACCESS_KEY_ID`     |         |             |
-| `S3_BUCKET`            |         |             |
 | `S3_ENDPOINT`          |         |             |
+| `S3_BUCKET`            |         |             |
+| `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
+| `S3_SSL_ENABLED`       | true    |             |
