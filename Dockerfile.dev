@@ -3,6 +3,7 @@ FROM node:12-alpine
 ARG NODE_ENV=development
 ENV NODE_ENV $NODE_ENV
 ENV PORT 3000
+ENV HOST localhost
 
 WORKDIR /app
 
