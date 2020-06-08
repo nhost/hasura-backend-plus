@@ -13,3 +13,4 @@
 - ci(docs): trigger publish docs when changes are done to the examples directory
 - docs(auth): login, mfa, jwt
 - server: Added support for multiple default allowed user roles (#246)
+- server + docs: Added "HOST" environment variable (#253)
