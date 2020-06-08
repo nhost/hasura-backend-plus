@@ -215,6 +215,7 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 | Name                         | Default                 | Description                                                                                                                                                                                  |
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_LOCAL_USERS_ENABLE`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
 | `AUTO_ACTIVATE_NEW_USERS`    | false                   | When set to true, automatically activate the users once registererd.                                                                                                                         |
 | `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
@@ -243,7 +244,8 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 | Name                   | Default | Description |
 | ---------------------- | ------- | ----------- |
-| `S3_ACCESS_KEY_ID`     |         |             |
-| `S3_BUCKET`            |         |             |
 | `S3_ENDPOINT`          |         |             |
+| `S3_BUCKET`            |         |             |
+| `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
+| `S3_SSL_ENABLED`       | true    |             |

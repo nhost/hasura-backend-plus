@@ -2,7 +2,8 @@ import {
   MFA_ENABLE,
   CHANGE_EMAIL_ENABLE,
   AUTO_ACTIVATE_NEW_USERS,
-  ALLOW_USER_SELF_DELETE
+  ALLOW_USER_SELF_DELETE,
+  AUTH_LOCAL_USERS_ENABLE
 } from '@shared/config'
 import { Router } from 'express'
 import changeEmail from './change-email'
@@ -39,12 +40,15 @@ if (ALLOW_USER_SELF_DELETE) {
   router.post('/delete', deleteAccount)
 }
 
-router
-  .get('/jwks', getJwks)
-  .post('/login', loginAccount)
-  .post('/logout', logout)
-  .post('/register', registerAccount)
-  .use('/token', token)
-  .use('/change-password', changePassword)
+if (AUTH_LOCAL_USERS_ENABLE) {
+  router
+    .post('/login', loginAccount)
+    .post('/logout', logout)
+    .post('/register', registerAccount)
+    .use('/change-password', changePassword)
+}
+
+router.get('/jwks', getJwks)
+router.use('/token', token)
 
 export default router
