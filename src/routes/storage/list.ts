@@ -54,7 +54,7 @@ export const listFile = async (
         const objectStream = s3
           .getObject({ Bucket: S3_BUCKET as string, Key: entry.key })
           .createReadStream()
-        archive.append(objectStream, { name: entry.head.Metadata?.filename || entry.key })
+        archive.append(objectStream, { name: entry.key })
       })
       res.attachment('list.zip').type('zip')
       archive.on('end', () => res.end())
