@@ -2,6 +2,7 @@
 
 ## Next release
 
+- server: Correct default value for `JWT_ALGORITHM`.
 - server + docs: Added "HOST" environment variable (#253)
 
 # v2.0.0-rc.3
