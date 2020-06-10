@@ -102,11 +102,10 @@ it('should get file metadata', async () => {
   const {
     status,
     body: {
-      Metadata: { filename, token }
+      Metadata: { token }
     }
   } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
   expect(status).toEqual(200)
-  expect(filename).toEqual(filePath)
   expect(token).toEqual(fileToken)
 })
 
@@ -122,21 +121,6 @@ it('should get a zip that contains all user files', async () => {
   expect(text).toBeTruthy()
   // TODO unzip and compare the file(s)
 })
-
-// it('should delete file metadata', async () => {
-//   const { status } = await request.delete(`/storage/m/user/${getUserId()}/${filePath}`)
-//   expect(status).toEqual(204)
-//   const {
-//     status: getStatus,
-//     body: {
-//       Metadata: { filename, token, description }
-//     }
-//   } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
-//   expect(getStatus).toEqual(200)
-//   expect(filename).toBeUndefined()
-//   expect(token).toBeString()
-//   expect(description).toBeUndefined()
-// })
 
 it('should delete file', async () => {
   const { status } = await request.delete(`/storage/o/user/${getUserId()}/${filePath}`)
