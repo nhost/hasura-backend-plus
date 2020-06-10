@@ -3,6 +3,7 @@
 ## Next release
 
 - server: Correct default value for `JWT_ALGORITHM`.
+- server + docs: Added "HOST" environment variable (#253)
 
 # v2.0.0-rc.3
 
@@ -18,6 +19,7 @@
 - refactor(auth): change token endpoint from HTTP POST to GET
 - ci(docs): trigger publish docs when changes are done to the examples directory
 - docs(auth): login, mfa, jwt
+- server: Added support for multiple default allowed user roles (#246)
 
 # v2.0.0-rc.1
 

@@ -7,7 +7,7 @@ import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
 import TMP from 'temp-dir'
-import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET, PORT } from '@shared/config'
+import { HASURA_ENDPOINT, HASURA_GRAPHQL_ADMIN_SECRET, HOST, PORT } from '@shared/config'
 import getJwks from './routes/auth/jwks'
 
 const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'ERROR' : 'INFO'
@@ -64,7 +64,7 @@ export default async (
      * ! As we need Hasura to be up to run the migrations, we provide a temporary server with only the JWKS endpoint.
      */
     try {
-      const server = app.listen(PORT, async () => {
+      const server = app.listen(PORT, HOST, async () => {
         const { protocol, host } = url.parse(HASURA_ENDPOINT)
         const hasuraURL = `${protocol}//${host}`
         // * Wait for GraphQL Engine to be ready
