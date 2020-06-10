@@ -9,6 +9,7 @@ import {
   EMAILS_ENABLE,
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
+  HOST,
   PORT,
   ANONYMOUS_USERS_ENABLE
 } from '@shared/config'
@@ -33,7 +34,7 @@ const password = generateRandomString()
 
 let request: SuperTest<Test>
 
-const server = app.listen(PORT)
+const server = app.listen(PORT, HOST)
 
 beforeAll(async () => {
   request = agent(server) // * Create the SuperTest agent

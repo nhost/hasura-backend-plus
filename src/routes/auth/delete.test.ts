@@ -2,14 +2,14 @@ import 'jest-extended'
 
 import { SuperTest, Test, agent } from 'supertest'
 
-import { PORT } from '@shared/config'
+import { HOST, PORT } from '@shared/config'
 import { registerAccount } from '@test/test-utils'
 
 import { app } from '../../server'
 
 let request: SuperTest<Test>
 
-const server = app.listen(PORT)
+const server = app.listen(PORT, HOST)
 
 // * Code that is executed before any jest test file that imports this file
 beforeAll(async () => {

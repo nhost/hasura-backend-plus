@@ -3,7 +3,7 @@
 ## General
 
 <!-- TODO AUTH_ENABLE and STORAGE_ENABLE -->
-<!-- TODO SERVER_URL, PORT -->
+<!-- TODO SERVER_URL, HOST, PORT -->
 <!-- TODO REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR -->
 
 ## Connect to Hasura
@@ -201,14 +201,15 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 ### General
 
-| Name                          | Default | Description                                                                                                 |
-| ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
-| `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
-| `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
-| `PORT`                        | 3000    | Port of the service                                                                                         |
-| `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                             |
-| `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                  |
-| `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                 |
+| Name                          | Default   | Description                                                                                                 |
+| ----------------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
+| `HASURA_ENDPOINT` (required)  |           | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
+| `HASURA_GRAPHQL_ADMIN_SECRET` |           | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
+| `HOST`                        | localhost | Listening ip of the service                                                                                 |
+| `PORT`                        | 3000      | Port of the service                                                                                         |
+| `SERVER_URL`                  |           | Current server URL. Currently used only for creating links from email templates                             |
+| `MAX_REQUESTS`                | 100       | Maximum requests per IP within the following `TIME_FRAME`.                                                  |
+| `TIME_FRAME`                  | 900000    | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                 |
 
 ### Authentication
 
