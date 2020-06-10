@@ -2,6 +2,7 @@
 
 ## Next release
 
+- server: Added auth test
 - server: Don't save original filename as metadata on s3 object
 - server: Correct default value for `JWT_ALGORITHM`.
 - server + docs: Added "HOST" environment variable (#253)
