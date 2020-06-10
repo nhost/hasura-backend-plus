@@ -75,10 +75,10 @@ You can add some safeguards and limitations to the registration process like ema
 
 ## Login
 
-Once an user is registered, they can connect to HBP with the `/auth/register` endpoint:
+Once an user is registered, they can connect to HBP with the `/auth/login` endpoint:
 
 ```shell
-curl -d '{"email":"real@emailadress.com", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/register`
+curl -d '{"email":"real@emailadress.com", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/login`
 ```
 
 It will return the following payload:
