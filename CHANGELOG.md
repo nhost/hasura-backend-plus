@@ -2,6 +2,8 @@
 
 ## Next release
 
+- server: Don't save original filename as metadata on s3 object
+
 # v2.0.0-rc.3
 
 - server: Added S3_SSL_ENABLED env var
