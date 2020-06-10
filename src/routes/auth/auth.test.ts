@@ -96,11 +96,16 @@ manualActivationIt('should activate the account from a valid ticket', async () =
   expect(status).toBeOneOf([204, 302])
 })
 
-it('should not sign the user in', async () => {
+it('should not sign user with wrong password', async () => {
+  const { status } = await request.post('/auth/login').send({ email, password: 'sommar' })
+  expect(status).toEqual(401)
+})
+
+it('should not sign in non existing user', async () => {
   const { status } = await request
     .post('/auth/login')
-    .send({ email: 'none-existing@nhost.io', password: 'sommar' })
-  expect(status).toEqual(401)
+    .send({ email: 'non-existing@nhost.io', password: 'sommar' })
+  expect(status).toEqual(400)
 })
 
 it('should complain about incorrect email', async () => {
