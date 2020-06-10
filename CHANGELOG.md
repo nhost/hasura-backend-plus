@@ -2,6 +2,7 @@
 
 ## Next release
 
+- server: Better default api rate limit values
 - server: Added auth test
 - server: Don't save original filename as metadata on s3 object
 - server: Correct default value for `JWT_ALGORITHM`.
