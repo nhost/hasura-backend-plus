@@ -2,6 +2,8 @@
 
 ## Next release
 
+- server: Correct default value for `JWT_ALGORITHM`.
+
 # v2.0.0-rc.3
 
 - server: Added S3_SSL_ENABLED env var
