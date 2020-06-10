@@ -1,4 +1,4 @@
-import { PORT, AUTO_MIGRATE } from '@shared/config'
+import { HOST, PORT, AUTO_MIGRATE } from '@shared/config'
 import { app } from './server'
 import migrate from './migrate'
 
@@ -10,7 +10,7 @@ const start = async (): Promise<void> => {
     }
     await migrate(migrationSetup)
   }
-  app.listen(PORT, () => console.log(`Running on http://localhost:${PORT}`))
+  app.listen(PORT, HOST, () => console.log(`Running on http://${HOST}:${PORT}`))
 }
 
 start()

@@ -7,7 +7,8 @@ export const {
   SERVER_URL,
   REDIRECT_URL_ERROR,
   REDIRECT_URL_SUCCESS,
-  HASURA_GRAPHQL_ADMIN_SECRET
+  HASURA_GRAPHQL_ADMIN_SECRET,
+  HOST = 'localhost',
 } = process.env
 export const PORT = castIntEnv('PORT', 3000)
 export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
