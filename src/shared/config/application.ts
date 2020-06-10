@@ -8,7 +8,7 @@ export const {
   REDIRECT_URL_ERROR,
   REDIRECT_URL_SUCCESS,
   HASURA_GRAPHQL_ADMIN_SECRET,
-  HOST = 'localhost',
+  HOST = 'localhost'
 } = process.env
 export const PORT = castIntEnv('PORT', 3000)
 export const HASURA_ENDPOINT = process.env.HASURA_ENDPOINT as string
@@ -22,7 +22,7 @@ export const AUTO_MIGRATE = autoMigrateSettings(process.env.AUTO_MIGRATE)
 /**
  * * Rate limiter settings
  */
-export const MAX_REQUESTS = castIntEnv('MAX_REQUESTS', 100)
+export const MAX_REQUESTS = castIntEnv('MAX_REQUESTS', 1000)
 export const TIME_FRAME = castIntEnv('TIME_FRAME', 15 * 60 * 1000)
 
 /**
