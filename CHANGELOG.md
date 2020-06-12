@@ -2,7 +2,7 @@
 
 ## Next release
 
-## v2.0.0-rc.3
+## v2.0.0-rc.4
 
 - server: Better default api rate limit values
 - server: Added auth test
