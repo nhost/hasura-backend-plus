@@ -1181,9 +1181,10 @@
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@types/ejs/-/ejs-3.0.2.tgz#b2eb8ac59af7057da7d93a37c54fee763e17b9bd"
 
-"@types/email-templates@6.0.3":
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/@types/email-templates/-/email-templates-6.0.3.tgz#1bf983d802c8604d2aef1f3168b580a895176f08"
+"@types/email-templates@7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@types/email-templates/-/email-templates-7.0.1.tgz#0b7bcafa1ff396ff69eb6bb73de11ee8469378d1"
+  integrity sha512-dO/luzyN+O60lVi9njcmh5AoofwxKz0yZiIZEbw0F2fcfe3RsAU/BUNlJDR8ry2gyjR0qn3PoOrUNJblcu9PmQ==
   dependencies:
     "@types/html-to-text" "*"
     "@types/nodemailer" "*"
@@ -1256,8 +1257,9 @@
     "@types/express" "*"
 
 "@types/html-to-text@*":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@types/html-to-text/-/html-to-text-5.1.0.tgz#6fc1446da15eb23d0472657598317daf0cc060b8"
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@types/html-to-text/-/html-to-text-5.1.1.tgz#11d402dcd734ed9f8faa6ad96ce27e58e32ba80f"
+  integrity sha512-V4eDOSqT3+Md4MBJvV3zF1u9ImXFQJp62qceBZlI9LTkH5lj8m6QWVWKmlQNWVB0XDKLezL0CBi318JF69S5SQ==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.1"
@@ -1326,7 +1328,12 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^13.11.1":
+"@types/node@*":
+  version "14.0.13"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.13.tgz#ee1128e881b874c371374c1f72201893616417c9"
+  integrity sha512-rouEWBImiRaSJsVA+ITTFM6ZxibuAlTuNOCyxVbwreu6k6+ujs7DfnU9o+PShFhET78pMBl3eH+AGSI5eOTkPA==
+
+"@types/node@^13.11.1":
   version "13.13.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.4.tgz#1581d6c16e3d4803eb079c87d4ac893ee7501c2c"
 
@@ -7488,6 +7495,11 @@ mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@~0.5.1, mkdirp@~0.5.x:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
   dependencies:
     minimist "^1.2.5"
+
+module-alias@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/module-alias/-/module-alias-2.2.2.tgz#151cdcecc24e25739ff0aa6e51e1c5716974c0e0"
+  integrity sha512-A/78XjoX2EmNvppVWEhM2oGk3x4lLxnkEA4jTbaK97QKSDjkIoOsKQlfylt/d3kKKi596Qy3NP5XrXJ6fZIC9Q==
 
 moment@^2.24.0:
   version "2.24.0"

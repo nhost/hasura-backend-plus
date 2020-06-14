@@ -2,6 +2,8 @@
 
 ## Next release
 
+- build: Run HBP with node instead of ts-node for lower memory consumption
+
 ## v2.0.0-rc.4
 
 - server: Better default api rate limit values
