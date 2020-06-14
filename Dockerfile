@@ -14,6 +14,6 @@ COPY . .
 
 RUN ./node_modules/typescript/bin/tsc -p .
 
-# HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget ${HOST}:${PORT}/healthz -q -O - > /dev/null 2>&1
+HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget ${HOST}:${PORT}/healthz -q -O - > /dev/null 2>&1
 
 CMD ["yarn", "start"]
