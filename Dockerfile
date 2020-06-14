@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:14.4.0-alpine3.11
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
@@ -12,6 +12,8 @@ RUN yarn install
 
 COPY . .
 
-HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget ${HOST}:${PORT}/healthz -q -O - > /dev/null 2>&1
+RUN ./node_modules/typescript/bin/tsc -p .
+
+# HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget ${HOST}:${PORT}/healthz -q -O - > /dev/null 2>&1
 
 CMD ["yarn", "start"]
