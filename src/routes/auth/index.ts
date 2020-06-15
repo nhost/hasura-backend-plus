@@ -6,6 +6,7 @@ import {
   AUTH_LOCAL_USERS_ENABLE
 } from '@shared/config'
 import { Router } from 'express'
+import nocache from 'nocache'
 import changeEmail from './change-email'
 import getJwks from './jwks'
 import loginAccount from './login'
@@ -19,6 +20,8 @@ import activateAccount from './activate'
 import deleteAccount from './delete'
 
 const router = Router()
+
+router.use(nocache())
 
 if (providers) {
   router.use('/providers', providers)
