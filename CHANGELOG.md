@@ -3,6 +3,7 @@
 ## Next release
 
 - build: Run HBP with node instead of ts-node for lower memory consumption
+- server + docs: Set "HOST" default value to empty
 
 ## v2.0.0-rc.4
 
