@@ -11,7 +11,8 @@ import {
   JWT_CLAIMS_NAMESPACE,
   HOST,
   PORT,
-  ANONYMOUS_USERS_ENABLE
+  ANONYMOUS_USERS_ENABLE,
+  ADMIN_SECRET,
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch, deleteAccount } from '@test/test-utils'
@@ -20,11 +21,7 @@ import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { app } from '../../server'
 import { SuperTest, Test, agent } from 'supertest'
-
-/**
- * Store variables in memory.
- */
-let jwtToken: string
+import { AdminSecretHeaderName } from './login'
 
 /**
  * Dummy account information.
@@ -116,20 +113,30 @@ it('should complain about incorrect email', async () => {
   expect(status).toEqual(400)
 })
 
-it('should sign the user in', async () => {
-  const { body, status } = await request.post('/auth/login').send({ email, password })
-  // Save JWT token to globally scoped varaible.
-  jwtToken = body.jwt_token
-  expect(status).toEqual(200)
-  expect(body.jwt_token).toBeString()
-  expect(body.jwt_expires_in).toBeNumber()
-})
-
-it('should decode a valid custom user claim', async () => {
+function expectValidJWT(jwtToken: string) {
   const decodedJwt = JWT.decode(jwtToken) as Token
   expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
   // Test if the custom claims work
   expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
+}
+
+it('should sign the user in', async () => {
+  const { body, status } = await request.post('/auth/login').send({ email, password })
+  expect(status).toEqual(200)
+  expect(body.jwt_token).toBeString()
+  expect(body.jwt_expires_in).toBeNumber()
+  expectValidJWT(body.jwt_token)
+})
+
+it('should sign the user in using the admin secret', async () => {
+  const { body, status } = await request.post('/auth/login')
+    .send({ email, password: '' })
+    .set(AdminSecretHeaderName, ADMIN_SECRET)
+
+  expect(status).toEqual(200)
+  expect(body.jwt_token).toBeString()
+  expect(body.jwt_expires_in).toBeNumber()
+  expectValidJWT(body.jwt_token)
 })
 
 it('should logout', async () => {
@@ -145,4 +152,5 @@ anonymousAccountIt('should login anonymously', async () => {
   expect(status).toEqual(200)
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
+  expectValidJWT(body.jwt_token)
 })

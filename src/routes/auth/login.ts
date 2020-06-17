@@ -8,7 +8,7 @@ import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData } from '@shared/types'
-import { ANONYMOUS_USERS_ENABLE, DEFAULT_ANONYMOUS_ROLE } from '@shared/config'
+import { ANONYMOUS_USERS_ENABLE, DEFAULT_ANONYMOUS_ROLE, ADMIN_SECRET } from '@shared/config'
 
 interface HasuraData {
   insert_auth_accounts: {
@@ -17,7 +17,11 @@ interface HasuraData {
   }
 }
 
-async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
+export const AdminSecretHeaderName = 'x-hbp-admin-secret'
+
+async function loginAccount(req: Request, res: Response): Promise<unknown> {
+  const { body } = req
+
   if (ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
@@ -76,7 +80,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     throw Boom.badRequest('Account is not activated.')
   }
 
-  if (!(await bcrypt.compare(password, password_hash))) {
+  if (!(await bcrypt.compare(password, password_hash)) && req.header(AdminSecretHeaderName) != ADMIN_SECRET) {
     throw Boom.unauthorized('Password does not match.')
   }
 
