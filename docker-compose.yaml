@@ -40,7 +40,7 @@ services:
       MINIO_ACCESS_KEY: '${S3_ACCESS_KEY_ID:-minio_access_key}' ## min 8 character
       MINIO_SECRET_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}' ## min 8 character
     entrypoint: sh
-    command: "-c 'mkdir -p /export/$${S3_BUCKET:-hasura-backend-plus} && /usr/bin/minio server /export'"
+    command: "-c 'mkdir -p /export/$${S3_BUCKET:-hasura-backend-plus} && /usr/bin/minio server /data'"
 volumes:
   db_data:
   minio_data:
