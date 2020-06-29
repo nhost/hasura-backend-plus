@@ -8,8 +8,9 @@
   "version": "2.0.0",
   "main": "src/start.ts",
   "scripts": {
-    "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/start.ts",
-    "dev:docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/start.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev -r tsconfig-paths/register --no-notify src/ts-start.ts",
+    "dev:docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/ts-start.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "start": "node -r ./prod-paths.js ./dist/start.js",

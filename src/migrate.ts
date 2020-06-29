@@ -30,16 +30,21 @@ const waitFor = async (path: string, attempts = 240): Promise<void> => {
 }
 
 const hasuraConsole = async (action: string): Promise<void> => {
-  const child = spawn('./node_modules/.bin/hasura', [
-    ...action.split(' '),
-    '--log-level',
-    LOG_LEVEL,
-    '--skip-update-check',
-    '--project',
-    TEMP_MIGRATION_DIR
-  ])
-  for await (const data of child.stdout) {
-    process.stdout.write(data.toString())
+  try {
+    const child = spawn('./node_modules/.bin/hasura', [
+      ...action.split(' '),
+      '--log-level',
+      LOG_LEVEL,
+      '--skip-update-check',
+      '--project',
+      TEMP_MIGRATION_DIR
+    ])
+    for await (const data of child.stdout) {
+      process.stdout.write(data.toString())
+    }
+  } catch (error) {
+    console.log('Error in starting hasura cli')
+    console.log(error)
   }
 }
 
