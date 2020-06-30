@@ -13,7 +13,7 @@
     "dev:docker": "ts-node-dev -r tsconfig-paths/register --no-deps --respawn --poll --interval 1000 --no-notify src/ts-start.ts",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
-    "start": "node -r ./prod-paths.js ./dist/start.js",
+    "start": "node -r ./prod-paths.js ./dist/src/start.js",
     "test": "NODE_ENV=test jest --coverage --forceExit --runInBand",
     "test:ci": "NODE_ENV=ci jest --coverage --forceExit --runInBand",
     "test:watch": "NODE_ENV=test jest --watch",
