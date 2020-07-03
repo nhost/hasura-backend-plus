@@ -164,14 +164,16 @@ export const setCookie = (
   res.cookie('refresh_token', refresh_token, {
     httpOnly: true,
     maxAge,
-    signed: Boolean(COOKIE_SECRET)
+    signed: Boolean(COOKIE_SECRET),
+    sameSite: 'none'
   })
 
   // set permission variables cookie
   res.cookie('permission_variables', permission_variables, {
     httpOnly: true,
     maxAge,
-    signed: Boolean(COOKIE_SECRET)
+    signed: Boolean(COOKIE_SECRET),
+    sameSite: 'none'
   })
 }
 
