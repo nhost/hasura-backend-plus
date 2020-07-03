@@ -17,7 +17,7 @@ paths:
     write: 'isOwner(userId)'
 ```
 
-In the permission variables cookie returned by the [login]() or [refresh]() endpoints.
+In the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
 
 This is a URL-encoded string, in the following template:
 
