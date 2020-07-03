@@ -129,7 +129,7 @@ The following URL will work for a file called `image.jpg` that has a token of `0
 
 ## Functions
 
-> Please note, it is not possible to call functions inside other functions
+> It is not possible to call functions inside other functions
 
 Functions allow you to define permissions which can be used by any rules. You can access the `permission_variables` cookie here, as `request.auth`.
 
