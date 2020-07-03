@@ -37,7 +37,7 @@ The `request.auth` part is a JSON object, which is the same as the [Hasura permi
 }
 ```
 
-You can use the `request.auth` variables in your storage rule functions.
+You can access these variables through `request.auth` (for example `request.auth['default-role']`) when creating your storage rules.
 
 ## Paths
 
