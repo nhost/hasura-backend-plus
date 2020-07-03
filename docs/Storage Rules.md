@@ -133,14 +133,33 @@ paths:
 
 Functions allow you to define permissions which can be used by any rules. You can access the `permission_variables` cookie here, as `request.auth`.
 
-For example, if you would like to allow users to access files within a folder named as their user id, you can add the following function:
+A simple function would be to test if a user is authenticated. You can do this by checking if `request.auth` is present:
+
+``` yaml
+functions:
+  isAuthenticated: 'return !!request.auth'
+```
+
+Now, you can use this function within a storage path:
+
+``` yaml
+functions:
+  isAuthenticated: 'return !!request.auth'
+paths:
+  /everyone/:
+    list: 'isAuthenticated()
+```
+
+This will allow any logged-in user to access the files in the `/everyone/` directory. If someone isn't logged in, they won't be able to see them.
+
+You can also add more complex rules. For example, if you would like to allow users to access files within a folder named as their user id, you can add the following function:
 
 ``` yaml
 functions:
   isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
 ```
 
-This function uses a variable, called `userId`, which must be passed in by the rule from a [dynamic path](#folder-paths):
+This function checks that a user is logged in, but also uses a variable called `userId`, which must be passed in by the rule from a [dynamic path](#folder-paths):
 
 ``` yaml
 functions:
@@ -152,7 +171,7 @@ paths:
     read: isOwner(userId)
 ```
 
-This will allow users to list their own file directory, and read their own files.
+This rule will allow users to list their own file directory, and read their own files.
 
 ## Adding variables
 
