@@ -137,14 +137,14 @@ For example, if you would like to allow users to access files within a folder na
 
 ``` yaml
 functions:
-  isOwner: '!!request.auth && request.auth["user-id"] === userId'
+  isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
 ```
 
 This function uses a variable, called `userId`, which must be passed in by the rule from a [dynamic path](#folder-paths):
 
 ``` yaml
 functions:
-  isOwner: '!!request.auth && request.auth["user-id"] === userId'
+  isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
 paths:
   /:userId/:
     list: isOwner(userId)
