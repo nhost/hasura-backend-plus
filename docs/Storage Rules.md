@@ -25,7 +25,7 @@ This is a URL-encoded string, in the following template:
 s:<request.auth>.<checksum>
 ```
 
-The request.auth part is a JSON object, in the following layout:
+The `request.auth` part is a JSON object, which is the same as the [Hasura permission variables](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/index.html#overview) but with the `x-hasura-` prefix removed:
 
 ``` json
 {
@@ -37,7 +37,7 @@ The request.auth part is a JSON object, in the following layout:
 }
 ```
 
-You can use the `request.auth` parts in your storage rule functions.
+You can use the `request.auth` variables in your storage rule functions.
 
 ## Paths
 
