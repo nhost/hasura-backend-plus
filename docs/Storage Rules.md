@@ -101,9 +101,16 @@ paths:
 
 ### File tokens
 
-Files are uploaded with a token within their metadata. This will mean that files are visible without authentication, if the file token is passed in as a query parameter.
+When you upload a file to Hasura Backend Plus, a token is automatically added to the file metadata. This is unique for the file, and can be used as an access token.
+You can create a `validToken` function, and use that to allow access to the file, even if a user is unauthenticated.
 
-You can access query parameters on the `request` object:
+We can define a rule to allow access to this image if the right token (in this case `c9aa7344-1b4c-42d2-81c0-48ee401a3eeb`) is present:
+
+``` txt
+/storage/o/private/secret-image.jpg?token=c9aa7344-1b4c-42d2-81c0-48ee401a3eeb
+```
+
+The token is sent as a query parameter, which you can access on the `request` object. You can check the token against the `resource.Metadata.token` variable:
 
 ``` yaml
 functions:
@@ -117,14 +124,7 @@ functions:
   validToken: 'return request.query.token === resource.Metadata.token'
 paths:
   /private/:fileId:
-    list: 'return false'
     read: 'validToken()'
-```
-
-The following URL will work for a file called `image.jpg` that has a token of `04f1449d-e567-44c9-a5b8-0f21b2eaa261`:
-
-``` txt
-/storage/o/private/image.jpg?token=04f1449d-e567-44c9-a5b8-0f21b2eaa261
 ```
 
 ## Functions
