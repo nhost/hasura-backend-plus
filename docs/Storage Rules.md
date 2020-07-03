@@ -41,9 +41,9 @@ You can access these variables through `request.auth` (for example `request.auth
 
 ## Paths
 
-Paths allow you to define where your files are, and what permissions should apply to them. You can have dynamic paths and static paths.
+Paths allow you to define authorization permissions to your folders and files. This means you can control access to files, folders, and subfolders easily.
 
-Dynamic paths can be used as variables within functions.
+Paths can be static or dynamic, and dynamic paths can be used as variables within functions.
 
 ### Folder paths
 
