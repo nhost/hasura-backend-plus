@@ -1,8 +1,8 @@
 # Storage Rules
 
-Storage rules are based on Firebase. You can see the [pull request here](https://github.com/nhost/hasura-backend-plus/pull/144).
+File authorization is tricky to manage, and means developers need to spend a lot of time on authentication and authorization. Using Hasura Backend Plus means all this complex code is done for you! All you need to do is set out file access rules, which makes creating and updating rules easy to manage.
 
-The rules are governed by a `yaml` file, which defines routes and permissions, with authenticating functions. You can see [the template file here](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml)
+The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [template set of rules](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you may need to change for your project.
 
 ``` yaml
 functions:
