@@ -66,11 +66,32 @@ Here's an example path that would be validated by this rule:
 
 You can specify the following rules in your `rules.yaml` file.
 
-- create: upload a file and set metadata
-- update: update the file and patch metadata
-- get: return the file
-- list: return a zip file with all the permitted files with a key starting with /custom-path/
-- delete: delete the file
+| Action           | Metadata (`/m/`)                  | Object (`/o/`)                        |
+|------------------|-----------------------------------|---------------------------------------|
+| Folder: `update` | N/A                               | N/A                                   |
+| Folder: `list`   | Get metadata for accessible files | Get `.zip` folder of accessible files |
+| Folder: `get`    | N/A                               | N/A                                   |
+| Folder: `delete` | N/A                               | Delete folder and children files      |
+| File: `create`   | N/A                               | Create file                           |
+| File: `update`   | Update metadata                   | Update file                           |
+| File: `list`     | N/A                               | N/A                                   |
+| File: `get`      | Get file metadata                 | Get file                              |
+| File: `delete`   | N/A                               | Delete the file                       |
+
+``` yaml
+paths:
+  /:folderPath/:
+    update: # update the file and patch metadata
+    list: # return `zip` folder of accessible files / return JSON object with metadata of 
+    get: # return the file
+    delete: # delete the file
+  /:filePath:
+    create: # upload a file
+    update: # update the file / patch metadata
+    list: # return `zip` folder of accessible files / list file metadata
+    get: # return the file
+    delete: # delete the file
+```
 
 For simple allow/deny, you can return boolean values. This should be a simple javascript expression in a string.
 
