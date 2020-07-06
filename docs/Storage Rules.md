@@ -2,7 +2,7 @@
 
 File authorization is tricky to manage, and means developers need to spend a lot of time on authentication and authorization. Using Hasura Backend Plus means all this complex code is done for you! All you need to do is set out file access rules, which makes creating and updating rules easy to manage.
 
-The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [template set of rules](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you may need to change for your project.
+The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [rules template](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you can change for your specific project.
 
 ``` yaml
 functions:
@@ -17,27 +17,12 @@ paths:
     write: 'isOwner(userId)'
 ```
 
-In the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+The `yaml` file is split into the following sections:
 
-This is a URL-encoded string, in the following template:
+ - [Paths](#paths)
+ - [Functions](#functions)
 
-``` txt
-s:<request.auth>.<checksum>
-```
-
-The `request.auth` part is a JSON object, which is the same as the [Hasura permission variables](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/index.html#overview) but with the `x-hasura-` prefix removed:
-
-``` json
-{
-  "user-id": "73f5d02c-484a-4003-98e4-bad5c6001882",
-  "allowed-roles": [
-    "user"
-  ],
-  "default-role": "user"
-}
-```
-
-You can access these variables through `request.auth` (for example `request.auth['default-role']`) when creating your storage rules.
+---
 
 ## Paths
 
@@ -131,7 +116,27 @@ paths:
 
 > It is not possible to call functions inside other functions
 
-Functions allow you to define permissions which can be used by any rules. You can access the `permission_variables` cookie here, as `request.auth`.
+Functions allow you to define permissions which can be used by any rules. Functions have access to the query string of the request, and the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+
+You can have a look at the permission variables by examining the `permission_variables` cookie. This is a URL-encoded string, in the following template:
+
+``` txt
+s:<request.auth>.<checksum>
+```
+
+The `request.auth` part is a JSON object, which is the same as the [Hasura permission variables](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/index.html#overview) but with the `x-hasura-` prefix removed:
+
+``` json
+{
+  "user-id": "73f5d02c-484a-4003-98e4-bad5c6001882",
+  "allowed-roles": [
+    "user"
+  ],
+  "default-role": "user"
+}
+```
+
+You can access these variables through `request.auth` (for example `request.auth['default-role']`) when creating your storage rules.
 
 A simple function would be to test if a user is authenticated. You can do this by checking if `request.auth` is present:
 
