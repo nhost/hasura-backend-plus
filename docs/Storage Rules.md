@@ -2,7 +2,7 @@
 
 File authorization is tricky to manage, and means developers need to spend a lot of time on authentication and authorization. Using Hasura Backend Plus means all this complex code is done for you! All you need to do is set out file access rules, which makes creating and updating rules easy to manage.
 
-The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [rules template](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you can change for your specific project.
+The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [rules template](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you can change for your specific project:
 
 ``` yaml
 functions:
@@ -80,8 +80,6 @@ You can specify the following rules in your `rules.yaml` file.
 
 For simple allow/deny, you can return boolean values. This should be a simple javascript expression in a string.
 
-For any complex permissions using variables, you should use [functions](#functions)
-
 ``` yaml
 paths:
   /public:
@@ -89,6 +87,8 @@ paths:
   /private:
     list: 'return false'
 ```
+
+(For any complex permissions using variables, you should use [functions](#functions)).
 
 ### File tokens
 
