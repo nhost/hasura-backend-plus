@@ -78,21 +78,6 @@ You can specify the following rules in your `rules.yaml` file.
 | File: `get`      | Get file metadata                 | Get file                              |
 | File: `delete`   | N/A                               | Delete the file                       |
 
-``` yaml
-paths:
-  /:folderPath/:
-    update: # update the file and patch metadata
-    list: # return `zip` folder of accessible files / return JSON object with metadata of 
-    get: # return the file
-    delete: # delete the file
-  /:filePath:
-    create: # upload a file
-    update: # update the file / patch metadata
-    list: # return `zip` folder of accessible files / list file metadata
-    get: # return the file
-    delete: # delete the file
-```
-
 For simple allow/deny, you can return boolean values. This should be a simple javascript expression in a string.
 
 For any complex permissions using variables, you should use [functions](#functions)
