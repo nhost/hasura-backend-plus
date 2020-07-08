@@ -68,10 +68,12 @@ You can specify the following rules in your `rules.yaml` file.
 
 | Action           | Metadata (`/m/`)                  | Object (`/o/`)                        |
 |------------------|-----------------------------------|---------------------------------------|
+| Folder: `create` | N/A                               | N/A                                   |
 | Folder: `update` | N/A                               | N/A                                   |
 | Folder: `list`   | Get metadata for accessible files | Get `.zip` folder of accessible files |
 | Folder: `get`    | N/A                               | N/A                                   |
-| Folder: `delete` | N/A                               | Delete folder and children files      |
+| Folder: `delete` | N/A                               | N/A                                   |
+| &nbsp;           |                                   |                                       |
 | File: `create`   | N/A                               | Create file                           |
 | File: `update`   | Update metadata                   | Update file                           |
 | File: `list`     | N/A                               | N/A                                   |
