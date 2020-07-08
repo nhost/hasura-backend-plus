@@ -165,7 +165,7 @@ Here is an example on the way to proceed to add a `nickname` value to the regist
 
 1. Add a column `nickname` of type text to the `public.users` table
 2. Set the environment variable `REGISTRATION_CUSTOM_FIELDS=nickname`
-3. The registration endpoint now expects a `nickname` value in addition to `email` and `password`
+3. The registration endpoint now expects a `user_data` value in addition to `email` and `password` that has `{"nickname": "Some Nickname"}`
 
 ::: warning
 Any given field must exist in the `users` GraphQL type that corresponds to the `public.users` PostgreSQL table, or registration will fail.
