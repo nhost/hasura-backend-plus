@@ -64,7 +64,7 @@ Here's an example path that would be validated by this rule:
 
 ## Rules
 
-You can specify the following rules in your `rules.yaml` file.
+You can specify the following rules in your `rules.yaml` file:
 
 | Action           | Metadata (`/m/`)                  | Object (`/o/`)                        |
 |------------------|-----------------------------------|---------------------------------------|
@@ -90,7 +90,7 @@ paths:
     list: 'false'
 ```
 
-(For any complex permissions using variables, you should use [functions](#functions)).
+For any complex permissions using variables, you should use [functions](#functions).
 
 ### File tokens
 
@@ -192,7 +192,7 @@ Say you have many users that belong to different companies. You need to allow us
 
 You will need a `company_id` column on your `users` table, and from this we can add appropriate permissions.
 
-First, you need to add this column to the authentication permission variables, so that the `request.auth` now contains this variable.
+First, you need to add this column to the authentication permission variables, so that the `request.auth` now contains this variable:
 
 ``` json
 {
