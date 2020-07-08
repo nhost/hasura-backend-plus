@@ -78,14 +78,14 @@ You can specify the following rules in your `rules.yaml` file.
 | File: `get`      | Get file metadata                 | Get file                              |
 | File: `delete`   | N/A                               | Delete the file                       |
 
-For simple allow/deny, you can return boolean values. This should be a simple javascript expression in a string.
+For simple allow/deny, you can return boolean values (`true`/`false`) in a string.
 
 ``` yaml
 paths:
   /public:
-    list: 'return true'
+    list: 'true'
   /private:
-    list: 'return false'
+    list: 'false'
 ```
 
 (For any complex permissions using variables, you should use [functions](#functions)).
@@ -177,9 +177,9 @@ functions:
   isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
 paths:
   /:userId/:
-    list: isOwner(userId)
+    list: 'isOwner(userId)'
   /:userId/:fileId:
-    read: isOwner(userId)
+    read: 'isOwner(userId)'
 ```
 
 This rule will allow users to list their own file directory, and read their own files.
@@ -207,10 +207,10 @@ Now, you can add the following functions to your `rules.yaml`:
 
 ``` yaml
 functions:
-  employedBy: "return !!request.auth && request.auth['company-id'] === companyId"
+  employedBy: 'return !!request.auth && request.auth["company-id"] === companyId'
 paths:
   /:companyId/:
-    list: "employedBy(companyId)"
+    list: 'employedBy(companyId)'
   /:companyId/:fileId:
     read: 'employedBy(companyId) && validToken()'
     write: 'employedBy(companyId)'
