@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE SCHEMA auth;
-CREATE FUNCTION public.set_current_timestamp_updated_at() RETURNS trigger
+CREATE OR REPLACE FUNCTION public.set_current_timestamp_updated_at() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 declare

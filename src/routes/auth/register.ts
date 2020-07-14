@@ -1,8 +1,9 @@
 import {
   AUTO_ACTIVATE_NEW_USERS,
   SERVER_URL,
-  SMTP_ENABLE,
+  EMAILS_ENABLE,
   DEFAULT_USER_ROLE,
+  DEFAULT_ALLOWED_USER_ROLES,
   VERIFY_EMAILS
 } from '@shared/config'
 import { Request, Response } from 'express'
@@ -41,7 +42,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
       active: AUTO_ACTIVATE_NEW_USERS,
       default_role: DEFAULT_USER_ROLE,
       account_roles: {
-        data: [{ role: DEFAULT_USER_ROLE }]
+        data: DEFAULT_ALLOWED_USER_ROLES.map(role => ({ role }))
       },
       user: {
         data: { display_name: email, ...user_data }
@@ -50,7 +51,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   })
 
   if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
-    if (!SMTP_ENABLE) {
+    if (!EMAILS_ENABLE) {
       throw Boom.badImplementation('SMTP settings unavailable')
     }
 

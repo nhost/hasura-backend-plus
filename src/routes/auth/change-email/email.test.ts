@@ -6,16 +6,13 @@ import { account, request } from '@test/test-mock-account'
 import { mailHogSearch, deleteMailHogEmail } from '@test/test-utils'
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
-import { JWT_CLAIMS_NAMESPACE, NOTIFY_EMAIL_CHANGE, SMTP_ENABLE } from '@shared/config'
+import { JWT_CLAIMS_NAMESPACE, NOTIFY_EMAIL_CHANGE, EMAILS_ENABLE } from '@shared/config'
 
 let ticket: string
 const new_email = `${generateRandomString()}@${generateRandomString()}.com`
 
 it('should request to change email', async () => {
-  const { status } = await request
-    .post('/auth/change-email/request')
-    .set('Authorization', `Bearer ${account.token}`)
-    .send({ new_email })
+  const { status } = await request.post('/auth/change-email/request').send({ new_email })
   expect(status).toBe(204)
 })
 
@@ -29,10 +26,7 @@ it('should receive a ticket by email', async () => {
 })
 
 it('should change the email from a ticket', async () => {
-  const { status } = await request
-    .post('/auth/change-email/change')
-    .set('Authorization', `Bearer ${account.token}`)
-    .send({ ticket })
+  const { status } = await request.post('/auth/change-email/change').send({ ticket })
   expect(status).toEqual(204)
 })
 
@@ -51,7 +45,7 @@ it('should reconnect using the new email', async () => {
 })
 
 it('should receive an email notifying the email account has been changed', async () => {
-  if (SMTP_ENABLE && NOTIFY_EMAIL_CHANGE) {
+  if (EMAILS_ENABLE && NOTIFY_EMAIL_CHANGE) {
     const [message] = await mailHogSearch(account.email)
     expect(message).toBeTruthy()
     expect(message.Content.Headers.Subject).toInclude(

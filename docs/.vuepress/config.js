@@ -6,12 +6,13 @@ module.exports = {
     nav: [
       { text: 'Getting started', link: '/guide/' },
       { text: 'Configuration', link: '/configuration/' },
-      { text: 'Recipes', link: '/recipes/' },
+      // { text: 'Recipes', link: '/recipes/' },
       { text: 'API', link: '/api/' }
     ],
     displayAllHeaders: true,
     sidebarDepth: 2,
-    sidebar: ['/guide', '/configuration', 'recipes', '/api'],
+    // sidebar: ['/guide', '/configuration', 'recipes', '/api'],
+    sidebar: ['/guide', '/configuration', '/api'],
     smoothScroll: true,
     lastUpdated: 'Last Updated',
     repo: 'nhost/hasura-backend-plus',

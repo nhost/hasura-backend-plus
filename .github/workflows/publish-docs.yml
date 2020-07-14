@@ -1,9 +1,10 @@
 name: Publish documentation
 on:
   push:
-    branches: [v2]
+    branches: [master]
     paths:
       - 'docs/**'
+      - 'examples/**'
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -31,4 +32,4 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: docs/.vuepress/dist
-          BASE_BRANCH: v2
+          BASE_BRANCH: master

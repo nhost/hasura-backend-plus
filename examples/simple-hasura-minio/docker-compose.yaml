@@ -3,10 +3,12 @@ services:
   postgres:
     image: postgres:12
     restart: always
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
     volumes:
       - db_data:/var/lib/postgresql/data
   graphql-engine:
-    image: hasura/graphql-engine:v1.2.0
+    image: hasura/graphql-engine:v1.2.1
     ports:
       - '8080:8080'
     depends_on:
@@ -26,5 +28,22 @@ services:
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
       HASURA_GRAPHQL_ADMIN_SECRET: '$HASURA_GRAPHQL_ADMIN_SECRET'
       JWT_ALGORITHM: RS256
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: hasura-backend-plus
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}'
+      AUTO_MIGRATE: true
+  minio:
+    image: minio/minio
+    restart: always
+    environment:
+      S3_BUCKET: hasura-backend-plus
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}' ## min 8 character
+    entrypoint: sh
+    command: "-c 'mkdir -p /export/hasura-backend-plus && /usr/bin/minio server /export'"
+    volumes:
+      - 'minio_data:/data'
 volumes:
   db_data:
+  minio_data:

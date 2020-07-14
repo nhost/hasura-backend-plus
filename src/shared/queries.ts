@@ -97,10 +97,13 @@ export const selectAccountByTicket = gql`
 
 export const insertRefreshToken = gql`
   mutation($refresh_token_data: auth_refresh_tokens_insert_input!) {
-    insert_auth_refresh_tokens(objects: [$refresh_token_data]) {
-      affected_rows
+    insert_auth_refresh_tokens_one(object: $refresh_token_data) {
+      account {
+        ...accountFragment
+      }
     }
   }
+  ${accountFragment}
 `
 
 export const selectRefreshToken = gql`

@@ -1,14 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import {
-  StoragePermissions,
-  createContext,
-  generateMetadata,
-  getHeadObject,
-  getKey,
-  hasPermission,
-  replaceMetadata
-} from './utils'
+import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
@@ -19,9 +11,8 @@ export const uploadFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: Partial<StoragePermissions>,
-  isMetadataRequest = false,
-  metadata: object = {}
+  rules: Partial<PathConfig>,
+  isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
 
@@ -47,20 +38,18 @@ export const uploadFile = async (
       Body: resource.data,
       ContentType: resource.mimetype,
       Metadata: {
-        filename: resource.name,
-        token: uuidv4(),
-        ...(oldHeadObject?.Metadata || {}),
-        ...generateMetadata(metadata, context)
+        token: oldHeadObject?.Metadata?.token || uuidv4()
       }
     }
     try {
       await s3.upload(upload_params).promise()
     } catch (err) {
+      console.error(err)
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {
-    // * Update the object metadata. Only possible when the object already exists.
-    await replaceMetadata(req, true, generateMetadata(metadata, context))
+    throw Boom.notImplemented('Setting metadata is not implemented')
+    // await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
   return res.status(200).send(await getHeadObject(req))
 }

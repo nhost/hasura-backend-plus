@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { StoragePermissions, createContext, getHeadObject, getKey, hasPermission } from './utils'
+import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
@@ -9,7 +9,7 @@ export const getFile = async (
   req: Request,
   res: Response,
   _next: NextFunction,
-  rules: Partial<StoragePermissions>,
+  rules: Partial<PathConfig>,
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
@@ -24,7 +24,7 @@ export const getFile = async (
     throw Boom.forbidden()
   }
   if (isMetadataRequest) {
-    return res.status(200).send(headObject)
+    return res.status(200).send({ key, ...headObject })
   } else {
     const params = {
       Bucket: S3_BUCKET as string,

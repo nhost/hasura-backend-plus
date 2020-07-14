@@ -8,9 +8,7 @@ let otpSecret: string
 let accountTicket: string
 
 it('should generate a secret', async () => {
-  const { body, status } = await request
-    .post('/auth/mfa/generate')
-    .set('Authorization', `Bearer ${account.token}`)
+  const { body, status } = await request.post('/auth/mfa/generate')
 
   /**
    * Save OTP secret to globally scoped variable.
@@ -26,7 +24,6 @@ it('should generate a secret', async () => {
 it('should enable mfa for account', async () => {
   const { status } = await request
     .post('/auth/mfa/enable')
-    .set('Authorization', `Bearer ${account.token}`)
     .send({ code: authenticator.generate(otpSecret) })
 
   expect(status).toEqual(204)
@@ -68,7 +65,6 @@ it('should sign the account in (mfa)', async () => {
 it('should disable mfa for account', async () => {
   const { status } = await request
     .post('/auth/mfa/disable')
-    .set('Authorization', `Bearer ${account.token}`)
     .send({ code: authenticator.generate(otpSecret) })
 
   expect(status).toEqual(204)

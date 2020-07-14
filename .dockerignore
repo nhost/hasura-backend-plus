@@ -17,3 +17,4 @@ npm-debug.log
 yarn-error.log
 **/*.test.ts
 src/test
+**/*.pem
