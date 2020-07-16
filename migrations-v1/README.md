@@ -36,10 +36,10 @@ Go to the Hasura console and track all tables/relationships, specifically in the
 
 # FAQ
 
-## What does the migrations script do?
+## What does this migration script do?
 
 1. Drop all Hasura relationships specific for HBPv1.
-2. Crete new tables and copy all existing data from old to the new tables.
+2. Crete new tables specific for HBPv2 and copy relevant data from old to the new tables.
 
 ## Will this script always work?
 
