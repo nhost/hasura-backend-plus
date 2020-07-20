@@ -10,6 +10,7 @@
 - build: reduction of the docker image from 617MB to 216MB (#291)
 - server: Add `SameSite=None` header to mitigate future cross-site errors from Chrome (#294)
 - server: Removed `X-Frame-Options` for GET storage requests.
+- server: Return file key on upload
 
 ## v2.0.0-rc.4
 
