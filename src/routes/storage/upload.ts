@@ -51,5 +51,6 @@ export const uploadFile = async (
     throw Boom.notImplemented('Setting metadata is not implemented')
     // await replaceMetadata(req, true, generateMetadata(metadata, context))
   }
-  return res.status(200).send(await getHeadObject(req))
+  const headObject = await getHeadObject(req)
+  return res.status(200).send({ key, ...headObject })
 }
