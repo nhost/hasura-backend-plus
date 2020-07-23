@@ -4,13 +4,8 @@ import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { COOKIE_SECRET } from '@shared/config'
-import {
-  newJwtExpiry,
-  newRefreshExpiry,
-  createHasuraJwt,
-  setCookie,
-  generatePermissionVariables
-} from '@shared/jwt'
+import { newJwtExpiry, createHasuraJwt, generatePermissionVariables } from '@shared/jwt'
+import { newRefreshExpiry, setCookie } from '@shared/cookies'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { AccountData } from '@shared/types'

@@ -4,13 +4,12 @@ export * from './registration'
 export * from './jwt'
 export * from './providers'
 export * from './mfa'
-
+export * from './cookies'
 /**
  * * Authentication settings
  */
 export const AUTH_ENABLE = castBooleanEnv('AUTH_ENABLE', true)
 export const AUTH_LOCAL_USERS_ENABLE = castBooleanEnv('AUTH_LOCAL_USERS_ENABLE', true)
-export const { COOKIE_SECRET } = process.env
 export const CHANGE_EMAIL_ENABLE = castBooleanEnv('CHANGE_EMAIL_ENABLE', true)
 export const NOTIFY_EMAIL_CHANGE = castBooleanEnv('NOTIFY_EMAIL_CHANGE', false)
 export const ANONYMOUS_USERS_ENABLE = castBooleanEnv('ANONYMOUS_USERS_ENABLE', false)
