@@ -13,7 +13,7 @@ import {
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
 import { InsertAccountData, QueryAccountProviderData, AccountData, UserData } from '@shared/types'
-import { setRefreshToken } from '@shared/jwt'
+import { setRefreshToken } from '@shared/cookies'
 
 interface Constructable<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

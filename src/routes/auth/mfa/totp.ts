@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, rotateTicket, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
+import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
+import { setRefreshToken } from '@shared/cookies'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'

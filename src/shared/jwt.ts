@@ -1,11 +1,9 @@
 import {
   JWT_KEY_FILE_PATH,
-  COOKIE_SECRET,
   JWT_ALGORITHM,
   JWT_EXPIRES_IN,
   JWT_KEY,
   JWT_CLAIMS_NAMESPACE,
-  JWT_REFRESH_EXPIRES_IN,
   DEFAULT_USER_ROLE,
   DEFAULT_ANONYMOUS_ROLE,
   JWT_CUSTOM_FIELDS
@@ -13,19 +11,9 @@ import {
 import { JWK, JWKS, JWT } from 'jose'
 
 import Boom from '@hapi/boom'
-import { Response } from 'express'
 import fs from 'fs'
-import { insertRefreshToken } from './queries'
-import { request } from './request'
-import { v4 as uuidv4 } from 'uuid'
 import kebabCase from 'lodash.kebabcase'
 import { Claims, Token, AccountData, ClaimValueType } from './types'
-
-interface InsertRefreshTokenData {
-  insert_auth_refresh_tokens_one: {
-    account: AccountData
-  }
-}
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -135,76 +123,6 @@ export const getClaims = (authorization: string | undefined): Claims => {
   } catch (err) {
     throw Boom.unauthorized('Invalid or expired JWT token.')
   }
-}
-
-/**
- * New refresh token expiry date.
- */
-export function newRefreshExpiry(): number {
-  const now = new Date()
-  const days = JWT_REFRESH_EXPIRES_IN / 1440
-
-  return now.setDate(now.getDate() + days)
-}
-
-/**
- * Set refresh token as a cookie
- * @param res Express Response
- * @param refresh_token Refresh token to be set
- */
-export const setCookie = (
-  res: Response,
-  refresh_token: string,
-  permission_variables: string
-): void => {
-  // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
-  const maxAge = JWT_REFRESH_EXPIRES_IN * 60 * 1000
-
-  // set refresh token as cookie
-  res.cookie('refresh_token', refresh_token, {
-    httpOnly: true,
-    maxAge,
-    signed: Boolean(COOKIE_SECRET),
-    sameSite: 'none'
-  })
-
-  // set permission variables cookie
-  res.cookie('permission_variables', permission_variables, {
-    httpOnly: true,
-    maxAge,
-    signed: Boolean(COOKIE_SECRET),
-    sameSite: 'none'
-  })
-}
-
-/**
- * Insert new refresh token in database and set new refresh token as cookie.
- * @param res Express Response
- * @param accountId Account ID
- * @param refresh_token (optional) Refresh token to be set
- */
-export const setRefreshToken = async (
-  res: Response,
-  accountId: string,
-  refresh_token?: string
-): Promise<void> => {
-  if (!refresh_token) {
-    refresh_token = uuidv4()
-  }
-
-  const insert_account_data = (await request(insertRefreshToken, {
-    refresh_token_data: {
-      account_id: accountId,
-      refresh_token,
-      expires_at: new Date(newRefreshExpiry())
-    }
-  })) as InsertRefreshTokenData
-
-  const { account } = insert_account_data.insert_auth_refresh_tokens_one
-
-  const permission_variables = JSON.stringify(generatePermissionVariables(account))
-
-  setCookie(res, refresh_token, permission_variables)
 }
 
 /**
