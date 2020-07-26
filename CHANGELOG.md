@@ -10,6 +10,7 @@
 - server: Add `SameSite=None` header to mitigate future cross-site errors from Chrome (#294)
 - server: Removed `X-Frame-Options` for GET storage requests.
 - server: Return file key on upload
+- server: add COOKIE_SECURE (default: true) and COOKIE_SAME_SITE (default: lax) environment variables
 
 ## v2.0.0
 
