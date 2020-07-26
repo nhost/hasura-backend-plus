@@ -5,7 +5,7 @@
     "url": "git://github.com/nhost/hasura-backend-plus.git",
     "type": "git"
   },
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "src/start.ts",
   "scripts": {
     "build": "tsc",
