@@ -89,7 +89,11 @@ const providerCallback = async (req: Request, res: Response): Promise<void> => {
   // However, we send account data.
   const account = req.user as AccountData
 
-  await setRefreshToken(res, account.id)
+  try {
+    await setRefreshToken(res, account.id)
+  } catch(e) {
+    res.redirect(PROVIDER_FAILURE_REDIRECT as string)
+  }
 
   // redirect back user to app url
   res.redirect(PROVIDER_SUCCESS_REDIRECT as string)
