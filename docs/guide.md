@@ -60,6 +60,7 @@ git clone https://github.com/nhost/hasura-backend-plus.git
 cd hasura-backend-plus
 yarn
 cp .env.example .env
+yarn build
 yarn start
 ```
 
