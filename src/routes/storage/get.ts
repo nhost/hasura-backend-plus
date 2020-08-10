@@ -26,9 +26,22 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
+    const filesize = headObject.ContentLength as number
+    const reqRange = req.headers.range
+
+    let start, end, range, chunksize
+    if (reqRange) {
+      const parts = reqRange.replace(/bytes=/, '').split('-')
+      start = parseInt(parts[0])
+      end = parts[1] ? parseInt(parts[1]) : filesize - 1
+      range = `bytes=${start}-${end}`
+      chunksize = end - start + 1
+    }
+
     const params = {
       Bucket: S3_BUCKET as string,
-      Key: key
+      Key: key,
+      Range: range
     }
     const stream = s3.getObject(params).createReadStream()
     // forward errors
@@ -44,6 +57,18 @@ export const getFile = async (
     res.set('Content-Disposition', `inline;`)
     res.set('Cache-Control', 'public, max-age=31557600')
     res.set('ETag', headObject.ETag)
+
+    // Set Content Range, Length Accepted Ranges
+    if (range) {
+      res.set('Content-Length', `${chunksize}`)
+      res.set('Content-Range', `bytes ${start}-${end}/${filesize}`)
+      res.set('Accept-Ranges', 'bytes')
+
+      // Set 206 Partial Content status if chunked response
+      if (chunksize && chunksize < filesize) {
+        res.status(206)
+      }
+    }
 
     // Pipe the s3 object to the response
     stream.pipe(res)
