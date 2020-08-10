@@ -13,7 +13,7 @@ import { emailClient } from '@shared/email'
 async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
   const { ticket } = await verifySchema.validateAsync(body)
 
-  const { email, new_email } = await selectAccountByTicket(ticket)
+  const { email, new_email, user } = await selectAccountByTicket(ticket)
 
   const hasuraData = await request<UpdateAccountData>(changeEmailByTicket, {
     ticket,
@@ -30,7 +30,10 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
     try {
       await emailClient.send({
         template: 'notify-email-change',
-        locals: { url: SERVER_URL },
+        locals: {
+          url: SERVER_URL,
+          display_name: user.display_name
+        },
         message: {
           to: email
         }

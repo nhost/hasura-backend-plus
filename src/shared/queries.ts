@@ -246,6 +246,11 @@ export const setNewEmail = gql`
       where: { user: { id: { _eq: $user_id } } }
       _set: { new_email: $new_email }
     ) {
+      returning {
+        user {
+          display_name
+        }
+      }
       affected_rows
     }
   }

@@ -90,3 +90,12 @@ export interface InsertAccountData {
     returning: AccountData[]
   }
 }
+
+export interface SetNewEmailData {
+  update_auth_accounts: {
+    returning: {
+      user: UserData
+    }[]
+    affected_rows: number
+  }
+}
