@@ -39,6 +39,7 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
         }
       })
     } catch (err) {
+      console.error('Unable to send email')
       console.error(err)
       throw Boom.badImplementation()
     }

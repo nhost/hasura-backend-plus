@@ -51,8 +51,9 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
       }
     })
   } catch (e) {
-    console.error('Error insert account data::')
+    console.error('Error inserting user account')
     console.error(e)
+    throw Boom.badImplementation('Error inserting user account')
   }
 
   if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
