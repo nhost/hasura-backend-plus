@@ -33,27 +33,35 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
   const password_hash = await hashPassword(password)
 
-  await request<InsertAccountData>(insertAccount, {
-    account: {
-      email,
-      password_hash,
-      ticket,
-      ticket_expires_at,
-      active: AUTO_ACTIVATE_NEW_USERS,
-      default_role: DEFAULT_USER_ROLE,
-      account_roles: {
-        data: DEFAULT_ALLOWED_USER_ROLES.map(role => ({ role }))
-      },
-      user: {
-        data: { display_name: email, ...user_data }
+  try {
+    await request<InsertAccountData>(insertAccount, {
+      account: {
+        email,
+        password_hash,
+        ticket,
+        ticket_expires_at,
+        active: AUTO_ACTIVATE_NEW_USERS,
+        default_role: DEFAULT_USER_ROLE,
+        account_roles: {
+          data: DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
+        },
+        user: {
+          data: { display_name: email, ...user_data }
+        }
       }
-    }
-  })
+    })
+  } catch (e) {
+    console.error('Error insert account data::')
+    console.error(e)
+  }
 
   if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
     if (!EMAILS_ENABLE) {
       throw Boom.badImplementation('SMTP settings unavailable')
     }
+
+    // use display name from `user_data` if available
+    const display_name = 'display_name' in user_data ? user_data.display_name : email
 
     try {
       await emailClient.send({
@@ -68,7 +76,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
           }
         },
         locals: {
-          display_name: '',
+          display_name,
           ticket,
           url: SERVER_URL
         }
