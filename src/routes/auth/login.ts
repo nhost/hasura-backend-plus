@@ -58,9 +58,25 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
 
       const refresh_token = await setRefreshToken(res, account.id, useCookie)
 
+      const jwt_token = createHasuraJwt(account)
+      const jwt_expires_in = newJwtExpiry
+
+      // return
+      if (useCookie) {
+        res.send({
+          jwt_token,
+          jwt_expires_in
+        })
+      } else {
+        res.send({
+          jwt_token,
+          jwt_expires_in,
+          refresh_token
+        })
+      }
+      return
+
       return res.send({
-        jwt_token: createHasuraJwt(account),
-        jwt_expires_in: newJwtExpiry,
         refresh_token
       })
     }

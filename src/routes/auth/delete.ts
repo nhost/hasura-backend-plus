@@ -1,14 +1,13 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 
 import Boom from '@hapi/boom'
-import { asyncWrapper, getPermissionVariablesFromCookie } from '@shared/helpers'
+import { asyncWrapper } from '@shared/helpers'
 import { deleteAccountByUserId } from '@shared/queries'
 import { request } from '@shared/request'
-import { DeleteAccountData } from '@shared/types'
+import { DeleteAccountData, RequestExtended } from '@shared/types'
 
-async function deleteUser(req: Request, res: Response): Promise<unknown> {
-  const permission_variables = getPermissionVariablesFromCookie(req)
-  const user_id = permission_variables['user-id']
+async function deleteUser(req: RequestExtended, res: Response): Promise<unknown> {
+  const { 'user-id': user_id } = req.permission_variables
 
   const hasuraData = await request<DeleteAccountData>(deleteAccountByUserId, { user_id })
 

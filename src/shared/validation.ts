@@ -108,4 +108,8 @@ export const loginSchema = extendedJoi.object({
 })
 export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketFields })
-export const totpSchema = Joi.object({ ...codeFields, ...ticketFields })
+export const totpSchema = Joi.object({
+  ...codeFields,
+  ...ticketFields,
+  cookie: Joi.boolean()
+})
