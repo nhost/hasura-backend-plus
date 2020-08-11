@@ -19,6 +19,9 @@ interface HasuraData {
 }
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
+  // useCookie or not
+  const useCookie = body.cookie
+
   if (ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
@@ -53,11 +56,12 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
 
       const account = hasura_data.insert_auth_accounts.returning[0]
 
-      await setRefreshToken(res, account.id)
+      const refresh_token = await setRefreshToken(res, account.id, useCookie)
 
       return res.send({
         jwt_token: createHasuraJwt(account),
-        jwt_expires_in: newJwtExpiry
+        jwt_expires_in: newJwtExpiry,
+        refresh_token
       })
     }
   }
@@ -85,12 +89,26 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     return res.send({ mfa: true, ticket })
   }
 
-  await setRefreshToken(res, id)
+  // refresh_token
+  const refresh_token = await setRefreshToken(res, id, useCookie)
 
-  return res.send({
-    jwt_token: createHasuraJwt(account),
-    jwt_expires_in: newJwtExpiry
-  })
+  // generate JWT
+  const jwt_token = createHasuraJwt(account)
+  const jwt_expires_in = newJwtExpiry
+
+  // return
+  if (useCookie) {
+    res.send({
+      jwt_token,
+      jwt_expires_in
+    })
+  } else {
+    res.send({
+      jwt_token,
+      jwt_expires_in,
+      refresh_token
+    })
+  }
 }
 
 export default asyncWrapper(loginAccount)
