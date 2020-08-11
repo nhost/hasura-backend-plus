@@ -1,3 +1,6 @@
+import { string } from '@hapi/joi'
+import { Request } from 'express'
+
 export type ClaimValueType =
   | string
   | string[]
@@ -89,4 +92,13 @@ export interface InsertAccountData {
   insert_auth_accounts: {
     returning: AccountData[]
   }
+}
+
+export interface RefreshTokenMiddleware {
+  value: string | null
+  type: 'query' | 'cookie' | null
+}
+
+export interface RequestExtended extends Request {
+  refresh_token: RefreshTokenMiddleware
 }

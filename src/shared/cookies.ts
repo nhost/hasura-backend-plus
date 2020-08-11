@@ -56,16 +56,18 @@ export const setCookie = (
 }
 
 /**
- * Insert new refresh token in database and set new refresh token as cookie.
+ * Insert new refresh token in database and maybe set new refresh token as cookie.
  * @param res Express Response
  * @param accountId Account ID
+ * @param useCookie (optional) if the cookie should be set or not
  * @param refresh_token (optional) Refresh token to be set
  */
 export const setRefreshToken = async (
   res: Response,
   accountId: string,
+  useCookie = false,
   refresh_token?: string
-): Promise<void> => {
+): Promise<string> => {
   if (!refresh_token) {
     refresh_token = uuidv4()
   }
@@ -78,9 +80,14 @@ export const setRefreshToken = async (
     }
   })) as InsertRefreshTokenData
 
-  const { account } = insert_account_data.insert_auth_refresh_tokens_one
+  if (useCookie) {
+    const { account } = insert_account_data.insert_auth_refresh_tokens_one
+    const permission_variables = JSON.stringify(generatePermissionVariables(account))
+    setCookie(res, refresh_token, permission_variables)
+  } else {
+    res.clearCookie('refresh_token')
+    res.clearCookie('permission_variables')
+  }
 
-  const permission_variables = JSON.stringify(generatePermissionVariables(account))
-
-  setCookie(res, refresh_token, permission_variables)
+  return refresh_token
 }
