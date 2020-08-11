@@ -74,11 +74,8 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
           refresh_token
         })
       }
-      return
 
-      return res.send({
-        refresh_token
-      })
+      return
     }
   }
 
