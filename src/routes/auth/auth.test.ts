@@ -117,7 +117,7 @@ it('should complain about incorrect email', async () => {
 })
 
 it('should sign the user in', async () => {
-  const { body, status } = await request.post('/auth/login').send({ email, password })
+  const { body, status } = await request.post('/auth/login').send({ email, password, cookie: true })
   // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
   expect(status).toEqual(200)
