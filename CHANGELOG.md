@@ -2,6 +2,8 @@
 
 ## Next release
 
+- server: Support streaming content (#307)
+
 ## v2.1.0
 
 - server: Added version endpoint
