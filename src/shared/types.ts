@@ -101,4 +101,5 @@ export interface RefreshTokenMiddleware {
 
 export interface RequestExtended extends Request {
   refresh_token: RefreshTokenMiddleware
+  permission_variables: PermissionVariables
 }
