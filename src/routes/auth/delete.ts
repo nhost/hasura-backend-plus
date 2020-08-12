@@ -7,6 +7,10 @@ import { request } from '@shared/request'
 import { DeleteAccountData, RequestExtended } from '@shared/types'
 
 async function deleteUser(req: RequestExtended, res: Response): Promise<unknown> {
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Unable to delete account')
+  }
+
   const { 'user-id': user_id } = req.permission_variables
 
   const hasuraData = await request<DeleteAccountData>(deleteAccountByUserId, { user_id })

@@ -1,22 +1,20 @@
-import {
-  asyncWrapper,
-  selectAccountByUserId,
-  getPermissionVariablesFromCookie
-} from '@shared/helpers'
-import { Request, Response } from 'express'
+import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
+import { Response } from 'express'
 import { deleteOtpSecret } from '@shared/queries'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
+import { RequestExtended } from '@shared/types'
 
-async function disableMfa(req: Request, res: Response): Promise<unknown> {
+async function disableMfa(req: RequestExtended, res: Response): Promise<unknown> {
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
   const { code } = await mfaSchema.validateAsync(req.body)
-
-  const permission_variables = getPermissionVariablesFromCookie(req)
-  const user_id = permission_variables['user-id']
-
   const { otp_secret, mfa_enabled } = await selectAccountByUserId(user_id)
 
   if (!mfa_enabled) {

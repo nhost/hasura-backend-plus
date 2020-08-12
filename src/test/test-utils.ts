@@ -98,7 +98,7 @@ export const registerAccount = async (agent: SuperTest<Test>): Promise<TestAccou
     await agent.get(`/auth/activate?ticket=${ticket}`)
     await deleteEmailsOfAccount(email)
   }
-  const res = await agent.post('/auth/login').send({ email, password })
+  const res = await agent.post('/auth/login').send({ email, password, cookie: true })
   // * Set the use variable so it is accessible to the jest test file
   return {
     email,

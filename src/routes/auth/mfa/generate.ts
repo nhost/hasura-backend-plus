@@ -1,13 +1,18 @@
-import { Request, Response } from 'express'
-import { asyncWrapper, createQR, getPermissionVariablesFromCookie } from '@shared/helpers'
-import { OTP_ISSUER } from '@shared/config'
+import { Response } from 'express'
+import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
+import { asyncWrapper, createQR } from '@shared/helpers'
+import { OTP_ISSUER } from '@shared/config'
 import { request } from '@shared/request'
 import { updateOtpSecret } from '@shared/queries'
+import { RequestExtended } from '@shared/types'
 
-async function generateMfa(req: Request, res: Response): Promise<unknown> {
-  const permission_variables = getPermissionVariablesFromCookie(req)
-  const user_id = permission_variables['user-id']
+async function generateMfa(req: RequestExtended, res: Response): Promise<unknown> {
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
 
   /**
    * Generate OTP secret and key URI.

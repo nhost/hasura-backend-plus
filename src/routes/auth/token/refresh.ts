@@ -3,7 +3,6 @@ import { Response } from 'express'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import Boom from '@hapi/boom'
-import { COOKIE_SECRET } from '@shared/config'
 import { newJwtExpiry, createHasuraJwt, generatePermissionVariables } from '@shared/jwt'
 import { newRefreshExpiry, setCookie } from '@shared/cookies'
 import { request } from '@shared/request'
@@ -15,6 +14,10 @@ interface HasuraData {
 }
 
 async function refreshToken({ refresh_token }: RequestExtended, res: Response): Promise<void> {
+  if (!refresh_token) {
+    throw Boom.unauthorized('Invalid or expired refresh token.')
+  }
+
   if (!refresh_token.value) {
     throw Boom.unauthorized('Invalid or expired refresh token.')
   }

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import Boom from '@hapi/boom'
 
@@ -9,8 +9,9 @@ import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
 
 import { getRequestInfo } from './utils'
+import { RequestExtended } from '@shared/types'
 
-async function requestChangeEmail(req: Request, res: Response): Promise<unknown> {
+async function requestChangeEmail(req: RequestExtended, res: Response): Promise<unknown> {
   const { user_id, new_email } = await getRequestInfo(req)
 
   // smtp must be enabled for request change password to work.

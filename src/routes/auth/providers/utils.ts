@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from 'express'
+import express, { Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
@@ -12,7 +12,13 @@ import {
 } from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
-import { InsertAccountData, QueryAccountProviderData, AccountData, UserData } from '@shared/types'
+import {
+  InsertAccountData,
+  QueryAccountProviderData,
+  AccountData,
+  UserData,
+  RequestExtended
+} from '@shared/types'
 import { setRefreshToken } from '@shared/cookies'
 
 interface Constructable<T> {
@@ -31,7 +37,7 @@ const manageProviderStrategy = (
   provider: string,
   transformProfile: TransformProfileFunction
 ) => async (
-  _req: Request,
+  _req: RequestExtended,
   _accessToken: string,
   _refreshToken: string,
   profile: Profile,
@@ -81,7 +87,7 @@ const manageProviderStrategy = (
   return done(null, hasura_account_provider_data.insert_auth_accounts.returning[0])
 }
 
-const providerCallback = async (req: Request, res: Response): Promise<void> => {
+const providerCallback = async (req: RequestExtended, res: Response): Promise<void> => {
   // Successful authentication, redirect home.
   // generate tokens and redirect back home
 
@@ -91,7 +97,7 @@ const providerCallback = async (req: Request, res: Response): Promise<void> => {
 
   try {
     await setRefreshToken(res, account.id)
-  } catch(e) {
+  } catch (e) {
     res.redirect(PROVIDER_FAILURE_REDIRECT as string)
   }
 
