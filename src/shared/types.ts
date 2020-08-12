@@ -103,3 +103,12 @@ export interface RequestExtended extends Request {
   refresh_token?: RefreshTokenMiddleware
   permission_variables?: PermissionVariables
 }
+
+export interface SetNewEmailData {
+  update_auth_accounts: {
+    returning: {
+      user: UserData
+    }[]
+    affected_rows: number
+  }
+}

@@ -2,6 +2,10 @@
 
 ## Next release
 
+- server: `display_name` is attached for email templates
+
+## v2.1.1
+
 - server: Support streaming content (#307)
 
 ## v2.1.0
