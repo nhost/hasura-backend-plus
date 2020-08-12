@@ -2,6 +2,8 @@
 
 ## Next release
 
+## v2.1.1
+
 - server: Support streaming content (#307)
 
 ## v2.1.0
