@@ -14,6 +14,7 @@ async function disableMfa(req: RequestExtended, res: Response): Promise<unknown>
   }
 
   const { 'user-id': user_id } = req.permission_variables
+
   const { code } = await mfaSchema.validateAsync(req.body)
   const { otp_secret, mfa_enabled } = await selectAccountByUserId(user_id)
 
