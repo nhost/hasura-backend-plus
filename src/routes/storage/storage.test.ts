@@ -65,7 +65,9 @@ describe('Tests as an unauthenticated user', () => {
   })
 
   afterAll(async () => {
-    await request.post('/auth/login').send({ email: account.email, password: account.password })
+    await request
+      .post('/auth/login')
+      .send({ email: account.email, password: account.password, cookie: true })
   })
 
   it('should get file from the token stored in the file metadata while unauthenticated', async () => {
@@ -99,14 +101,11 @@ describe('Tests as an unauthenticated user', () => {
 // })
 
 it('should get file metadata', async () => {
-  const {
-    status,
-    body: {
-      Metadata: { token }
-    }
-  } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
+  console.log('should get file metadata log body:')
+  console.log(body)
   expect(status).toEqual(200)
-  expect(token).toEqual(fileToken)
+  expect(body.Metadata.token).toEqual(fileToken)
 })
 
 it('should get the headers of all the user files', async () => {

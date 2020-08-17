@@ -1,14 +1,16 @@
-import { Request } from 'express'
-import { selectAccountByEmail, getPermissionVariablesFromCookie } from '@shared/helpers'
+import { selectAccountByEmail } from '@shared/helpers'
 import { emailResetSchema } from '@shared/validation'
 import Boom from '@hapi/boom'
+import { RequestExtended } from '@shared/types'
 
 export const getRequestInfo = async (
-  req: Request
+  req: RequestExtended
 ): Promise<{ user_id: string | number; new_email: string }> => {
-  // get current user_id
-  const permission_variables = getPermissionVariablesFromCookie(req)
-  const user_id = permission_variables['user-id']
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
 
   // validate new email
   const { new_email } = await emailResetSchema.validateAsync(req.body)

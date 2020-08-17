@@ -1,4 +1,5 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
+import { RequestExtended } from '@shared/types'
 
 interface Error {
   output?: {
@@ -18,7 +19,7 @@ interface Error {
  */
 export async function errors(
   err: Error,
-  _req: Request,
+  _req: RequestExtended,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction

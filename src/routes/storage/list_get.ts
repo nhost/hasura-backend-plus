@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import { PathConfig, getKey } from './utils'
 import { getFile } from './get'
 import { listFile } from './list'
+import { RequestExtended } from '@shared/types'
 
 export const listGet = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   _next: NextFunction,
   rules: Partial<PathConfig>,

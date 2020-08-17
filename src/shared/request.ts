@@ -25,7 +25,7 @@ export async function request<T extends unknown>(
   try {
     return (await client.request(print(query), variables)) as T
   } catch (err) {
-    console.error(err);
+    console.error(err)
     throw Boom.badImplementation()
   }
 }

@@ -1,5 +1,5 @@
 import { HIBP_ENABLE, COOKIE_SECRET } from './config'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
@@ -13,7 +13,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables } from './types'
+import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
 
 /**
  * Create QR code.
@@ -32,7 +32,7 @@ export async function createQR(secret: string): Promise<string> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asyncWrapper(fn: any) {
-  return function (req: Request, res: Response, next: NextFunction): void {
+  return function (req: RequestExtended, res: Response, next: NextFunction): void {
     fn(req, res, next).catch(next)
   }
 }
@@ -113,7 +113,7 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
   return new_ticket
 }
 
-export const getPermissionVariablesFromCookie = (req: Request): PermissionVariables => {
+export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {
   const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw Boom.unauthorized()
   return JSON.parse(permission_variables)

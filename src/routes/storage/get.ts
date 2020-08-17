@@ -1,12 +1,13 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
 import Boom from '@hapi/boom'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
+import { RequestExtended } from '@shared/types'
 
 export const getFile = async (
-  req: Request,
+  req: RequestExtended,
   res: Response,
   _next: NextFunction,
   rules: Partial<PathConfig>,

@@ -7,9 +7,12 @@ import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { totpSchema } from '@shared/validation'
 
-async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
+async function totpLogin({ body }: Request, res: Response): Promise<void> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const account = await selectAccount(body)
+
+  // default to true
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   if (!account) {
     throw Boom.unauthorized('Invalid or expired ticket.')
@@ -33,13 +36,24 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.unauthorized('Invalid two-factor code.')
   }
 
-  await setRefreshToken(res, id)
+  const refresh_token = await setRefreshToken(res, id, useCookie)
   await rotateTicket(ticket)
+  const jwt_token = createHasuraJwt(account)
+  const jwt_expires_in = newJwtExpiry
 
-  return res.send({
-    jwt_token: createHasuraJwt(account),
-    jwt_expires_in: newJwtExpiry
-  })
+  // return
+  if (useCookie) {
+    res.send({
+      jwt_token,
+      jwt_expires_in
+    })
+  } else {
+    res.send({
+      jwt_token,
+      jwt_expires_in,
+      refresh_token
+    })
+  }
 }
 
 export default asyncWrapper(totpLogin)

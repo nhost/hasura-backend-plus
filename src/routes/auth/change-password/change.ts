@@ -1,24 +1,22 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import Boom from '@hapi/boom'
 import bcrypt from 'bcryptjs'
 
-import {
-  asyncWrapper,
-  checkHibp,
-  hashPassword,
-  selectAccountByUserId,
-  getPermissionVariablesFromCookie
-} from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccountByUserId } from '@shared/helpers'
 import { changePasswordFromOldSchema } from '@shared/validation'
 import { updatePasswordWithUserId } from '@shared/queries'
 import { request } from '@shared/request'
+import { RequestExtended } from '@shared/types'
 
 /**
  * Change the password from the current one
  */
-async function basicPasswordChange(req: Request, res: Response): Promise<unknown> {
-  // get current user_id
-  const { 'user-id': user_id } = getPermissionVariablesFromCookie(req)
+async function basicPasswordChange(req: RequestExtended, res: Response): Promise<unknown> {
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
 
   const { old_password, new_password } = await changePasswordFromOldSchema.validateAsync(req.body)
 

@@ -102,7 +102,14 @@ export const loginAnonymouslySchema = Joi.object({
   email: Joi.string(), // these will be checked more regeriously in `loginSchema`
   password: Joi.string() // these will be checked more regeriously in `loginSchema`
 })
-export const loginSchema = extendedJoi.object(accountFields)
+export const loginSchema = extendedJoi.object({
+  ...accountFields,
+  cookie: Joi.boolean()
+})
 export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketFields })
-export const totpSchema = Joi.object({ ...codeFields, ...ticketFields })
+export const totpSchema = Joi.object({
+  ...codeFields,
+  ...ticketFields,
+  cookie: Joi.boolean()
+})

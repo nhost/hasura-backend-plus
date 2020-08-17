@@ -1,11 +1,16 @@
-import { Request, Response } from 'express'
-import { asyncWrapper, getPermissionVariablesFromCookie } from '@shared/helpers'
+import { Response } from 'express'
+import Boom from '@hapi/boom'
+import { asyncWrapper } from '@shared/helpers'
 import { deleteAllAccountRefreshTokens } from '@shared/queries'
 import { request } from '@shared/request'
+import { RequestExtended } from '@shared/types'
 
-async function revokeToken(req: Request, res: Response): Promise<unknown> {
-  const permission_variables = getPermissionVariablesFromCookie(req)
-  const user_id = permission_variables['user-id']
+async function revokeToken(req: RequestExtended, res: Response): Promise<unknown> {
+  if (!req.permission_variables) {
+    throw Boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
 
   await request(deleteAllAccountRefreshTokens, { user_id })
 

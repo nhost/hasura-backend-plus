@@ -8,3 +8,6 @@ paths:
   /user/:userId/:fileId:
     read: 'isOwner(userId) || validToken()'
     write: 'isOwner(userId)'
+  /public*:
+    read: 'true'
+    write: 'true'
