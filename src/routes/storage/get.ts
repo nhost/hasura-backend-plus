@@ -44,11 +44,11 @@ export const getFile = async (
       Key: key,
       Range: range
     }
-    const stream = s3.getObject(params).createReadStream()
-    // forward errors
-    stream.on('error', (err) => {
+    // Split request with stream to be able to abort request on timeout errors
+    const request = s3.getObject(params)
+    const stream = request.createReadStream().on('error', (err) => {
       console.error(err)
-      throw Boom.badImplementation()
+      request.abort()
     })
 
     // Add the content type to the response (it's not propagated from the S3 SDK)
