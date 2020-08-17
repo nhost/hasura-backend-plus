@@ -3,6 +3,7 @@
 ## Next release
 
 - server: `display_name` is attached for email templates
+- server: Added auth middleware to suppor non-cookie approach for refresh and jwt tokens
 
 ## v2.1.1
 
