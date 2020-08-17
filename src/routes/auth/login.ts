@@ -19,8 +19,8 @@ interface HasuraData {
 }
 
 async function loginAccount({ body }: Request, res: Response): Promise<unknown> {
-  // useCookie or not
-  const useCookie = body.cookie
+  // default to true
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   if (ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)

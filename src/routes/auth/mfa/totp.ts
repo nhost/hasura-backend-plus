@@ -10,7 +10,9 @@ import { totpSchema } from '@shared/validation'
 async function totpLogin({ body }: Request, res: Response): Promise<void> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const account = await selectAccount(body)
-  const useCookie = body.cookie
+
+  // default to true
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   if (!account) {
     throw Boom.unauthorized('Invalid or expired ticket.')

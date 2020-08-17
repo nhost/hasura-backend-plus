@@ -32,7 +32,7 @@ it('should enable mfa for account', async () => {
 it('should return a ticket', async () => {
   const { body, status } = await request
     .post('/auth/login')
-    .send({ email: account.email, password: account.password, cookie: true })
+    .send({ email: account.email, password: account.password })
 
   /**
    * Save ticket to globally scoped varaible.
@@ -48,8 +48,7 @@ it('should return a ticket', async () => {
 it('should sign the account in (mfa)', async () => {
   const { body, status } = await request.post('/auth/mfa/totp').send({
     ticket: accountTicket,
-    code: authenticator.generate(otpSecret),
-    cookie: true
+    code: authenticator.generate(otpSecret)
   })
 
   /**

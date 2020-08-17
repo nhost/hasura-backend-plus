@@ -10,8 +10,8 @@ import {
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
   HOST,
-  PORT,
-  ANONYMOUS_USERS_ENABLE
+  PORT
+  // ANONYMOUS_USERS_ENABLE
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch, deleteAccount } from '@test/test-utils'
@@ -117,7 +117,7 @@ it('should complain about incorrect email', async () => {
 })
 
 it('should sign the user in', async () => {
-  const { body, status } = await request.post('/auth/login').send({ email, password, cookie: true })
+  const { body, status } = await request.post('/auth/login').send({ email, password })
   // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
   expect(status).toEqual(200)
@@ -136,13 +136,44 @@ it('should logout', async () => {
   const res = await request.post('/auth/logout').send()
   expect(res.status).toBe(204)
   await request.post('/auth/login').send({ email, password })
-  await deleteAccount(request, { email, password })
 })
 
-const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
-anonymousAccountIt('should login anonymously', async () => {
-  const { body, status } = await request.post('/auth/login').send({ anonymous: true })
-  expect(status).toEqual(200)
-  expect(body.jwt_token).toBeString()
-  expect(body.jwt_expires_in).toBeNumber()
+describe('Tests without cookies', () => {
+  it('Should login without cookies', async () => {
+    const { body, status } = await request
+      .post('/auth/login')
+      .send({ email, password, cookie: false })
+    // Save JWT token to globally scoped varaible.
+    console.log(body)
+    jwtToken = body.jwt_token
+    expect(status).toEqual(200)
+    expect(body.jwt_token).toBeString()
+    expect(body.jwt_expires_in).toBeNumber()
+    expect(body.refresh_token).toBeString()
+
+    const uuid_regex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+    expect(body.refresh_token).toMatch(uuid_regex)
+  })
+
+  it('should decode a valid custom user claim', async () => {
+    const decodedJwt = JWT.decode(jwtToken) as Token
+    expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
+    // Test if the custom claims work
+    expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
+  })
 })
+
+// delete account
+it('should delete account', async () => {
+  await deleteAccount(request, { email, password })
+  expect('1').toBeString()
+})
+
+// test anonymous account
+// const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
+// anonymousAccountIt('should login anonymously', async () => {
+//   const { body, status } = await request.post('/auth/login').send({ anonymous: true })
+//   expect(status).toEqual(200)
+//   expect(body.jwt_token).toBeString()
+//   expect(body.jwt_expires_in).toBeNumber()
+// })
