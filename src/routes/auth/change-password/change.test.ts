@@ -22,7 +22,7 @@ describe('change password without cookies', () => {
     expect(status).toEqual(204)
   })
 
-  it('Should login without cookies', async () => {
+  it('Should login user', async () => {
     const { body, status } = await request
       .post('/auth/login')
       .send({ email: account.email, password: account.password, cookie: false })
