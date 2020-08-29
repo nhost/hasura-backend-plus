@@ -18,7 +18,7 @@ cp -r hasura-backend-plus/migrations-v1 tmp/migrations
 cd tmp
 
 # Create a Hasura config file specify version 2
-echo "version: 2" > config.yaml
+echo "version: 1" > config.yaml
 
 # Apply migrations
 hasura migrate apply --endpoint=https://hasura-endpoint.com --admin-secret=<admin-secret>
