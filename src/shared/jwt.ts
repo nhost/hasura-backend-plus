@@ -60,7 +60,7 @@ export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
  * @param jwt if true, add a 'x-hasura-' prefix to the property names, and stringifies the values (required by Hasura)
  */
 export function generatePermissionVariables(
-  { default_role, account_roles = [], user }: AccountData,
+  { email, default_role, account_roles = [], user }: AccountData,
   jwt = false
 ): { [key: string]: ClaimValueType } {
   const prefix = jwt ? 'x-hasura-' : ''
@@ -73,6 +73,7 @@ export function generatePermissionVariables(
 
   return {
     [`${prefix}user-id`]: user.id,
+    [`${prefix}user-email`]: email,
     [`${prefix}allowed-roles`]: accountRoles,
     [`${prefix}default-role`]: role,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
