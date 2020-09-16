@@ -1,0 +1,22 @@
+{
+  "exclude": ["node_modules", "**/*.spec.ts", "*.js"],
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "lib": ["dom", "es2020"],
+    "paths": {
+      "*": ["src/types/*"],
+      "@shared/*": ["src/shared/*"],
+      "@test/*": ["src/test/*"]
+    },
+    "module": "commonjs",
+    "outDir": "dist",
+    "strict": true,
+    "target": "es2019",
+    "baseUrl": ".",
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "resolveJsonModule": false
+  }
+}
