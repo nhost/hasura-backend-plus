@@ -7,7 +7,6 @@ import {
   FIREBASE_AUTH_ENABLE
 } from '@shared/config'
 import { Router } from 'express'
-import { initializeFirebaseApp } from '@shared/firebase'
 import nocache from 'nocache'
 import changeEmail from './change-email'
 import getJwks from './jwks'
@@ -55,7 +54,6 @@ if (AUTH_LOCAL_USERS_ENABLE) {
 }
 
 if (FIREBASE_AUTH_ENABLE) {
-  initializeFirebaseApp()
   router.post('/firebase', firebase)
 }
 

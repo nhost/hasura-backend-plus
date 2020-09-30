@@ -1,4 +1,4 @@
-import { COOKIE_SECRET, AUTH_HAS_ONE_PROVIDER } from '@shared/config'
+import { COOKIE_SECRET, AUTH_HAS_ONE_PROVIDER, FIREBASE_AUTH_ENABLE } from '@shared/config'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
@@ -11,6 +11,7 @@ import { limiter } from './limiter'
 import router from './routes'
 import passport from 'passport'
 import { authMiddleware } from './middlewares/auth'
+import initializeFirebaseApp from '@shared/firebase'
 
 const app = express()
 
@@ -26,6 +27,10 @@ app.use(fileUpload())
 
 if (AUTH_HAS_ONE_PROVIDER) {
   app.use(passport.initialize())
+}
+
+if (FIREBASE_AUTH_ENABLE) {
+  initializeFirebaseApp()
 }
 
 /**
