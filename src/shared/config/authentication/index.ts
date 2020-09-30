@@ -16,3 +16,4 @@ export const ANONYMOUS_USERS_ENABLE = castBooleanEnv('ANONYMOUS_USERS_ENABLE', f
 export const ALLOW_USER_SELF_DELETE = castBooleanEnv('ALLOW_USER_SELF_DELETE', false)
 export const VERIFY_EMAILS = castBooleanEnv('VERIFY_EMAILS', false)
 export const LOST_PASSWORD_ENABLE = castBooleanEnv('LOST_PASSWORD_ENABLE', false)
+export const FIREBASE_AUTH_ENABLE = castBooleanEnv('FIREBASE_AUTH_ENABLE', false)

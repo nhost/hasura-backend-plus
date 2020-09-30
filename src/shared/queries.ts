@@ -21,6 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
+    firebase_uid
   }
 `
 
@@ -72,6 +73,15 @@ export const updatePasswordWithUserId = gql`
 export const selectAccountByUserId = gql`
   query($user_id: uuid!) {
     auth_accounts(where: { user: { id: { _eq: $user_id } } }) {
+      ...accountFragment
+    }
+  }
+  ${accountFragment}
+`
+
+export const selectAccountByFirebaseUid = gql`
+  query($firebase_uid: String!) {
+    auth_accounts(where: { firebase_uid: { _eq: $firebase_uid } }) {
       ...accountFragment
     }
   }

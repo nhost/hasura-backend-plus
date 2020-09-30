@@ -63,6 +63,7 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
+  firebase_uid?: string
 }
 
 export interface QueryAccountData {

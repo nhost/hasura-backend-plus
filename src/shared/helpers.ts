@@ -4,7 +4,8 @@ import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  selectAccountByFirebaseUid as selectAccountByFirebaseUidQuery
 } from './queries'
 
 import Boom from '@hapi/boom'
@@ -57,6 +58,15 @@ export const selectAccountByUserId = async (user_id: string | undefined): Promis
   const hasuraData = await request<QueryAccountData>(selectAccountByUserIdQuery, { user_id })
   if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
   return hasuraData.auth_accounts[0]
+}
+
+export const selectAccountByFirebaseUid = async (
+  firebase_uid: string
+): Promise<AccountData | null> => {
+  const hasuraData = await request<QueryAccountData>(selectAccountByFirebaseUidQuery, {
+    firebase_uid
+  })
+  return hasuraData.auth_accounts[0] || null
 }
 
 /**

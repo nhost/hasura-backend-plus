@@ -41,6 +41,7 @@
     "express-fileupload": "1.1.9",
     "express-rate-limit": "5.1.1",
     "express-session": "^1.17.1",
+    "firebase-admin": "^9.2.0",
     "fs-extra": "^9.0.0",
     "graphql": "15.0.0",
     "graphql-request": "1.8.2",
