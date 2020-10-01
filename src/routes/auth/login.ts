@@ -95,7 +95,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
   }
 
   if (!(await bcrypt.compare(password, password_hash))) {
-    throw Boom.unauthorized('Password does not match.')
+    throw Boom.unauthorized('Username and password do not match')
   }
 
   if (mfa_enabled) {
