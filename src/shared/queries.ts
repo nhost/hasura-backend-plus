@@ -26,7 +26,7 @@ const accountFragment = gql`
 
 export const insertAccount = gql`
   mutation($account: auth_accounts_insert_input!) {
-    insert_auth_accounts(objects: [$account]) {
+    insert_auth_accounts(objects: [$account], on_conflict: {constraint: accounts_email_key, update_columns: []}) {
       affected_rows
       returning {
         ...accountFragment
