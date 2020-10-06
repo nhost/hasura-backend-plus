@@ -67,7 +67,11 @@ const manageProviderStrategy = (
     active: true,
     default_role: DEFAULT_USER_ROLE,
     account_roles: {
-      data: [{ role: DEFAULT_USER_ROLE }]
+      data: [{ role: DEFAULT_USER_ROLE }],
+      on_conflict: {
+        constraint: 'user_roles_account_id_role_key',
+        update_columns: ['role']
+      }
     },
     user: { data: { display_name, avatar_url } },
     account_providers: {
