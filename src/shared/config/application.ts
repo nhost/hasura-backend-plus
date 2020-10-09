@@ -32,7 +32,7 @@ export const {
   SMTP_PASS,
   SMTP_HOST,
   SMTP_USER,
-  SMTP_SENDER = SMTP_USER,
+  SMTP_SENDER,
   SMTP_AUTH_METHOD = 'PLAIN'
 } = process.env
 export const EMAILS_ENABLE = castBooleanEnv('EMAILS_ENABLE')
