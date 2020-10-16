@@ -69,7 +69,7 @@ const manageProviderStrategy = (
     account_roles: {
       data: [{ role: DEFAULT_USER_ROLE }]
     },
-    user: { data: { display_name, avatar_url } },
+    user: { data: { display_name: display_name || email, avatar_url } },
     account_providers: {
       data: [
         {
