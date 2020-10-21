@@ -4,6 +4,7 @@
 
 - server: `display_name` is attached for email templates
 - server: Added auth middleware to support non-cookie approach for refresh and JWT tokens
+- server: Fix default allowed roles for OAuth Providers
 
 ## v2.1.1
 
