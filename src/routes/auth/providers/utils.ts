@@ -99,7 +99,7 @@ const manageProviderStrategy = (
     account_roles: {
       data: DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
-    user: { data: { display_name, avatar_url } },
+    user: { data: { display_name: display_name || email, avatar_url } },
     account_providers: {
       data: [
         {
