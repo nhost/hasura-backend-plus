@@ -51,18 +51,15 @@ it('should not upload file on missing file name in correct path', async () => {
 })
 
 it('should not upload file on incorrect file path', async () => {
-  const res = await request.post(`/storage/o/user/${getUserId()}/123/`).attach('file', filePath)
-  console.log('res:')
-  console.log(res)
-  const { status } = res
+  const { status } = await request
+    .post(`/storage/o/user/${getUserId()}/123/`)
+    .attach('file', filePath)
   expect(status).toEqual(500)
 })
 
 it('should still only include one file', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
-  console.log('body1:')
-  console.log(body)
   expect(body).toBeArrayOfSize(1)
 })
 
@@ -123,8 +120,6 @@ describe('Tests as an unauthenticated user', () => {
 
 it('should get file metadata', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
-  console.log('should get file metadata log body:')
-  console.log(body)
   expect(status).toEqual(200)
   expect(body.Metadata.token).toEqual(fileToken)
 })
@@ -132,8 +127,6 @@ it('should get file metadata', async () => {
 it('should get the headers of all the user files', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
-  console.log('body:')
-  console.log(body)
   expect(body).toBeArrayOfSize(1)
 })
 
