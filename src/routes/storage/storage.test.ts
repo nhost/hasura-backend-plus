@@ -9,6 +9,12 @@ const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 let fileToken: string
 
+it('should not have any files', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(0)
+})
+
 it('should upload a new file', async () => {
   const {
     status,
@@ -19,6 +25,12 @@ it('should upload a new file', async () => {
   expect(status).toEqual(200)
   expect(token).toBeString()
   fileToken = token
+})
+
+it('should include one file', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(1)
 })
 
 it('should fail if trying to upload, without a file attached', async () => {
@@ -111,6 +123,8 @@ it('should get file metadata', async () => {
 it('should get the headers of all the user files', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
+  console.log('body:')
+  console.log(body)
   expect(body).toBeArrayOfSize(1)
 })
 
