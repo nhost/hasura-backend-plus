@@ -36,6 +36,20 @@ export const insertAccount = gql`
   ${accountFragment}
 `
 
+export const insertAccountProviderToUser = gql`
+  mutation($account_provider: auth_account_providers_insert_input!, $account_id: uuid!) {
+    insert_auth_account_providers_one(object: $account_provider) {
+      account {
+        ...accountFragment
+      }
+    }
+    update_auth_accounts(_set: { active: true }, where: { id: { _eq: $account_id } }) {
+      affected_rows
+    }
+  }
+  ${accountFragment}
+`
+
 export const setNewTicket = gql`
   mutation($ticket: uuid!, $ticket_expires_at: timestamptz!, $user_id: uuid!) {
     update_auth_accounts(

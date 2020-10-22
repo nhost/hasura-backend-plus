@@ -35,7 +35,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: --restart always --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       graphql-engine:
-        image: hasura/graphql-engine:v1.2.1
+        image: hasura/graphql-engine:v1.3.2
         env:
           HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
@@ -48,7 +48,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       minio:
-        image: bitnami/minio:latest
+        image: bitnami/minio:2020.7.31
         env:
           MINIO_ACCESS_KEY: ${{ env.S3_ACCESS_KEY_ID }}
           MINIO_SECRET_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}

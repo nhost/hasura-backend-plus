@@ -9,6 +9,12 @@ const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
 let fileToken: string
 
+it('should not have any files', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(0)
+})
+
 it('should upload a new file', async () => {
   const {
     status,
@@ -19,6 +25,12 @@ it('should upload a new file', async () => {
   expect(status).toEqual(200)
   expect(token).toBeString()
   fileToken = token
+})
+
+it('should include one file', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(1)
 })
 
 it('should fail if trying to upload, without a file attached', async () => {
@@ -43,6 +55,12 @@ it('should not upload file on incorrect file path', async () => {
     .post(`/storage/o/user/${getUserId()}/123/`)
     .attach('file', filePath)
   expect(status).toEqual(500)
+})
+
+it('should still only include one file', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  expect(body).toBeArrayOfSize(1)
 })
 
 it('should not update an hypothetical file of another hypothetical user', async () => {
@@ -102,8 +120,6 @@ describe('Tests as an unauthenticated user', () => {
 
 it('should get file metadata', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/${filePath}`)
-  console.log('should get file metadata log body:')
-  console.log(body)
   expect(status).toEqual(200)
   expect(body.Metadata.token).toEqual(fileToken)
 })
