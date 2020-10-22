@@ -8,7 +8,8 @@ import {
   PROVIDER_FAILURE_REDIRECT,
   SERVER_URL,
   PROVIDERS,
-  DEFAULT_USER_ROLE
+  DEFAULT_USER_ROLE,
+  DEFAULT_ALLOWED_USER_ROLES,
 } from '@shared/config'
 import { insertAccount, selectAccountProvider } from '@shared/queries'
 import { request } from '@shared/request'
@@ -67,7 +68,7 @@ const manageProviderStrategy = (
     active: true,
     default_role: DEFAULT_USER_ROLE,
     account_roles: {
-      data: [{ role: DEFAULT_USER_ROLE }]
+      data: DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
     user: { data: { display_name, avatar_url } },
     account_providers: {
