@@ -52,8 +52,8 @@ jobs:
         env:
           MINIO_ACCESS_KEY: ${{ env.S3_ACCESS_KEY_ID }}
           MINIO_SECRET_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
-          MINIO_DEFAULT_BUCKETS: ${{ env.S3_BUCKET }}
         options: --restart always
+        command: "-c 'mkdir -p /export/$${S3_BUCKET:-hasura-backend-plus} && /usr/bin/minio server /export'"
       mailhog:
         image: mailhog/mailhog
     container:
