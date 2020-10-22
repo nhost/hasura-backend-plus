@@ -2,11 +2,16 @@
 
 ## Next release
 
-- server: `display_name` is attached for email templates
-- server: Added auth middleware to support non-cookie approach for refresh and JWT tokens
+## v2.2.1
+
 - server: Default to email if no display_name exists for OAuth Provider.
 - server: Merge accounts using external OAuth providers.
 - server: Fix default allowed roles for OAuth Providers.
+
+## v2.2.0
+
+- server: `display_name` is attached for email templates
+- server: Added auth middleware to support non-cookie approach for refresh and JWT tokens
 
 ## v2.1.1
 
