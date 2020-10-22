@@ -51,9 +51,10 @@ it('should not upload file on missing file name in correct path', async () => {
 })
 
 it('should not upload file on incorrect file path', async () => {
-  const { status } = await request
-    .post(`/storage/o/user/${getUserId()}/123/`)
-    .attach('file', filePath)
+  const res = await request.post(`/storage/o/user/${getUserId()}/123/`).attach('file', filePath)
+  console.log('res:')
+  console.log(res)
+  const { status } = res
   expect(status).toEqual(500)
 })
 
