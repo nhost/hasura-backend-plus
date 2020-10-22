@@ -57,6 +57,14 @@ it('should not upload file on incorrect file path', async () => {
   expect(status).toEqual(500)
 })
 
+it('should still only include one file', async () => {
+  const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
+  expect(status).toEqual(200)
+  console.log('body1:')
+  console.log(body)
+  expect(body).toBeArrayOfSize(1)
+})
+
 it('should not update an hypothetical file of another hypothetical user', async () => {
   const { status } = await request
     .post(`/storage/o/user/another-user/another-file`)
