@@ -93,6 +93,12 @@ export interface InsertAccountData {
   }
 }
 
+export interface InsertAccountProviderToUser {
+  insert_auth_account_providers_one: {
+    account: AccountData
+  }
+}
+
 export interface RefreshTokenMiddleware {
   value: string | null
   type: 'query' | 'cookie' | null
