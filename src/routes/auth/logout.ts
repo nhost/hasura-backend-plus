@@ -14,7 +14,7 @@ interface HasuraData {
   auth_refresh_tokens: { account: AccountData }[]
 }
 
-async function logout({ body, cookies, signedCookies }: Request, res: Response): Promise<unknown> {
+async function logout({ body, cookies, signedCookies, query }: Request, res: Response): Promise<unknown> {
   // clear cookie
   res.clearCookie('refresh_token')
   res.clearCookie('permission_variables')
@@ -22,7 +22,11 @@ async function logout({ body, cookies, signedCookies }: Request, res: Response):
   // should we delete all refresh tokens to this user or not
   const { all } = await logoutSchema.validateAsync(body)
 
-  const { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
+  let { refresh_token } = COOKIE_SECRET ? signedCookies : cookies
+
+  if (!refresh_token) {
+    refresh_token = query.refresh_token
+  }
 
   if (all) {
     // get user based on refresh token
