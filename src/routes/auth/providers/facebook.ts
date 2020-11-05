@@ -12,6 +12,6 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Facebook OAuth.`)
     }
-    initProvider(router, 'facebook', Strategy, { scope: ['email'] })
+    initProvider(router, 'facebook', Strategy, { profileFields: ['email', 'photos', 'displayName']  })
   }
 }
