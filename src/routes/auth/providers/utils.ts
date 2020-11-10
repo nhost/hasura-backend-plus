@@ -2,6 +2,7 @@ import express, { Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
+import { AUTH_SAVE_OAUTH_TOKEN } from '@shared/config'
 
 import {
   PROVIDER_SUCCESS_REDIRECT,
@@ -11,7 +12,7 @@ import {
   DEFAULT_USER_ROLE,
   DEFAULT_ALLOWED_USER_ROLES,
 } from '@shared/config'
-import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
+import { insertAccount, insertAccountProviderToUser, selectAccountProvider, updateAccountProviderTokens } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
@@ -41,8 +42,8 @@ const manageProviderStrategy = (
   transformProfile: TransformProfileFunction
 ) => async (
   _req: RequestExtended,
-  _accessToken: string,
-  _refreshToken: string,
+  accessToken: string,
+  refreshToken: string,
   profile: Profile,
   done: VerifyCallback
 ): Promise<void> => {
@@ -59,6 +60,26 @@ const manageProviderStrategy = (
 
   // IF user is already registered
   if (hasuraData.auth_account_providers.length > 0) {
+    if (AUTH_SAVE_OAUTH_TOKEN) {
+      let query = updateAccountProviderAccessToken
+      const tokenData = {
+        provider,
+        profile_id: id,
+        access_token: accessToken,
+      }
+
+      if (refreshToken) {
+        query = updateAccountProviderTokens
+        tokenData.refresh_token = refreshToken
+      }
+
+      try {
+        await request<void>(updateAccountProviderTokens, tokenData)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     return done(null, hasuraData.auth_account_providers[0].account)
   }
 
@@ -78,7 +99,9 @@ const manageProviderStrategy = (
         account_provider: {
           account_id: account.id,
           auth_provider: provider,
-          auth_provider_unique_id: id
+          auth_provider_unique_id: id,
+          refresh_token: refreshToken,
+          access_token: accessToken,
         },
         account_id: account.id
       }
@@ -104,7 +127,9 @@ const manageProviderStrategy = (
       data: [
         {
           auth_provider: provider,
-          auth_provider_unique_id: id
+          auth_provider_unique_id: id,
+          refresh_token: refreshToken,
+          access_token: accessToken,
         }
       ]
     }

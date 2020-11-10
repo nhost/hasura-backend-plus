@@ -287,3 +287,25 @@ export const selectAccountProvider = gql`
   }
   ${accountFragment}
 `
+
+export const updateAccountProviderAccessToken = gql`
+  mutation($provider: String!, $profile_id: String!, $access_token: String!) {
+    update_auth_account_providers(
+      where: { _and: [{ auth_provider: { _eq: $provider } }, { auth_provider_unique_id: { _eq: $profile_id } } ] }
+      _set: { access_token: $access_token }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const updateAccountProviderTokens = gql`
+  mutation($provider: String!, $profile_id: String!, $refresh_token: String!, $access_token: String!) {
+    update_auth_account_providers(
+      where: { _and: [{ auth_provider: { _eq: $provider } }, { auth_provider_unique_id: { _eq: $profile_id } } ] }
+      _set: { refresh_token: $refresh_token, access_token: $access_token }
+    ) {
+      affected_rows
+    }
+  }
+`
