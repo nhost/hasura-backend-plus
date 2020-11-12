@@ -65,7 +65,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     const display_name = 'display_name' in user_data ? user_data.display_name : email
 
     try {
-      await emailClient.send({
+      const sendOptions = {
         template: 'activate-account',
         message: {
           to: email,
@@ -81,7 +81,8 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
           ticket,
           url: SERVER_URL
         }
-      })
+      }
+      await emailClient.send(sendOptions)
     } catch (err) {
       console.error(err)
       throw Boom.badImplementation()

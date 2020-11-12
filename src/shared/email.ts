@@ -6,7 +6,7 @@ import {
   SMTP_SECURE,
   SMTP_SENDER,
   SMTP_USER,
-  SMTP_AUTH_METHOD
+  SMTP_AUTH_METHOD, EMAILS_SERVICE
 } from '@shared/config'
 
 import Email from 'email-templates'
@@ -16,21 +16,23 @@ import path from 'path'
 /**
  * SMTP transport.
  */
-const transport = nodemailer.createTransport({
+const transportOptions = {
   host: SMTP_HOST,
   port: Number(SMTP_PORT),
   secure: Boolean(SMTP_SECURE),
+  service: EMAILS_SERVICE,
   auth: {
     pass: SMTP_PASS,
     user: SMTP_USER
   },
   authMethod: SMTP_AUTH_METHOD
-})
+}
+const transport = nodemailer.createTransport(transportOptions)
 
 /**
  * Reusable email client.
  */
-export const emailClient = new Email({
+const emailClientConfig = {
   transport,
   message: { from: SMTP_SENDER },
   send: EMAILS_ENABLE,
@@ -40,4 +42,5 @@ export const emailClient = new Email({
       extension: 'ejs'
     }
   }
-})
+}
+export const emailClient = new Email(emailClientConfig)
