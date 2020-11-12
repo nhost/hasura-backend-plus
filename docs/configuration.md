@@ -49,7 +49,7 @@ graphql-engine:
 
 Hasura Backend Plus v2 introduces some brand new features, coming with some breaking changes:
 
-- While all the former v1 features exist in v2, the [API endpoints](api) have been modified, and some may behave slightly differently. You may need to change your frontend applications accordingly.
+- While all the former v1 features exist in v2, the [API endpoints](api) has been modified, and some may behave slightly differently. You may need to change your frontend applications accordingly.
 - The Storage module have been completely rewritten. <!-- TODO link to storage -->
 - The refresh token is now stored in an [HTTP cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) <!-- TODO link to refresh token / cookies system -->
 
@@ -331,7 +331,7 @@ The `request.auth` part is a JSON object, which is the same as the [Hasura permi
 
 You can access these variables through `request.auth` (for example `request.auth['default-role']`) when creating your storage rules.
 
-A simple storage function would be to test if a user is authenticated. You can do this by checking if `request.auth` is present:
+A simple storage function would be to test if a user has authenticated. You can do this by checking if `request.auth` is present:
 
 ```yaml
 functions:
@@ -434,12 +434,12 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AUTH_LOCAL_USERS_ENABLE`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
-| `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
+| `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registered.                                                                                                                          |
 | `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
 | `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
 | `COOKIE_SAME_SITE`           | lax                     | SameSite cookie attribute. Accepts true, false, lax, none or strict. If none of these values it will be set to 'lax'                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
-| `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                                  |
+| `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma separated list of allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                                  |
 | `HIBP_ENABLE`                | false                   |                                                                                                                                                                                              |
 | `JWT_ALGORITHM`              | RS256                   | Valid values: RS256, RS384, RS512, HS256, HS384, HS512                                                                                                                                       |
 | `JWT_KEY`                    |                         | Encryption secret. Required when using a SHA (RS*) algorithm. When using a RSA algorithm (RS*), should contain a valid RSA PEM key, otherwise `JWT_KEY_FILE_PATH` will be used.              |
@@ -448,17 +448,17 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `MIN_PASSWORD_LENGTH`        | 3                       | Minimum allowed password length.                                                                                                                                                             |
 | `REDIRECT_URL_ERROR`         |                         |                                                                                                                                                                                              |
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
-| `VERIFY_EMAILS`              | false                   | Enable verification emails                                                                                                                                                                   |
 | `JWT_REFRESH_EXPIRES_IN`     | 43200                   |                                                                                                                                                                                              |
 | `EMAILS_ENABLE`              | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
+| `EMAILS_SERVICE`             |                         | Customize `nodemailer` service. (Ex. settings to "SendGrid" enables sending email via SendGrid).                                                                                             |
 | `SMTP_HOST`                  |                         | SMTP server path to use for sending emails.                                                                                                                                                  |
 | `SMTP_PASS`                  |                         | Password to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_USER`                  |                         | Username to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_PORT`                  | 587                     | SMTP server port.                                                                                                                                                                            |
 | `SMTP_SECURE`                | false                   | Set to true when the SMTP uses SSL.                                                                                                                                                          |
-| `REGISTRATION_CUSTOM_FIELDS` |                         | Fields that need to be passed on to the registration patload, and that correspond to columns of the `public.users`table.                                                                     |
+| `REGISTRATION_CUSTOM_FIELDS` |                         | Fields that need to be passed on to the registration payload, and that correspond to columns of the `public.users`table.                                                                     |
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
-| `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
+| `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with multi-factor authentication.                                                                                                                          |
 
 ### Storage
 
