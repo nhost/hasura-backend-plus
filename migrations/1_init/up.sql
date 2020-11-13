@@ -110,7 +110,7 @@ ALTER TABLE ONLY auth.refresh_tokens
     ADD CONSTRAINT refresh_tokens_account_id_fkey FOREIGN KEY (account_id) REFERENCES auth.accounts(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 INSERT INTO auth.roles (role)
-    VALUES ('user'), ('anonymous');
+    VALUES ('user'), ('anonymous'), ('me');
 
 INSERT INTO auth.providers (provider)
     VALUES ('github'), ('facebook'), ('twitter'), ('google'), ('apple'),  ('linkedin'), ('windowslive');
