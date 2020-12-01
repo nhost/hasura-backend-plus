@@ -54,6 +54,15 @@ if (RSA_TYPES.includes(JWT_ALGORITHM)) {
 export const newJwtExpiry = JWT_EXPIRES_IN * 60 * 1000
 
 /**
+ * Convert array to Postgres array
+ * @param arr js array to be converted to Postgres array
+ */
+function toPgArray(arr: string[]): string {
+  const m = arr.map((e) => `"${e}"`).join(',')
+  return `{${m}}`
+}
+
+/**
  * Create an object that contains all the permission variables of the user,
  * i.e. user-id, allowed-roles, default-role and the kebab-cased columns
  * of the public.tables columns defined in JWT_CUSTOM_FIELDS
@@ -77,11 +86,19 @@ export function generatePermissionVariables(
     [`${prefix}default-role`]: role,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...JWT_CUSTOM_FIELDS.reduce<{ [key: string]: ClaimValueType }>((aggr: any, cursor) => {
-      aggr[`${prefix}${kebabCase(cursor)}`] = jwt
-        ? typeof user[cursor] === 'string'
-          ? user[cursor]
-          : JSON.stringify(user[cursor] ?? null)
-        : user[cursor]
+      const type = typeof user[cursor] as ClaimValueType
+
+      let value
+      if (type === 'string') {
+        value = user[cursor]
+      } else if (Array.isArray(user[cursor])) {
+        value = toPgArray(user[cursor] as string[])
+      } else {
+        value = JSON.stringify(user[cursor] ?? null)
+      }
+
+      aggr[`${prefix}${kebabCase(cursor)}`] = value
+
       return aggr
     }, {})
   }
