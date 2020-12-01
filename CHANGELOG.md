@@ -2,6 +2,8 @@
 
 ## Next release
 
+- server: add support for Postgres arrays in JWT claims to support `_in` operator for Hasura Permissions (#378)
+
 ## v2.2.1
 
 - server: Default to email if no display_name exists for OAuth Provider.
