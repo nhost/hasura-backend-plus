@@ -89,7 +89,9 @@ export function generatePermissionVariables(
       const type = typeof user[cursor] as ClaimValueType
 
       let value
-      if (type === 'string') {
+      if (user[cursor] === null) {
+        value = null
+      } else if (type === 'string') {
         value = user[cursor]
       } else if (Array.isArray(user[cursor])) {
         value = toPgArray(user[cursor] as string[])
