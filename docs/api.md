@@ -252,7 +252,7 @@ Change password based on a ticket. This endpoint is active if env var `LOST_PASS
 
 ### Change Email
 
-Change email without email verification as a logged in account. This endpoint is only active if env var `VARIFY_EMAILS=false` (default ``).
+Change email without email verification as a logged in account. This endpoint is only active if env var `VERIFY_EMAILS=false` (default ``).
 
 #### Request
 

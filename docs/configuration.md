@@ -420,6 +420,8 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 
 | Name                          | Default | Description                                                                                                 |
 | ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                    |         |                                                                                                             |
+| `LOG_LEVEL`                   |         |                                                                                                             |
 | `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
 | `HOST`                        |         | Listening host of the service                                                                               |
@@ -428,12 +430,16 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                  |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                 |
 
+
 ### Authentication
 
 | Name                         | Default                 | Description                                                                                                                                                                                  |
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AUTH_LOCAL_USERS_ENABLE`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
+| `ANONYMOUS_USERS_ENABLE`     | false                   |                                                                                                                                                                                              |
+| `DEFAULT_ANONYMOUS_ROLE`     |                         |                                                                                                                                                                                              |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
+| `CHANGE_EMAIL_ENABLE`        |                         |                                                                                                                                                                                              |
 | `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
 | `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
 | `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
@@ -445,6 +451,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `JWT_KEY`                    |                         | Encryption secret. Required when using a SHA (RS*) algorithm. When using a RSA algorithm (RS*), should contain a valid RSA PEM key, otherwise `JWT_KEY_FILE_PATH` will be used.              |
 | `JWT_EXPIRES_IN`             | 15                      |                                                                                                                                                                                              |
 | `JWT_KEY_FILE_PATH`          | custom/keys/private.pem | Path to the RSA PEM private key file when using a RSA (RS\*) algorithm and no `JWT_KEY` is set. When used, will create a random key if the file is not found.                                |
+| `JWT_CLAIMS_NAMESPACE`       |                         |                                                                                                                                                                                              |
 | `MIN_PASSWORD_LENGTH`        | 3                       | Minimum allowed password length.                                                                                                                                                             |
 | `REDIRECT_URL_ERROR`         |                         |                                                                                                                                                                                              |
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
@@ -456,9 +463,51 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `SMTP_USER`                  |                         | Username to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_PORT`                  | 587                     | SMTP server port.                                                                                                                                                                            |
 | `SMTP_SECURE`                | false                   | Set to true when the SMTP uses SSL.                                                                                                                                                          |
+| `SMTP_AUTH_METHOD`           |                         |                                                                                                                                                                                              |
+| `SMTP_SENDER`                |                         |                                                                                                                                                                                              |
+| `NOTIFY_EMAIL_CHANGE`        |                         |                                                                                                                                                                                              |
 | `REGISTRATION_CUSTOM_FIELDS` |                         | Fields that need to be passed on to the registration patload, and that correspond to columns of the `public.users`table.                                                                     |
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
+| `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
+
+
+### Providers
+
+| Name                           | Default | Description |
+| ------------------------------ | ------- | ----------- |
+| `PROVIDER_SUCCESS_REDIRECT`    |         |             |
+| `PROVIDER_FAILURE_REDIRECT`    |         |             |
+| `GOOGLE_ENABLE`                | false   |             |
+| `GOOGLE_CLIENT_ID`             |         |             |
+| `GOOGLE_CLIENT_SECRET`         |         |             |
+| `FACEBOOK_ENABLE`              | false   |             |
+| `FACEBOOK_CLIENT_ID`           |         |             |
+| `FACEBOOK_CLIENT_SECRET`       |         |             |
+| `TWITTER_ENABLE`               | false   |             |
+| `TWITTER_CONSUMER_KEY`         |         |             |
+| `TWITTER_CONSUMER_SECRET`      |         |             |
+| `LINKEDIN_ENABLE`              | false   |             |
+| `LINKEDIN_CLIENT_ID`           |         |             |
+| `LINKEDIN_CLIENT_SECRET`       |         |             |
+| `APPLE_ENABLE`                 | false   |             |
+| `APPLE_CLIENT_ID`              |         |             |
+| `APPLE_KEY_ID`                 |         |             |
+| `APPLE_PRIVATE_KEY`            |         |             |
+| `APPLE_TEAM_ID`                |         |             |
+| `GITHUB_ENABLE`                | false   |             |
+| `GITHUB_AUTHORIZATION_URL`     |         |             |
+| `GITHUB_CLIENT_ID`             |         |             |
+| `GITHUB_CLIENT_SECRET`         |         |             |
+| `GITHUB_TOKEN_URL`             |         |             |
+| `GITHUB_USER_PROFILE_URL`      |         |             |
+| `WINDOWS_LIVE_ENABLE`          | false   |             |
+| `WINDOWS_LIVE_CLIENT_ID`       |         |             |
+| `WINDOWS_LIVE_CLIENT_SECRET`   |         |             |
+| `SPOTIFY_ENABLE`               | false   |             |
+| `SPOTIFY_CLIENT_ID`            |         |             |
+| `SPOTIFY_CLIENT_SECRET`        |         |             |
+
 
 ### Storage
 
@@ -469,3 +518,5 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
 | `S3_SSL_ENABLED`       | true    |             |
+| `OBJECT_PREFIX`        | /o      |             |
+| `META_PREFIX`          | /m      |             |
