@@ -4,6 +4,7 @@ import {
   EMAILS_ENABLE,
   DEFAULT_USER_ROLE,
   DEFAULT_ALLOWED_USER_ROLES,
+  ALLOWED_USER_ROLES,
   VERIFY_EMAILS
 } from '@shared/config'
 import { Request, Response } from 'express'
@@ -38,28 +39,22 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
   ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
   const password_hash = await hashPassword(password)
 
-  // check if register_options.default_role is part of DEFAULT_ALLOWED_USER_ROLES
-  if ('default_role' in register_options) {
-    if (!DEFAULT_ALLOWED_USER_ROLES.includes(register_options.default_role)) {
-      throw Boom.badRequest('Default role must be in DEFAULT_ALLOWED_USER_ROLES')
-    }
-  }
-
-  // check that register_options.allowed_roles overlapp with DEFAULT_ALLOWeD_USER_ROLES
-  if ('allowed_roles' in register_options) {
-    register_options.allowed_roles.forEach((allowedRole: string) => {
-      if (!DEFAULT_ALLOWED_USER_ROLES.includes(allowedRole)) {
-        throw Boom.badRequest('allowed_roles must overlap with DEFAULT_ALLOWED_USER_ROLES')
-      }
-    })
-  }
-
   const defaultRole = register_options.default_role ?? DEFAULT_USER_ROLE
   const allowedRoles = register_options.allowed_roles ?? DEFAULT_ALLOWED_USER_ROLES
 
   // check if default role is part of allowedRoles
   if (!allowedRoles.includes(defaultRole)) {
     throw Boom.badRequest('Default role must be part of allowed roles.')
+  }
+
+  // check if defaultRole appears is part of allowed roles
+  if (!allowedRoles.includes(defaultRole)) {
+    throw Boom.badRequest('Default role must be in allowed roles')
+  }
+
+  // check if allowed roles is a subset of ALLOWED_ROLES
+  if (!allowedRoles.every((role: string) => ALLOWED_USER_ROLES.includes(role))) {
+    throw Boom.badRequest('allowed roles must be a subset of ALLOWED_ROLES')
   }
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
