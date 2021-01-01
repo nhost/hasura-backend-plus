@@ -47,11 +47,6 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     throw Boom.badRequest('Default role must be part of allowed roles.')
   }
 
-  // check if defaultRole appears is part of allowed roles
-  if (!allowedRoles.includes(defaultRole)) {
-    throw Boom.badRequest('Default role must be in allowed roles')
-  }
-
   // check if allowed roles is a subset of ALLOWED_ROLES
   if (!allowedRoles.every((role: string) => ALLOWED_USER_ROLES.includes(role))) {
     throw Boom.badRequest('allowed roles must be a subset of ALLOWED_ROLES')
