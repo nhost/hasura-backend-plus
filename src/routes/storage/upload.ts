@@ -20,6 +20,9 @@ export const uploadFile = async (
   const oldHeadObject = await getHeadObject(req, true)
   const isNew = !oldHeadObject
 
+  console.log('files:')
+  console.log(req.files)
+
   if (isNew && !req.files?.file) {
     throw Boom.notFound()
   }
@@ -45,6 +48,9 @@ export const uploadFile = async (
     try {
       await s3.upload(upload_params).promise()
     } catch (err) {
+      console.error('fail to upload...')
+      console.error({ upload_params })
+
       console.error(err)
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
