@@ -60,7 +60,11 @@ export const userDataFields = {
       }),
       {}
     )
-  )
+  ),
+  register_options: Joi.object({
+    allowed_roles: Joi.array().items(Joi.string()),
+    default_role: Joi.string()
+  })
 }
 
 export const registerSchema = Joi.object({

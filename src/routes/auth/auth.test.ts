@@ -62,6 +62,56 @@ it('should create an account', async () => {
   expect(status).toEqual(204)
 })
 
+it('should fail to create accunt with unallowed role', async () => {
+  const { status } = await request.post('/auth/register').send({
+    email: 'test1@nhost.io',
+    password,
+    user_data: { name: 'Test name' },
+    register_options: {
+      allowed_roles: ['user', 'me', 'super-admin']
+    }
+  })
+  expect(status).toEqual(400)
+})
+
+it('should fail to create accunt with default_role that does not overlap allowed_roles', async () => {
+  const { status } = await request.post('/auth/register').send({
+    email: 'test2@nhost.io',
+    password,
+    user_data: { name: 'Test name' },
+    register_options: {
+      default_role: 'editor',
+      allowed_roles: ['user', 'me']
+    }
+  })
+  expect(status).toEqual(400)
+})
+
+it('should create account with default_rolw that is in the ALLOWED_USER_ROLES variable', async () => {
+  const { status } = await request.post('/auth/register').send({
+    email: 'test3@nhost.io',
+    password,
+    user_data: { name: 'Test name' },
+    register_options: {
+      default_role: 'editor'
+    }
+  })
+  expect(status).toEqual(204)
+})
+
+it('should register account with default_role and allowed_roles set', async () => {
+  const { status } = await request.post('/auth/register').send({
+    email: 'test4@nhost.io',
+    password,
+    user_data: { name: 'Test name' },
+    register_options: {
+      default_role: 'user',
+      allowed_roles: ['user', 'me']
+    }
+  })
+  expect(status).toEqual(204)
+})
+
 it('should tell the account already exists', async () => {
   const {
     status,
@@ -144,7 +194,6 @@ describe('Tests without cookies', () => {
       .post('/auth/login')
       .send({ email, password, cookie: false })
     // Save JWT token to globally scoped varaible.
-    console.log(body)
     jwtToken = body.jwt_token
     expect(status).toEqual(200)
     expect(body.jwt_token).toBeString()
