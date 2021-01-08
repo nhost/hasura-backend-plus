@@ -194,7 +194,6 @@ describe('Tests without cookies', () => {
       .post('/auth/login')
       .send({ email, password, cookie: false })
     // Save JWT token to globally scoped varaible.
-    console.log(body)
     jwtToken = body.jwt_token
     expect(status).toEqual(200)
     expect(body.jwt_token).toBeString()
