@@ -4,6 +4,7 @@ import { deleteFile } from './delete'
 import { listGet } from './list_get'
 import { uploadFile } from './upload'
 import { RequestExtended } from '@shared/types'
+import { revokeAccessToken } from './revoke-access-token'
 
 const router = Router()
 
@@ -24,6 +25,11 @@ const createRoutes = (
   // write, create, update
   if (containsSomeRule(rules, ['write', 'create', 'update'])) {
     middleware.post(path, createSecureMiddleware(uploadFile, rules, isMetadataRequest))
+  }
+
+  if (containsSomeRule(rules, ['write', 'update'])) {
+    console.log({ path })
+    middleware.post(path, createSecureMiddleware(revokeAccessToken, rules, isMetadataRequest))
   }
 
   // read, get, list

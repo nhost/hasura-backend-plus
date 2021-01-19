@@ -20,9 +20,6 @@ export const uploadFile = async (
   const oldHeadObject = await getHeadObject(req, true)
   const isNew = !oldHeadObject
 
-  console.log('files:')
-  console.log(req.files)
-
   if (isNew && !req.files?.file) {
     throw Boom.notFound()
   }
@@ -45,6 +42,8 @@ export const uploadFile = async (
         token: oldHeadObject?.Metadata?.token || uuidv4()
       }
     }
+
+    console.log({ upload_params })
     try {
       await s3.upload(upload_params).promise()
     } catch (err) {
@@ -55,8 +54,43 @@ export const uploadFile = async (
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {
-    throw Boom.notImplemented('Setting metadata is not implemented')
-    // await replaceMetadata(req, true, generateMetadata(metadata, context))
+    console.log('replace old token with new token. And update')
+
+    const updateTokenHeader = req.header('x-revoke-token') === 'true'
+
+    console.log({ updateTokenHeader })
+
+    if (updateTokenHeader) {
+      const key = getKey(req)
+      const oldHeadObject = await getHeadObject(req, true)
+
+      const updatedToken = uuidv4()
+
+      console.log({ updatedToken })
+
+      // As S3 objects are immutable, we need to replace the entire object by its copy
+      const params = {
+        Bucket: S3_BUCKET as string,
+        Key: key,
+        CopySource: `${S3_BUCKET}/${key}`,
+        ContentType: oldHeadObject?.ContentType,
+        Metadata: {
+          ...oldHeadObject?.Metadata,
+          token: updatedToken
+        },
+        MetadataDirective: 'REPLACE'
+      }
+
+      try {
+        await s3.copyObject(params).promise()
+      } catch (err) {
+        console.log('error updating metadata')
+        console.log(err)
+        throw Boom.badImplementation('Impossible to update the object metadata.')
+      }
+    } else {
+      throw Boom.notImplemented('Setting metadata is not implemented')
+    }
   }
   const headObject = await getHeadObject(req)
   return res.status(200).send({ key, ...headObject })
