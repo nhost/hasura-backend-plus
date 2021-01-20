@@ -57,10 +57,13 @@ export const uploadFile = async (
     console.log('replace old token with new token. And update')
 
     const updateTokenHeader = req.header('x-revoke-token') === 'true'
-
-    console.log({ updateTokenHeader })
+    const adminSecretIsOk = req.header('x-admin-secret') === process.env.HASURA_GRAPHQL_ADMIN_SECRET
 
     if (updateTokenHeader) {
+      if (!adminSecretIsOk) {
+        throw Boom.unauthorized('incorrect x-admin-secret')
+      }
+
       const key = getKey(req)
       const oldHeadObject = await getHeadObject(req, true)
 
