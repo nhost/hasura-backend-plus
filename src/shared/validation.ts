@@ -117,3 +117,10 @@ export const totpSchema = Joi.object({
   ...ticketFields,
   cookie: Joi.boolean()
 })
+
+export const imgTransformParams = Joi.object({
+  w: Joi.number().integer().min(0).max(8192),
+  h: Joi.number().integer().min(0).max(8192),
+  q: Joi.number().integer().min(0).max(100).default(100),
+  token: Joi.string().uuid()
+})
