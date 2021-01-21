@@ -42,7 +42,6 @@ export const getFile = async (
         Bucket: S3_BUCKET as string,
         Key: key
       }
-      const headObject = await getHeadObject(req, true)
       const contentType = headObject?.ContentType
 
       const object = s3.getObject(params)
@@ -63,6 +62,12 @@ export const getFile = async (
         transformer.jpeg({ quality: q })
       }
 
+      res.set('Content-Type', headObject.ContentType)
+      res.set('Content-Length', headObject.ContentLength?.toString())
+      res.set('Last-Modified', headObject.LastModified?.toString())
+      res.set('Content-Disposition', `inline;`)
+      res.set('Cache-Control', 'public, max-age=31557600')
+      res.set('ETag', headObject.ETag)
       return stream.pipe(transformer).pipe(res)
     } else {
       const filesize = headObject.ContentLength as number
