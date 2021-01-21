@@ -63,7 +63,8 @@ export const getFile = async (
       }
 
       res.set('Content-Type', headObject.ContentType)
-      res.set('Content-Length', headObject.ContentLength?.toString())
+      // we don't know the size of the transformed image since it's streamed
+      // res.set('Content-Length', headObject.ContentLength?.toString())
       res.set('Last-Modified', headObject.LastModified?.toString())
       res.set('Content-Disposition', `inline;`)
       res.set('Cache-Control', 'public, max-age=31557600')
