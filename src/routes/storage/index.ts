@@ -4,7 +4,6 @@ import { deleteFile } from './delete'
 import { listGet } from './list_get'
 import { uploadFile } from './upload'
 import { RequestExtended } from '@shared/types'
-import { revokeAccessToken } from './revoke-access-token'
 
 const router = Router()
 
