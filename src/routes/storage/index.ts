@@ -27,11 +27,6 @@ const createRoutes = (
     middleware.post(path, createSecureMiddleware(uploadFile, rules, isMetadataRequest))
   }
 
-  if (containsSomeRule(rules, ['write', 'update'])) {
-    console.log({ path })
-    middleware.post(path, createSecureMiddleware(revokeAccessToken, rules, isMetadataRequest))
-  }
-
   // read, get, list
   if (containsSomeRule(rules, ['read', 'get', 'list'])) {
     middleware.get(

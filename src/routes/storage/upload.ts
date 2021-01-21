@@ -43,33 +43,27 @@ export const uploadFile = async (
       }
     }
 
-    console.log({ upload_params })
     try {
       await s3.upload(upload_params).promise()
     } catch (err) {
-      console.error('fail to upload...')
+      console.error('Fail to upload file')
       console.error({ upload_params })
-
       console.error(err)
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {
-    console.log('replace old token with new token. And update')
-
-    const updateTokenHeader = req.header('x-revoke-token') === 'true'
+    const revokeToken = req.header('x-revoke-token') === 'true'
     const adminSecretIsOk = req.header('x-admin-secret') === process.env.HASURA_GRAPHQL_ADMIN_SECRET
 
-    if (updateTokenHeader) {
+    if (revokeToken) {
       if (!adminSecretIsOk) {
-        throw Boom.unauthorized('incorrect x-admin-secret')
+        throw Boom.forbidden('incorrect x-admin-secret')
       }
 
       const key = getKey(req)
       const oldHeadObject = await getHeadObject(req, true)
 
       const updatedToken = uuidv4()
-
-      console.log({ updatedToken })
 
       // As S3 objects are immutable, we need to replace the entire object by its copy
       const params = {
@@ -87,14 +81,15 @@ export const uploadFile = async (
       try {
         await s3.copyObject(params).promise()
       } catch (err) {
-        console.log('error updating metadata')
-        console.log(err)
+        console.error('error updating metadata')
+        console.error(err)
         throw Boom.badImplementation('Impossible to update the object metadata.')
       }
     } else {
-      throw Boom.notImplemented('Setting metadata is not implemented')
+      throw Boom.notImplemented('Unknown metadata update')
     }
   }
+
   const headObject = await getHeadObject(req)
   return res.status(200).send({ key, ...headObject })
 }
