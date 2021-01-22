@@ -3,6 +3,7 @@ import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from 
 
 import Boom from '@hapi/boom'
 import sharp from 'sharp'
+import { createHash } from 'crypto'
 import { S3_BUCKET } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
@@ -43,13 +44,14 @@ export const getFile = async (
       }
       const contentType = headObject?.ContentType
 
-      const object = s3.getObject(params)
-      const stream = object.createReadStream().on('error', (err) => {
-        console.error(err)
-        object.abort()
-      })
+      const object = await s3.getObject(params).promise()
 
-      const transformer = sharp()
+      if (!object.Body) {
+        throw Boom.badImplementation('File found without body')
+      }
+
+      const transformer = sharp(object.Body as Buffer)
+      transformer.rotate()
       transformer.resize({ width: w, height: h })
 
       if (contentType === WEBP) {
@@ -59,15 +61,15 @@ export const getFile = async (
       } else if (contentType === JPEG) {
         transformer.jpeg({ quality: q })
       }
+      const optimizedBuffer = await transformer.toBuffer()
+      const etag = getHash([optimizedBuffer])
 
       res.set('Content-Type', headObject.ContentType)
-      // we don't know the size of the transformed image since it's streamed
-      // res.set('Content-Length', headObject.ContentLength?.toString())
-      res.set('Last-Modified', headObject.LastModified?.toString())
       res.set('Content-Disposition', `inline;`)
       res.set('Cache-Control', 'public, max-age=31557600')
-      res.set('ETag', headObject.ETag)
-      return stream.pipe(transformer).pipe(res)
+      res.set('ETag', etag)
+      return res.send(optimizedBuffer)
+      // return stream.pipe(transformer).pipe(res)
     } else {
       const filesize = headObject.ContentLength as number
       const reqRange = req.headers.range
@@ -117,4 +119,16 @@ export const getFile = async (
       stream.pipe(res)
     }
   }
+}
+
+function getHash(items: (string | number | Buffer)[]) {
+  const hash = createHash('sha256')
+  for (let item of items) {
+    if (typeof item === 'number') hash.update(String(item))
+    else {
+      hash.update(item)
+    }
+  }
+  // See https://en.wikipedia.org/wiki/Base64#Filenames
+  return hash.digest('base64').replace(/\//g, '-')
 }
