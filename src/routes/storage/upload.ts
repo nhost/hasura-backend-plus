@@ -53,11 +53,9 @@ export const uploadFile = async (
     }
   } else if (!isNew) {
     const revokeToken = req.header('x-revoke-token') === 'true'
-    const adminSecretIsOk = req.header('x-admin-secret') === process.env.HASURA_GRAPHQL_ADMIN_SECRET
-
     if (revokeToken) {
-      if (!adminSecretIsOk) {
-        throw Boom.forbidden('incorrect x-admin-secret')
+      if (!hasPermission([], context)) {
+        throw Boom.forbidden('incorrect x-access-token')
       }
 
       const key = getKey(req)
