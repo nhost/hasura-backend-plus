@@ -32,7 +32,6 @@ export const getFile = async (
     if (req.query.w || req.query.h || req.query.q) {
       // transform image
       const { w, h, q } = await imgTransformParams.validateAsync(req.query)
-      console.log({ w, h, q })
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -45,7 +44,6 @@ export const getFile = async (
       const contentType = headObject?.ContentType
 
       const object = s3.getObject(params)
-      console.log({ object })
       const stream = object.createReadStream().on('error', (err) => {
         console.error(err)
         object.abort()
