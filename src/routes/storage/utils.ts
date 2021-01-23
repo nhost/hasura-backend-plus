@@ -38,12 +38,6 @@ interface StorageRequest {
   auth?: PermissionVariables
 }
 
-interface Context {
-  functions: { [key: string]: Function }
-  varialbes: StorageContext
-  req: RequestExtended
-}
-
 export const containsSomeRule = (
   rulesDefinition: Partial<PathConfig> = {},
   rules: (string | undefined)[]
