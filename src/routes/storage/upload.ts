@@ -27,11 +27,12 @@ export const uploadFile = async (
   const resource = req.files?.file as UploadedFile
   const context = createContext(req, resource)
 
-  if (!hasPermission(isNew ? [rules.create, rules.write] : [rules.update, rules.write], context)) {
-    throw Boom.forbidden()
-  }
-
   if (!isMetadataRequest) {
+    if (
+      !hasPermission(isNew ? [rules.create, rules.write] : [rules.update, rules.write], context)
+    ) {
+      throw Boom.forbidden()
+    }
     // * Create or update the object
     const upload_params = {
       Bucket: S3_BUCKET as string,
