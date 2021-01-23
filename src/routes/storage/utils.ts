@@ -106,7 +106,7 @@ export const createContext = (
   return { ...functions, ...variables, req }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: Context): boolean => {
+export const hasPermission = (rules: (string | undefined)[], context: any): boolean => {
   return (
     context.req.headers['x-admin-secret'] === process.env.HASURA_GRAPHQL_ADMIN_SECRET ||
     rules.some((rule) => rule && !!safeEval(rule, context))
