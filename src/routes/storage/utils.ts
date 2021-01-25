@@ -38,12 +38,6 @@ interface StorageRequest {
   auth?: PermissionVariables
 }
 
-interface Context {
-  functions: { [key: string]: Function }
-  varialbes: StorageContext
-  req: RequestExtended
-}
-
 export const containsSomeRule = (
   rulesDefinition: Partial<PathConfig> = {},
   rules: (string | undefined)[]
@@ -106,7 +100,7 @@ export const createContext = (
   return { ...functions, ...variables, req }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: Context): boolean => {
+export const hasPermission = (rules: (string | undefined)[], context: any): boolean => {
   return (
     context.req.headers['x-admin-secret'] === process.env.HASURA_GRAPHQL_ADMIN_SECRET ||
     rules.some((rule) => rule && !!safeEval(rule, context))
