@@ -1391,6 +1391,13 @@
     "@types/oauth" "*"
     "@types/passport" "*"
 
+"@types/passport-spotify@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/passport-spotify/-/passport-spotify-1.1.0.tgz#6fb270f5bf2ca62244269db8cd1ec9cef3b11afd"
+  integrity sha512-Av/1km8im4JqAh3O3QEHh8R60YTQBOQsxjf6YT3UkuY8Y/YVJ1zyThmnosjZ2sWZE/SMqjA/lUDvB2SL+OyAGw==
+  dependencies:
+    "@types/express" "*"
+
 "@types/passport-twitter@^1.0.34":
   version "1.0.34"
   resolved "https://registry.yarnpkg.com/@types/passport-twitter/-/passport-twitter-1.0.34.tgz#2e06ac0f57e01362e4bac3f806f4768376ad4607"
@@ -8319,6 +8326,23 @@ passport-oauth2@1.x.x:
     uid2 "0.0.x"
     utils-merge "1.x.x"
 
+passport-oauth@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/passport-oauth/-/passport-oauth-1.0.0.tgz#90aff63387540f02089af28cdad39ea7f80d77df"
+  integrity sha1-kK/2M4dUDwIImvKM2tOep/gNd98=
+  dependencies:
+    passport-oauth1 "1.x.x"
+    passport-oauth2 "1.x.x"
+
+passport-spotify@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/passport-spotify/-/passport-spotify-1.1.0.tgz#d0baa0a97907ca199ad9b33f0e8937b5f199ce19"
+  integrity sha512-jLVtH7Z+5XW854H0mAsdpGJq5dMSwxQQu1jcXhq+3JlB8HuP5xkCLMuQ5K24S7WYh+cAHLrEKJPAoeo1D8CbUg==
+  dependencies:
+    passport-oauth "1.0.0"
+    querystring "~0.2.0"
+    util "~0.11.0"
+
 passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
@@ -9154,7 +9178,7 @@ querystring-es3@^0.2.0, querystring-es3@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring-es3/-/querystring-es3-0.2.1.tgz#9ec61f79049875707d69414596fd907a4d711e73"
 
-querystring@0.2.0:
+querystring@0.2.0, querystring@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
 
@@ -11020,9 +11044,10 @@ util@0.10.3:
   dependencies:
     inherits "2.0.1"
 
-util@^0.11.0:
+util@^0.11.0, util@~0.11.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/util/-/util-0.11.1.tgz#3236733720ec64bb27f6e26f421aaa2e1b588d61"
+  integrity sha512-HShAsny+zS2TZfaXxD9tYj4HQGlBezXZMZuM/S5PKLLoZkShZiGk9o5CzukI1LVHZvjdvZ2Sj1aW/Ndn2NB/HQ==
   dependencies:
     inherits "2.0.3"
 

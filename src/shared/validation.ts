@@ -124,3 +124,8 @@ export const imgTransformParams = Joi.object({
   q: Joi.number().integer().min(0).max(100).default(100),
   token: Joi.string().uuid()
 })
+
+export const fileMetadataUpdate = Joi.object({
+  // action: Joi.string().valid('revoke-token','some-other-action').required(),
+  action: Joi.string().valid('revoke-token').required()
+})
