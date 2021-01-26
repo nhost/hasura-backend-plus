@@ -35,7 +35,8 @@ it('should revoke and generate new token', async () => {
     }
   } = await request
     .post(`/storage/m/user/${getUserId()}/${filePath}`)
-    .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET, 'x-revoke-token': true })
+    .send({ action: 'revoke-token' })
+    .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
 
   expect(status).toEqual(200)
   expect(token).not.toEqual(fileToken)
@@ -45,9 +46,28 @@ it('should revoke and generate new token', async () => {
 it('should fail to revoke token on incorrect admin secret', async () => {
   const { status } = await request
     .post(`/storage/m/user/${getUserId()}/${filePath}`)
-    .set({ 'x-admin-secret': 'incorrect123', 'x-revoke-token': true })
+    .send({ action: 'revoke-token' })
+    .set({ 'x-admin-secret': 'incorrect-admin-secret' })
 
   expect(status).toEqual(403)
+})
+
+it('should fail to revoke token on incorrect admin secret', async () => {
+  const { status } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'non-existing' })
+    .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
+
+  expect(status).toEqual(400)
+})
+
+it('should fail to revoke token on incorrect admin secret', async () => {
+  const { status } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'non-existing' })
+    .set({ 'x-admin-secret': 'incorrect-admin-secret' })
+
+  expect(status).toEqual(400)
 })
 
 it('should include one file', async () => {

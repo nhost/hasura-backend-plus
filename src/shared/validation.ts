@@ -117,3 +117,8 @@ export const totpSchema = Joi.object({
   ...ticketFields,
   cookie: Joi.boolean()
 })
+
+export const fileMetadataUpdate = Joi.object({
+  // action: Joi.string().valid('revoke-token','some-other-action').required(),
+  action: Joi.string().valid('revoke-token').required()
+})

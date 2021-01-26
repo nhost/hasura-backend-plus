@@ -7,6 +7,7 @@ import { S3_BUCKET } from '@shared/config'
 import { UploadedFile } from 'express-fileupload'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
+import { fileMetadataUpdate } from '@shared/validation'
 
 export const uploadFile = async (
   req: RequestExtended,
@@ -53,8 +54,9 @@ export const uploadFile = async (
       throw Boom.badImplementation('Impossible to create or update the object.')
     }
   } else if (!isNew) {
-    const revokeToken = req.header('x-revoke-token') === 'true'
-    if (revokeToken) {
+    const { action } = await fileMetadataUpdate.validateAsync(req.body)
+
+    if (action === 'revoke-token') {
       if (!hasPermission([], context)) {
         throw Boom.forbidden('incorrect x-access-token')
       }
