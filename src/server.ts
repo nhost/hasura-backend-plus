@@ -18,7 +18,11 @@ if (process.env.NODE_ENV === 'production') {
   app.use(limiter)
 }
 
-app.use(morgan('tiny'))
+app.use(
+  morgan(
+    ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]'
+  )
+)
 app.use(helmet())
 app.use(json())
 app.use(cors({ credentials: true, origin: true }))
