@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import { COOKIE_SECRET } from '@shared/config'
+import { COOKIE_SECRET, COOKIE_SECURE, COOKIE_SAME_SITE } from '@shared/config'
 import { request } from '@shared/request'
 import {
   selectRefreshToken,
@@ -16,8 +16,18 @@ interface HasuraData {
 
 async function logout({ body, cookies, signedCookies }: Request, res: Response): Promise<unknown> {
   // clear cookie
-  res.clearCookie('refresh_token')
-  res.clearCookie('permission_variables')
+  res.clearCookie('refresh_token', {
+    httpOnly: true,
+    signed: Boolean(COOKIE_SECRET),
+    sameSite: COOKIE_SAME_SITE,
+    secure: COOKIE_SECURE
+  })
+  res.clearCookie('permission_variables', {
+    httpOnly: true,
+    signed: Boolean(COOKIE_SECRET),
+    sameSite: COOKIE_SAME_SITE,
+    secure: COOKIE_SECURE
+  })
 
   // should we delete all refresh tokens to this user or not
   const { all } = await logoutSchema.validateAsync(body)
