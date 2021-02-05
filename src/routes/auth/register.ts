@@ -9,25 +9,28 @@ import {
 } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
+import { setRefreshToken } from '@shared/cookies'
 import { registerSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { InsertAccountData } from '@shared/types'
+import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
+
   const {
     email,
     password,
     user_data = {},
     register_options = {}
   } = await registerSchema.validateAsync(body)
-  const account = await selectAccount(body)
 
-  if (account) {
+  if (await selectAccount(body)) {
     throw Boom.badRequest('Account already exists.')
   }
 
@@ -54,8 +57,9 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
+  let accounts: InsertAccountData
   try {
-    await request<InsertAccountData>(insertAccount, {
+    accounts = await request<InsertAccountData>(insertAccount, {
       account: {
         email,
         password_hash,
@@ -109,7 +113,22 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     }
   }
 
-  return res.status(204).send()
+  const account = accounts.insert_auth_accounts.returning[0]
+  const refresh_token = await setRefreshToken(res, account.id, useCookie)
+
+  // generate JWT
+  const jwt_token = createHasuraJwt(account)
+  const jwt_expires_in = newJwtExpiry
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
+  }
+  let session: Session = { jwt_token, jwt_expires_in, user }
+  if (!useCookie) session.refresh_token = refresh_token
+
+  return res.send(session)
 }
 
 export default asyncWrapper(registerAccount)
