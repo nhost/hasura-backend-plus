@@ -61,7 +61,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
       const jwt_token = createHasuraJwt(account)
       const jwt_expires_in = newJwtExpiry
 
-      let session: Session = { jwt_token, jwt_expires_in, user: account.user }
+      const session: Session = { jwt_token, jwt_expires_in, user: account.user }
       if (useCookie) session.refresh_token = refresh_token
 
       return res.send(session)
@@ -103,7 +103,7 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  let session: Session = { jwt_token, jwt_expires_in, user }
+  const session: Session = { jwt_token, jwt_expires_in, user }
   if (!useCookie) session.refresh_token = refresh_token
 
   res.send(session)
