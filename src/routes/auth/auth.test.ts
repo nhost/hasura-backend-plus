@@ -59,7 +59,7 @@ it('should create an account', async () => {
   const { status } = await request
     .post('/auth/register')
     .send({ email, password, user_data: { name: 'Test name' } })
-  expect(status).toEqual(204)
+  expect(status).toEqual(200)
 })
 
 it('should fail to create account with unallowed role', async () => {
