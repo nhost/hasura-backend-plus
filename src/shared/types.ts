@@ -45,7 +45,7 @@ export type Token = {
 export interface Session {
   jwt_token: string
   jwt_expires_in: number;
-  refresh_token: string
+  refresh_token?: string
   user: UserData | null;
 }
 
