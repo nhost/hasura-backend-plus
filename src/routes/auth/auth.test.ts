@@ -62,7 +62,7 @@ it('should create an account', async () => {
   expect(status).toEqual(204)
 })
 
-it('should fail to create accunt with unallowed role', async () => {
+it('should fail to create account with unallowed role', async () => {
   const { status } = await request.post('/auth/register').send({
     email: 'test1@nhost.io',
     password,
@@ -96,7 +96,7 @@ it('should create account with default_role that is in the ALLOWED_USER_ROLES va
       default_role: 'editor'
     }
   })
-  expect(status).toEqual(204)
+  expect(status).toEqual(200)
 })
 
 it('should register account with default_role and allowed_roles set', async () => {
@@ -109,7 +109,7 @@ it('should register account with default_role and allowed_roles set', async () =
       allowed_roles: ['user', 'me']
     }
   })
-  expect(status).toEqual(204)
+  expect(status).toEqual(200)
 })
 
 it('should tell the account already exists', async () => {
