@@ -14,11 +14,7 @@ interface HasuraData {
 }
 
 async function refreshToken({ refresh_token }: RequestExtended, res: Response): Promise<void> {
-  if (!refresh_token) {
-    throw Boom.unauthorized('Invalid or expired refresh token.')
-  }
-
-  if (!refresh_token.value) {
+  if (!refresh_token || !refresh_token.value) {
     throw Boom.unauthorized('Invalid or expired refresh token.')
   }
 
@@ -55,15 +51,16 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
 
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  const user: UserData = { 
+  const user: UserData = {
     id: account.user.id,
     display_name: account.user.display_name,
     email: account.email,
     avatar_url: account.user.avatar_url
   }
   const session: Session = { jwt_token, jwt_expires_in, user }
-  if (refresh_token.type === "cookie") {
+  if (refresh_token.type === 'cookie') {
     setCookie(res, new_refresh_token, permission_variables)
+  } else {
     session.refresh_token = new_refresh_token
   }
   res.send(session)

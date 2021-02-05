@@ -87,7 +87,7 @@ it('should fail to create accunt with default_role that does not overlap allowed
   expect(status).toEqual(400)
 })
 
-it('should create account with default_rolw that is in the ALLOWED_USER_ROLES variable', async () => {
+it('should create account with default_role that is in the ALLOWED_USER_ROLES variable', async () => {
   const { status } = await request.post('/auth/register').send({
     email: 'test3@nhost.io',
     password,

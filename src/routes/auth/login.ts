@@ -104,9 +104,10 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
     avatar_url: account.user.avatar_url
   }
   let session: Session = { jwt_token, jwt_expires_in, user }
-  if (useCookie) session.refresh_token = refresh_token
+  if (!useCookie) session.refresh_token = refresh_token
 
   res.send(session)
 }
 
 export default asyncWrapper(loginAccount)
+
