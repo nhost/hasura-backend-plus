@@ -81,6 +81,14 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     throw Boom.badImplementation('Error inserting user account')
   }
 
+  const account = accounts.insert_auth_accounts.returning[0]
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
+  }
+
   if (!AUTO_ACTIVATE_NEW_USERS && VERIFY_EMAILS) {
     if (!EMAILS_ENABLE) {
       throw Boom.badImplementation('SMTP settings unavailable')
@@ -111,20 +119,17 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
       console.error(err)
       throw Boom.badImplementation()
     }
+
+    let session: Session = { jwt_token: null, jwt_expires_in: null, user }
+    return res.send(session)
   }
 
-  const account = accounts.insert_auth_accounts.returning[0]
   const refresh_token = await setRefreshToken(res, account.id, useCookie)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  const user: UserData = {
-    id: account.user.id,
-    display_name: account.user.display_name,
-    email: account.email,
-    avatar_url: account.user.avatar_url
-  }
+  
   let session: Session = { jwt_token, jwt_expires_in, user }
   if (!useCookie) session.refresh_token = refresh_token
 
