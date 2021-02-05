@@ -8,7 +8,7 @@ import { setRefreshToken } from '@shared/cookies'
 import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
-import { AccountData } from '@shared/types'
+import { AccountData, UserData, Session } from '@shared/types'
 import { ANONYMOUS_USERS_ENABLE, DEFAULT_ANONYMOUS_ROLE } from '@shared/config'
 
 interface HasuraData {
@@ -61,21 +61,8 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
       const jwt_token = createHasuraJwt(account)
       const jwt_expires_in = newJwtExpiry
 
-      // return
-      if (useCookie) {
-        res.send({
-          jwt_token,
-          jwt_expires_in
-        })
-      } else {
-        res.send({
-          jwt_token,
-          jwt_expires_in,
-          refresh_token
-        })
-      }
-
-      return
+      const session: Session = { jwt_token, jwt_expires_in, refresh_token, user: null }
+      return res.send(session)
     }
   }
 
@@ -108,20 +95,15 @@ async function loginAccount({ body }: Request, res: Response): Promise<unknown> 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-
-  // return
-  if (useCookie) {
-    res.send({
-      jwt_token,
-      jwt_expires_in
-    })
-  } else {
-    res.send({
-      jwt_token,
-      jwt_expires_in,
-      refresh_token
-    })
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
   }
+  const session: Session = { jwt_token, jwt_expires_in, refresh_token, user }
+
+  res.send(session)
 }
 
 export default asyncWrapper(loginAccount)
