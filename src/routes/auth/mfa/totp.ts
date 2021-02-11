@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { asyncWrapper, rotateTicket, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
-import { UserData, Session } from "@shared/types"
+import { UserData, Session } from '@shared/types'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
