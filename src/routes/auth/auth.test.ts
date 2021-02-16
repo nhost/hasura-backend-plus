@@ -10,7 +10,9 @@ import {
   REDIRECT_URL_ERROR,
   JWT_CLAIMS_NAMESPACE,
   HOST,
-  PORT
+  PORT,
+  ADMIN_SECRET_HEADER,
+  HASURA_GRAPHQL_ADMIN_SECRET
   // ANONYMOUS_USERS_ENABLE
 } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
@@ -170,6 +172,26 @@ it('should sign the user in', async () => {
   const { body, status } = await request.post('/auth/login').send({ email, password })
   // Save JWT token to globally scoped varaible.
   jwtToken = body.jwt_token
+  expect(status).toEqual(200)
+  expect(body.jwt_token).toBeString()
+  expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should not sign user in with invalid admin secret', async () => {
+  const { status } = await request
+  .post('/auth.login')
+  .set(ADMIN_SECRET_HEADER, 'invalidsecret')
+  .send({ email, password })
+  
+  expect(status).toEqual(401)
+})
+
+it('should sign user in with valid admin secret', async () => {
+  const { body, status } = await request
+  .post('/auth.login')
+  .set(ADMIN_SECRET_HEADER, HASURA_GRAPHQL_ADMIN_SECRET as string)
+  .send({ email, password: 'invalidpassword' })
+  
   expect(status).toEqual(200)
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()

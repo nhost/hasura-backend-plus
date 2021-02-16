@@ -430,7 +430,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                  |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                 |
 
-
 ### Authentication
 
 | Name                         | Default                 | Description                                                                                                                                                                                  |
@@ -471,44 +470,43 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
-
+| `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-hasura-admin-secret` header on `/auth/login`                                                                                                                     |
 
 ### Providers
 
-| Name                           | Default | Description |
-| ------------------------------ | ------- | ----------- |
-| `PROVIDER_SUCCESS_REDIRECT`    |         |             |
-| `PROVIDER_FAILURE_REDIRECT`    |         |             |
-| `GOOGLE_ENABLE`                | false   |             |
-| `GOOGLE_CLIENT_ID`             |         |             |
-| `GOOGLE_CLIENT_SECRET`         |         |             |
-| `FACEBOOK_ENABLE`              | false   |             |
-| `FACEBOOK_CLIENT_ID`           |         |             |
-| `FACEBOOK_CLIENT_SECRET`       |         |             |
-| `TWITTER_ENABLE`               | false   |             |
-| `TWITTER_CONSUMER_KEY`         |         |             |
-| `TWITTER_CONSUMER_SECRET`      |         |             |
-| `LINKEDIN_ENABLE`              | false   |             |
-| `LINKEDIN_CLIENT_ID`           |         |             |
-| `LINKEDIN_CLIENT_SECRET`       |         |             |
-| `APPLE_ENABLE`                 | false   |             |
-| `APPLE_CLIENT_ID`              |         |             |
-| `APPLE_KEY_ID`                 |         |             |
-| `APPLE_PRIVATE_KEY`            |         |             |
-| `APPLE_TEAM_ID`                |         |             |
-| `GITHUB_ENABLE`                | false   |             |
-| `GITHUB_AUTHORIZATION_URL`     |         |             |
-| `GITHUB_CLIENT_ID`             |         |             |
-| `GITHUB_CLIENT_SECRET`         |         |             |
-| `GITHUB_TOKEN_URL`             |         |             |
-| `GITHUB_USER_PROFILE_URL`      |         |             |
-| `WINDOWS_LIVE_ENABLE`          | false   |             |
-| `WINDOWS_LIVE_CLIENT_ID`       |         |             |
-| `WINDOWS_LIVE_CLIENT_SECRET`   |         |             |
-| `SPOTIFY_ENABLE`               | false   |             |
-| `SPOTIFY_CLIENT_ID`            |         |             |
-| `SPOTIFY_CLIENT_SECRET`        |         |             |
-
+| Name                         | Default | Description |
+| ---------------------------- | ------- | ----------- |
+| `PROVIDER_SUCCESS_REDIRECT`  |         |             |
+| `PROVIDER_FAILURE_REDIRECT`  |         |             |
+| `GOOGLE_ENABLE`              | false   |             |
+| `GOOGLE_CLIENT_ID`           |         |             |
+| `GOOGLE_CLIENT_SECRET`       |         |             |
+| `FACEBOOK_ENABLE`            | false   |             |
+| `FACEBOOK_CLIENT_ID`         |         |             |
+| `FACEBOOK_CLIENT_SECRET`     |         |             |
+| `TWITTER_ENABLE`             | false   |             |
+| `TWITTER_CONSUMER_KEY`       |         |             |
+| `TWITTER_CONSUMER_SECRET`    |         |             |
+| `LINKEDIN_ENABLE`            | false   |             |
+| `LINKEDIN_CLIENT_ID`         |         |             |
+| `LINKEDIN_CLIENT_SECRET`     |         |             |
+| `APPLE_ENABLE`               | false   |             |
+| `APPLE_CLIENT_ID`            |         |             |
+| `APPLE_KEY_ID`               |         |             |
+| `APPLE_PRIVATE_KEY`          |         |             |
+| `APPLE_TEAM_ID`              |         |             |
+| `GITHUB_ENABLE`              | false   |             |
+| `GITHUB_AUTHORIZATION_URL`   |         |             |
+| `GITHUB_CLIENT_ID`           |         |             |
+| `GITHUB_CLIENT_SECRET`       |         |             |
+| `GITHUB_TOKEN_URL`           |         |             |
+| `GITHUB_USER_PROFILE_URL`    |         |             |
+| `WINDOWS_LIVE_ENABLE`        | false   |             |
+| `WINDOWS_LIVE_CLIENT_ID`     |         |             |
+| `WINDOWS_LIVE_CLIENT_SECRET` |         |             |
+| `SPOTIFY_ENABLE`             | false   |             |
+| `SPOTIFY_CLIENT_ID`          |         |             |
+| `SPOTIFY_CLIENT_SECRET`      |         |             |
 
 ### Storage
 
