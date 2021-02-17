@@ -24,7 +24,7 @@ interface HasuraData {
   }
 }
 
-async function loginAccount({ body, header }: Request, res: Response): Promise<unknown> {
+async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
@@ -90,17 +90,19 @@ async function loginAccount({ body, header }: Request, res: Response): Promise<u
   }
 
   // Handle User Impersonation Check
-  const adminSecret = header(ADMIN_SECRET_HEADER)
+  const adminSecret = headers[ADMIN_SECRET_HEADER]
   const hasAdminSecret = Boolean(adminSecret)
   const isAdminSecretCorrect = adminSecret === HASURA_GRAPHQL_ADMIN_SECRET
-  const userImpersonationValid = USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect
-  if (!userImpersonationValid) {
+  let userImpersonationValid = false;
+  if (USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
     throw Boom.unauthorized('Invalid x-hasura-admin-secret')
+  } else if (USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
+    userImpersonationValid = true;
   }
 
   // Validate Password
   const isPasswordCorrect = await bcrypt.compare(password, password_hash)
-  if (!isPasswordCorrect || !userImpersonationValid) {
+  if (!isPasswordCorrect && !userImpersonationValid) {
     throw Boom.unauthorized('Username and password do not match')
   }
 
