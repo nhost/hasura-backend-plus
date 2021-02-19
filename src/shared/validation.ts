@@ -69,7 +69,8 @@ export const userDataFields = {
 
 export const registerSchema = Joi.object({
   ...accountFields,
-  ...userDataFields
+  ...userDataFields,
+  cookie: Joi.boolean()
 })
 
 export const registerUserDataSchema = Joi.object(userDataFields)
