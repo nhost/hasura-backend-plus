@@ -18,7 +18,7 @@ export async function request<T extends unknown>(
 ): Promise<T> {
   const client = new GraphQLClient(HASURA_ENDPOINT, {
     headers: HASURA_GRAPHQL_ADMIN_SECRET
-      ? { 'x-hasura-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET }
+      ? { 'x-admin-secret': HASURA_GRAPHQL_ADMIN_SECRET }
       : undefined
   })
 

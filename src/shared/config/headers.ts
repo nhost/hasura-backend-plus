@@ -1,2 +1,2 @@
 // Headers
-export const ADMIN_SECRET_HEADER = 'x-hasura-admin-secret'
+export const ADMIN_SECRET_HEADER = 'x-admin-secret'

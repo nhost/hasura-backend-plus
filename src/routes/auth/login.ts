@@ -95,7 +95,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const isAdminSecretCorrect = adminSecret === HASURA_GRAPHQL_ADMIN_SECRET
   let userImpersonationValid = false;
   if (USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
-    throw Boom.unauthorized('Invalid x-hasura-admin-secret')
+    throw Boom.unauthorized('Invalid x-admin-secret')
   } else if (USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
     userImpersonationValid = true;
   }
