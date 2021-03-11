@@ -12,6 +12,7 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for GitHub OAuth.`)
     }
-    initProvider(router, 'github', Strategy, { scope: ['user:email'] })
+    const scope = options.scope ? options.scope.split(',') : ['user:email']
+    initProvider(router, 'github', Strategy, { scope })
   }
 }

@@ -13,14 +13,9 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Windows Live.`)
     }
-    initProvider(router, 'windowslive', Strategy, {
-      scope: [
-        'wl.basic',
-        'wl.emails',
-        // The scope 'wl.contacts_emails' is a undocumented scope which allows us
-        // to retrieve the email address of the Windows Live account
-        'wl.contacts_emails'
-      ]
-    })
+    // The scope 'wl.contacts_emails' is a undocumented scope which allows us
+    // to retrieve the email address of the Windows Live account
+    const scope = options.scope ? options.scope.split(',') : ['wl.basic', 'wl.emails', 'wl.contacts_emails']
+    initProvider(router, 'windowslive', Strategy, { scope })
   }
 }

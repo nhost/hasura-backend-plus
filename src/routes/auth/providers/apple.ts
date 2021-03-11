@@ -20,9 +20,9 @@ export default (router: Router): void => {
     if (!options.clientID || !options.teamID || !options.keyID || !options.key) {
       throw Boom.badImplementation(`Missing environment variables for GitHub OAuth.`)
     }
-
+    const scope = options.scope ? options.scope.split(',') : ['name', 'email']
     initProvider(router, 'apple', Strategy, {
-      scope: ['name', 'email'],
+      scope,
       transformProfile,
       callbackMethod: 'POST'
     })

@@ -18,6 +18,7 @@ if (castBooleanEnv('GITHUB_ENABLE')) {
   PROVIDERS.github = {
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    scopes: process.env.GITHUB_SCOPES,
     authorizationURL: process.env.GITHUB_AUTHORIZATION_URL, // optional
     tokenURL: process.env.GITHUB_TOKEN_URL, // optional
     userProfileURL: process.env.GITHUB_USER_PROFILE_URL // optional
@@ -28,7 +29,8 @@ if (castBooleanEnv('GITHUB_ENABLE')) {
 if (castBooleanEnv('GOOGLE_ENABLE')) {
   PROVIDERS.google = {
     clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    scopes: process.env.GOOGLE_SCOPES
   }
 }
 
@@ -36,7 +38,8 @@ if (castBooleanEnv('GOOGLE_ENABLE')) {
 if (castBooleanEnv('FACEBOOK_ENABLE')) {
   PROVIDERS.facebook = {
     clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    scopes: process.env.FACEBOOK_SCOPES
   }
 }
 
@@ -44,14 +47,15 @@ if (castBooleanEnv('FACEBOOK_ENABLE')) {
 if (castBooleanEnv('TWITTER_ENABLE')) {
   PROVIDERS.twitter = {
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
-    consumerSecret: process.env.TWITTER_CONSUMER_SECRET
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
   }
 }
 // LinkedIn OAuth2 provider settings
 if (castBooleanEnv('LINKEDIN_ENABLE')) {
   PROVIDERS.linkedin = {
     clientID: process.env.LINKEDIN_CLIENT_ID,
-    clientSecret: process.env.LINKEDIN_CLIENT_SECRET
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    scopes: process.env.LINKEDIN_SCOPES
   }
 }
 
@@ -62,6 +66,7 @@ if (castBooleanEnv('APPLE_ENABLE')) {
       clientID: process.env.APPLE_CLIENT_ID,
       teamID: process.env.APPLE_TEAM_ID,
       keyID: process.env.APPLE_KEY_ID,
+      scopes: process.env.APPLE_SCOPES,
       key:
         process.env.APPLE_PRIVATE_KEY &&
         // Convert contents from base64 string to string to avoid issues with line breaks in the environment variable
@@ -76,7 +81,8 @@ if (castBooleanEnv('APPLE_ENABLE')) {
 if (castBooleanEnv('WINDOWS_LIVE_ENABLE')) {
   PROVIDERS.windowslive = {
     clientID: process.env.WINDOWS_LIVE_CLIENT_ID,
-    clientSecret: process.env.WINDOWS_LIVE_CLIENT_SECRET
+    clientSecret: process.env.WINDOWS_LIVE_CLIENT_SECRET,
+    scopes: process.env.WINDOWS_LIVE_SCOPES
   }
 }
 
@@ -84,7 +90,8 @@ if (castBooleanEnv('WINDOWS_LIVE_ENABLE')) {
 if (castBooleanEnv('SPOTIFY_ENABLE')) {
     PROVIDERS.spotify = {
       clientID: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+      scopes: process.env.SPOTIFY_SCOPES
     }
   }
 

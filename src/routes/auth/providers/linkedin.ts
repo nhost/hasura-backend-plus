@@ -13,8 +13,7 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for LinkedIn.`)
     }
-    initProvider(router, 'linkedin', Strategy, {
-      scope: ['r_emailaddress', 'r_liteprofile']
-    })
+    const scope = options.scope ? options.scope.split(',') : ['r_emailaddress', 'r_liteprofile']
+    initProvider(router, 'linkedin', Strategy, { scope })
   }
 }

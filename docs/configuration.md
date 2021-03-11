@@ -481,32 +481,39 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `GOOGLE_ENABLE`              | false   |             |
 | `GOOGLE_CLIENT_ID`           |         |             |
 | `GOOGLE_CLIENT_SECRET`       |         |             |
+| `GOOGLE_SCOPES`              | email,profile |             |
 | `FACEBOOK_ENABLE`            | false   |             |
 | `FACEBOOK_CLIENT_ID`         |         |             |
 | `FACEBOOK_CLIENT_SECRET`     |         |             |
+| `FACEBOOK_SCOPES`              | email,photos,displayName |             |
 | `TWITTER_ENABLE`             | false   |             |
 | `TWITTER_CONSUMER_KEY`       |         |             |
 | `TWITTER_CONSUMER_SECRET`    |         |             |
 | `LINKEDIN_ENABLE`            | false   |             |
 | `LINKEDIN_CLIENT_ID`         |         |             |
 | `LINKEDIN_CLIENT_SECRET`     |         |             |
+| `LINKEDIN_SCOPES`            | r_emailaddress,r_liteprofile |             |
 | `APPLE_ENABLE`               | false   |             |
 | `APPLE_CLIENT_ID`            |         |             |
 | `APPLE_KEY_ID`               |         |             |
 | `APPLE_PRIVATE_KEY`          |         |             |
 | `APPLE_TEAM_ID`              |         |             |
+| `APPLE_SCOPES`               | name,email |             |
 | `GITHUB_ENABLE`              | false   |             |
 | `GITHUB_AUTHORIZATION_URL`   |         |             |
 | `GITHUB_CLIENT_ID`           |         |             |
 | `GITHUB_CLIENT_SECRET`       |         |             |
+| `GITHUB_SCOPES`              | user:email |             |
 | `GITHUB_TOKEN_URL`           |         |             |
 | `GITHUB_USER_PROFILE_URL`    |         |             |
 | `WINDOWS_LIVE_ENABLE`        | false   |             |
 | `WINDOWS_LIVE_CLIENT_ID`     |         |             |
 | `WINDOWS_LIVE_CLIENT_SECRET` |         |             |
+| `WINDOWS_LIVE_SCOPES`        | wl.basic,wl.emails,wl.contacts_emails |             |
 | `SPOTIFY_ENABLE`             | false   |             |
 | `SPOTIFY_CLIENT_ID`          |         |             |
 | `SPOTIFY_CLIENT_SECRET`      |         |             |
+| `SPOTIFY_SCOPES`             | user-read-email,user-read-private |             |
 
 ### Storage
 
