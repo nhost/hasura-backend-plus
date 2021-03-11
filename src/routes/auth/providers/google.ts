@@ -12,7 +12,7 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Google OAuth.`)
     }
-    const scope = options.scope ? options.scope.split(',') : ['email', 'profile']
+    const scope = options.scopes ? options.scopes.split(',') : ['email', 'profile']
     initProvider(router, 'google', Strategy, { scope })
   }
 }

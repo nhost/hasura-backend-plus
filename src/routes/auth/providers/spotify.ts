@@ -12,7 +12,7 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Spotify OAuth.`)
     }
-    const scope = options.scope ? options.scope.split(',') : ['user-read-email', 'user-read-private']
+    const scope = options.scopes ? options.scopes.split(',') : ['user-read-email', 'user-read-private']
     initProvider(router, 'spotify', Strategy, { scope })
   }
 }

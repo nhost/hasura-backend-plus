@@ -15,7 +15,7 @@ export default (router: Router): void => {
     }
     // The scope 'wl.contacts_emails' is a undocumented scope which allows us
     // to retrieve the email address of the Windows Live account
-    const scope = options.scope ? options.scope.split(',') : ['wl.basic', 'wl.emails', 'wl.contacts_emails']
+    const scope = options.scopes ? options.scopes.split(',') : ['wl.basic', 'wl.emails', 'wl.contacts_emails']
     initProvider(router, 'windowslive', Strategy, { scope })
   }
 }
