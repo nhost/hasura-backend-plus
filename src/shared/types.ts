@@ -42,6 +42,13 @@ export type Token = {
   iat: bigint
 }
 
+export interface Session {
+  jwt_token: string | null;
+  jwt_expires_in: number | null;
+  refresh_token?: string
+  user: UserData;
+}
+
 export interface UserData {
   [key: string]: ClaimValueType
   id: string

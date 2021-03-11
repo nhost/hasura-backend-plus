@@ -27,6 +27,49 @@ it('should upload a new file', async () => {
   fileToken = token
 })
 
+it('should revoke and generate new token', async () => {
+  const {
+    status,
+    body: {
+      Metadata: { token }
+    }
+  } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'revoke-token' })
+    .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
+
+  expect(status).toEqual(200)
+  expect(token).not.toEqual(fileToken)
+  fileToken = token
+})
+
+it('should fail to revoke token on incorrect admin secret', async () => {
+  const { status } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'revoke-token' })
+    .set({ 'x-admin-secret': 'incorrect-admin-secret' })
+
+  expect(status).toEqual(403)
+})
+
+it('should fail with non existing action with correct admin secret', async () => {
+  const { status } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'non-existing' })
+    .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
+
+  expect(status).toEqual(400)
+})
+
+it('should fail to with incorrect action and incorrect admin secret', async () => {
+  const { status } = await request
+    .post(`/storage/m/user/${getUserId()}/${filePath}`)
+    .send({ action: 'non-existing' })
+    .set({ 'x-admin-secret': 'incorrect-admin-secret' })
+
+  expect(status).toEqual(400)
+})
+
 it('should include one file', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
@@ -151,4 +194,56 @@ it('should get the headers of no files', async () => {
   const { status, body } = await request.get(`/storage/m/user/${getUserId()}/`)
   expect(status).toEqual(200)
   expect(body).toBeArrayOfSize(0)
+})
+
+it('should upload a new imae', async () => {
+  const { status } = await request
+    .post(`/storage/o/public/example.jpg`)
+    .attach('file', 'test-mocks/example.jpg')
+  expect(status).toEqual(200)
+})
+
+it('should get image', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg`)
+  expect(status).toEqual(200)
+})
+
+it('should get image with width and height parameter', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?w=100&h=200`)
+  expect(status).toEqual(200)
+})
+
+it('should get image with width, height and quality parameter', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?w=100&h=200&q=50`)
+  expect(status).toEqual(200)
+})
+
+it('should fail to get image with width parameter of -1', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?w=-1`)
+  expect(status).toEqual(400)
+})
+
+it('should fail to get image with width parameter of 10000', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?w=10000`)
+  expect(status).toEqual(400)
+})
+
+it('should fail to get image with height parameter of -1', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?h=-1`)
+  expect(status).toEqual(400)
+})
+
+it('should fail to get image with height parameter of 10000', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?h=10000`)
+  expect(status).toEqual(400)
+})
+
+it('should fail to get image with quality parameter of -1', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?q=-1`)
+  expect(status).toEqual(400)
+})
+
+it('should fail to get image with quality parameter of 101', async () => {
+  const { status } = await request.get(`/storage/o/public/example.jpg?q=101`)
+  expect(status).toEqual(400)
 })

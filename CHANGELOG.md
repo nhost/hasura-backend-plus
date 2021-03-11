@@ -2,8 +2,12 @@
 
 ## Next release
 
+- Transfer images (width, height, quality) by specifying query parameter (ex: .../example.jpg?w=100) (#403)
+- Added `ALLOWED_USER_ROLES` that a user can have upon registration
+- Bypass all permissoins with `x-admin-secret` (Same value as Hasura's admin secret) (#401)
+- Revoke tokens (#401)
 - server: add support for Postgres arrays in JWT claims to support `_in` operator for Hasura Permissions (#378)
-
+- server: add support for user impersonation (#250)
 ## v2.2.1
 
 - server: Default to email if no display_name exists for OAuth Provider.

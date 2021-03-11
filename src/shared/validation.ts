@@ -60,12 +60,17 @@ export const userDataFields = {
       }),
       {}
     )
-  )
+  ),
+  register_options: Joi.object({
+    allowed_roles: Joi.array().items(Joi.string()),
+    default_role: Joi.string()
+  })
 }
 
 export const registerSchema = Joi.object({
   ...accountFields,
-  ...userDataFields
+  ...userDataFields,
+  cookie: Joi.boolean()
 })
 
 export const registerUserDataSchema = Joi.object(userDataFields)
@@ -112,4 +117,16 @@ export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
   cookie: Joi.boolean()
+})
+
+export const imgTransformParams = Joi.object({
+  w: Joi.number().integer().min(0).max(8192),
+  h: Joi.number().integer().min(0).max(8192),
+  q: Joi.number().integer().min(0).max(100).default(100),
+  token: Joi.string().uuid()
+})
+
+export const fileMetadataUpdate = Joi.object({
+  // action: Joi.string().valid('revoke-token','some-other-action').required(),
+  action: Joi.string().valid('revoke-token').required()
 })

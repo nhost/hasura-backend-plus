@@ -97,11 +97,14 @@ export const createContext = (
 
   const functions = storageFunctions(variables)
 
-  return { ...functions, ...variables }
+  return { ...functions, ...variables, req }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
-  return rules.some((rule) => rule && !!safeEval(rule, context))
+export const hasPermission = (rules: (string | undefined)[], context: any): boolean => {
+  return (
+    context.req.headers['x-admin-secret'] === process.env.HASURA_GRAPHQL_ADMIN_SECRET ||
+    rules.some((rule) => rule && !!safeEval(rule, context))
+  )
 }
 
 export const generateMetadata = (metadataParams: object, context: object): object =>
