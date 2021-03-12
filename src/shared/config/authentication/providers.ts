@@ -39,7 +39,7 @@ if (castBooleanEnv('FACEBOOK_ENABLE')) {
   PROVIDERS.facebook = {
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    scopes: process.env.FACEBOOK_SCOPES
+    profileFields: process.env.FACEBOOK_PROFILE_FIELDS
   }
 }
 
@@ -88,12 +88,12 @@ if (castBooleanEnv('WINDOWS_LIVE_ENABLE')) {
 
 // Spotify OAuth2 provider settings
 if (castBooleanEnv('SPOTIFY_ENABLE')) {
-    PROVIDERS.spotify = {
-      clientID: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      scopes: process.env.SPOTIFY_SCOPES
-    }
+  PROVIDERS.spotify = {
+    clientID: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+    scopes: process.env.SPOTIFY_SCOPES
   }
+}
 
 export { PROVIDERS }
 

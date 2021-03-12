@@ -12,7 +12,7 @@ export default (router: Router): void => {
     if (!options.clientID || !options.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Facebook OAuth.`)
     }
-    const scope = options.scopes ? options.scopes.split(',') : ['email', 'photos', 'displayName']
-    initProvider(router, 'facebook', Strategy, { profileFields: scope  })
+    const profileFields = options.profileFields ? options.profileFields.split(',') : ['email', 'photos', 'displayName']
+    initProvider(router, 'facebook', Strategy, { profileFields  })
   }
 }

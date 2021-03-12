@@ -485,7 +485,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `FACEBOOK_ENABLE`            | false   |             |
 | `FACEBOOK_CLIENT_ID`         |         |             |
 | `FACEBOOK_CLIENT_SECRET`     |         |             |
-| `FACEBOOK_SCOPES`              | email,photos,displayName |             |
+| `FACEBOOK_PROFILE_FIELDS`              | email,photos,displayName |             |
 | `TWITTER_ENABLE`             | false   |             |
 | `TWITTER_CONSUMER_KEY`       |         |             |
 | `TWITTER_CONSUMER_SECRET`    |         |             |
