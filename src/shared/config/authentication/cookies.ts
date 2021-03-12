@@ -1,6 +1,7 @@
 import { castBooleanEnv } from '../utils'
 
 export const { COOKIE_SECRET } = process.env
+export const { REFRESH_COOKIE_NAME = 'refresh_token' } = process.env
 export const COOKIE_SECURE = castBooleanEnv('COOKIE_SECURE')
 
 const sameSiteEnv = process.env.COOKIE_SAME_SITE?.toLowerCase()

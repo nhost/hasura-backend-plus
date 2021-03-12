@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express'
-import { COOKIE_SECRET } from '@shared/config'
+import { COOKIE_SECRET, REFRESH_COOKIE_NAME } from '@shared/config'
 import { RefreshTokenMiddleware, RequestExtended, PermissionVariables, Claims } from '@shared/types'
 import { getClaims } from '@shared/jwt'
 import { getPermissionVariablesFromCookie } from '@shared/helpers'
@@ -46,9 +46,9 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
   // -------------------------------------
   const cookiesInUse = COOKIE_SECRET ? req.signedCookies : req.cookies
 
-  if ('refresh_token' in cookiesInUse) {
+  if (`${REFRESH_COOKIE_NAME}` in cookiesInUse) {
     refresh_token = {
-      value: cookiesInUse.refresh_token,
+      value: cookiesInUse[`${REFRESH_COOKIE_NAME}`],
       type: 'cookie'
     }
     req.refresh_token = refresh_token
