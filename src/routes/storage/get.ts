@@ -98,7 +98,7 @@ export const getFile = async (
       // Add the content type to the response (it's not propagated from the S3 SDK)
       res.set('Content-Type', headObject.ContentType)
       res.set('Content-Length', headObject.ContentLength?.toString())
-      res.set('Last-Modified', headObject.LastModified?.toString())
+      res.set('Last-Modified', headObject.LastModified?.toUTCString())
       res.set('Content-Disposition', `inline;`)
       res.set('Cache-Control', 'public, max-age=3w1557600')
       res.set('ETag', headObject.ETag)
