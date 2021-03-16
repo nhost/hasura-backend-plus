@@ -421,7 +421,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | Name                          | Default | Description                                                                                                 |
 | ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
 | `NODE_ENV`                    |         |                                                                                                             |
-| `LOG_LEVEL`                   |         |                                                                                                             |
+| `LOG_LEVEL`                   | INFO    | Piped to the Hasura CLI when applying migrations/metadata. Allowed values [here](https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura.html#options). |
 | `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
 | `HOST`                        |         | Listening host of the service                                                                               |
