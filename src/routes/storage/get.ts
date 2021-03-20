@@ -55,7 +55,8 @@ export const getFile = async (
       transformer.resize({ width: w, height: h })
   
       // Add corners to the image when the radius ('r') is is specified in the query
-      if (r) {
+      let { height, width } = await transformer.metadata()
+      if (r && height && width) {
         let { height, width } = await transformer.metadata()
         if (w && h) {
           width = w
