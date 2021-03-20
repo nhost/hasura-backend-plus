@@ -44,7 +44,7 @@ export const getFile = async (
       }
       
       // Find and set the contentType
-      const acceptsWebP = req.headers.accept.split(',').some(header => header === WEBP)
+      const acceptsWebP = !!req?.headers?.accept?.split(',').some(header => header === WEBP)
       const contentType = f
         ? f === 'auto'
           ? acceptsWebP
