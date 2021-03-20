@@ -56,11 +56,21 @@ export const getFile = async (
   
       // Add corners to the image when the radius ('r') is is specified in the query
       if (r) {
-        const { height, width } = await transformer.metadata()
-        const radiusX = r === 'full' ? height : r
-        const radiusY = r === 'full' ? width : r
-        const overlay = new Buffer(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radiusX}" ry="${radiusY}"/></svg>`)
-        transformer.overlayWith(overlay, { cutout: true }) 
+        let { height, width } = await transformer.metadata()
+        if (w && h) {
+          width = w
+          height = h
+        } else if (w) {
+          height = Math.round(height * w / width)
+          width = w
+        } else if (h) {
+          width = Math.round(width * h / height)
+          height = h
+        }
+
+        // Set the radius to 'r' or to 1/2 the height or width
+        const radius = r === 'full' ? Math.min(height, width) / 2 : r
+        const overlay = Buffer.from(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radius}" ry="${radius}"/></svg>`)
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
