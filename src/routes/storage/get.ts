@@ -30,9 +30,9 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q) {
+    if (req.query.w || req.query.h || req.query.q || req.query.b) {
       // transform image
-      const { w, h, q } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, b } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -53,6 +53,11 @@ export const getFile = async (
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate()
       transformer.resize({ width: w, height: h })
+  
+      // Add a blur when specified
+      if (b) {
+        transformer.blur(b)
+      }
 
       if (contentType === WEBP) {
         transformer.webp({ quality: q })
