@@ -30,9 +30,9 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q) {
+    if (req.query.w || req.query.h || req.query.q || req.query.p) {
       // transform image
-      const { w, h, q } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, p } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -50,9 +50,10 @@ export const getFile = async (
         throw Boom.badImplementation('File found without body')
       }
 
+      const position = (p === 'entropy' || p === 'attention') ? sharp.strategy[p] : p
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate()
-      transformer.resize({ width: w, height: h })
+      transformer.resize(w, h, { position })
 
       if (contentType === WEBP) {
         transformer.webp({ quality: q })
