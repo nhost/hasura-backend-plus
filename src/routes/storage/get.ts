@@ -30,9 +30,9 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q) {
+    if (req.query.w || req.query.h || req.query.q || req.query.f) {
       // transform image
-      const { w, h, q } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, f } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -42,7 +42,16 @@ export const getFile = async (
         Bucket: S3_BUCKET as string,
         Key: key
       }
-      const contentType = headObject?.ContentType
+      
+      // Find and set the contentType
+      const acceptsWebP = req.headers.accept.split(',').some(header => header === WEBP)
+      const contentType = f
+        ? f === 'auto'
+          ? acceptsWebP
+            ? WEBP
+            : headObject?.ContentType
+          : `image/${f}`
+        : headObject?.ContentType
 
       const object = await s3.getObject(params).promise()
 
@@ -64,7 +73,7 @@ export const getFile = async (
       const optimizedBuffer = await transformer.toBuffer()
       const etag = getHash([optimizedBuffer])
 
-      res.set('Content-Type', headObject.ContentType)
+      res.set('Content-Type', contentType)
       res.set('Content-Disposition', `inline;`)
       res.set('Cache-Control', 'public, max-age=31557600')
       res.set('ETag', etag)
