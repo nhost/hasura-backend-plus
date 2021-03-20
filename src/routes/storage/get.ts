@@ -30,7 +30,7 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q) {
+    if (req.query.w || req.query.h || req.query.q || req.query.r) {
       // transform image
       const { w, h, q, r } = await imgTransformParams.validateAsync(req.query)
 
