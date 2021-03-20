@@ -123,6 +123,7 @@ export const imgTransformParams = Joi.object({
   w: Joi.number().integer().min(0).max(8192),
   h: Joi.number().integer().min(0).max(8192),
   q: Joi.number().integer().min(0).max(100).default(100),
+  b: Joi.number().integer().min(0.3).max(1000),
   token: Joi.string().uuid()
 })
 
