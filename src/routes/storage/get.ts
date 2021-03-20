@@ -100,7 +100,7 @@ export const getFile = async (
       res.set('Content-Length', headObject.ContentLength?.toString())
       res.set('Last-Modified', headObject.LastModified?.toUTCString())
       res.set('Content-Disposition', `inline;`)
-      res.set('Cache-Control', 'public, max-age=3w1557600')
+      res.set('Cache-Control', 'public, max-age=31557600')
       res.set('ETag', headObject.ETag)
 
       // Set Content Range, Length Accepted Ranges
