@@ -458,6 +458,54 @@ Get file
 
 `GET /storage/o/<path-to-file>`
 
+#### Image Transformation
+
+Transform images on-the-fly using query parameters. Cache headers are sent with the image for browsers to cache the image client-side.
+
+##### Example
+
+`/storage/o/<path-to-file>?w=800&q=90`
+
+##### Width
+
+Specify width in pixels of the image. If no height (`h`) is specified, the image automatically calculates the height to keep the image's aspect ratio. The value has to be between 0 and 8192.
+
+Query parameter: `w`.
+
+##### Height
+
+Specify the height of the image. If no width (`w`) is specified, the image automatically calculates the width to keep the image's aspect ratio. The value has to be between 0 and 8192.
+
+Query parameter: `h`.
+
+##### Quality
+
+Specify the quality of the image with a value between 1 (very course) to 100 (lossless or almost lossless).
+
+Query parameter: `q`.
+
+##### Format
+
+Specify the preferred format of the requested image.
+
+This parameter can be one of the following values: `webp`, `png`, `jpeg`, `auto`. When the value is `auto` the image will be transformed to the `webp` format if the request header explicitly accepts `image/webp`, otherwise the default format will be returned.
+
+Query parameter: `f`.
+
+##### Rounding
+
+Give the image rounded corners
+
+Query parameter: `r`.
+
+This parameter can be either an integer or `full` for when the image has to be fully rounded (e.g. an avatar).
+
+##### Blur
+
+Add a Gaussian blur to the image, the blur has to be between 0.3 and 1000.
+
+Query parameter: `b`.
+
 #### Response
 
 ```
