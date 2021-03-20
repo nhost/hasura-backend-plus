@@ -32,7 +32,7 @@ export const getFile = async (
   } else {
     if (req.query.w || req.query.h || req.query.q) {
       // transform image
-      const { w, h, q } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, r } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -53,6 +53,15 @@ export const getFile = async (
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate()
       transformer.resize({ width: w, height: h })
+  
+      // Add corners to the image when the radius ('r') is is specified in the query
+      if (r) {
+        const { height, width } = await transformer.metadata()
+        const radiusX = r === 'full' ? height : r
+        const radiusY = r === 'full' ? width : r
+        const overlay = new Buffer(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radiusX}" ry="${radiusY}"/></svg>`)
+        transformer.overlayWith(overlay, { cutout: true }) 
+      }
 
       if (contentType === WEBP) {
         transformer.webp({ quality: q })
@@ -100,7 +109,7 @@ export const getFile = async (
       res.set('Content-Length', headObject.ContentLength?.toString())
       res.set('Last-Modified', headObject.LastModified?.toUTCString())
       res.set('Content-Disposition', `inline;`)
-      res.set('Cache-Control', 'public, max-age=31557600')
+      res.set('Cache-Control', 'public, max-age=3w1557600')
       res.set('ETag', headObject.ETag)
 
       // Set Content Range, Length Accepted Ranges
