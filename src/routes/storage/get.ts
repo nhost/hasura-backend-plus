@@ -70,7 +70,8 @@ export const getFile = async (
         }
 
         // Set the radius to 'r' or to 1/2 the height or width
-        const radius = r === 'full' ? Math.min(height, width) / 2 : r
+        const maxRadius = Math.min(height, width) / 2
+        const radius = r === 'full' ? maxRadius : Math.min(maxRadius, r)
         const overlay = Buffer.from(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radius}" ry="${radius}"/></svg>`)
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
