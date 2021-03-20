@@ -61,6 +61,7 @@ export const getFile = async (
         const radiusY = r === 'full' ? width : r
         const overlay = new Buffer(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radiusX}" ry="${radiusY}"/></svg>`)
         transformer.overlayWith(overlay, { cutout: true }) 
+        transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
       if (contentType === WEBP) {
