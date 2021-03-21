@@ -51,7 +51,7 @@ export const getFile = async (
       }
 
       const transformer = sharp(object.Body as Buffer)
-      transformer.rotate()
+      transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({ width: w, height: h })
 
       if (contentType === WEBP) {
