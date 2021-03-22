@@ -8,6 +8,11 @@ import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { totpSchema } from '@shared/validation'
 
+// Increase the authenticator window so that TOTP codes from the previous 30 seconds are also valid
+authenticator.options = {
+  window: [1, 0]
+}
+
 async function totpLogin({ body }: Request, res: Response): Promise<void> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const account = await selectAccount(body)
