@@ -71,14 +71,14 @@ export const selectAccount = async (httpBody: {
   try {
     return await selectAccountByEmail(email)
   } catch {
-    if (ticket) {
-      try {
-        return await selectAccountByTicket(ticket)
-      } catch {
-        return undefined
-      }
+    if (!ticket) {
+      return undefined
     }
-    return undefined
+    try {
+      return await selectAccountByTicket(ticket)
+    } catch {
+      return undefined
+    }
   }
 }
 

@@ -181,12 +181,12 @@ it('should not sign user in with invalid admin secret', async () => {
   const { status } = await request
     .post('/auth/login')
     .set(ADMIN_SECRET_HEADER, 'invalidsecret')
-    .send({ email, password })
+    .send({ email, password: 'invalidpassword' })
 
   expect(status).toEqual(401)
 })
 
-it('should sign user in with valid admin secret', async () => {
+it('should sign in user with valid admin secret', async () => {
   const { body, status } = await request
     .post('/auth/login')
     .set(ADMIN_SECRET_HEADER, HASURA_GRAPHQL_ADMIN_SECRET as string)

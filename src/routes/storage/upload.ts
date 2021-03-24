@@ -18,6 +18,10 @@ export const uploadFile = async (
 ): Promise<unknown> => {
   const key = getKey(req)
 
+  if (key.endsWith('/')) {
+    throw Boom.forbidden(`Can't upload file that ends with /`)
+  }
+
   const oldHeadObject = await getHeadObject(req, true)
   const isNew = !oldHeadObject
 
@@ -34,6 +38,7 @@ export const uploadFile = async (
     ) {
       throw Boom.forbidden()
     }
+
     // * Create or update the object
     const upload_params = {
       Bucket: S3_BUCKET as string,

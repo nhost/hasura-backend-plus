@@ -9,6 +9,18 @@ import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
 
+function getHash(items: (string | number | Buffer)[]): string {
+  const hash = createHash('sha256')
+  for (const item of items) {
+    if (typeof item === 'number') hash.update(String(item))
+    else {
+      hash.update(item)
+    }
+  }
+  // See https://en.wikipedia.org/wiki/Base64#Filenames
+  return hash.digest('base64').replace(/\//g, '-')
+}
+
 export const getFile = async (
   req: RequestExtended,
   res: Response,
@@ -30,9 +42,10 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q || req.query.b) {
+      
+    if (req.query.w || req.query.h || req.query.q || req.query.r || req.query.b) {
       // transform image
-      const { w, h, q, b } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, r, b } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -51,12 +64,47 @@ export const getFile = async (
       }
 
       const transformer = sharp(object.Body as Buffer)
-      transformer.rotate()
+      transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({ width: w, height: h })
   
       // Add a blur when specified
       if (b) {
         transformer.blur(b)
+      }
+
+      // Add corners to the image when the radius ('r') is is specified in the query
+      if (r) {
+        const { height, width } = await transformer.metadata()
+
+        if (!height) {
+          throw Boom.badImplementation('Unable to determine image height')
+        }
+
+        if (!width) {
+          throw Boom.badImplementation('Unable to determine image width')
+        }
+
+        let imageHeight = height
+        let imageWidth = width
+
+        if (w && h) {
+          imageHeight = h
+          imageWidth = w
+        } else if (w) {
+          imageHeight = Math.round((height * w) / width)
+          imageWidth = w
+        } else if (h) {
+          imageWidth = Math.round((width * h) / height)
+          imageHeight = h
+        }
+
+        // Set the radius to 'r' or to 1/2 the height or width
+        const maxRadius = Math.min(imageHeight, imageWidth) / 2
+        const radius = r === 'full' ? maxRadius : Math.min(maxRadius, r)
+        const overlay = Buffer.from(
+          `<svg><rect x="0" y="0" width="${imageWidth}" height="${imageHeight}" rx="${radius}" ry="${radius}"/></svg>`
+        )
+        transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
       if (contentType === WEBP) {
@@ -67,7 +115,7 @@ export const getFile = async (
         transformer.jpeg({ quality: q })
       }
       const optimizedBuffer = await transformer.toBuffer()
-      const etag = getHash([optimizedBuffer])
+      const etag = `"${getHash([optimizedBuffer])}"` // The extra quotes are needed to conform to the ETag protocol (https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11)
 
       res.set('Content-Type', headObject.ContentType)
       res.set('Content-Disposition', `inline;`)
@@ -105,7 +153,7 @@ export const getFile = async (
       res.set('Content-Length', headObject.ContentLength?.toString())
       res.set('Last-Modified', headObject.LastModified?.toUTCString())
       res.set('Content-Disposition', `inline;`)
-      res.set('Cache-Control', 'public, max-age=31557600')
+      res.set('Cache-Control', 'public, max-age=3w1557600')
       res.set('ETag', headObject.ETag)
 
       // Set Content Range, Length Accepted Ranges
@@ -124,16 +172,4 @@ export const getFile = async (
       stream.pipe(res)
     }
   }
-}
-
-function getHash(items: (string | number | Buffer)[]) {
-  const hash = createHash('sha256')
-  for (let item of items) {
-    if (typeof item === 'number') hash.update(String(item))
-    else {
-      hash.update(item)
-    }
-  }
-  // See https://en.wikipedia.org/wiki/Base64#Filenames
-  return hash.digest('base64').replace(/\//g, '-')
 }
