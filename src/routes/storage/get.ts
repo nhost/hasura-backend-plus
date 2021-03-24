@@ -109,7 +109,7 @@ export const getFile = async (
         transformer.jpeg({ quality: q })
       }
       const optimizedBuffer = await transformer.toBuffer()
-      const etag = getHash([optimizedBuffer])
+      const etag = `"${getHash([optimizedBuffer])}"` // The extra quotes are needed to conform to the ETag protocol (https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11)
 
       res.set('Content-Type', headObject.ContentType)
       res.set('Content-Disposition', `inline;`)
