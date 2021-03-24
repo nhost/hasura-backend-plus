@@ -97,7 +97,7 @@ it('should not upload file on incorrect file path', async () => {
   const { status } = await request
     .post(`/storage/o/user/${getUserId()}/123/`)
     .attach('file', filePath)
-  expect(status).toEqual(500)
+  expect(status).toEqual(403)
 })
 
 it('should still only include one file', async () => {
