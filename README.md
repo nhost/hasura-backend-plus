@@ -7,7 +7,7 @@
 <h2 align="center">Authentication & Storage for Hasura</h2>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000" />
+  <img src="https://img.shields.io/badge/version-2.2.1-blue.svg?cacheSeconds=2592000" />
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="license: MIT" />
   </a>
@@ -35,7 +35,7 @@ For detailed usage and installation instructions check out the [documentation](h
 - 🎨 Fully customizable with sensible defaults.
 - 🚀 Easy to setup, can be deployed anywhere.
 - 🔑 Two-factor authentication support.
-- 🔑 Third-party OAuth providers: Google, GitHub, Facebook, Apple, Twitter, Microsoft Live, Linkedin.
+- 🔑 Third-party OAuth providers: Google, GitHub, Facebook, Apple, Twitter, Microsoft Live, Linkedin, Spotify.
 - 📁 Highly customisable storage rules on any S3-compatible instance.
 - 📨 Optional email account verification.
 - 📨 Secure email and password change.
