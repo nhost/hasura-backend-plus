@@ -42,9 +42,10 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    if (req.query.w || req.query.h || req.query.q || req.query.r) {
+      
+    if (req.query.w || req.query.h || req.query.q || req.query.r || req.query.b) {
       // transform image
-      const { w, h, q, r } = await imgTransformParams.validateAsync(req.query)
+      const { w, h, q, r, b } = await imgTransformParams.validateAsync(req.query)
 
       const WEBP = 'image/webp'
       const PNG = 'image/png'
@@ -65,6 +66,11 @@ export const getFile = async (
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({ width: w, height: h })
+  
+      // Add a blur when specified
+      if (b) {
+        transformer.blur(b)
+      }
 
       // Add corners to the image when the radius ('r') is is specified in the query
       if (r) {
