@@ -9,7 +9,6 @@ import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
 
-
 function getHash(items: (string | number | Buffer)[]): string {
   const hash = createHash('sha256')
   for (const item of items) {
@@ -66,26 +65,39 @@ export const getFile = async (
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate()
       transformer.resize({ width: w, height: h })
-  
+
       // Add corners to the image when the radius ('r') is is specified in the query
-      let { height, width } = await transformer.metadata()
-      if (r && height && width) {
-        let { height, width } = await transformer.metadata()
+      if (r) {
+        const { height, width } = await transformer.metadata()
+
+        if (!height) {
+          throw Boom.badImplementation('Unable to determine image height')
+        }
+
+        if (!width) {
+          throw Boom.badImplementation('Unable to determine image width')
+        }
+
+        let imageHeight = height
+        let imageWidth = width
+
         if (w && h) {
-          width = w
-          height = h
+          imageHeight = h
+          imageWidth = w
         } else if (w) {
-          height = Math.round(height * w / width)
-          width = w
+          imageHeight = Math.round((height * w) / width)
+          imageWidth = w
         } else if (h) {
-          width = Math.round(width * h / height)
-          height = h
+          imageWidth = Math.round((width * h) / height)
+          imageHeight = h
         }
 
         // Set the radius to 'r' or to 1/2 the height or width
-        const maxRadius = Math.min(height, width) / 2
+        const maxRadius = Math.min(imageHeight, imageWidth) / 2
         const radius = r === 'full' ? maxRadius : Math.min(maxRadius, r)
-        const overlay = Buffer.from(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${radius}" ry="${radius}"/></svg>`)
+        const overlay = Buffer.from(
+          `<svg><rect x="0" y="0" width="${imageWidth}" height="${imageHeight}" rx="${radius}" ry="${radius}"/></svg>`
+        )
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
