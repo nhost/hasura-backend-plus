@@ -15,9 +15,6 @@ interface HasuraData {
 }
 
 async function logout({ body, refresh_token }: RequestExtended, res: Response): Promise<unknown> {
-  console.log('in logout')
-  console.log({ refresh_token })
-
   if (!refresh_token || !refresh_token.value) {
     throw Boom.unauthorized('Invalid or expired refresh token.')
   }
