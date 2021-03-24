@@ -165,7 +165,7 @@ Here is an example on the way to proceed to add a `nickname` value to the regist
 
 1. Add a column `nickname` of type text to the `public.users` table
 2. Set the environment variable `REGISTRATION_CUSTOM_FIELDS=nickname`
-3. The registration endpoint now expects a `nickname` value in addition to `email` and `password`
+3. The registration endpoint now expects a `user_data` value in addition to `email` and `password` that has `{"nickname": "Some Nickname"}`
 
 ::: warning
 Any given field must exist in the `users` GraphQL type that corresponds to the `public.users` PostgreSQL table, or registration will fail.
@@ -187,6 +187,223 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 ### Storage Rules
 
+File authorization is tricky to manage, and means developers need to spend a lot of time on authentication and authorization. Using Hasura Backend Plus means all this complex code is done for you! All you need to do is set out file access rules, which makes creating and updating rules easy to manage.
+
+The rules are set in a `yaml` file, and let you control granular access to files and folders. Hasura Backend Plus comes with a [rules template](https://github.com/nhost/hasura-backend-plus/blob/master/custom/storage-rules/rules.yaml), which you can change for your specific project:
+
+```yaml
+functions:
+  isAuthenticated: 'return !!request.auth'
+  isOwner: "return !!request.auth && userId === request.auth['user-id']"
+  validToken: 'return request.query.token === resource.Metadata.token'
+paths:
+  /user/:userId/:
+    list: 'isOwner(userId)'
+  /user/:userId/:fileId:
+    read: 'isOwner(userId) || validToken()'
+    write: 'isOwner(userId)'
+```
+
+The `yaml` file is split into the following sections:
+
+- [Paths](#paths)
+- [Storage functions](#storage-functions)
+
+---
+
+#### Paths
+
+Paths allow you to define authorization permissions to your folders and files. This means you can control access to files, folders, and subfolders easily.
+
+Paths can be static or dynamic, and dynamic paths can be used as variables within storage functions.
+
+##### Folder paths
+
+Folder paths
+
+```yaml
+paths:
+  /user/:userId/files/:
+    # Rules
+```
+
+**Note the trailing slash**. This is how you define folder paths.
+
+You can use this to add permissions to listing files in a directory or downloading a `.zip` file of all the files.
+
+##### File paths
+
+File paths define rules for the individual files within your storage.
+
+```yaml
+paths:
+  /user/:userId/files/:fileId:
+    # Rules
+```
+
+Here, the `/user` and `/files` parts are static paths. The `:userId` and `:fileId` parts are dynamic paths.
+
+Here's an example path that would be validated by this rule:
+
+```txt
+/user/1/files/image.png
+```
+
+#### Rules
+
+You can specify the following rules in your `rules.yaml` file:
+
+| Action           | Metadata (`/m/`)                  | Object (`/o/`)                        |
+| ---------------- | --------------------------------- | ------------------------------------- |
+| Folder: `create` | N/A                               | N/A                                   |
+| Folder: `update` | N/A                               | N/A                                   |
+| Folder: `list`   | Get metadata for accessible files | Get `.zip` folder of accessible files |
+| Folder: `get`    | N/A                               | N/A                                   |
+| Folder: `delete` | N/A                               | N/A                                   |
+| &nbsp;           |                                   |                                       |
+| File: `create`   | N/A                               | Create file                           |
+| File: `update`   | Update metadata                   | Update file                           |
+| File: `list`     | N/A                               | N/A                                   |
+| File: `get`      | Get file metadata                 | Get file                              |
+| File: `delete`   | N/A                               | Delete the file                       |
+
+For simple allow/deny, you can return boolean values (`true`/`false`) in a string.
+
+```yaml
+paths:
+  /public:
+    list: 'true'
+  /private:
+    list: 'false'
+```
+
+For any complex permissions using variables, you should use [storage functions](#storage-functions).
+
+##### File tokens
+
+When you upload a file to Hasura Backend Plus, a token is automatically added to the file metadata. This is unique for the file, and can be used as an access token.
+You can create a `validToken` storage function, and use that to allow access to the file, even if a user is unauthenticated.
+
+We can define a rule to allow access to this image if the right token (in this case `c9aa7344-1b4c-42d2-81c0-48ee401a3eeb`) is present:
+
+```txt
+/storage/o/private/secret-image.jpg?token=c9aa7344-1b4c-42d2-81c0-48ee401a3eeb
+```
+
+The token is sent as a query parameter, which you can access on the `request` object. You can check the token against the `resource.Metadata.token` variable:
+
+```yaml
+functions:
+  validToken: 'return request.query.token === resource.Metadata.token'
+```
+
+You can now use the `validToken` storage function to allow anyone to see the file with the correct token:
+
+```yaml
+functions:
+  validToken: 'return request.query.token === resource.Metadata.token'
+paths:
+  /private/:fileId:
+    read: 'validToken()'
+```
+
+#### Storage functions
+
+> It is not possible to call storage functions inside other functions
+
+Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+
+You can have a look at the permission variables by examining the `permission_variables` cookie. This is a URL-encoded string, in the following template:
+
+```txt
+s:<request.auth>.<checksum>
+```
+
+The `request.auth` part is a JSON object, which is the same as the [Hasura permission variables](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/index.html#overview) but with the `x-hasura-` prefix removed:
+
+```json
+{
+  "user-id": "73f5d02c-484a-4003-98e4-bad5c6001882",
+  "allowed-roles": ["user"],
+  "default-role": "user"
+}
+```
+
+You can access these variables through `request.auth` (for example `request.auth['default-role']`) when creating your storage rules.
+
+A simple storage function would be to test if a user is authenticated. You can do this by checking if `request.auth` is present:
+
+```yaml
+functions:
+  isAuthenticated: 'return !!request.auth'
+```
+
+Now, you can use this storage function within a storage path:
+
+```yaml
+functions:
+  isAuthenticated: 'return !!request.auth'
+paths:
+  /everyone/:
+    list: 'isAuthenticated()
+```
+
+This will allow any logged-in user to access the files in the `/everyone/` directory. If someone isn't logged in, they won't be able to see them.
+
+You can also add more complex rules. For example, if you would like to allow users to access files within a folder named as their user id, you can add the following storage function:
+
+```yaml
+functions:
+  isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
+```
+
+This function checks that a user is logged in, but also uses a variable called `userId`, which must be passed in by the rule from a [dynamic path](#folder-paths):
+
+```yaml
+functions:
+  isOwner: 'return !!request.auth && request.auth["user-id"] === userId'
+paths:
+  /:userId/:
+    list: 'isOwner(userId)'
+  /:userId/:fileId:
+    read: 'isOwner(userId)'
+```
+
+This rule will allow users to list their own file directory, and read their own files.
+
+#### Adding variables
+
+Say you have many users that belong to different companies. You need to allow users to see files belonging to their own company, but not files belonging to other companies.
+
+You will need a `company_id` column on your `users` table, and from this we can add appropriate permissions.
+
+First, you need to add this column to the authentication permission variables, so that the `request.auth` now contains this variable:
+
+```json
+{
+  "user-id": "73f5d02c-484a-4003-98e4-bad5c6001882",
+  "allowed-roles": ["user"],
+  "default-role": "user",
+  "company-id": "e04567bf-884d-46f0-898e-bac1a260e128"
+}
+```
+
+Now, you can add the following storage functions to your `rules.yaml`:
+
+```yaml
+functions:
+  employedBy: 'return !!request.auth && request.auth["company-id"] === companyId'
+paths:
+  /:companyId/:
+    list: 'employedBy(companyId)'
+  /:companyId/:fileId:
+    read: 'employedBy(companyId) && validToken()'
+    write: 'employedBy(companyId)'
+```
+
+How does this work? The `:companyId` path creates a variable called `companyId`, which can be passed into a function.
+This gets passed into the `employedBy()` function, (called `companyId`), and can be compared to `request.auth['company-id']` from the `permission_variables` cookie.
+
 ### Email templates
 
 ### Private key
@@ -203,6 +420,8 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 
 | Name                          | Default | Description                                                                                                 |
 | ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                    |         |                                                                                                             |
+| `LOG_LEVEL`                   | INFO    | Piped to the Hasura CLI when applying migrations/metadata. Allowed values [here](https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura.html#options). |
 | `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
 | `HOST`                        |         | Listening host of the service                                                                               |
@@ -216,19 +435,27 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 | Name                         | Default                 | Description                                                                                                                                                                                  |
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AUTH_LOCAL_USERS_ENABLE`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
+| `ANONYMOUS_USERS_ENABLE`     | false                   |                                                                                                                                                                                              |
+| `DEFAULT_ANONYMOUS_ROLE`     |                         |                                                                                                                                                                                              |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
-| `AUTO_ACTIVATE_NEW_USERS`    | false                   | When set to true, automatically activate the users once registererd.                                                                                                                         |
+| `CHANGE_EMAIL_ENABLE`        |                         |                                                                                                                                                                                              |
+| `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
 | `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
+| `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
+| `COOKIE_SAME_SITE`           | lax                     | SameSite cookie attribute. Accepts true, false, lax, none or strict. If none of these values it will be set to 'lax'                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
-| `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                                  |
+| `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of default allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                          |
+| `ALLOWED_USER_ROLES`         | user                    | Comma spearated list of allowed roles users can specify on registration. Defaults to DEFAULT_ALLOWED_USER_ROLES.                                                                             |
 | `HIBP_ENABLE`                | false                   |                                                                                                                                                                                              |
 | `JWT_ALGORITHM`              | RS256                   | Valid values: RS256, RS384, RS512, HS256, HS384, HS512                                                                                                                                       |
 | `JWT_KEY`                    |                         | Encryption secret. Required when using a SHA (RS*) algorithm. When using a RSA algorithm (RS*), should contain a valid RSA PEM key, otherwise `JWT_KEY_FILE_PATH` will be used.              |
 | `JWT_EXPIRES_IN`             | 15                      |                                                                                                                                                                                              |
 | `JWT_KEY_FILE_PATH`          | custom/keys/private.pem | Path to the RSA PEM private key file when using a RSA (RS\*) algorithm and no `JWT_KEY` is set. When used, will create a random key if the file is not found.                                |
+| `JWT_CLAIMS_NAMESPACE`       |                         |                                                                                                                                                                                              |
 | `MIN_PASSWORD_LENGTH`        | 3                       | Minimum allowed password length.                                                                                                                                                             |
 | `REDIRECT_URL_ERROR`         |                         |                                                                                                                                                                                              |
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
+| `VERIFY_EMAILS`              | false                   | Enable verification emails                                                                                                                                                                   |
 | `JWT_REFRESH_EXPIRES_IN`     | 43200                   |                                                                                                                                                                                              |
 | `EMAILS_ENABLE`              | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
 | `SMTP_HOST`                  |                         | SMTP server path to use for sending emails.                                                                                                                                                  |
@@ -236,9 +463,50 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 | `SMTP_USER`                  |                         | Username to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_PORT`                  | 587                     | SMTP server port.                                                                                                                                                                            |
 | `SMTP_SECURE`                | false                   | Set to true when the SMTP uses SSL.                                                                                                                                                          |
+| `SMTP_AUTH_METHOD`           |                         |                                                                                                                                                                                              |
+| `SMTP_SENDER`                |                         |                                                                                                                                                                                              |
+| `NOTIFY_EMAIL_CHANGE`        |                         |                                                                                                                                                                                              |
 | `REGISTRATION_CUSTOM_FIELDS` |                         | Fields that need to be passed on to the registration patload, and that correspond to columns of the `public.users`table.                                                                     |
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
+| `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
+| `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                                     |
+
+### Providers
+
+| Name                         | Default | Description |
+| ---------------------------- | ------- | ----------- |
+| `PROVIDER_SUCCESS_REDIRECT`  |         |             |
+| `PROVIDER_FAILURE_REDIRECT`  |         |             |
+| `GOOGLE_ENABLE`              | false   |             |
+| `GOOGLE_CLIENT_ID`           |         |             |
+| `GOOGLE_CLIENT_SECRET`       |         |             |
+| `FACEBOOK_ENABLE`            | false   |             |
+| `FACEBOOK_CLIENT_ID`         |         |             |
+| `FACEBOOK_CLIENT_SECRET`     |         |             |
+| `TWITTER_ENABLE`             | false   |             |
+| `TWITTER_CONSUMER_KEY`       |         |             |
+| `TWITTER_CONSUMER_SECRET`    |         |             |
+| `LINKEDIN_ENABLE`            | false   |             |
+| `LINKEDIN_CLIENT_ID`         |         |             |
+| `LINKEDIN_CLIENT_SECRET`     |         |             |
+| `APPLE_ENABLE`               | false   |             |
+| `APPLE_CLIENT_ID`            |         |             |
+| `APPLE_KEY_ID`               |         |             |
+| `APPLE_PRIVATE_KEY`          |         |             |
+| `APPLE_TEAM_ID`              |         |             |
+| `GITHUB_ENABLE`              | false   |             |
+| `GITHUB_AUTHORIZATION_URL`   |         |             |
+| `GITHUB_CLIENT_ID`           |         |             |
+| `GITHUB_CLIENT_SECRET`       |         |             |
+| `GITHUB_TOKEN_URL`           |         |             |
+| `GITHUB_USER_PROFILE_URL`    |         |             |
+| `WINDOWS_LIVE_ENABLE`        | false   |             |
+| `WINDOWS_LIVE_CLIENT_ID`     |         |             |
+| `WINDOWS_LIVE_CLIENT_SECRET` |         |             |
+| `SPOTIFY_ENABLE`             | false   |             |
+| `SPOTIFY_CLIENT_ID`          |         |             |
+| `SPOTIFY_CLIENT_SECRET`      |         |             |
 
 ### Storage
 
@@ -249,3 +517,5 @@ Any given field must exist in the `users` GraphQL type that corresponds to the `
 | `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
 | `S3_SSL_ENABLED`       | true    |             |
+| `OBJECT_PREFIX`        | /o      |             |
+| `META_PREFIX`          | /m      |             |

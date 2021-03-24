@@ -1,14 +1,19 @@
 import { Request, Response } from 'express'
 import { asyncWrapper, rotateTicket, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, setRefreshToken, createHasuraJwt } from '@shared/jwt'
+import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
+import { setRefreshToken } from '@shared/cookies'
+import { UserData, Session } from '@shared/types'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { totpSchema } from '@shared/validation'
 
-async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
+async function totpLogin({ body }: Request, res: Response): Promise<void> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const account = await selectAccount(body)
+
+  // default to true
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   if (!account) {
     throw Boom.unauthorized('Invalid or expired ticket.')
@@ -32,13 +37,21 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.unauthorized('Invalid two-factor code.')
   }
 
-  await setRefreshToken(res, id)
+  const refresh_token = await setRefreshToken(res, id, useCookie)
   await rotateTicket(ticket)
+  const jwt_token = createHasuraJwt(account)
+  const jwt_expires_in = newJwtExpiry
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
+  }
 
-  return res.send({
-    jwt_token: createHasuraJwt(account),
-    jwt_expires_in: newJwtExpiry
-  })
+  const session: Session = { jwt_token, jwt_expires_in, user }
+
+  if (!useCookie) session.refresh_token = refresh_token
+  res.send(session)
 }
 
 export default asyncWrapper(totpLogin)

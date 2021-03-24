@@ -3,14 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 
 import Boom from '@hapi/boom'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
-import { Request } from 'express'
 import { S3_BUCKET } from '@shared/config'
 import fs from 'fs'
 import path from 'path'
 import { s3 } from '@shared/s3'
 import yaml from 'js-yaml'
-import { PermissionVariables } from '@shared/types'
-import { getPermissionVariablesFromCookie } from '@shared/helpers'
+import { PermissionVariables, RequestExtended } from '@shared/types'
 
 export const OBJECT_PREFIX = '/o'
 export const META_PREFIX = '/m'
@@ -81,15 +79,10 @@ const storageFunctions = (context: object): { [key: string]: Function } =>
   }, {})
 
 export const createContext = (
-  req: Request,
+  req: RequestExtended,
   s3HeadObject: object = {} // TODO better s3 head object type
 ): object => {
-  let auth
-  try {
-    auth = getPermissionVariablesFromCookie(req)
-  } catch (err) {
-    auth = undefined
-  }
+  const auth = req.permission_variables
 
   const variables: StorageContext = {
     request: {
@@ -104,11 +97,14 @@ export const createContext = (
 
   const functions = storageFunctions(variables)
 
-  return { ...functions, ...variables }
+  return { ...functions, ...variables, req }
 }
 
-export const hasPermission = (rules: (string | undefined)[], context: object): boolean => {
-  return rules.some((rule) => rule && !!safeEval(rule, context))
+export const hasPermission = (rules: (string | undefined)[], context: any): boolean => {
+  return (
+    context.req.headers['x-admin-secret'] === process.env.HASURA_GRAPHQL_ADMIN_SECRET ||
+    rules.some((rule) => rule && !!safeEval(rule, context))
+  )
 }
 
 export const generateMetadata = (metadataParams: object, context: object): object =>
@@ -125,10 +121,10 @@ export const generateMetadata = (metadataParams: object, context: object): objec
   }, {})
 
 // Creates an object key that is the path without the first character '/'
-export const getKey = (req: Request): string => req.path.substring(1)
+export const getKey = (req: RequestExtended): string => req.path.substring(1)
 
 export const getHeadObject = async (
-  req: Request,
+  req: RequestExtended,
   ignoreErrors = false
 ): Promise<HeadObjectOutput | undefined> => {
   const params = {
@@ -146,7 +142,7 @@ export const getHeadObject = async (
 }
 
 export const replaceMetadata = async (
-  req: Request,
+  req: RequestExtended,
   keepOldMetadata: boolean,
   newMetadata: object = {}
 ): Promise<void> => {

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import Boom from '@hapi/boom'
 
@@ -7,10 +7,12 @@ import { asyncWrapper } from '@shared/helpers'
 import { EMAILS_ENABLE, SERVER_URL } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
+import { SetNewEmailData } from '@shared/types'
 
 import { getRequestInfo } from './utils'
+import { RequestExtended } from '@shared/types'
 
-async function requestChangeEmail(req: Request, res: Response): Promise<unknown> {
+async function requestChangeEmail(req: RequestExtended, res: Response): Promise<unknown> {
   const { user_id, new_email } = await getRequestInfo(req)
 
   // smtp must be enabled for request change password to work.
@@ -36,8 +38,10 @@ async function requestChangeEmail(req: Request, res: Response): Promise<unknown>
     return Boom.badImplementation('Unable to set new ticket')
   }
   // set new email
+  let display_name
   try {
-    await request(setNewEmail, { user_id, new_email })
+    const setNewEmailReturn = await request<SetNewEmailData>(setNewEmail, { user_id, new_email })
+    display_name = setNewEmailReturn.update_auth_accounts.returning[0].user.display_name
   } catch (error) {
     console.error(error)
     throw Boom.badImplementation('unable to set new email')
@@ -46,7 +50,11 @@ async function requestChangeEmail(req: Request, res: Response): Promise<unknown>
   try {
     await emailClient.send({
       template: 'change-email',
-      locals: { ticket, url: SERVER_URL },
+      locals: {
+        ticket,
+        url: SERVER_URL,
+        display_name
+      },
       message: {
         to: new_email,
         headers: {

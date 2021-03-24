@@ -60,6 +60,7 @@ git clone https://github.com/nhost/hasura-backend-plus.git
 cd hasura-backend-plus
 yarn
 cp .env.example .env
+yarn build
 yarn start
 ```
 
@@ -185,6 +186,12 @@ It will return the same kind of payload as in `/auth/login`, with a new JWT:
 ```
 
 ## Enable an OAuth provider
+
+### Backend
+Set the necessary environment variables on `docker-compose.yaml` under the `hasura-backend-plus` section. The OAuth Providers section from `.env.example` has a list of the supported providers and options. Make sure to set also the `PROVIDER_SUCCESS_REDIRECT` and `PROVIDER_FAILURE_REDIRECT` URLs to the frontend.
+
+### Frontend
+For OAuth login, redirect the user to `//hasura-backend-plus/auth/providers/{provider}` to perform the authentication. Upon success, the URL set in `PROVIDER_SUCCESS_REDIRECT` will be called back, with a `refresh_token` query parameter. Use this value to perform a GET on `//hasura-backend-plus/auth/token/refresh?refresh_token={refresh_token}` to obtain the response which contains the valid JWT.
 
 ## Change email
 

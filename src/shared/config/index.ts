@@ -12,6 +12,7 @@ import { HASURA_ENDPOINT } from './application'
 export * from './application'
 export * from './authentication'
 export * from './storage'
+export * from './headers';
 
 /**
  * * Check required settings, and raise an error if some are missing.
