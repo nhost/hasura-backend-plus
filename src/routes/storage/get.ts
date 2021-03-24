@@ -9,6 +9,19 @@ import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
 
+
+function getHash(items: (string | number | Buffer)[]): string {
+  const hash = createHash('sha256')
+  for (const item of items) {
+    if (typeof item === 'number') hash.update(String(item))
+    else {
+      hash.update(item)
+    }
+  }
+  // See https://en.wikipedia.org/wiki/Base64#Filenames
+  return hash.digest('base64').replace(/\//g, '-')
+}
+
 export const getFile = async (
   req: RequestExtended,
   res: Response,
@@ -119,16 +132,4 @@ export const getFile = async (
       stream.pipe(res)
     }
   }
-}
-
-function getHash(items: (string | number | Buffer)[]) {
-  const hash = createHash('sha256')
-  for (let item of items) {
-    if (typeof item === 'number') hash.update(String(item))
-    else {
-      hash.update(item)
-    }
-  }
-  // See https://en.wikipedia.org/wiki/Base64#Filenames
-  return hash.digest('base64').replace(/\//g, '-')
 }
