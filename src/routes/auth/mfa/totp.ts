@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { asyncWrapper, rotateTicket, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
+import { UserData, Session } from '@shared/types'
 
 import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
@@ -40,20 +41,17 @@ async function totpLogin({ body }: Request, res: Response): Promise<void> {
   await rotateTicket(ticket)
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-
-  // return
-  if (useCookie) {
-    res.send({
-      jwt_token,
-      jwt_expires_in
-    })
-  } else {
-    res.send({
-      jwt_token,
-      jwt_expires_in,
-      refresh_token
-    })
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
   }
+
+  const session: Session = { jwt_token, jwt_expires_in, user }
+
+  if (!useCookie) session.refresh_token = refresh_token
+  res.send(session)
 }
 
 export default asyncWrapper(totpLogin)

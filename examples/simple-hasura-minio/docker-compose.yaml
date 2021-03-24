@@ -18,11 +18,12 @@ services:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
       HASURA_GRAPHQL_ADMIN_SECRET: '$HASURA_GRAPHQL_ADMIN_SECRET'
       HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "jwk_url": "http://hasura-backend-plus:3000/auth/jwks"}'
-      HASURA_GRAPHQL_ENABLE_CONSOLE: true
+      HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
   hasura-backend-plus:
     image: nhost/hasura-backend-plus:latest
     ports:
       - '3000:3000'
+    restart: always
     environment:
       SERVER_URL: http://localhost:3000
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
@@ -32,7 +33,7 @@ services:
       S3_BUCKET: hasura-backend-plus
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}'
-      AUTO_MIGRATE: true
+      AUTO_MIGRATE: 'true'
   minio:
     image: minio/minio
     restart: always

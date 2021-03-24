@@ -74,7 +74,6 @@ export const selectAccount = async (httpBody: {
     if (!ticket) {
       return undefined
     }
-
     try {
       return await selectAccountByTicket(ticket)
     } catch {
