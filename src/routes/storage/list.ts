@@ -44,7 +44,7 @@ export const listFile = async (
       return res.status(200).send(
         headObjectsList.map((entry) => {
           return {
-            Key: entry.key,
+            key: entry.key,
             ...entry.head
           }
         })
