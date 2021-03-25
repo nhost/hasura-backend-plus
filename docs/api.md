@@ -144,13 +144,7 @@ Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=fa
 
 #### Request
 
-`POST /auth/activate`
-
-```json
-{
-  "ticket": "0175b2e2-b6b5-4d3f-a5db-5b2d4bfc2ce7"
-}
-```
+`GET /auth/activate?ticket=<ticket>`
 
 #### Response
 
