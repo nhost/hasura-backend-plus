@@ -9,6 +9,7 @@ import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
 
+const AVIF = 'image/avif'
 const WEBP = 'image/webp'
 const PNG = 'image/png'
 const JPEG = 'image/jpeg'
@@ -46,16 +47,27 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    const { width, height, quality, radius, blur } = await imgTransformParams.validateAsync(req.query)
-    if (width || height || quality !== 100 || radius || blur) {
+    const { width, height, quality, format, radius, blur } = await imgTransformParams.validateAsync(req.query)
+    if (width || height || quality !== 100 || format || radius || blur) {
 
       const params = {
         Bucket: S3_BUCKET as string,
         Key: key
       }
-      const contentType = headObject?.ContentType
 
       const object = await s3.getObject(params).promise()
+
+      // Find and set the contentType
+      let contentType
+      if (format === 'auto' && req.headers.accept.split(',').some(header => header === AVIF)) {
+        contentType = AVIF
+      } else if (format === 'auto' && req.headers.accept.split(',').some(header => header === WEBP)) {
+        contentType = WEBP
+      } else if (format && format !== 'auto') {
+        contentType = `image/${format}`
+      } else {
+        contentType = headObject?.ContentType
+      }
 
       if (!object.Body) {
         throw Boom.badImplementation('File found without body')
@@ -102,17 +114,27 @@ export const getFile = async (
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
-      if (contentType === WEBP) {
+      // Set the quality of the image
+      if (contentType === AVIF) {
+        transformer.avif({ quality })
+      } else if (contentType === WEBP) {
         transformer.webp({ quality })
       } else if (contentType === PNG) {
         transformer.png({ quality })
       } else if (contentType === JPEG) {
         transformer.jpeg({ quality })
       }
+
+      // Transform to the new format, if explicitly set
+      if (contentType !== headObject.contentType) {
+        const newFormat = contentType.split('image/')[1]
+        transformer.toFormat(newFormat)
+      }
+
       const optimizedBuffer = await transformer.toBuffer()
       const etag = `"${getHash([optimizedBuffer])}"` // The extra quotes are needed to conform to the ETag protocol (https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11)
 
-      res.set('Content-Type', headObject.ContentType)
+      res.set('Content-Type', contentType)
       res.set('Content-Disposition', `inline;`)
       res.set('Cache-Control', 'public, max-age=31557600')
       res.set('ETag', etag)

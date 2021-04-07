@@ -126,6 +126,13 @@ export const imgTransformParams = Joi.object({
   h: Joi.number().integer().min(0).max(8192),
   quality: Joi.number().integer().min(0).max(100).default(100),
   q: Joi.number().integer().min(0).max(100),
+  format: Joi.alternatives().try(
+    Joi.string().valid('avif'),
+    Joi.string().valid('webp'),
+    Joi.string().valid('png'),
+    Joi.string().valid('jpeg'),
+    Joi.string().valid('auto')
+  ),
   blur: Joi.number().integer().min(0.3).max(1000),
   b: Joi.number().integer().min(0.3).max(1000),
   radius: Joi.alternatives().try(Joi.number(), Joi.string().valid('full')),
