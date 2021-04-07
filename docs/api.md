@@ -464,6 +464,76 @@ Get file
 <file>
 ```
 
+#### Image Transformation
+
+Transform images on-the-fly using query parameters. Cache headers are sent with the image for browsers to cache the image client-side.
+
+
+##### Example
+
+`/storage/o/<path-to-file>?w=800&q=90`
+
+
+##### Width
+
+Specify width in pixels of the image. If no height (`h` or `height`) is specified, the image automatically calculates the height to keep the image's aspect ratio. The value has to be between 0 and 8192.
+
+Query parameter: `w` or `width`.
+
+
+##### Height
+
+Specify the height of the image. If no width (`w` or `width`) is specified, the image automatically calculates the width to keep the image's aspect ratio. The value has to be between 0 and 8192.
+
+Query parameter: `h` or `height`.
+
+
+##### Quality
+
+Specify the quality of the image with a value between 1 (very course) to 100 (lossless or almost lossless).
+
+Query parameter: `q` or `quality`.
+
+
+##### Format
+
+Specify the preferred format of the requested image.
+
+This parameter can be one of the following values: `webp`, `png`, `jpeg`, `auto`. When the value is `auto` the image will be transformed to the `avif` or `webp` format if the request header explicitly accepts `image/avif` or `image/webp`, otherwise the image will be returned in the format in which it was saved.
+
+Query parameter: `format`.
+
+
+##### Fit
+
+Specify how the image has to be cropped. This parameter only works when both the width and the height are specified. The `fit` parameter can have one of four values:
+
+- `cover` (default): Preserves aspect ratio and clips to fit
+- `contain`: Preserves aspect ratio, but instead of clipping adds extra padding (letterboxing) where necessary
+- `fill`: Ignore the aspect ratio and stretch the image to fit the specified width and height
+- `inside`: Preserves the aspect ratio and resizes the image to fit inside the specified dimensions
+- `outside`: Preserves the aspect ratio and resizes the image so both the width and height are at least the specified dimensions
+
+
+##### Crop
+
+Specify which section of the image to crop. This parameter only works when the `fit` parameter is either `cover` or `contain`. The crop parameter can be one of six values: `top`, `right`, `bottom`, `left`, `attention`, and `entropy`. The `attention` value will focus on the highest luminance frequency, colour saturation and presence of skin tones while the `entropy` value will focus the on the region with the highest Shannon entropy.
+
+
+##### Radius
+
+Give the image rounded corners. This parameter can be either an integer (pixels) or `full` for when the image has to be fully rounded (e.g. an avatar).
+
+Query parameter: `r` or `radius`.
+
+
+##### Blur
+
+Add a Gaussian blur to the image, the blur has to be between 0.3 and 1000.
+
+Query parameter: `b` or `blur`.
+
+
 ---
 
 ### File metadata
