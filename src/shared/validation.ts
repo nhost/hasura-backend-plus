@@ -120,13 +120,22 @@ export const totpSchema = Joi.object({
 })
 
 export const imgTransformParams = Joi.object({
+  width: Joi.number().integer().min(0).max(8192),
   w: Joi.number().integer().min(0).max(8192),
+  height: Joi.number().integer().min(0).max(8192),
   h: Joi.number().integer().min(0).max(8192),
-  q: Joi.number().integer().min(0).max(100).default(100),
+  quality: Joi.number().integer().min(0).max(100).default(100),
+  q: Joi.number().integer().min(0).max(100),
+  blur: Joi.number().integer().min(0.3).max(1000),
   b: Joi.number().integer().min(0.3).max(1000),
+  radius: Joi.alternatives().try(Joi.number(), Joi.string().valid('full')),
   r: Joi.alternatives().try(Joi.number(), Joi.string().valid('full')),
   token: Joi.string().uuid()
-})
+}).rename('w', 'width')
+  .rename('h', 'height')
+  .rename('q', 'quality')
+  .rename('b', 'blur')
+  .rename('r', 'radius')
 
 export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),

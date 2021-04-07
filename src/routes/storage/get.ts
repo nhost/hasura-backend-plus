@@ -9,6 +9,10 @@ import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
 
+const WEBP = 'image/webp'
+const PNG = 'image/png'
+const JPEG = 'image/jpeg'
+
 function getHash(items: (string | number | Buffer)[]): string {
   const hash = createHash('sha256')
   for (const item of items) {
@@ -42,14 +46,8 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-      
-    if (req.query.w || req.query.h || req.query.q || req.query.r || req.query.b) {
-      // transform image
-      const { w, h, q, r, b } = await imgTransformParams.validateAsync(req.query)
-
-      const WEBP = 'image/webp'
-      const PNG = 'image/png'
-      const JPEG = 'image/jpeg'
+    const { width, height, quality, radius, blur } = await imgTransformParams.validateAsync(req.query)
+    if (width || height || quality !== 100 || radius || blur) {
 
       const params = {
         Bucket: S3_BUCKET as string,
@@ -65,54 +63,51 @@ export const getFile = async (
 
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
-      transformer.resize({ width: w, height: h })
-  
+      transformer.resize({ width, height })
+
       // Add a blur when specified
-      if (b) {
-        transformer.blur(b)
+      if (blur) {
+        transformer.blur(blur)
       }
 
       // Add corners to the image when the radius ('r') is is specified in the query
-      if (r) {
-        const { height, width } = await transformer.metadata()
+      if (radius) {
+        let { height: imageHeight, width: imageWidth } = await transformer.metadata()
 
-        if (!height) {
+        if (!imageHeight) {
           throw Boom.badImplementation('Unable to determine image height')
         }
 
-        if (!width) {
+        if (!imageWidth) {
           throw Boom.badImplementation('Unable to determine image width')
         }
 
-        let imageHeight = height
-        let imageWidth = width
-
-        if (w && h) {
-          imageHeight = h
-          imageWidth = w
-        } else if (w) {
-          imageHeight = Math.round((height * w) / width)
-          imageWidth = w
-        } else if (h) {
-          imageWidth = Math.round((width * h) / height)
-          imageHeight = h
+        if (width && height) {
+          imageHeight = height
+          imageWidth = width
+        } else if (width) {
+          imageHeight = Math.round((imageHeight * width) / imageWidth)
+          imageWidth = width
+        } else if (height) {
+          imageWidth = Math.round((imageWidth * height) / imageHeight)
+          imageHeight = height
         }
 
         // Set the radius to 'r' or to 1/2 the height or width
         const maxRadius = Math.min(imageHeight, imageWidth) / 2
-        const radius = r === 'full' ? maxRadius : Math.min(maxRadius, r)
+        const computedRadius = radius === 'full' ? maxRadius : Math.min(maxRadius, radius)
         const overlay = Buffer.from(
-          `<svg><rect x="0" y="0" width="${imageWidth}" height="${imageHeight}" rx="${radius}" ry="${radius}"/></svg>`
+          `<svg><rect x="0" y="0" width="${imageWidth}" height="${imageHeight}" rx="${computedRadius}" ry="${computedRadius}"/></svg>`
         )
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
 
       if (contentType === WEBP) {
-        transformer.webp({ quality: q })
+        transformer.webp({ quality })
       } else if (contentType === PNG) {
-        transformer.png({ quality: q })
+        transformer.png({ quality })
       } else if (contentType === JPEG) {
-        transformer.jpeg({ quality: q })
+        transformer.jpeg({ quality })
       }
       const optimizedBuffer = await transformer.toBuffer()
       const etag = `"${getHash([optimizedBuffer])}"` // The extra quotes are needed to conform to the ETag protocol (https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11)
