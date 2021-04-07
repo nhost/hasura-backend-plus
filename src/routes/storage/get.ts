@@ -74,10 +74,39 @@ export const getFile = async (
       }
 
       const transformer = sharp(object.Body as Buffer)
+
+      const { width: originalWidth, height: originalHeight } = await transformer.metadata()
+      const originalAspectRatio = originalWidth / originalHeight
+
+      if (!originalHeight) {
+        throw Boom.badImplementation('Unable to determine image height')
+      }
+
+      if (!originalWidth) {
+        throw Boom.badImplementation('Unable to determine image width')
+      }
+
+      // Use the newWidth and newHeight variables to not serve an image that is larger than the original
+      let newWidth, newHeight
+      if (width && height) {
+        const newAspectRatio = width / height
+        newWidth = Math.min(width, originalWidth, Math.round(originalHeight * newAspectRatio))
+        newHeight = Math.min(height, originalHeight, Math.round(originalWidth / newAspectRatio))
+      } else if (width) {
+        newWidth = Math.min(width, originalWidth)
+        newHeight = Math.min(Math.round(width / originalAspectRatio), originalHeight)
+      } else if (height) {
+        newWidth = Math.min(Math.round(height * originalAspectRatio), originalWidth)
+        newHeight = Math.min(height, originalHeight)
+      } else {
+        newWidth = originalWidth
+        newHeight = originalHeight
+      }
+
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({
-        width,
-        height,
+        width: newWidth,
+        height: newHeight,
         fit,
         position: ['entropy', 'attention'].includes(crop) ? sharp.strategy[crop] : crop
       })
@@ -89,32 +118,11 @@ export const getFile = async (
 
       // Add corners to the image when the radius ('r') is is specified in the query
       if (radius) {
-        let { height: imageHeight, width: imageWidth } = await transformer.metadata()
-
-        if (!imageHeight) {
-          throw Boom.badImplementation('Unable to determine image height')
-        }
-
-        if (!imageWidth) {
-          throw Boom.badImplementation('Unable to determine image width')
-        }
-
-        if (width && height) {
-          imageHeight = height
-          imageWidth = width
-        } else if (width) {
-          imageHeight = Math.round((imageHeight * width) / imageWidth)
-          imageWidth = width
-        } else if (height) {
-          imageWidth = Math.round((imageWidth * height) / imageHeight)
-          imageHeight = height
-        }
-
         // Set the radius to 'r' or to 1/2 the height or width
-        const maxRadius = Math.min(imageHeight, imageWidth) / 2
+        const maxRadius = Math.min(newWidth, newHeight) / 2
         const computedRadius = radius === 'full' ? maxRadius : Math.min(maxRadius, radius)
         const overlay = Buffer.from(
-          `<svg><rect x="0" y="0" width="${imageWidth}" height="${imageHeight}" rx="${computedRadius}" ry="${computedRadius}"/></svg>`
+          `<svg><rect x="0" y="0" width="${newWidth}" height="${newHeight}" rx="${computedRadius}" ry="${computedRadius}"/></svg>`
         )
         transformer.composite([{ input: overlay, blend: 'dest-in' }])
       }
