@@ -37,8 +37,11 @@ export const getFile = async (
   const headObject = await getHeadObject(req)
   if (!headObject?.Metadata) {
     throw Boom.forbidden()
+  } else if (!req?.headers) {
+    throw Boom.badImplementation('No headers were set')
+  } else if (!req?.headers.accept) {
+    throw Boom.badImplementation('No accept headers were set')
   }
-
   const context = createContext(req, headObject)
 
   if (!hasPermission([rules.get, rules.read], context)) {
@@ -57,6 +60,10 @@ export const getFile = async (
 
       const object = await s3.getObject(params).promise()
 
+      if (!object.Body) {
+        throw Boom.badImplementation('File found without body')
+      }
+
       // Find and set the contentType
       let contentType
       if (format === 'auto' && req.headers.accept.split(',').some(header => header === AVIF)) {
@@ -66,17 +73,16 @@ export const getFile = async (
       } else if (format && format !== 'auto') {
         contentType = `image/${format}`
       } else {
-        contentType = headObject?.ContentType
+        contentType = headObject.ContentType
       }
 
-      if (!object.Body) {
-        throw Boom.badImplementation('File found without body')
+      if (!contentType) {
+        throw Boom.badImplementation('Unable to determine ContentType')
       }
 
       const transformer = sharp(object.Body as Buffer)
 
       const { width: originalWidth, height: originalHeight } = await transformer.metadata()
-      const originalAspectRatio = originalWidth / originalHeight
 
       if (!originalHeight) {
         throw Boom.badImplementation('Unable to determine image height')
@@ -87,6 +93,7 @@ export const getFile = async (
       }
 
       // Use the newWidth and newHeight variables to not serve an image that is larger than the original
+      const originalAspectRatio = originalWidth / originalHeight
       let newWidth, newHeight
       if (width && height) {
         const newAspectRatio = width / height
@@ -139,9 +146,12 @@ export const getFile = async (
       }
 
       // Transform to the new format, if explicitly set
-      if (contentType !== headObject.contentType) {
+      if (contentType !== headObject.ContentType) {
         const newFormat = contentType.split('image/')[1]
-        transformer.toFormat(newFormat)
+
+        if (newFormat) {
+          transformer.toFormat(newFormat)
+        }
       }
 
       const optimizedBuffer = await transformer.toBuffer()
