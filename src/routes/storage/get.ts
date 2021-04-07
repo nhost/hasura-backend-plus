@@ -47,8 +47,8 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-    const { width, height, quality, format, radius, blur } = await imgTransformParams.validateAsync(req.query)
-    if (width || height || quality !== 100 || format || radius || blur) {
+    const { width, height, quality, format, fit, crop, radius, blur } = await imgTransformParams.validateAsync(req.query)
+    if (width || height || quality !== 100 || format || fit || crop || radius || blur) {
 
       const params = {
         Bucket: S3_BUCKET as string,
@@ -75,7 +75,12 @@ export const getFile = async (
 
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
-      transformer.resize({ width, height })
+      transformer.resize({
+        width,
+        height,
+        fit,
+        position: ['entropy', 'attention'].includes(crop) ? sharp.strategy[crop] : crop
+      })
 
       // Add a blur when specified
       if (blur) {

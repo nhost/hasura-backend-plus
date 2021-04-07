@@ -133,6 +133,21 @@ export const imgTransformParams = Joi.object({
     Joi.string().valid('jpeg'),
     Joi.string().valid('auto')
   ),
+  fit: Joi.alternatives().try(
+    Joi.string().valid('cover'),
+    Joi.string().valid('contain'),
+    Joi.string().valid('fill'),
+    Joi.string().valid('inside'),
+    Joi.string().valid('outside')
+  ),
+  crop: Joi.alternatives().try(
+    Joi.string().valid('top'),
+    Joi.string().valid('right'),
+    Joi.string().valid('bottom'),
+    Joi.string().valid('left'),
+    Joi.string().valid('entropy'),
+    Joi.string().valid('attention')
+  ),
   blur: Joi.number().integer().min(0.3).max(1000),
   b: Joi.number().integer().min(0.3).max(1000),
   radius: Joi.alternatives().try(Joi.number(), Joi.string().valid('full')),
@@ -143,6 +158,8 @@ export const imgTransformParams = Joi.object({
   .rename('q', 'quality')
   .rename('b', 'blur')
   .rename('r', 'radius')
+  .with('fit', ['width', 'height'])
+  .with('crop', ['width', 'height'])
 
 export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),
