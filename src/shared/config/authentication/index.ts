@@ -10,31 +10,31 @@ export * from './cookies'
  * * Authentication settings
  */
 export const AUTHENTICATION = {
-  AUTH_ENABLE() {
+  get AUTH_ENABLE() {
     return castBooleanEnv('AUTH_ENABLE', true)
   },
-  AUTH_LOCAL_USERS_ENABLE() {
+  get AUTH_LOCAL_USERS_ENABLE() {
     return castBooleanEnv('AUTH_LOCAL_USERS_ENABLE', true)
   },
-  CHANGE_EMAIL_ENABLE() {
+  get CHANGE_EMAIL_ENABLE() {
     return castBooleanEnv('CHANGE_EMAIL_ENABLE', true)
   },
-  NOTIFY_EMAIL_CHANGE() {
+  get NOTIFY_EMAIL_CHANGE() {
     return castBooleanEnv('NOTIFY_EMAIL_CHANGE', false)
   },
-  ANONYMOUS_USERS_ENABLE() {
+  get ANONYMOUS_USERS_ENABLE() {
     return castBooleanEnv('ANONYMOUS_USERS_ENABLE', false)
   },
-  ALLOW_USER_SELF_DELETE() {
+  get ALLOW_USER_SELF_DELETE() {
     return castBooleanEnv('ALLOW_USER_SELF_DELETE', false)
   },
-  VERIFY_EMAILS() {
+  get VERIFY_EMAILS() {
     return castBooleanEnv('VERIFY_EMAILS', false)
   },
-  LOST_PASSWORD_ENABLE() {
+  get LOST_PASSWORD_ENABLE() {
     return castBooleanEnv('LOST_PASSWORD_ENABLE', false)
   },
-  USER_IMPERSONATION_ENABLE() {
+  get USER_IMPERSONATION_ENABLE() {
     return castBooleanEnv('USER_IMPERSONATION_ENABLE', false)
   },
 }
