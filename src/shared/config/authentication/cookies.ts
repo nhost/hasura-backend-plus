@@ -2,7 +2,7 @@ import { castBooleanEnv } from '../utils'
 
 export const COOKIES = {
   get SECRET() {
-    return process.env.COOKIE_SECRET
+    return process.env.COOKIE_SECRET || ''
   },
   get SECURE() {
     return castBooleanEnv('COOKIE_SECURE')

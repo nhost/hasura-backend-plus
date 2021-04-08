@@ -11,19 +11,19 @@ const autoMigrateSettings = (envVal?: string): boolean | string => {
  */
 export const APPLICATION = {
   get SERVER_URL() {
-    return process.env.SERVER_URL
+    return process.env.SERVER_URL || ''
   },
   get REDIRECT_URL_ERROR() {
-    return process.env.REDIRECT_URL_ERROR
+    return process.env.REDIRECT_URL_ERROR || ''
   },
   get REDIRECT_URL_SUCCESS() {
-    return process.env.REDIRECT_URL_SUCCESS
+    return process.env.REDIRECT_URL_SUCCESS || ''
   },
   get HASURA_GRAPHQL_ADMIN_SECRET() {
-    return process.env.HASURA_GRAPHQL_ADMIN_SECRET
+    return process.env.HASURA_GRAPHQL_ADMIN_SECRET || ''
   },
   get HASURA_ENDPOINT() {
-    return process.env.HASURA_ENDPOINT
+    return process.env.HASURA_ENDPOINT || ''
   },
 
   get HOST() {
@@ -34,13 +34,13 @@ export const APPLICATION = {
   },
 
   get SMTP_PASS() {
-    return process.env.SMTP_PASS
+    return process.env.SMTP_PASS || ''
   },
   get SMTP_HOST() {
-    return process.env.SMTP_HOST
+    return process.env.SMTP_HOST || ''
   },
   get SMTP_USER() {
-    return process.env.SMTP_USER
+    return process.env.SMTP_USER || ''
   },
   get SMTP_SENDER() {
     return process.env.SMTP_SENDER || this.SMTP_USER

@@ -33,10 +33,10 @@ const PROVIDERS = {
   get google() {
     return !castBooleanEnv('GOOGLE_ENABLE') ? null : {
       get clientID() {
-        return process.env.GITHUB_CLIENT_ID
+        return process.env.GITHUB_CLIENT_ID || ''
       },
       get clientSecret() {
-        return process.env.GITHUB_CLIENT_SECRET
+        return process.env.GITHUB_CLIENT_SECRET || ''
       },
     }
   },
@@ -44,10 +44,10 @@ const PROVIDERS = {
   get facebook() {
     return !castBooleanEnv('FACEBOOK_ENABLE') ? null : {
       get clientID() {
-        return process.env.FACEBOOK_CLIENT_ID
+        return process.env.FACEBOOK_CLIENT_ID || ''
       },
       get clientSecret() {
-        return process.env.FACEBOOK_CLIENT_SECRET
+        return process.env.FACEBOOK_CLIENT_SECRET || ''
       },
     }
   },
@@ -55,10 +55,10 @@ const PROVIDERS = {
   get twitter() {
     return !castBooleanEnv('TWITTER_ENABLE') ? null : {
       get consumerKey() {
-        return process.env.TWITTER_CONSUMER_KEY
+        return process.env.TWITTER_CONSUMER_KEY || ''
       },
       get consumerSecret() {
-        return process.env.TWITTER_CONSUMER_SECRET
+        return process.env.TWITTER_CONSUMER_SECRET || ''
       },
     }
   },
@@ -66,10 +66,10 @@ const PROVIDERS = {
   get linkedin() {
     return !castBooleanEnv('LINKEDIN_ENABLE') ? null : {
       get clientID() {
-        return process.env.LINKEDIN_CLIENT_ID
+        return process.env.LINKEDIN_CLIENT_ID || ''
       },
       get clientSecret() {
-        return process.env.LINKEDIN_CLIENT_SECRET
+        return process.env.LINKEDIN_CLIENT_SECRET || ''
       },
     }
   },
@@ -79,18 +79,18 @@ const PROVIDERS = {
     try {
       return {
         get clientID() {
-          return process.env.APPLE_CLIENT_ID
+          return process.env.APPLE_CLIENT_ID || ''
         },
         get teamID() {
-          return process.env.APPLE_TEAM_ID
+          return process.env.APPLE_TEAM_ID || ''
         },
         get keyID() {
-          return process.env.APPLE_KEY_ID
+          return process.env.APPLE_KEY_ID || ''
         },
         get key() {
           return process.env.APPLE_PRIVATE_KEY &&
           // Convert contents from base64 string to string to avoid issues with line breaks in the environment variable
-          Buffer.from(process.env.APPLE_PRIVATE_KEY, 'base64').toString('ascii')
+          Buffer.from(process.env.APPLE_PRIVATE_KEY, 'base64').toString('ascii') || ''
         }
       }
     } catch (e) {
@@ -101,10 +101,10 @@ const PROVIDERS = {
   get windowslive() {
     return !castBooleanEnv('WINDOWS_LIVE_ENABLE') ? null : {
       get clientID() {
-        return process.env.WINDOWS_LIVE_CLIENT_ID
+        return process.env.WINDOWS_LIVE_CLIENT_ID || ''
       },
       get clientSecret() {
-        return process.env.WINDOWS_LIVE_CLIENT_SECRET
+        return process.env.WINDOWS_LIVE_CLIENT_SECRET || ''
       },
     }
   },
@@ -112,10 +112,10 @@ const PROVIDERS = {
   get spotify() {
     return !castBooleanEnv('SPOTIFY_ENABLE') ? null : {
       get clientID() {
-        return process.env.SPOTIFY_CLIENT_ID
+        return process.env.SPOTIFY_CLIENT_ID || ''
       },
       get clientSecret() {
-        return process.env.SPOTIFY_CLIENT_SECRET
+        return process.env.SPOTIFY_CLIENT_SECRET || ''
       },
     }
   }
