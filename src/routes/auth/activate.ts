@@ -1,4 +1,4 @@
-import { APPLICATION } from '@shared/config'
+import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
@@ -10,6 +10,10 @@ import { verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
+  if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
+    throw Boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
+  }
+
   let hasuraData: UpdateAccountData
 
   const { ticket } = await verifySchema.validateAsync(query)
