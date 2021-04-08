@@ -45,6 +45,10 @@ const accountFields = {
   password: passwordRule
 }
 
+const passwordlessAccountFields = {
+  email: emailRule,
+}
+
 export const userDataFields = {
   user_data: Joi.object(
     REGISTRATION_CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
@@ -72,6 +76,13 @@ export const registerSchema = Joi.object({
   ...userDataFields,
   cookie: Joi.boolean()
 })
+
+export const passwordlessRegisterSchema = Joi.object({
+  ...passwordlessAccountFields,
+  ...userDataFields,
+  cookie: Joi.boolean()
+})
+
 
 export const registerUserDataSchema = Joi.object(userDataFields)
 
@@ -104,12 +115,20 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
-  email: Joi.string(), // these will be checked more regeriously in `loginSchema`
-  password: Joi.string() // these will be checked more regeriously in `loginSchema`
+  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
+  password: Joi.string() // these will be checked more rigorously in `loginSchema`
+})
+export const passwordlessLoginAnonymouslySchema = Joi.object({
+  anonymous: Joi.boolean(),
+  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
 })
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
+  cookie: Joi.boolean()
+})
+export const passwordlessLoginSchema = extendedJoi.object({
+  email: emailRule,
   cookie: Joi.boolean()
 })
 export const forgotSchema = Joi.object({ email: emailRule })
@@ -133,3 +152,9 @@ export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),
   action: Joi.string().valid('revoke-token').required()
 })
+
+export const passwordlessQuery = Joi.object({
+  token: Joi.string().required(),
+  action: Joi.string().required(),
+  cookie: Joi.boolean().optional(),
+});

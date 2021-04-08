@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
-import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
+import { loginAnonymouslySchema, loginSchema, passwordlessLoginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
@@ -13,9 +13,12 @@ import {
   ADMIN_SECRET_HEADER,
   ANONYMOUS_USERS_ENABLE,
   DEFAULT_ANONYMOUS_ROLE,
+  ENABLE_PASSWORDLESS,
   HASURA_GRAPHQL_ADMIN_SECRET,
+  SERVER_URL,
   USER_IMPERSONATION_ENABLE
 } from '@shared/config'
+import { emailClient } from '@shared/email'
 
 interface HasuraData {
   insert_auth_accounts: {
@@ -75,7 +78,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await loginSchema.validateAsync(body)
+  const { password } = await (ENABLE_PASSWORDLESS ? passwordlessLoginSchema : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -83,7 +86,31 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     throw Boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, active, ticket } = account
+  const { id, mfa_enabled, password_hash, active, ticket, email } = account
+
+  if(!password) {
+    const refresh_token = await setRefreshToken(res, id, useCookie)
+
+    try {
+      await emailClient.send({
+        template: 'passwordless',
+        message: {
+          to: email,
+        },
+        locals: {
+          display_name: account.user.display_name,
+          token: refresh_token,
+          url: SERVER_URL,
+          action: 'log in'
+        }
+      })
+
+      return res.send({ jwt_token: null, jwt_expires_in: null, user: null });
+    } catch (err) {
+      console.error(err)
+      throw Boom.badImplementation()
+    }
+  }
 
   if (!active) {
     throw Boom.badRequest('Account is not activated.')

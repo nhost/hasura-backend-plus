@@ -5,7 +5,8 @@ import {
   DEFAULT_USER_ROLE,
   DEFAULT_ALLOWED_USER_ROLES,
   ALLOWED_USER_ROLES,
-  VERIFY_EMAILS
+  VERIFY_EMAILS,
+  ENABLE_PASSWORDLESS
 } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
@@ -15,7 +16,7 @@ import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema } from '@shared/validation'
+import { registerSchema, passwordlessRegisterSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -28,19 +29,24 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     password,
     user_data = {},
     register_options = {}
-  } = await registerSchema.validateAsync(body)
+  } = await (ENABLE_PASSWORDLESS ? passwordlessRegisterSchema : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     throw Boom.badRequest('Account already exists.')
   }
 
-  await checkHibp(password)
+  let password_hash: string|null = null;
 
   const ticket = uuidv4()
   const now = new Date()
   const ticket_expires_at = new Date()
   ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
-  const password_hash = await hashPassword(password)
+
+  if(password) {
+    await checkHibp(password)
+
+    password_hash = await hashPassword(password)
+  }
 
   const defaultRole = register_options.default_role ?? DEFAULT_USER_ROLE
   const allowedRoles = register_options.allowed_roles ?? DEFAULT_ALLOWED_USER_ROLES
@@ -96,6 +102,29 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
 
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
+
+    if(!password) {
+      try {
+        await emailClient.send({
+          template: 'passwordless',
+          message: {
+            to: user.email,
+          },
+          locals: {
+            display_name,
+            token: ticket,
+            url: SERVER_URL,
+            action: 'sign up'
+          }
+        })
+      } catch (err) {
+        console.error(err)
+        throw Boom.badImplementation()
+      }
+
+      const session: Session = { jwt_token: null, jwt_expires_in: null, user }
+      return res.send(session)
+    }
 
     try {
       await emailClient.send({

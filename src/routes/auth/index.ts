@@ -3,7 +3,8 @@ import {
   CHANGE_EMAIL_ENABLE,
   AUTO_ACTIVATE_NEW_USERS,
   ALLOW_USER_SELF_DELETE,
-  AUTH_LOCAL_USERS_ENABLE
+  AUTH_LOCAL_USERS_ENABLE,
+  ENABLE_PASSWORDLESS
 } from '@shared/config'
 import { Router } from 'express'
 import nocache from 'nocache'
@@ -18,6 +19,7 @@ import registerAccount from './register'
 import token from './token'
 import activateAccount from './activate'
 import deleteAccount from './delete'
+import passwordless from './passwordless'
 
 const router = Router()
 
@@ -49,6 +51,10 @@ if (AUTH_LOCAL_USERS_ENABLE) {
     .post('/logout', logout)
     .post('/register', registerAccount)
     .use('/change-password', changePassword)
+}
+
+if (ENABLE_PASSWORDLESS) {
+  router.get('/passwordless', passwordless)
 }
 
 router.get('/jwks', getJwks)

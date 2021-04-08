@@ -17,3 +17,4 @@ export const ALLOW_USER_SELF_DELETE = castBooleanEnv('ALLOW_USER_SELF_DELETE', f
 export const VERIFY_EMAILS = castBooleanEnv('VERIFY_EMAILS', false)
 export const LOST_PASSWORD_ENABLE = castBooleanEnv('LOST_PASSWORD_ENABLE', false)
 export const USER_IMPERSONATION_ENABLE = castBooleanEnv('USER_IMPERSONATION_ENABLE', false)
+export const ENABLE_PASSWORDLESS = castBooleanEnv('ENABLE_PASSWORDLESS', false)
