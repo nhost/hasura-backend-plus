@@ -4,8 +4,7 @@ import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
 import {
-  PROVIDER_SUCCESS_REDIRECT,
-  PROVIDER_FAILURE_REDIRECT,
+  REDIRECT,
   SERVER_URL,
   PROVIDERS,
   DEFAULT_USER_ROLE,
@@ -129,11 +128,11 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   try {
     refresh_token = await setRefreshToken(res, account.id, true)
   } catch (e) {
-    res.redirect(PROVIDER_FAILURE_REDIRECT as string)
+    res.redirect(REDIRECT.PROVIDER_FAILURE as string)
   }
 
   // redirect back user to app url
-  res.redirect(`${PROVIDER_SUCCESS_REDIRECT}?refresh_token=${refresh_token}`)
+  res.redirect(`${REDIRECT.PROVIDER_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export const initProvider = <T extends Strategy>(

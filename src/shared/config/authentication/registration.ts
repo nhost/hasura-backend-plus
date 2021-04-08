@@ -1,21 +1,34 @@
 import { castBooleanEnv, castStringArrayEnv, castIntEnv } from '../utils'
 
 /**
- * *  Registration settings
- * */
-export const {
-  ALLOWED_EMAIL_DOMAINS,
-  DEFAULT_USER_ROLE = 'user',
-  DEFAULT_ANONYMOUS_ROLE = 'anonymous'
-} = process.env
-export const AUTO_ACTIVATE_NEW_USERS = castBooleanEnv('AUTO_ACTIVATE_NEW_USERS', true)
-export const HIBP_ENABLE = castBooleanEnv('HIBP_ENABLE')
-export const REGISTRATION_CUSTOM_FIELDS = castStringArrayEnv('REGISTRATION_CUSTOM_FIELDS')
-export const MIN_PASSWORD_LENGTH = castIntEnv('MIN_PASSWORD_LENGTH', 3)
-export const DEFAULT_ALLOWED_USER_ROLES = castStringArrayEnv('DEFAULT_ALLOWED_USER_ROLES', [
-  DEFAULT_USER_ROLE
-])
-export const ALLOWED_USER_ROLES = castStringArrayEnv(
-  'ALLOWED_USER_ROLES',
-  DEFAULT_ALLOWED_USER_ROLES
-)
+ * * Registration settings
+ */
+export const REGISTRATION = {
+  get ALLOWED_EMAIL_DOMAINS() {
+    return process.env.ALLOWED_EMAIL_DOMAINS
+  },
+  get DEFAULT_USER_ROLE() {
+    return process.env.DEFAULT_USER_ROLE || 'user'
+  },
+  get DEFAULT_ANONYMOUS_ROLE() {
+    return process.env.DEFAULT_ANONYMOUS_ROLE || 'anonymous'
+  },
+  get AUTO_ACTIVATE_NEW_USERS() {
+    return castBooleanEnv('AUTO_ACTIVATE_NEW_USERS', true)
+  },
+  get HIBP_ENABLE() {
+    return castBooleanEnv('HIBP_ENABLE')
+  },
+  get REGISTRATION_CUSTOM_FIELDS() {
+    return castStringArrayEnv('REGISTRATION_CUSTOM_FIELDS')
+  },
+  get MIN_PASSWORD_LENGTH() {
+    return castIntEnv('MIN_PASSWORD_LENGTH', 3)
+  },
+  get DEFAULT_ALLOWED_USER_ROLES() {
+    return castStringArrayEnv('DEFAULT_ALLOWED_USER_ROLES', [this.DEFAULT_USER_ROLE])
+  },
+  get ALLOWED_USER_ROLES() {
+    return castStringArrayEnv('ALLOWED_USER_ROLES', this.DEFAULT_ALLOWED_USER_ROLES)
+  },
+}
