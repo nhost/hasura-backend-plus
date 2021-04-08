@@ -2,95 +2,82 @@ import Boom from '@hapi/boom'
 import { castBooleanEnv } from '../utils'
 import { APPLICATION } from '../application'
 
-/**
- * * OAuth settings
- */
-export const REDIRECT = {
-  get PROVIDER_SUCCESS() {
+const PROVIDERS = {
+  get REDIRECT_SUCCESS() {
     return process.env.PROVIDER_SUCCESS_REDIRECT || APPLICATION.REDIRECT_URL_SUCCESS
   },
-  get PROVIDER_FAILURE() {
+  get REDIRECT_FAILURE() {
     return process.env.PROVIDER_FAILURE_REDIRECT || APPLICATION.REDIRECT_URL_ERROR
-  }
-}
+  },
 
-const PROVIDERS: Record<string, Record<string, string | undefined> | null> = {}
-
-// Github OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'github', {
-  get: () => !castBooleanEnv('GITHUB_ENABLE') ? null : {
-    get clientID() {
-      return process.env.GITHUB_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.GITHUB_CLIENT_SECRET
-    },
-    get authorizationURL() {
-      return process.env.GITHUB_AUTHORIZATION_URL
-    },
-    get tokenURL() {
-      return process.env.GITHUB_TOKEN_URL
-    },
-    get userProfileURL() {
-      return process.env.GITHUB_USER_PROFILE_URL
+  get github() {
+    return !castBooleanEnv('GITHUB_ENABLE') ? null : {
+      get clientID() {
+        return process.env.GITHUB_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.GITHUB_CLIENT_SECRET
+      },
+      get authorizationURL() {
+        return process.env.GITHUB_AUTHORIZATION_URL
+      },
+      get tokenURL() {
+        return process.env.GITHUB_TOKEN_URL
+      },
+      get userProfileURL() {
+        return process.env.GITHUB_USER_PROFILE_URL
+      }
     }
-  }
-})
+  },
 
-// Google OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'google', {
-  get: () => !castBooleanEnv('GOOGLE_ENABLE') ? null : {
-    get clientID() {
-      return process.env.GITHUB_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.GITHUB_CLIENT_SECRET
-    },
-  }
-})
+  get google() {
+    return !castBooleanEnv('GOOGLE_ENABLE') ? null : {
+      get clientID() {
+        return process.env.GITHUB_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.GITHUB_CLIENT_SECRET
+      },
+    }
+  },
 
-// Google OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'facebook', {
-  get: () => !castBooleanEnv('FACEBOOK_ENABLE') ? null : {
-    get clientID() {
-      return process.env.FACEBOOK_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.FACEBOOK_CLIENT_SECRET
-    },
-  }
-})
+  get facebook() {
+    return !castBooleanEnv('FACEBOOK_ENABLE') ? null : {
+      get clientID() {
+        return process.env.FACEBOOK_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.FACEBOOK_CLIENT_SECRET
+      },
+    }
+  },
 
-// Twitter provider settings
-Object.defineProperty(PROVIDERS, 'twitter', {
-  get: () => !castBooleanEnv('TWITTER_ENABLE') ? null : {
-    get consumerKey() {
-      return process.env.TWITTER_CONSUMER_KEY
-    },
-    get consumerSecret() {
-      return process.env.TWITTER_CONSUMER_SECRET
-    },
-  }
-})
+  get twitter() {
+    return !castBooleanEnv('TWITTER_ENABLE') ? null : {
+      get consumerKey() {
+        return process.env.TWITTER_CONSUMER_KEY
+      },
+      get consumerSecret() {
+        return process.env.TWITTER_CONSUMER_SECRET
+      },
+    }
+  },
 
-// LinkedIn OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'linkedin', {
-  get: () => !castBooleanEnv('LINKEDIN_ENABLE') ? null : {
-    get clientID() {
-      return process.env.LINKEDIN_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.LINKEDIN_CLIENT_SECRET
-    },
-  }
-})
+  get linkedin() {
+    return !castBooleanEnv('LINKEDIN_ENABLE') ? null : {
+      get clientID() {
+        return process.env.LINKEDIN_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.LINKEDIN_CLIENT_SECRET
+      },
+    }
+  },
 
-// Apple OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'apple', {
-  get: () => {
+  get apple() {
     if (!castBooleanEnv('APPLE_ENABLE')) return null;
     try {
-      PROVIDERS.apple = {
+      return {
         get clientID() {
           return process.env.APPLE_CLIENT_ID
         },
@@ -109,31 +96,29 @@ Object.defineProperty(PROVIDERS, 'apple', {
     } catch (e) {
       throw Boom.badImplementation(`Invalid Apple OAuth Key file.`)
     }
-  }
-})
+  },
 
-// Microsoft Windows Live SSO provider settings
-Object.defineProperty(PROVIDERS, 'windowslive', {
-  get: () => !castBooleanEnv('WINDOWS_LIVE_ENABLE') ? null : {
-    get clientID() {
-      return process.env.WINDOWS_LIVE_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.WINDOWS_LIVE_CLIENT_SECRET
-    },
-  }
-})
+  get windowslive() {
+    return !castBooleanEnv('WINDOWS_LIVE_ENABLE') ? null : {
+      get clientID() {
+        return process.env.WINDOWS_LIVE_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.WINDOWS_LIVE_CLIENT_SECRET
+      },
+    }
+  },
 
-// Spotify OAuth2 provider settings
-Object.defineProperty(PROVIDERS, 'spotify', {
-  get: () => !castBooleanEnv('SPOTIFY_ENABLE') ? null : {
-    get clientID() {
-      return process.env.SPOTIFY_CLIENT_ID
-    },
-    get clientSecret() {
-      return process.env.SPOTIFY_CLIENT_SECRET
-    },
+  get spotify() {
+    return !castBooleanEnv('SPOTIFY_ENABLE') ? null : {
+      get clientID() {
+        return process.env.SPOTIFY_CLIENT_ID
+      },
+      get clientSecret() {
+        return process.env.SPOTIFY_CLIENT_SECRET
+      },
+    }
   }
-})
+}
 
 export { PROVIDERS }
