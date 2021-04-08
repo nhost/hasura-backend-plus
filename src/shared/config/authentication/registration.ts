@@ -19,7 +19,7 @@ export const REGISTRATION = {
   get HIBP_ENABLE() {
     return castBooleanEnv('HIBP_ENABLE')
   },
-  get REGISTRATION_CUSTOM_FIELDS() {
+  get CUSTOM_FIELDS() {
     return castStringArrayEnv('REGISTRATION_CUSTOM_FIELDS')
   },
   get MIN_PASSWORD_LENGTH() {
