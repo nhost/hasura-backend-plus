@@ -1,4 +1,4 @@
-import { ALLOWED_EMAIL_DOMAINS, REGISTRATION_CUSTOM_FIELDS, MIN_PASSWORD_LENGTH } from './config'
+import { REGISTRATION } from './config'
 import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
@@ -21,9 +21,9 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
         return this.$_addRule({ name: 'allowedDomains' })
       },
       validate(value: string, helpers): unknown {
-        if (ALLOWED_EMAIL_DOMAINS) {
+        if (REGISTRATION.ALLOWED_EMAIL_DOMAINS) {
           const lowerValue = value.toLowerCase()
-          const allowedEmailDomains = ALLOWED_EMAIL_DOMAINS.split(',')
+          const allowedEmailDomains = REGISTRATION.ALLOWED_EMAIL_DOMAINS.split(',')
 
           if (allowedEmailDomains.every((domain) => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
@@ -36,7 +36,7 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(MIN_PASSWORD_LENGTH).max(128).required()
+const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128).required()
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
@@ -47,7 +47,7 @@ const accountFields = {
 
 export const userDataFields = {
   user_data: Joi.object(
-    REGISTRATION_CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
+    REGISTRATION.CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
       (aggr, key) => ({
         ...aggr,
         [key]: [

@@ -3,13 +3,7 @@ import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import {
-  REDIRECT,
-  SERVER_URL,
-  PROVIDERS,
-  DEFAULT_USER_ROLE,
-  DEFAULT_ALLOWED_USER_ROLES,
-} from '@shared/config'
+import { PROVIDERS, APPLICATION, REGISTRATION} from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -94,9 +88,9 @@ const manageProviderStrategy = (
     email,
     password_hash: null,
     active: true,
-    default_role: DEFAULT_USER_ROLE,
+    default_role: REGISTRATION.DEFAULT_USER_ROLE,
     account_roles: {
-      data: DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
+      data: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
     user: { data: { display_name: display_name || email, avatar_url } },
     account_providers: {
@@ -128,16 +122,16 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   try {
     refresh_token = await setRefreshToken(res, account.id, true)
   } catch (e) {
-    res.redirect(REDIRECT.PROVIDER_FAILURE as string)
+    res.redirect(PROVIDERS.REDIRECT_FAILURE as string)
   }
 
   // redirect back user to app url
-  res.redirect(`${REDIRECT.PROVIDER_SUCCESS}?refresh_token=${refresh_token}`)
+  res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: string,
+  strategyName: 'github'|'google'|'facebook'|'twitter'|'linkedin'|'apple'|'windowslive'|'spotify',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
 ): void => {
@@ -156,7 +150,7 @@ export const initProvider = <T extends Strategy>(
       {
         ...PROVIDERS[strategyName],
         ...options,
-        callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
+        callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
         passReqToCallback: true
       },
       manageProviderStrategy(strategyName, transformProfile)
@@ -169,7 +163,7 @@ export const initProvider = <T extends Strategy>(
 
   const handlers = [
     passport.authenticate(strategyName, {
-      failureRedirect: PROVIDER_FAILURE_REDIRECT,
+      failureRedirect: PROVIDERS.REDIRECT_FAILURE,
       session: false
     }),
     providerCallback

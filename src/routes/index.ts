@@ -1,5 +1,3 @@
-import { AUTH_ENABLE, STORAGE_ENABLE } from '@shared/config'
-
 import { Router } from 'express'
 import auth from './auth'
 import storage from './storage'
@@ -7,13 +5,9 @@ import Boom from '@hapi/boom'
 
 const router = Router()
 
-if (AUTH_ENABLE) {
-  router.use('/auth', auth)
-}
+router.use('/auth', auth)
 
-if (STORAGE_ENABLE) {
-  router.use('/storage', storage)
-}
+router.use('/storage', storage)
 
 router.get('/healthz', (_req, res) => res.send('OK'))
 router.get('/version', (_req, res) =>

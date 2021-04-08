@@ -9,7 +9,7 @@ import {
 } from './utils'
 
 import Boom from '@hapi/boom'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 
@@ -33,7 +33,7 @@ export const deleteFile = async (
   } else {
     // * Delete the object, sharp
     const params = {
-      Bucket: S3_BUCKET as string,
+      Bucket: STORAGE.S3_BUCKET,
       Key: getKey(req)
     }
     try {

@@ -9,13 +9,7 @@ import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
-import {
-  ADMIN_SECRET_HEADER,
-  ANONYMOUS_USERS_ENABLE,
-  DEFAULT_ANONYMOUS_ROLE,
-  HASURA_GRAPHQL_ADMIN_SECRET,
-  USER_IMPERSONATION_ENABLE
-} from '@shared/config'
+import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 
 interface HasuraData {
   insert_auth_accounts: {
@@ -28,7 +22,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
-  if (ANONYMOUS_USERS_ENABLE) {
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
@@ -43,9 +37,9 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
             ticket,
             active: true,
             is_anonymous: true,
-            default_role: DEFAULT_ANONYMOUS_ROLE,
+            default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
             account_roles: {
-              data: [{ role: DEFAULT_ANONYMOUS_ROLE }]
+              data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
             },
             user: {
               data: { display_name: 'Anonymous user' }
@@ -90,13 +84,13 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // Handle User Impersonation Check
-  const adminSecret = headers[ADMIN_SECRET_HEADER]
+  const adminSecret = headers[HEADERS.ADMIN_SECRET_HEADER]
   const hasAdminSecret = Boolean(adminSecret)
-  const isAdminSecretCorrect = adminSecret === HASURA_GRAPHQL_ADMIN_SECRET
+  const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
   let userImpersonationValid = false;
-  if (USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
+  if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
     throw Boom.unauthorized('Invalid x-admin-secret')
-  } else if (USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
+  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
     userImpersonationValid = true;
   }
 

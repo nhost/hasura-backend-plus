@@ -4,7 +4,7 @@ import Boom from '@hapi/boom'
 
 import { setNewTicket, setNewEmail } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
-import { EMAILS_ENABLE, SERVER_URL } from '@shared/config'
+import { APPLICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
 import { SetNewEmailData } from '@shared/types'
@@ -16,7 +16,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
   const { user_id, new_email } = await getRequestInfo(req)
 
   // smtp must be enabled for request change password to work.
-  if (!EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLE) {
     throw Boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -52,7 +52,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
       template: 'change-email',
       locals: {
         ticket,
-        url: SERVER_URL,
+        url: APPLICATION.SERVER_URL,
         display_name
       },
       message: {
