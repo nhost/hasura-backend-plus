@@ -85,7 +85,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run Jest tests
-        run: yarn run test:ci
+        run: yarn run test
       - name: Upload test results
         uses: actions/upload-artifact@v1
         with:
