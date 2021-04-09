@@ -129,15 +129,12 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
-// NOTE: not a complete type, just what is needed for initProvided
-type ExpressMiddleware = RequestHandler | [string, RequestHandler]
-
 export const initProvider = <T extends Strategy>(
   router: Router,
   strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
-  middleware?: ExpressMiddleware | ExpressMiddleware[]
+  middleware?: RequestHandler[]
 ): void => {
   const {
     transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
@@ -153,12 +150,7 @@ export const initProvider = <T extends Strategy>(
   const subRouter = Router()
 
   if(middleware) {
-    if(!Array.isArray(middleware)) middleware = [middleware]
-
-    for(const m of middleware) {
-      if(Array.isArray(m)) subRouter.use(...m)
-      else subRouter.use(m as RequestHandler)
-    }
+    subRouter.use(middleware)
   }
 
   let registered = false
@@ -193,7 +185,7 @@ export const initProvider = <T extends Strategy>(
   ]
   if (callbackMethod === 'POST') {
     // The Sign in with Apple auth provider requires a POST route for authentication
-    subRouter.post('/callback', express.urlencoded(), ...handlers)
+    subRouter.post('/callback', express.urlencoded({ extended: true }), ...handlers)
   } else {
     subRouter.get('/callback', ...handlers)
   }
