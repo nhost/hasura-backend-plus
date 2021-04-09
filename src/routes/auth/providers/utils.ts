@@ -1,4 +1,4 @@
-import express, { Response, Router } from 'express'
+import express, { RequestHandler, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
@@ -129,11 +129,15 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
+// NOTE: not a complete type, just what is needed for initProvided
+type ExpressMiddleware = RequestHandler | [string, RequestHandler]
+
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github'|'google'|'facebook'|'twitter'|'linkedin'|'apple'|'windowslive'|'spotify',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
   strategy: Constructable<T>,
-  settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
+  settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
+  middleware?: ExpressMiddleware | ExpressMiddleware[]
 ): void => {
   const {
     transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
@@ -145,19 +149,38 @@ export const initProvider = <T extends Strategy>(
     callbackMethod = 'GET',
     ...options
   } = settings
-  passport.use(
-    new strategy(
-      {
-        ...PROVIDERS[strategyName],
-        ...options,
-        callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
-        passReqToCallback: true
-      },
-      manageProviderStrategy(strategyName, transformProfile)
-    )
-  )
 
   const subRouter = Router()
+
+  if(middleware) {
+    if(!Array.isArray(middleware)) middleware = [middleware]
+
+    for(const m of middleware) {
+      if(Array.isArray(m)) subRouter.use(...m)
+      else subRouter.use(m as RequestHandler)
+    }
+  }
+
+  let registered = false
+
+  subRouter.use((req, res, next) => {
+    if(!registered) {
+      passport.use(
+        new strategy(
+          {
+            ...PROVIDERS[strategyName],
+            ...options,
+            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
+            passReqToCallback: true
+          },
+          manageProviderStrategy(strategyName, transformProfile)
+        )
+      )
+
+      registered = true
+    }
+    next()
+  })
 
   subRouter.get('/', passport.authenticate(strategyName, { session: false }))
 

@@ -58,6 +58,5 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
     req.permission_variables = getPermissionVariablesFromCookie(req)
   }
 
-  // if (refresh_token) console.log('in auth middleware')
   next()
 }
