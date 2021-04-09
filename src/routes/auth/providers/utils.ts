@@ -134,7 +134,7 @@ export const initProvider = <T extends Strategy>(
   strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
-  middleware?: RequestHandler[]
+  middleware?: RequestHandler
 ): void => {
   const {
     transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
