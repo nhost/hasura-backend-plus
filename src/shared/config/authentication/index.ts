@@ -10,7 +10,7 @@ export * from './cookies'
  * * Authentication settings
  */
 export const AUTHENTICATION = {
-  get AUTH_ENABLE() {
+  get ENABLE() {
     return castBooleanEnv('AUTH_ENABLE', true)
   },
   get AUTH_LOCAL_USERS_ENABLE() {

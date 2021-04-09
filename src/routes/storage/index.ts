@@ -10,7 +10,7 @@ import Boom from '@hapi/boom'
 const router = Router()
 
 router.use((req, res, next) => {
-  if(!STORAGE.STORAGE_ENABLE) {
+  if(!STORAGE.ENABLE) {
     throw Boom.badImplementation(`Please set the STORAGE_ENABLE env variable to true to use the storage routes.`)
   } else {
     return next();
