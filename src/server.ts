@@ -1,4 +1,4 @@
-import { COOKIE_SECRET, AUTH_HAS_ONE_PROVIDER } from '@shared/config'
+import { COOKIES } from '@shared/config'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
@@ -29,15 +29,13 @@ app.use(json())
 app.use(cors({ credentials: true, origin: true }))
 app.use(fileUpload())
 
-if (AUTH_HAS_ONE_PROVIDER) {
-  app.use(passport.initialize())
-}
+app.use(passport.initialize())
 
 /**
  * Set a cookie secret to enable server validation of cookies.
  */
-if (COOKIE_SECRET) {
-  app.use(cookieParser(COOKIE_SECRET))
+if (COOKIES.SECRET) {
+  app.use(cookieParser(COOKIES.SECRET))
 } else {
   app.use(cookieParser())
 }

@@ -7,10 +7,14 @@ import { request } from '@shared/request'
 import { verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
 import { v4 as uuidv4 } from 'uuid'
-import { NOTIFY_EMAIL_CHANGE, EMAILS_ENABLE, SERVER_URL } from '@shared/config'
+import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 
 async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
+  if(!AUTHENTICATION.VERIFY_EMAILS) {
+    throw Boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/change route.`)
+  }
+
   const { ticket } = await verifySchema.validateAsync(body)
 
   const { email, new_email, user } = await selectAccountByTicket(ticket)
@@ -26,12 +30,12 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if (NOTIFY_EMAIL_CHANGE && EMAILS_ENABLE) {
+  if (AUTHENTICATION.NOTIFY_EMAIL_CHANGE && APPLICATION.EMAILS_ENABLE) {
     try {
       await emailClient.send({
         template: 'notify-email-change',
         locals: {
-          url: SERVER_URL,
+          url: APPLICATION.SERVER_URL,
           display_name: user.display_name
         },
         message: {

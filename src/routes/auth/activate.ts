@@ -1,4 +1,4 @@
-import { REDIRECT_URL_ERROR, REDIRECT_URL_SUCCESS } from '@shared/config'
+import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
 
 import Boom from '@hapi/boom'
@@ -10,6 +10,10 @@ import { verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
+  if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
+    throw Boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
+  }
+
   let hasuraData: UpdateAccountData
 
   const { ticket } = await verifySchema.validateAsync(query)
@@ -24,8 +28,8 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     })
   } catch (err) /* istanbul ignore next */ {
     console.error(err)
-    if (REDIRECT_URL_ERROR) {
-      return res.redirect(302, REDIRECT_URL_ERROR as string)
+    if (APPLICATION.REDIRECT_URL_ERROR) {
+      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
     }
     throw err
   }
@@ -35,15 +39,15 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   if (!affected_rows) {
     console.error('Invalid or expired ticket')
 
-    if (REDIRECT_URL_ERROR) {
-      return res.redirect(302, REDIRECT_URL_ERROR as string)
+    if (APPLICATION.REDIRECT_URL_ERROR) {
+      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
     }
     /* istanbul ignore next */
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if (REDIRECT_URL_SUCCESS) {
-    return res.redirect(302, REDIRECT_URL_SUCCESS as string)
+  if (APPLICATION.REDIRECT_URL_SUCCESS) {
+    return res.redirect(302, APPLICATION.REDIRECT_URL_SUCCESS as string)
   }
 
   res.status(200).send('Your account has been activated. You can close this window and login')

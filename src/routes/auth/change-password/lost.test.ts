@@ -1,10 +1,10 @@
 import 'jest-extended'
 
-import { LOST_PASSWORD_ENABLE } from '@shared/config'
+import { AUTHENTICATION } from '@shared/config'
 import { account, request } from '@test/test-mock-account'
 import { mailHogSearch, deleteMailHogEmail } from '@test/test-utils'
 
-const describeIfSecurePasswordChange = LOST_PASSWORD_ENABLE ? describe : describe.skip
+const describeIfSecurePasswordChange = AUTHENTICATION.LOST_PASSWORD_ENABLE ? describe : describe.skip
 describeIfSecurePasswordChange('Reset lost password', () => {
   let ticket: string
 

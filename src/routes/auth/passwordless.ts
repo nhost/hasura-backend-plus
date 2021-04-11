@@ -1,6 +1,5 @@
-import { REDIRECT_URL_ERROR, REDIRECT_URL_SUCCESS } from '@shared/config'
+import { APPLICATION } from '@shared/config'
 import { Request, Response } from 'express'
-
 import Boom from '@hapi/boom'
 import { accountOfRefreshToken, activateAccount } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
@@ -30,8 +29,8 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
       })
     } catch (err) /* istanbul ignore next */ {
       console.error(err)
-      if (REDIRECT_URL_ERROR) {
-        return res.redirect(302, REDIRECT_URL_ERROR as string)
+      if (APPLICATION.REDIRECT_URL_ERROR) {
+        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
       }
       throw err
     }
@@ -41,8 +40,8 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
     if (!affected_rows) {
       console.error('Invalid or expired ticket')
 
-      if (REDIRECT_URL_ERROR) {
-        return res.redirect(302, REDIRECT_URL_ERROR as string)
+      if (APPLICATION.REDIRECT_URL_ERROR) {
+        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
       }
       /* istanbul ignore next */
       throw Boom.unauthorized('Invalid or expired token.')
@@ -75,7 +74,7 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
   if (!useCookie) session.refresh_token = refresh_token
 
   if(action === 'log-in') {
-    return res.redirect(`${REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
+    return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
   }
 
   res.send(session)

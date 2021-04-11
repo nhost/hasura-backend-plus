@@ -5,8 +5,13 @@ import { asyncWrapper } from '@shared/helpers'
 import { deleteAccountByUserId } from '@shared/queries'
 import { request } from '@shared/request'
 import { DeleteAccountData, RequestExtended } from '@shared/types'
+import { AUTHENTICATION } from '@shared/config'
 
 async function deleteUser(req: RequestExtended, res: Response): Promise<unknown> {
+  if(!AUTHENTICATION.ALLOW_USER_SELF_DELETE) {
+    throw Boom.badImplementation(`Please set the ALLOW_USER_SELF_DELETE env variable to true to use the auth/delete route.`)
+  }
+
   if (!req.permission_variables) {
     throw Boom.unauthorized('Unable to delete account')
   }

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
 import Boom from '@hapi/boom'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import { UploadedFile } from 'express-fileupload'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
@@ -41,7 +41,7 @@ export const uploadFile = async (
 
     // * Create or update the object
     const upload_params = {
-      Bucket: S3_BUCKET as string,
+      Bucket: STORAGE.S3_BUCKET,
       Key: key,
       Body: resource.data,
       ContentType: resource.mimetype,
@@ -73,9 +73,9 @@ export const uploadFile = async (
 
       // As S3 objects are immutable, we need to replace the entire object by its copy
       const params = {
-        Bucket: S3_BUCKET as string,
+        Bucket: STORAGE.S3_BUCKET,
         Key: key,
-        CopySource: `${S3_BUCKET}/${key}`,
+        CopySource: `${STORAGE.S3_BUCKET}/${key}`,
         ContentType: oldHeadObject?.ContentType,
         Metadata: {
           ...oldHeadObject?.Metadata,

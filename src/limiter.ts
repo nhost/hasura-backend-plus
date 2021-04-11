@@ -1,4 +1,4 @@
-import { MAX_REQUESTS, TIME_FRAME } from '@shared/config'
+import { APPLICATION } from '@shared/config'
 import rateLimit, { Message } from 'express-rate-limit'
 
 /**
@@ -16,8 +16,8 @@ interface LimitMessage extends Message {
 export const limiter = rateLimit({
   headers: true,
 
-  max: MAX_REQUESTS,
-  windowMs: TIME_FRAME,
+  max: APPLICATION.MAX_REQUESTS,
+  windowMs: APPLICATION.TIME_FRAME,
   skip: ({ path }) => {
     // Don't limit health checks. See https://github.com/nhost/hasura-backend-plus/issues/175
     if (path === '/healthz') return true

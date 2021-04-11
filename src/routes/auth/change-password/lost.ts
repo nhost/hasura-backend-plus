@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import Boom from '@hapi/boom'
 
 import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
-import { EMAILS_ENABLE, SERVER_URL } from '@shared/config'
+import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
@@ -14,8 +14,12 @@ import { request } from '@shared/request'
  * Always return status code 204 in order to not leak information about emails in the database
  */
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
+  if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
+    throw Boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
+  }
+
   // smtp must be enabled for request change password to work.
-  if (!EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLE) {
     throw Boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -59,7 +63,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
       template: 'lost-password',
       locals: {
         ticket,
-        url: SERVER_URL,
+        url: APPLICATION.SERVER_URL,
         display_name: account.user.display_name
       },
       message: {

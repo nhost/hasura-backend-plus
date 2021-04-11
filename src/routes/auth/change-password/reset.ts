@@ -7,11 +7,16 @@ import { resetPasswordWithTicketSchema } from '@shared/validation'
 import { updatePasswordWithTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { UpdateAccountData, RequestExtended } from '@shared/types'
+import { AUTHENTICATION } from '@shared/config'
 
 /**
  * Reset the password, either from a valid ticket or from a valid JWT and a valid password
  */
 async function resetPassword(req: RequestExtended, res: Response): Promise<unknown> {
+  if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
+    throw Boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/change route.`)
+  }
+
   // Reset the password from { ticket, new_password }
   const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(req.body)
 

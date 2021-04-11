@@ -1,7 +1,7 @@
 import fetch, { Response } from 'node-fetch'
 import request, { SuperTest, Test } from 'supertest'
 
-import { SMTP_HOST, AUTO_ACTIVATE_NEW_USERS } from '@shared/config'
+import { APPLICATION, REGISTRATION } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -61,13 +61,13 @@ export const createAccount = (): TestAccount => ({
 
 export const mailHogSearch = async (query: string, fields = 'to'): Promise<MailhogMessage[]> => {
   const response = await fetch(
-    `http://${SMTP_HOST}:8025/api/v2/search?kind=${fields}&query=${query}`
+    `http://${APPLICATION.SMTP_HOST}:8025/api/v2/search?kind=${fields}&query=${query}`
   )
   return ((await response.json()) as MailhogSearchResult).items
 }
 
 export const deleteMailHogEmail = async ({ ID }: MailhogMessage): Promise<Response> =>
-  await fetch(`http://${SMTP_HOST}:8025/api/v1/messages/${ID}`, { method: 'DELETE' })
+  await fetch(`http://${APPLICATION.SMTP_HOST}:8025/api/v1/messages/${ID}`, { method: 'DELETE' })
 
 export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
   (await mailHogSearch(email)).forEach(async (message) => await deleteMailHogEmail(message))
@@ -93,7 +93,7 @@ export const itif = (condition: boolean): jest.It => (condition ? it : it.skip)
 export const registerAccount = async (agent: SuperTest<Test>): Promise<TestAccount> => {
   const { email, password } = createAccount()
   await agent.post('/auth/register').send({ email, password })
-  if (!AUTO_ACTIVATE_NEW_USERS) {
+  if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     const { ticket } = await selectAccountByEmail(email)
     await agent.get(`/auth/activate?ticket=${ticket}`)
     await deleteEmailsOfAccount(email)

@@ -4,7 +4,7 @@ import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from 
 import Boom from '@hapi/boom'
 import sharp from 'sharp'
 import { createHash } from 'crypto'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
@@ -52,7 +52,7 @@ export const getFile = async (
       const JPEG = 'image/jpeg'
 
       const params = {
-        Bucket: S3_BUCKET as string,
+        Bucket: STORAGE.S3_BUCKET,
         Key: key
       }
       const contentType = headObject?.ContentType
@@ -137,7 +137,7 @@ export const getFile = async (
       }
 
       const params = {
-        Bucket: S3_BUCKET as string,
+        Bucket: STORAGE.S3_BUCKET,
         Key: key,
         Range: range
       }

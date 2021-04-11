@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import Boom from '@hapi/boom'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import fs from 'fs'
 import path from 'path'
 import { s3 } from '@shared/s3'
@@ -128,7 +128,7 @@ export const getHeadObject = async (
   ignoreErrors = false
 ): Promise<HeadObjectOutput | undefined> => {
   const params = {
-    Bucket: S3_BUCKET as string,
+    Bucket: STORAGE.S3_BUCKET,
     Key: getKey(req)
   }
   try {
@@ -151,9 +151,9 @@ export const replaceMetadata = async (
 
   // As S3 objects are immutable, we need to replace the entire object by its copy
   const params = {
-    Bucket: S3_BUCKET as string,
+    Bucket: STORAGE.S3_BUCKET,
     Key: key,
-    CopySource: `${S3_BUCKET}/${key}`,
+    CopySource: `${STORAGE.S3_BUCKET}/${key}`,
     ContentType: oldHeadObject?.ContentType,
     Metadata: {
       ...((keepOldMetadata && oldHeadObject?.Metadata) || {

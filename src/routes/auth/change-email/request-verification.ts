@@ -4,7 +4,7 @@ import Boom from '@hapi/boom'
 
 import { setNewTicket, setNewEmail } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
-import { EMAILS_ENABLE, SERVER_URL } from '@shared/config'
+import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
 import { SetNewEmailData } from '@shared/types'
@@ -13,10 +13,14 @@ import { getRequestInfo } from './utils'
 import { RequestExtended } from '@shared/types'
 
 async function requestChangeEmail(req: RequestExtended, res: Response): Promise<unknown> {
+  if(!AUTHENTICATION.VERIFY_EMAILS) {
+    throw Boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/request route.`)
+  }
+
   const { user_id, new_email } = await getRequestInfo(req)
 
   // smtp must be enabled for request change password to work.
-  if (!EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLE) {
     throw Boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -52,7 +56,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
       template: 'change-email',
       locals: {
         ticket,
-        url: SERVER_URL,
+        url: APPLICATION.SERVER_URL,
         display_name
       },
       message: {
