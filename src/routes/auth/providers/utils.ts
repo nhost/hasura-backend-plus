@@ -122,7 +122,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   try {
     refresh_token = await setRefreshToken(res, account.id, true)
   } catch (e) {
-    res.redirect(PROVIDERS.REDIRECT_FAILURE as string)
+    res.redirect(PROVIDERS.REDIRECT_FAILURE)
   }
 
   // redirect back user to app url

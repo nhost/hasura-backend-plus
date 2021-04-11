@@ -30,7 +30,7 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
     } catch (err) /* istanbul ignore next */ {
       console.error(err)
       if (APPLICATION.REDIRECT_URL_ERROR) {
-        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
+        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR)
       }
       throw err
     }
@@ -41,7 +41,7 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
       console.error('Invalid or expired ticket')
 
       if (APPLICATION.REDIRECT_URL_ERROR) {
-        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
+        return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR)
       }
       /* istanbul ignore next */
       throw Boom.unauthorized('Invalid or expired token.')

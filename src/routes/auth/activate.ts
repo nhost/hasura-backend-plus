@@ -29,7 +29,7 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   } catch (err) /* istanbul ignore next */ {
     console.error(err)
     if (APPLICATION.REDIRECT_URL_ERROR) {
-      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
+      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR)
     }
     throw err
   }
@@ -40,14 +40,14 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     console.error('Invalid or expired ticket')
 
     if (APPLICATION.REDIRECT_URL_ERROR) {
-      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR as string)
+      return res.redirect(302, APPLICATION.REDIRECT_URL_ERROR)
     }
     /* istanbul ignore next */
     throw Boom.unauthorized('Invalid or expired ticket.')
   }
 
   if (APPLICATION.REDIRECT_URL_SUCCESS) {
-    return res.redirect(302, APPLICATION.REDIRECT_URL_SUCCESS as string)
+    return res.redirect(302, APPLICATION.REDIRECT_URL_SUCCESS)
   }
 
   res.status(200).send('Your account has been activated. You can close this window and login')

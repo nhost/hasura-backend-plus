@@ -20,7 +20,7 @@ export const listFile = async (
     throw Boom.forbidden()
   }
   const params = {
-    Bucket: STORAGE.S3_BUCKET as string,
+    Bucket: STORAGE.S3_BUCKET,
     Prefix: key.slice(0, -1)
   }
   const list = await s3.listObjectsV2(params).promise()
