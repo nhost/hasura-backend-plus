@@ -74,11 +74,8 @@ it('should create an account without a password when passwordless login is enabl
     await deleteMailHogEmail(message)
 
     {
-      const { body, status } = await request.get(`/auth/passwordless?action=sign-up&token=${token}`)
-      expect(status).toBe(200)
-      expect(body.jwt_token).toBeString()
-      expect(body.jwt_expires_in).toBeNumber()
-      expect(body.user).toBeTruthy()
+      const { status } = await request.get(`/auth/passwordless?action=sign-up&token=${token}`)
+      expect(status).toBe(302)
     }
   })
 })
