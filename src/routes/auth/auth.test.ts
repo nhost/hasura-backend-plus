@@ -11,6 +11,7 @@ import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { app } from '../../server'
 import { SuperTest, Test, agent } from 'supertest'
+import { withEnv } from '../../test/test-utils'
 
 /**
  * Store variables in memory.
@@ -22,6 +23,7 @@ let jwtToken: string
  */
 const email = `${generateRandomString()}@${generateRandomString()}.com`
 const password = generateRandomString()
+const passwordlessEmail = `${generateRandomString()}@${generateRandomString()}.com`
 
 let request: SuperTest<Test>
 
@@ -51,6 +53,46 @@ it('should create an account', async () => {
     .post('/auth/register')
     .send({ email, password, user_data: { name: 'Test name' } })
   expect(status).toEqual(200)
+})
+
+it('should create an account without a password when passwordless login is enabled', async () => {
+  await withEnv({
+    ENABLE_PASSWORDLESS: 'true'
+  }, request, async () => {
+    const { body, status } = await request
+      .post('/auth/register')
+      .send({ email: passwordlessEmail, user_data: { name: 'Test name' } })
+
+    expect(status).toEqual(200)
+    expect(body.jwt_token).toBeNull()
+    expect(body.jwt_expires_in).toBeNull()
+    expect(body.user).toBeTruthy()
+
+    const [message] = await mailHogSearch(passwordlessEmail)
+    expect(message).toBeTruthy()
+    const token = message.Content.Headers['X-Token'][0]
+    await deleteMailHogEmail(message)
+
+    {
+      const { body, status } = await request.get(`/auth/passwordless?action=sign-up&token=${token}`)
+      expect(status).toBe(200)
+      expect(body.jwt_token).toBeString()
+      expect(body.jwt_expires_in).toBeNumber()
+      expect(body.user).toBeTruthy()
+    }
+  })
+})
+
+it('should not create an account without a password when passwordless login is disabled', async () => {
+  await withEnv({
+    ENABLE_PASSWORDLESS: 'false'
+  }, request, async () => {
+    const { status } = await request
+      .post('/auth/register')
+      .send({ email: passwordlessEmail, user_data: { name: 'Test name' } })
+
+    expect(status).toEqual(400)
+  })
 })
 
 it('should fail to create account with unallowed role', async () => {
@@ -164,6 +206,37 @@ it('should sign the user in', async () => {
   expect(status).toEqual(200)
   expect(body.jwt_token).toBeString()
   expect(body.jwt_expires_in).toBeNumber()
+})
+
+it('should sign the user in without password when passwordless is enabled', async () => {
+  await withEnv({
+    ENABLE_PASSWORDLESS: 'true'
+  }, request, async () => {
+    const { body, status } = await request.post('/auth/login').send({ email: passwordlessEmail })
+    expect(status).toEqual(200)
+    expect(body.jwt_token).toBeNull()
+    expect(body.jwt_expires_in).toBeNull()
+    expect(body.user).toBeNull()
+
+    const [message] = await mailHogSearch(passwordlessEmail)
+    expect(message).toBeTruthy()
+    const token = message.Content.Headers['X-Token'][0]
+    await deleteMailHogEmail(message)
+
+    {
+      const { status } = await request.get(`/auth/passwordless?action=log-in&token=${token}`)
+      expect(status).toBe(302)
+    }
+  })
+})
+
+it('should not sign the user in without password when passwordless is disabled', async () => {
+  await withEnv({
+    ENABLE_PASSWORDLESS: 'false'
+  }, request, async () => {
+    const { status } = await request.post('/auth/login').send({ email: passwordlessEmail })
+    expect(status).toEqual(400)
+  });
 })
 
 it('should not sign user in with invalid admin secret', async () => {

@@ -116,3 +116,11 @@ export const deleteAccount = async (
   // * Remove any message sent to this account
   await deleteEmailsOfAccount(account.email)
 }
+
+export async function withEnv(env: any, request: SuperTest<Test>, cb: () => Promise<any>, rollbackEnv?: any) {
+  await request.post('/change-env').send(env)
+  await cb()
+  if(rollbackEnv) {
+    await request.post('/change-env').send(rollbackEnv)
+  }
+}

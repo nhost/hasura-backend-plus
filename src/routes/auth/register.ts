@@ -100,6 +100,12 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
           template: 'passwordless',
           message: {
             to: user.email,
+            headers: {
+              'x-token': {
+                prepared: true,
+                value: ticket
+              }
+            }
           },
           locals: {
             display_name,

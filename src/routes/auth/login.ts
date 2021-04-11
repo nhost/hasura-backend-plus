@@ -88,6 +88,12 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
         template: 'passwordless',
         message: {
           to: email,
+          headers: {
+            'x-token': {
+              prepared: true,
+              value: refresh_token
+            }
+          }
         },
         locals: {
           display_name: account.user.display_name,
