@@ -155,6 +155,6 @@ export const fileMetadataUpdate = Joi.object({
 
 export const passwordlessQuery = Joi.object({
   token: Joi.string().required(),
-  action: Joi.string().required(),
+  action: Joi.string().valid('log-in', 'sign-up').required(),
   cookie: Joi.boolean().optional(),
 });
