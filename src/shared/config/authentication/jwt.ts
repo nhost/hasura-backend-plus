@@ -4,7 +4,6 @@ import { castIntEnv, castStringArrayEnv } from '../utils'
 /**
  * * Authentication settings
  */
-
 export const JWT = {
   get KEY() {
     return process.env.JWT_KEY || ''
