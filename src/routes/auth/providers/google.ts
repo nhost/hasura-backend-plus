@@ -6,12 +6,14 @@ import { PROVIDERS } from '@shared/config'
 
 export default (router: Router): void => {
   const options = PROVIDERS.google
-  // Checks if the strategy is enabled. Don't create any route otherwise
-  if (options) {
-    // Checks if the strategy has at least a client ID and a client secret
-    if (!options.clientID || !options.clientSecret) {
+
+  initProvider(router, 'google', Strategy, { scope: ['email', 'profile'] }, (req, res, next) => {
+    if(!PROVIDERS.google) {
+      throw Boom.badImplementation(`Please set the GOOGLE_ENABLE env variable to true to use the auth/providers/google routes.`)
+    } else if (!options?.clientID || !options?.clientSecret) {
       throw Boom.badImplementation(`Missing environment variables for Google OAuth.`)
+    } else {
+      return next();
     }
-    initProvider(router, 'google', Strategy, { scope: ['email', 'profile'] })
-  }
+  })
 }

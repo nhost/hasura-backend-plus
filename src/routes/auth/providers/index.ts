@@ -1,4 +1,3 @@
-import { AUTH_HAS_ONE_PROVIDER } from '@shared/config'
 import { Router } from 'express'
 
 import github from './github'
@@ -10,20 +9,15 @@ import windowslive from './windowslive'
 import linkedin from './linkedin'
 import spotify from './spotify'
 
-const initRoutes = (): Router | undefined => {
-  if (AUTH_HAS_ONE_PROVIDER) {
-    // Create the middleware only if at least one provider is enabled
-    const router = Router()
-    github(router)
-    google(router)
-    facebook(router)
-    twitter(router)
-    apple(router)
-    windowslive(router)
-    linkedin(router)
-    spotify(router)
-    return router
-  }
-}
+const router = Router()
 
-export default initRoutes()
+github(router)
+google(router)
+facebook(router)
+twitter(router)
+apple(router)
+windowslive(router)
+linkedin(router)
+spotify(router)
+
+export default router

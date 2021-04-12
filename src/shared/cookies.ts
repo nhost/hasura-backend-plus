@@ -1,4 +1,4 @@
-import { COOKIE_SECRET, JWT_REFRESH_EXPIRES_IN, COOKIE_SECURE, COOKIE_SAME_SITE } from './config'
+import { COOKIES, JWT } from './config'
 
 import { Response } from 'express'
 import { insertRefreshToken } from './queries'
@@ -18,7 +18,7 @@ interface InsertRefreshTokenData {
  */
 export function newRefreshExpiry(): number {
   const now = new Date()
-  const days = JWT_REFRESH_EXPIRES_IN / 1440
+  const days = JWT.REFRESH_EXPIRES_IN / 1440
 
   return now.setDate(now.getDate() + days)
 }
@@ -34,24 +34,24 @@ export const setCookie = (
   permission_variables: string
 ): void => {
   // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
-  const maxAge = JWT_REFRESH_EXPIRES_IN * 60 * 1000
+  const maxAge = JWT.REFRESH_EXPIRES_IN * 60 * 1000
 
   // set refresh token as cookie
   res.cookie('refresh_token', refresh_token, {
     httpOnly: true,
     maxAge,
-    signed: Boolean(COOKIE_SECRET),
-    sameSite: COOKIE_SAME_SITE,
-    secure: COOKIE_SECURE
+    signed: Boolean(COOKIES.SECRET),
+    sameSite: COOKIES.SAME_SITE,
+    secure: COOKIES.SECURE
   })
 
   // set permission variables cookie
   res.cookie('permission_variables', permission_variables, {
     httpOnly: true,
     maxAge,
-    signed: Boolean(COOKIE_SECRET),
-    sameSite: COOKIE_SAME_SITE,
-    secure: COOKIE_SECURE
+    signed: Boolean(COOKIES.SECRET),
+    sameSite: COOKIES.SAME_SITE,
+    secure: COOKIES.SECURE
   })
 }
 

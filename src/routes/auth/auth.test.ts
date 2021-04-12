@@ -3,18 +3,7 @@
 import 'jest-extended'
 import { v4 as uuidv4 } from 'uuid'
 
-import {
-  AUTO_ACTIVATE_NEW_USERS,
-  HIBP_ENABLE,
-  EMAILS_ENABLE,
-  REDIRECT_URL_ERROR,
-  JWT_CLAIMS_NAMESPACE,
-  HOST,
-  PORT,
-  ADMIN_SECRET_HEADER,
-  HASURA_GRAPHQL_ADMIN_SECRET
-  // ANONYMOUS_USERS_ENABLE
-} from '@shared/config'
+import { APPLICATION, JWT as CONFIG_JWT, REGISTRATION, HEADERS } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
 import { deleteMailHogEmail, mailHogSearch, deleteAccount } from '@test/test-utils'
 
@@ -36,7 +25,7 @@ const password = generateRandomString()
 
 let request: SuperTest<Test>
 
-const server = app.listen(PORT, HOST)
+const server = app.listen(APPLICATION.PORT, APPLICATION.HOST)
 
 beforeAll(async () => {
   request = agent(server) // * Create the SuperTest agent
@@ -47,7 +36,7 @@ afterAll(async () => {
   server.close()
 })
 
-const pwndPasswordIt = HIBP_ENABLE ? it : it.skip
+const pwndPasswordIt = REGISTRATION.HIBP_ENABLE ? it : it.skip
 pwndPasswordIt('should tell the password has been pwned', async () => {
   const {
     status,
@@ -124,18 +113,18 @@ it('should tell the account already exists', async () => {
 })
 
 // * Only run test if auto activation is disabled
-const manualActivationIt = !AUTO_ACTIVATE_NEW_USERS ? it : it.skip
+const manualActivationIt = !REGISTRATION.AUTO_ACTIVATE_NEW_USERS ? it : it.skip
 
 manualActivationIt('should fail to activate an user from a wrong ticket', async () => {
   const { status, redirect, header } = await request.get(`/auth/activate?ticket=${uuidv4()}`)
   expect(
-    status === 500 || (status === 302 && redirect && header?.location === REDIRECT_URL_ERROR)
+    status === 500 || (status === 302 && redirect && header?.location === APPLICATION.REDIRECT_URL_ERROR)
   ).toBeTrue()
 })
 
 manualActivationIt('should activate the account from a valid ticket', async () => {
   let ticket
-  if (EMAILS_ENABLE) {
+  if (APPLICATION.EMAILS_ENABLE) {
     // Sends the email, checks if it's received and use the link for activation
     const [message] = await mailHogSearch(email)
     expect(message).toBeTruthy()
@@ -180,7 +169,7 @@ it('should sign the user in', async () => {
 it('should not sign user in with invalid admin secret', async () => {
   const { status } = await request
     .post('/auth/login')
-    .set(ADMIN_SECRET_HEADER, 'invalidsecret')
+    .set(HEADERS.ADMIN_SECRET_HEADER, 'invalidsecret')
     .send({ email, password: 'invalidpassword' })
 
   expect(status).toEqual(401)
@@ -189,7 +178,7 @@ it('should not sign user in with invalid admin secret', async () => {
 it('should sign in user with valid admin secret', async () => {
   const { body, status } = await request
     .post('/auth/login')
-    .set(ADMIN_SECRET_HEADER, HASURA_GRAPHQL_ADMIN_SECRET as string)
+    .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET as string)
     .send({ email, password: 'invalidpassword' })
 
   expect(status).toEqual(200)
@@ -199,9 +188,9 @@ it('should sign in user with valid admin secret', async () => {
 
 it('should decode a valid custom user claim', async () => {
   const decodedJwt = JWT.decode(jwtToken) as Token
-  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
+  expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
   // Test if the custom claims work
-  expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
+  expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
 })
 
 it('should logout', async () => {
@@ -228,9 +217,9 @@ describe('Tests without cookies', () => {
 
   it('should decode a valid custom user claim', async () => {
     const decodedJwt = JWT.decode(jwtToken) as Token
-    expect(decodedJwt[JWT_CLAIMS_NAMESPACE]).toBeObject()
+    expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
     // Test if the custom claims work
-    expect(decodedJwt[JWT_CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
+    expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
   })
 })
 

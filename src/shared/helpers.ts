@@ -1,4 +1,4 @@
-import { HIBP_ENABLE, COOKIE_SECRET } from './config'
+import { COOKIES, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
   rotateTicket as rotateTicketQuery,
@@ -99,7 +99,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (HIBP_ENABLE && (await pwnedPassword(password))) {
+  if (REGISTRATION.HIBP_ENABLE && (await pwnedPassword(password))) {
     throw Boom.badRequest('Password is too weak.')
   }
 }
@@ -117,7 +117,7 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
 }
 
 export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {
-  const { permission_variables } = COOKIE_SECRET ? req.signedCookies : req.cookies
+  const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw Boom.unauthorized()
   return JSON.parse(permission_variables)
 }

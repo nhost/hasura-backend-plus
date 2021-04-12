@@ -1,16 +1,9 @@
-import express, { Response, Router } from 'express'
+import express, { RequestHandler, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import {
-  PROVIDER_SUCCESS_REDIRECT,
-  PROVIDER_FAILURE_REDIRECT,
-  SERVER_URL,
-  PROVIDERS,
-  DEFAULT_USER_ROLE,
-  DEFAULT_ALLOWED_USER_ROLES,
-} from '@shared/config'
+import { PROVIDERS, APPLICATION, REGISTRATION} from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -95,9 +88,9 @@ const manageProviderStrategy = (
     email,
     password_hash: null,
     active: true,
-    default_role: DEFAULT_USER_ROLE,
+    default_role: REGISTRATION.DEFAULT_USER_ROLE,
     account_roles: {
-      data: DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
+      data: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
     user: { data: { display_name: display_name || email, avatar_url } },
     account_providers: {
@@ -129,18 +122,19 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   try {
     refresh_token = await setRefreshToken(res, account.id, true)
   } catch (e) {
-    res.redirect(PROVIDER_FAILURE_REDIRECT as string)
+    res.redirect(PROVIDERS.REDIRECT_FAILURE as string)
   }
 
   // redirect back user to app url
-  res.redirect(`${PROVIDER_SUCCESS_REDIRECT}?refresh_token=${refresh_token}`)
+  res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: string,
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
   strategy: Constructable<T>,
-  settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0] // TODO: Strategy option type is not inferred correctly
+  settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
+  middleware?: RequestHandler
 ): void => {
   const {
     transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
@@ -152,32 +146,46 @@ export const initProvider = <T extends Strategy>(
     callbackMethod = 'GET',
     ...options
   } = settings
-  passport.use(
-    new strategy(
-      {
-        ...PROVIDERS[strategyName],
-        ...options,
-        callbackURL: `${SERVER_URL}/auth/providers/${strategyName}/callback`,
-        passReqToCallback: true
-      },
-      manageProviderStrategy(strategyName, transformProfile)
-    )
-  )
 
   const subRouter = Router()
+
+  if(middleware) {
+    subRouter.use(middleware)
+  }
+
+  let registered = false
+
+  subRouter.use((req, res, next) => {
+    if(!registered) {
+      passport.use(
+        new strategy(
+          {
+            ...PROVIDERS[strategyName],
+            ...options,
+            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
+            passReqToCallback: true
+          },
+          manageProviderStrategy(strategyName, transformProfile)
+        )
+      )
+
+      registered = true
+    }
+    next()
+  })
 
   subRouter.get('/', passport.authenticate(strategyName, { session: false }))
 
   const handlers = [
     passport.authenticate(strategyName, {
-      failureRedirect: PROVIDER_FAILURE_REDIRECT,
+      failureRedirect: PROVIDERS.REDIRECT_FAILURE,
       session: false
     }),
     providerCallback
   ]
   if (callbackMethod === 'POST') {
     // The Sign in with Apple auth provider requires a POST route for authentication
-    subRouter.post('/callback', express.urlencoded(), ...handlers)
+    subRouter.post('/callback', express.urlencoded({ extended: true }), ...handlers)
   } else {
     subRouter.get('/callback', ...handlers)
   }
