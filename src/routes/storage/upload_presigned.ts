@@ -56,6 +56,6 @@ export const uploadFilePresignedURL = async (
     console.error('Fail to generate presigned PUT URL')
     console.error({ params })
     console.error(err)
-    throw Boom.badImplementation('Fail to generate presigned PUR URL')
+    throw Boom.badImplementation('Fail to generate presigned PUT URL')
   }
 }
