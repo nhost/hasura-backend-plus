@@ -1,8 +1,17 @@
-import { OBJECT_PREFIX, META_PREFIX, STORAGE_RULES, PathConfig, containsSomeRule } from './utils'
+import {
+  OBJECT_PREFIX,
+  META_PREFIX,
+  STORAGE_RULES,
+  PathConfig,
+  containsSomeRule,
+  PRESIGN_PREFIX
+} from './utils'
 import { NextFunction, Response, Router } from 'express'
 import { deleteFile } from './delete'
 import { listGet } from './list_get'
 import { uploadFile } from './upload'
+import { getFilePresignedURL } from './get_presigned'
+import { uploadFilePresignedURL } from './upload_presigned'
 import { RequestExtended } from '@shared/types'
 
 const router = Router()
@@ -46,6 +55,32 @@ const createRoutes = (
   return middleware
 }
 
+const createPresignedRoutes = (path: string, rules: Partial<PathConfig>): Router => {
+  const middleware = Router()
+
+  // Presigned requests will never be metadata requests
+  const isMetadataRequest = false
+
+  // write, create, update
+  if (containsSomeRule(rules, ['write', 'create', 'update'])) {
+    middleware.post(path, createSecureMiddleware(uploadFilePresignedURL, rules, isMetadataRequest))
+  }
+
+  // read, get
+  if (containsSomeRule(rules, ['read', 'get', 'list'])) {
+    middleware.get(
+      path,
+      (_, res, next) => {
+        res.removeHeader('X-Frame-Options')
+        next()
+      },
+      createSecureMiddleware(getFilePresignedURL, rules, isMetadataRequest)
+    )
+  }
+
+  return middleware
+}
+
 for (const path in STORAGE_RULES.paths) {
   const rules = STORAGE_RULES.paths[path]
 
@@ -54,6 +89,9 @@ for (const path in STORAGE_RULES.paths) {
 
   // create meta data paths
   router.use(META_PREFIX, createRoutes(path, rules, true))
+
+  // create object presign paths
+  router.use(PRESIGN_PREFIX, createPresignedRoutes(path, rules))
 }
 
 export default router

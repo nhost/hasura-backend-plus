@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express'
 import { PathConfig, getKey } from './utils'
 import { getFile } from './get'
+import { getFilePresignedURL } from './get_presigned'
 import { listFile } from './list'
 import { RequestExtended } from '@shared/types'
 
@@ -9,7 +10,8 @@ export const listGet = async (
   res: Response,
   _next: NextFunction,
   rules: Partial<PathConfig>,
-  isMetadataRequest = false
+  isMetadataRequest = false,
+  isPresignedRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
 
@@ -19,5 +21,9 @@ export const listGet = async (
   }
 
   // or get file
+  if (isPresignedRequest) {
+    return getFilePresignedURL(req, res, _next, rules)
+  }
+
   return getFile(req, res, _next, rules, isMetadataRequest)
 }

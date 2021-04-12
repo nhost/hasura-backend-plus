@@ -133,3 +133,7 @@ export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),
   action: Joi.string().valid('revoke-token').required()
 })
+
+export const filePresignedParms = Joi.object({
+  expires: Joi.number().integer().min(1)
+})

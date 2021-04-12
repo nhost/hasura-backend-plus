@@ -12,6 +12,7 @@ import { PermissionVariables, RequestExtended } from '@shared/types'
 
 export const OBJECT_PREFIX = '/o'
 export const META_PREFIX = '/m'
+export const PRESIGN_PREFIX = '/presign'
 export interface PathConfig {
   read: string
   write: string
