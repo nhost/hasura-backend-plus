@@ -135,5 +135,6 @@ export const fileMetadataUpdate = Joi.object({
 })
 
 export const filePresignedParms = Joi.object({
-  expires: Joi.number().integer().min(1)
+  expires: Joi.number().integer().min(1),
+  token: Joi.string().uuid()
 })

@@ -140,6 +140,13 @@ describe('Tests as an unauthenticated user', () => {
     expect(text).toEqual(fileData)
   })
 
+  it('should get file presigned url from the token stored in the file metadata while unauthenticated', async () => {
+    const { status } = await request
+      .get(`/storage/presign/user/${getUserId()}/${filePath}`)
+      .query({ token: fileToken })
+    expect(status).toEqual(200)
+  })
+
   it('should not get file from incorrect token while unauthenticated', async () => {
     const { status } = await request
       .get(`/storage/o/user/${getUserId()}/${filePath}`)
@@ -149,6 +156,11 @@ describe('Tests as an unauthenticated user', () => {
 
   it('should not get file without authentication nor token', async () => {
     const { status } = await request.get(`/storage/o/user/${getUserId()}/${filePath}`)
+    expect(status).toEqual(403)
+  })
+
+  it('should not get file presigned without authentication nor token', async () => {
+    const { status } = await request.get(`/storage/presign/user/${getUserId()}/${filePath}`)
     expect(status).toEqual(403)
   })
   // TODO attempt to get the file from another authenticated user

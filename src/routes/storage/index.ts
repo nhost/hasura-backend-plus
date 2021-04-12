@@ -26,56 +26,33 @@ const createSecureMiddleware = (
 const createRoutes = (
   path: string,
   rules: Partial<PathConfig>,
-  isMetadataRequest = false
+  isMetadataRequest = false,
+  isPresignedRequest = false
 ): Router => {
   const middleware = Router()
 
   // write, create, update
   if (containsSomeRule(rules, ['write', 'create', 'update'])) {
-    middleware.post(path, createSecureMiddleware(uploadFile, rules, isMetadataRequest))
+    const uploadFn = isPresignedRequest ? uploadFilePresignedURL : uploadFile
+    middleware.post(path, createSecureMiddleware(uploadFn, rules, isMetadataRequest))
   }
 
   // read, get, list
   if (containsSomeRule(rules, ['read', 'get', 'list'])) {
+    const getFn = isPresignedRequest ? getFilePresignedURL : listGet
     middleware.get(
       path,
       (_, res, next) => {
         res.removeHeader('X-Frame-Options')
         next()
       },
-      createSecureMiddleware(listGet, rules, isMetadataRequest)
+      createSecureMiddleware(getFn, rules, isMetadataRequest)
     )
   }
 
   // write, delete
-  if (containsSomeRule(rules, ['write', 'delete'])) {
+  if (containsSomeRule(rules, ['write', 'delete']) && !isPresignedRequest) {
     middleware.delete(path, createSecureMiddleware(deleteFile, rules, isMetadataRequest))
-  }
-
-  return middleware
-}
-
-const createPresignedRoutes = (path: string, rules: Partial<PathConfig>): Router => {
-  const middleware = Router()
-
-  // Presigned requests will never be metadata requests
-  const isMetadataRequest = false
-
-  // write, create, update
-  if (containsSomeRule(rules, ['write', 'create', 'update'])) {
-    middleware.post(path, createSecureMiddleware(uploadFilePresignedURL, rules, isMetadataRequest))
-  }
-
-  // read, get
-  if (containsSomeRule(rules, ['read', 'get', 'list'])) {
-    middleware.get(
-      path,
-      (_, res, next) => {
-        res.removeHeader('X-Frame-Options')
-        next()
-      },
-      createSecureMiddleware(getFilePresignedURL, rules, isMetadataRequest)
-    )
   }
 
   return middleware
@@ -91,7 +68,7 @@ for (const path in STORAGE_RULES.paths) {
   router.use(META_PREFIX, createRoutes(path, rules, true))
 
   // create object presign paths
-  router.use(PRESIGN_PREFIX, createPresignedRoutes(path, rules))
+  router.use(PRESIGN_PREFIX, createRoutes(path, rules, false, true))
 }
 
 export default router
