@@ -59,7 +59,7 @@ export const getFile = async (
       const object = await s3.getObject(params).promise()
 
       if (!object.Body) {
-        return res.boom.badImplementation('File found without body')
+        return res.boom.notFound('File found without body')
       }
 
       const transformer = sharp(object.Body as Buffer)
