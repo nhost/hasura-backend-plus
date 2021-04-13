@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import auth from './auth'
 import storage from './storage'
-import Boom from '@hapi/boom'
+import boom = require('express-boom')
 
 const router = Router()
+
+router.use(boom())
 
 router.use('/auth', auth)
 
@@ -25,8 +27,8 @@ if(process.env.NODE_ENV === 'test') {
 }
 
 // all other routes should throw 404 not found
-router.use('*', () => {
-  throw Boom.notFound()
+router.use('*', (rwq, res) => {
+  return res.boom.notFound()
 })
 
 export default router

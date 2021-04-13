@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express'
 import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
-import Boom from '@hapi/boom'
 import sharp from 'sharp'
 import { createHash } from 'crypto'
 import { STORAGE } from '@shared/config'
@@ -31,13 +30,13 @@ export const getFile = async (
   const key = getKey(req)
   const headObject = await getHeadObject(req)
   if (!headObject?.Metadata) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
 
   const context = createContext(req, headObject)
 
   if (!hasPermission([rules.get, rules.read], context)) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
@@ -60,7 +59,7 @@ export const getFile = async (
       const object = await s3.getObject(params).promise()
 
       if (!object.Body) {
-        throw Boom.badImplementation('File found without body')
+        return res.boom.badImplementation('File found without body')
       }
 
       const transformer = sharp(object.Body as Buffer)
@@ -77,11 +76,11 @@ export const getFile = async (
         const { height, width } = await transformer.metadata()
 
         if (!height) {
-          throw Boom.badImplementation('Unable to determine image height')
+          return res.boom.badImplementation('Unable to determine image height')
         }
 
         if (!width) {
-          throw Boom.badImplementation('Unable to determine image width')
+          return res.boom.badImplementation('Unable to determine image width')
         }
 
         let imageHeight = height
