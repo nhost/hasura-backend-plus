@@ -21,7 +21,8 @@
     "report-coverage": "codecov",
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node -r ./dist/start.js"
   },
   "config": {
     "commitizen": {
