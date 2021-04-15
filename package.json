@@ -116,8 +116,6 @@
     "@vuepress/plugin-back-to-top": "1.4.1",
     "codecov": "^3.7.1",
     "cz-conventional-changelog": "3.1.0",
-    "death": "^1.1.0",
-    "docker-compose": "^0.23.6",
     "dotenv-cli": "^4.0.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
