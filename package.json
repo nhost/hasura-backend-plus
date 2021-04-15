@@ -20,7 +20,8 @@
     "test:watch-command": "jest --watchAll --maxWorkers=1",
     "report-coverage": "codecov",
     "docs:build": "vuepress build docs",
-    "docs:dev": "vuepress dev docs"
+    "docs:dev": "vuepress dev docs",
+    "build": "tsc"
   },
   "config": {
     "commitizen": {
