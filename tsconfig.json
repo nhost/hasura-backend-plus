@@ -1,12 +1,25 @@
 {
-  "exclude": ["node_modules", "**/*.spec.ts", "*.js"],
-  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ],
   "compilerOptions": {
-    "lib": ["dom", "es2020"],
+    "lib": [
+      "dom",
+      "es2020"
+    ],
     "paths": {
-      "*": ["src/types/*"],
-      "@shared/*": ["src/shared/*"],
-      "@test/*": ["src/test/*"]
+      "*": [
+        "src/types/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@test/*": [
+        "src/test/*"
+      ]
     },
     "module": "commonjs",
     "outDir": "dist",
@@ -17,6 +30,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "strictNullChecks": true,
-    "resolveJsonModule": false
+    "resolveJsonModule": false,
+    "inlineSourceMap": true,
   }
 }

@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Attach",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "trace": true,
+      "sourceMaps": true,
+      "remoteRoot": "/app"
+    }
+  ]
+}
