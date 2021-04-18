@@ -103,7 +103,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
         }
       })
 
-      return res.send({ jwt_token: null, jwt_expires_in: null, user: null });
+      return res.send({ passwordless: true });
     } catch (err) {
       console.error(err)
       throw Boom.badImplementation()
