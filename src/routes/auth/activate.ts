@@ -10,7 +10,7 @@ import { verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
-  if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
+  if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     throw Boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
   }
 

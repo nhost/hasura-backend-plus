@@ -26,14 +26,14 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     throw Boom.badRequest('Account already exists.')
   }
 
-  let password_hash: string|null = null;
+  let password_hash: string | null = null;
 
   const ticket = uuidv4()
   const now = new Date()
   const ticket_expires_at = new Date()
   ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
 
-  if(password) {
+  if (password) {
     await checkHibp(password)
 
     password_hash = await hashPassword(password)
@@ -94,7 +94,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
 
-    if(!password) {
+    if (!password) {
       try {
         await emailClient.send({
           template: 'passwordless',

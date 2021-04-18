@@ -14,10 +14,10 @@ export const APPLICATION = {
     return process.env.SERVER_URL || ''
   },
   get REDIRECT_URL_ERROR() {
-    return process.env.REDIRECT_URL_ERROR|| ''
+    return process.env.REDIRECT_URL_ERROR || ''
   },
   get REDIRECT_URL_SUCCESS() {
-    return process.env.REDIRECT_URL_SUCCESS|| ''
+    return process.env.REDIRECT_URL_SUCCESS || ''
   },
   get HASURA_GRAPHQL_ADMIN_SECRET() {
     return process.env.HASURA_GRAPHQL_ADMIN_SECRET || ''

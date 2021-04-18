@@ -80,7 +80,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
 
   const { id, mfa_enabled, password_hash, active, ticket, email } = account
 
-  if(!password) {
+  if (!password) {
     const refresh_token = await setRefreshToken(res, id, useCookie)
 
     try {
