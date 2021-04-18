@@ -7,6 +7,7 @@ import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
+import type { S3 } from 'aws-sdk'
 
 function getHash(items: (string | number | Buffer)[]): string {
   const hash = createHash('sha256')
@@ -28,7 +29,15 @@ export const getFile = async (
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
-  const headObject = await getHeadObject(req)
+
+  let headObject: S3.HeadObjectOutput | undefined;
+
+  try {
+    headObject = await getHeadObject(req)
+  } catch {
+    return res.boom.notFound();
+  }
+
   if (!headObject?.Metadata) {
     return res.boom.forbidden()
   }
@@ -41,7 +50,7 @@ export const getFile = async (
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-      
+
     if (req.query.w || req.query.h || req.query.q || req.query.r || req.query.b) {
       // transform image
       const { w, h, q, r, b } = await imgTransformParams.validateAsync(req.query)
@@ -65,7 +74,7 @@ export const getFile = async (
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({ width: w, height: h })
-  
+
       // Add a blur when specified
       if (b) {
         transformer.blur(b)
