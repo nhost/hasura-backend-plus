@@ -94,7 +94,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
 
-    if (!password) {
+    if (typeof password === 'undefined') {
       try {
         await emailClient.send({
           template: 'passwordless',
