@@ -11,6 +11,9 @@ import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { app } from '../../server'
 import { SuperTest, Test, agent } from 'supertest'
+import { end } from '@test/supertest-utils'
+
+import { Response } from 'superagent'
 
 /**
  * Store variables in memory.
@@ -37,35 +40,28 @@ afterAll(() => {
 })
 
 function errorMessageEqual(msg: string) {
-  return (res: any) => {
+  return (res: Response) => {
     expect(res.body.message).toEqual(msg)
   }
 }
 
 function validJwt() {
-  return (res: any) => {
+  return (res: Response) => {
     expect(res.body.jwt_token).toBeString()
     expect(res.body.jwt_expires_in).toBeNumber()
   }
 }
 
 function saveJwt() {
-  return (res: any) => {
+  return (res: Response) => {
     jwtToken = res.body.jwt_token
   }
 }
 
 function validRefreshToken(uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) {
-  return (res: any) => {
+  return (res: Response) => {
     expect(res.body.refresh_token).toMatch(uuidRegex)
     expect(res.body.refresh_token).toMatch(uuidRegex)
-  }
-}
-
-function end(done: any) {
-  return (err: any) => {
-    if (err) return done(err);
-    else return done();
   }
 }
 
