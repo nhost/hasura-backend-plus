@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { APPLICATION, JWT as CONFIG_JWT, REGISTRATION, HEADERS } from '@shared/config'
 import { generateRandomString, selectAccountByEmail } from '@shared/helpers'
-import { deleteMailHogEmail, mailHogSearch, deleteAccount } from '@test/test-utils'
+import { deleteMailHogEmail, mailHogSearch, registerAccount } from '@test/test-utils'
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
@@ -27,89 +27,129 @@ let request: SuperTest<Test>
 
 const server = app.listen(APPLICATION.PORT, APPLICATION.HOST)
 
-beforeAll(async () => {
+beforeAll(() => {
   request = agent(server) // * Create the SuperTest agent
 })
 
 // * Code that is executed after any jest test file that imports test-utiles
-afterAll(async () => {
+afterAll(() => {
   server.close()
 })
 
+function errorMessageEqual(msg: string) {
+  return (res: any) => {
+    expect(res.body.message).toEqual(msg)
+  }
+}
+
+function validJwt() {
+  return (res: any) => {
+    expect(res.body.jwt_token).toBeString()
+    expect(res.body.jwt_expires_in).toBeNumber()
+  }
+}
+
+function saveJwt() {
+  return (res: any) => {
+    jwtToken = res.body.jwt_token
+  }
+}
+
+function validRefreshToken(uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) {
+  return (res: any) => {
+    expect(res.body.refresh_token).toMatch(uuidRegex)
+    expect(res.body.refresh_token).toMatch(uuidRegex)
+  }
+}
+
+function end(done: any) {
+  return (err: any) => {
+    if (err) return done(err);
+    else return done();
+  }
+}
+
 const pwndPasswordIt = REGISTRATION.HIBP_ENABLE ? it : it.skip
-pwndPasswordIt('should tell the password has been pwned', async () => {
-  const {
-    status,
-    body: { message }
-  } = await request.post('/auth/register').send({ email: 'test@example.com', password: '123456' })
-  expect(status).toEqual(400)
-  expect(message).toEqual('Password is too weak.')
+pwndPasswordIt('should tell the password has been pwned', (done) => {
+  request.post('/auth/register')
+    .send({ email: 'test@example.com', password: '123456' })
+    .expect(400)
+    .expect(errorMessageEqual('Password is too weak.'))
+    .end(end(done))
 })
 
-it('should create an account', async () => {
-  const { status } = await request
+it('should create an account', (done) => {
+  request
     .post('/auth/register')
     .send({ email, password, user_data: { name: 'Test name' } })
-  expect(status).toEqual(200)
+    .expect(200)
+    .end(end(done))
 })
 
-it('should fail to create account with unallowed role', async () => {
-  const { status } = await request.post('/auth/register').send({
-    email: 'test1@nhost.io',
-    password,
-    user_data: { name: 'Test name' },
-    register_options: {
-      allowed_roles: ['user', 'me', 'super-admin']
-    }
-  })
-  expect(status).toEqual(400)
+it('should fail to create account with unallowed role', (done) => {
+  request.post('/auth/register')
+    .send({
+      email: 'test1@nhost.io',
+      password,
+      user_data: { name: 'Test name' },
+      register_options: {
+        allowed_roles: ['user', 'me', 'super-admin']
+      }
+    })
+    .expect(400)
+    .end(end(done))
 })
 
-it('should fail to create accunt with default_role that does not overlap allowed_roles', async () => {
-  const { status } = await request.post('/auth/register').send({
-    email: 'test2@nhost.io',
-    password,
-    user_data: { name: 'Test name' },
-    register_options: {
-      default_role: 'editor',
-      allowed_roles: ['user', 'me']
-    }
-  })
-  expect(status).toEqual(400)
+it('should fail to create accunt with default_role that does not overlap allowed_roles', (done) => {
+  request.post('/auth/register')
+    .send({
+      email: 'test2@nhost.io',
+      password,
+      user_data: { name: 'Test name' },
+      register_options: {
+        default_role: 'editor',
+        allowed_roles: ['user', 'me']
+      }
+    })
+    .expect(400)
+    .end(end(done))
 })
 
-it('should create account with default_role that is in the ALLOWED_USER_ROLES variable', async () => {
-  const { status } = await request.post('/auth/register').send({
-    email: 'test3@nhost.io',
-    password,
-    user_data: { name: 'Test name' },
-    register_options: {
-      default_role: 'editor'
-    }
-  })
-  expect(status).toEqual(200)
+it('should create account with default_role that is in the ALLOWED_USER_ROLES variable', (done) => {
+  request.post('/auth/register')
+    .send({
+      email: 'test3@nhost.io',
+      password,
+      user_data: { name: 'Test name' },
+      register_options: {
+        default_role: 'editor'
+      }
+    })
+    .expect(200)
+    .end(end(done))
 })
 
-it('should register account with default_role and allowed_roles set', async () => {
-  const { status } = await request.post('/auth/register').send({
-    email: 'test4@nhost.io',
-    password,
-    user_data: { name: 'Test name' },
-    register_options: {
-      default_role: 'user',
-      allowed_roles: ['user', 'me']
-    }
-  })
-  expect(status).toEqual(200)
+it('should register account with default_role and allowed_roles set', (done) => {
+  request.post('/auth/register')
+    .send({
+      email: 'test4@nhost.io',
+      password,
+      user_data: { name: 'Test name' },
+      register_options: {
+        default_role: 'user',
+        allowed_roles: ['user', 'me']
+      }
+    })
+    .expect(200)
+    .end(end(done))
 })
 
-it('should tell the account already exists', async () => {
-  const {
-    status,
-    body: { message }
-  } = await request.post('/auth/register').send({ email, password })
-  expect(status).toEqual(400)
-  expect(message).toEqual('Account already exists.')
+it('should tell the account already exists', (done) => {
+  request
+    .post('/auth/register').send({ email, password })
+    .expect(400)
+    .expect(errorMessageEqual('Account already exists.'))
+    .end(end(done))
 })
 
 // * Only run test if auto activation is disabled
@@ -138,84 +178,84 @@ manualActivationIt('should activate the account from a valid ticket', async () =
   expect(status).toBeOneOf([204, 302])
 })
 
-it('should not sign user with wrong password', async () => {
-  const { status } = await request.post('/auth/login').send({ email, password: 'sommar' })
-  expect(status).toEqual(401)
+it('should not sign user with wrong password', (done) => {
+  request
+    .post('/auth/login')
+    .send({ email, password: 'sommar' })
+    .expect(401)
+    .end(end(done))
 })
 
-it('should not sign in non existing user', async () => {
-  const { status } = await request
+it('should not sign in non existing user', (done) => {
+  request
     .post('/auth/login')
     .send({ email: 'non-existing@nhost.io', password: 'sommar' })
-  expect(status).toEqual(400)
+    .expect(400)
+    .end(end(done))
 })
 
-it('should complain about incorrect email', async () => {
-  const { status } = await request
+it('should complain about incorrect email', (done) => {
+  request
     .post('/auth/login')
     .send({ email: 'not-valid-email', password: 'sommar' })
-  expect(status).toEqual(400)
+    .expect(400)
+    .end(end(done))
 })
 
-it('should sign the user in', async () => {
-  const { body, status } = await request.post('/auth/login').send({ email, password })
-  // Save JWT token to globally scoped varaible.
-  jwtToken = body.jwt_token
-  expect(status).toEqual(200)
-  expect(body.jwt_token).toBeString()
-  expect(body.jwt_expires_in).toBeNumber()
+it('should sign the user in', (done) => {
+  request.post('/auth/login')
+    .send({ email, password })
+    .expect(validJwt())
+    .expect(200)
+    .expect(saveJwt())
+    .end(end(done))
 })
 
-it('should not sign user in with invalid admin secret', async () => {
-  const { status } = await request
+it('should not sign user in with invalid admin secret', (done) => {
+  request
     .post('/auth/login')
     .set(HEADERS.ADMIN_SECRET_HEADER, 'invalidsecret')
     .send({ email, password: 'invalidpassword' })
-
-  expect(status).toEqual(401)
+    .expect(401)
+    .end(end(done))
 })
 
-it('should sign in user with valid admin secret', async () => {
-  const { body, status } = await request
+it('should sign in user with valid admin secret', (done) => {
+  request
     .post('/auth/login')
     .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET as string)
     .send({ email, password: 'invalidpassword' })
-
-  expect(status).toEqual(200)
-  expect(body.jwt_token).toBeString()
-  expect(body.jwt_expires_in).toBeNumber()
+    .expect(200)
+    .expect(validJwt())
+    .end(end(done))
 })
 
-it('should decode a valid custom user claim', async () => {
+it('should decode a valid custom user claim', () => {
   const decodedJwt = JWT.decode(jwtToken) as Token
   expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
   // Test if the custom claims work
   expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
 })
 
-it('should logout', async () => {
-  const res = await request.post('/auth/logout').send()
-  expect(res.status).toBe(204)
-  await request.post('/auth/login').send({ email, password })
+it('should logout', (done) => {
+  request.post('/auth/logout')
+    .send()
+    .expect(204)
+    .end(end(done))
 })
 
 describe('Tests without cookies', () => {
-  it('Should login without cookies', async () => {
-    const { body, status } = await request
+  it('Should login without cookies', (done) => {
+    request
       .post('/auth/login')
       .send({ email, password, cookie: false })
-    // Save JWT token to globally scoped varaible.
-    jwtToken = body.jwt_token
-    expect(status).toEqual(200)
-    expect(body.jwt_token).toBeString()
-    expect(body.jwt_expires_in).toBeNumber()
-    expect(body.refresh_token).toBeString()
-
-    const uuid_regex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
-    expect(body.refresh_token).toMatch(uuid_regex)
+      .expect(saveJwt())
+      .expect(validJwt())
+      .expect(validRefreshToken())
+      .end(end(done))
   })
 
-  it('should decode a valid custom user claim', async () => {
+  it('should decode a valid custom user claim', () => {
     const decodedJwt = JWT.decode(jwtToken) as Token
     expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
     // Test if the custom claims work
@@ -223,15 +263,18 @@ describe('Tests without cookies', () => {
   })
 })
 
-// delete account
-it('should delete account', async () => {
-  await deleteAccount(request, { email, password })
-  expect('1').toBeString()
+it('should delete an account', (done) => {
+  registerAccount(request).then(() => {
+    request
+      .post('/auth/delete')
+      .expect(204)
+      .end(end(done))
+  })
 })
 
 // test anonymous account
 // const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
-// anonymousAccountIt('should login anonymously', async () => {
+// anonymousAccountIt('should login anonymously', (done) => {
 //   const { body, status } = await request.post('/auth/login').send({ anonymous: true })
 //   expect(status).toEqual(200)
 //   expect(body.jwt_token).toBeString()
