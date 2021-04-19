@@ -211,9 +211,7 @@ it('should sign the user in without password when passwordless is enabled', asyn
   }, request, async () => {
     const { body, status } = await request.post('/auth/login').send({ email: passwordlessEmail })
     expect(status).toEqual(200)
-    expect(body.jwt_token).toBeNull()
-    expect(body.jwt_expires_in).toBeNull()
-    expect(body.user).toBeNull()
+    expect(body.passwordless).toBeTrue()
 
     const [message] = await mailHogSearch(passwordlessEmail)
     expect(message).toBeTruthy()
