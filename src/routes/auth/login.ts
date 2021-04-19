@@ -70,7 +70,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_PASSWORDLESS ? passwordlessLoginSchema : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? passwordlessLoginSchema : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -85,7 +85,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
 
     try {
       await emailClient.send({
-        template: 'passwordless',
+        template: 'magic-link',
         message: {
           to: email,
           headers: {
@@ -103,7 +103,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
         }
       })
 
-      return res.send({ passwordless: true });
+      return res.send({ magicLink: true });
     } catch (err) {
       console.error(err)
       throw Boom.badImplementation()

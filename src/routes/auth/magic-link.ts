@@ -5,19 +5,19 @@ import { accountOfRefreshToken, activateAccount } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { passwordlessQuery } from '@shared/validation'
+import { magicLinkQuery } from '@shared/validation'
 import { AccountData, Session, UpdateAccountData, UserData } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
 
-async function passwordless({ query }: Request, res: Response): Promise<unknown> {
-  const { token, action } = await passwordlessQuery.validateAsync(query);
+async function magicLink({ query }: Request, res: Response): Promise<unknown> {
+  const { token, action } = await magicLinkQuery.validateAsync(query);
 
   const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
 
   let refresh_token = token;
 
-  if(action === 'sign-up') {
+  if (action === 'sign-up') {
     const new_ticket = uuidv4()
     let hasuraData: UpdateAccountData
 
@@ -58,7 +58,7 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
 
   const account = hasura_data.auth_refresh_tokens?.[0].account;
 
-  if(!account) {
+  if (!account) {
     throw Boom.unauthorized('Invalid or expired token.')
   }
 
@@ -73,13 +73,13 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
   const session: Session = { jwt_token, jwt_expires_in, user }
   if (!useCookie) session.refresh_token = refresh_token
 
-  if(action === 'log-in') {
+  if (action === 'log-in') {
     if (APPLICATION.REDIRECT_URL_SUCCESS) {
       return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
     }
 
     res.status(200).send('You have logged in')
-  } else if(action === 'sign-up') {
+  } else if (action === 'sign-up') {
     if (APPLICATION.REDIRECT_URL_SUCCESS) {
       return res.redirect(APPLICATION.REDIRECT_URL_SUCCESS)
     }
@@ -92,4 +92,4 @@ async function passwordless({ query }: Request, res: Response): Promise<unknown>
   res.send(session)
 }
 
-export default asyncWrapper(passwordless)
+export default asyncWrapper(magicLink)

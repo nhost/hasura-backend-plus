@@ -45,7 +45,7 @@ const accountFields = {
   password: passwordRule
 }
 
-const passwordlessAccountFields = {
+const magicLinkAccountFields = {
   email: emailRule,
 }
 
@@ -77,8 +77,8 @@ export const registerSchema = Joi.object({
   cookie: Joi.boolean()
 })
 
-export const passwordlessRegisterSchema = Joi.object({
-  ...passwordlessAccountFields,
+export const magicLinkRegisterSchema = Joi.object({
+  ...magicLinkAccountFields,
   ...userDataFields,
   cookie: Joi.boolean()
 })
@@ -153,7 +153,7 @@ export const fileMetadataUpdate = Joi.object({
   action: Joi.string().valid('revoke-token').required()
 })
 
-export const passwordlessQuery = Joi.object({
+export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
   action: Joi.string().valid('log-in', 'sign-up').required(),
   cookie: Joi.boolean().optional(),

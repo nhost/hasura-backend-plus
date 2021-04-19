@@ -7,7 +7,7 @@ import Boom from '@hapi/boom'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema, passwordlessRegisterSchema } from '@shared/validation'
+import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -20,7 +20,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_PASSWORDLESS ? passwordlessRegisterSchema : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkRegisterSchema : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     throw Boom.badRequest('Account already exists.')
@@ -97,7 +97,7 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     if (typeof password === 'undefined') {
       try {
         await emailClient.send({
-          template: 'passwordless',
+          template: 'magic-link',
           message: {
             to: user.email,
             headers: {

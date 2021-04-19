@@ -37,7 +37,7 @@ export const AUTHENTICATION = {
   get USER_IMPERSONATION_ENABLE() {
     return castBooleanEnv('USER_IMPERSONATION_ENABLE', false)
   },
-  get ENABLE_PASSWORDLESS() {
-    return castBooleanEnv('ENABLE_PASSWORDLESS', false)
+  get ENABLE_MAGIC_LINK() {
+    return castBooleanEnv('ENABLE_MAGIC_LINK', false)
   }
 }

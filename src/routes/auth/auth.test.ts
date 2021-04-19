@@ -55,9 +55,9 @@ it('should create an account', async () => {
   expect(status).toEqual(200)
 })
 
-it('should create an account without a password when passwordless login is enabled', async () => {
+it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv({
-    ENABLE_PASSWORDLESS: 'true'
+    ENABLE_MAGIC_LINK: 'true'
   }, request, async () => {
     const { body, status } = await request
       .post('/auth/register')
@@ -74,15 +74,15 @@ it('should create an account without a password when passwordless login is enabl
     await deleteMailHogEmail(message)
 
     {
-      const { status } = await request.get(`/auth/passwordless?action=sign-up&token=${token}`)
+      const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
       expect(status).toBe(302)
     }
   })
 })
 
-it('should not create an account without a password when passwordless login is disabled', async () => {
+it('should not create an account without a password when magic link login is disabled', async () => {
   await withEnv({
-    ENABLE_PASSWORDLESS: 'false'
+    ENABLE_MAGIC_LINK: 'false'
   }, request, async () => {
     const { status } = await request
       .post('/auth/register')
@@ -205,13 +205,13 @@ it('should sign the user in', async () => {
   expect(body.jwt_expires_in).toBeNumber()
 })
 
-it('should sign the user in without password when passwordless is enabled', async () => {
+it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv({
-    ENABLE_PASSWORDLESS: 'true'
+    ENABLE_MAGIC_LINK: 'true'
   }, request, async () => {
     const { body, status } = await request.post('/auth/login').send({ email: passwordlessEmail })
     expect(status).toEqual(200)
-    expect(body.passwordless).toBeTrue()
+    expect(body.magicLink).toBeTrue()
 
     const [message] = await mailHogSearch(passwordlessEmail)
     expect(message).toBeTruthy()
@@ -219,15 +219,15 @@ it('should sign the user in without password when passwordless is enabled', asyn
     await deleteMailHogEmail(message)
 
     {
-      const { status } = await request.get(`/auth/passwordless?action=log-in&token=${token}`)
+      const { status } = await request.get(`/auth/magic-link?action=log-in&token=${token}`)
       expect(status).toBe(302)
     }
   })
 })
 
-it('should not sign the user in without password when passwordless is disabled', async () => {
+it('should not sign the user in without password when magic link is disabled', async () => {
   await withEnv({
-    ENABLE_PASSWORDLESS: 'false'
+    ENABLE_MAGIC_LINK: 'false'
   }, request, async () => {
     const { status } = await request.post('/auth/login').send({ email: passwordlessEmail })
     expect(status).toEqual(400)

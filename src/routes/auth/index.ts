@@ -11,7 +11,7 @@ import registerAccount from './register'
 import token from './token'
 import activateAccount from './activate'
 import deleteAccount from './delete'
-import passwordless from './passwordless'
+import magicLink from './magic-link'
 import { AUTHENTICATION } from '@shared/config'
 import Boom from '@hapi/boom'
 
@@ -39,6 +39,6 @@ router
   .use('/change-password', changePassword)
 router.get('/jwks', getJwks)
 router.use('/token', token)
-router.get('/passwordless', passwordless)
+router.get('/magic-link', magicLink)
 
 export default router
