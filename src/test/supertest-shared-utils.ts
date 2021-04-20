@@ -26,9 +26,8 @@ export function saveRefreshToken(fn: (refreshToken: string) => any) {
   }
 }
 
-export function validRefreshToken(uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) {
+export function validRefreshToken(regex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) {
   return (res: Response) => {
-    expect(res.body.refresh_token).toMatch(uuidRegex)
-    expect(res.body.refresh_token).toMatch(uuidRegex)
+    expect(res.body.refresh_token).toMatch(regex)
   }
 }
