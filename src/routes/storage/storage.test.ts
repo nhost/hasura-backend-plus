@@ -4,7 +4,7 @@ import { account, getUserId, request } from '@test/test-mock-account'
 
 import fs from 'fs'
 import { promisify } from 'util'
-import { end } from '@test/supertest-utils'
+import { end } from '@test/supertest-shared-utils'
 
 import { Response } from 'superagent'
 
@@ -24,11 +24,7 @@ function text() {
   }
 }
 
-function textIsFileData({
-  fileData
-}: {
-  fileData: string
-}) {
+function textIsFileData(fileData: string) {
   return (res: Response) => {
     expect(res.text).toEqual(fileData)
   }
@@ -173,7 +169,7 @@ it('should get file', (done) => {
     request
       .get(`/storage/o/user/${getUserId()}/${filePath}`)
       .expect(200)
-      .expect(textIsFileData({ fileData }))
+      .expect(textIsFileData(fileData))
       .end(end(done))
   })
 })
@@ -198,7 +194,7 @@ describe('Tests as an unauthenticated user', () => {
         .get(`/storage/o/user/${getUserId()}/${filePath}`)
         .query({ token: fileToken })
         .expect(200)
-        .expect(textIsFileData({ fileData }))
+        .expect(textIsFileData(fileData))
         .end(end(done))
     });
   })

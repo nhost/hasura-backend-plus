@@ -11,7 +11,7 @@ import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { app } from '../../server'
 import { SuperTest, Test, agent } from 'supertest'
-import { end } from '@test/supertest-utils'
+import { end, saveJwt, validJwt, validRefreshToken } from '@test/supertest-shared-utils'
 
 import { Response } from 'superagent'
 
@@ -42,26 +42,6 @@ afterAll(() => {
 function errorMessageEqual(msg: string) {
   return (res: Response) => {
     expect(res.body.message).toEqual(msg)
-  }
-}
-
-function validJwt() {
-  return (res: Response) => {
-    expect(res.body.jwt_token).toBeString()
-    expect(res.body.jwt_expires_in).toBeNumber()
-  }
-}
-
-function saveJwt() {
-  return (res: Response) => {
-    jwtToken = res.body.jwt_token
-  }
-}
-
-function validRefreshToken(uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) {
-  return (res: Response) => {
-    expect(res.body.refresh_token).toMatch(uuidRegex)
-    expect(res.body.refresh_token).toMatch(uuidRegex)
   }
 }
 
@@ -203,7 +183,7 @@ it('should sign the user in', (done) => {
     .send({ email, password })
     .expect(validJwt())
     .expect(200)
-    .expect(saveJwt())
+    .expect(saveJwt(j => jwtToken = j))
     .end(end(done))
 })
 
@@ -245,7 +225,7 @@ describe('Tests without cookies', () => {
     request
       .post('/auth/login')
       .send({ email, password, cookie: false })
-      .expect(saveJwt())
+      .expect(saveJwt(j => jwtToken = j))
       .expect(validJwt())
       .expect(validRefreshToken())
       .end(end(done))
