@@ -23,9 +23,17 @@
 <body>
   <h2>Hello <%= display_name %>
   </h2>
-  <p>Please confirm your magic link <%= action %> by clicking the below button:</p>
+  <p>Use this link to securely <%= action %>:</p>
   <a href="<%= url %>/auth/magic-link?token=<%= token %>&action=<%= action.replace(/ /g, '-') %>">
-    <button>Confirm <%= action %></button></a>
+    <button>
+      <%= action %>
+    </button>
+  </a>
+  <p>
+    You can also copy & paste this URL into your browser:
+
+    <%= url %>/auth/magic-link?token=<%= token %>&action=<%= action.replace(/ /g, '-' ) %>
+  </p>
   <p>Thanks,<br />The Team</p>
 </body>
 

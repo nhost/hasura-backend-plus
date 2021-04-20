@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
-import { loginAnonymouslySchema, loginSchema, passwordlessLoginSchema } from '@shared/validation'
+import { loginAnonymouslySchema, loginSchema, magicLinkLoginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
@@ -70,7 +70,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? passwordlessLoginSchema : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkLoginSchema : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 

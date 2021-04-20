@@ -118,7 +118,7 @@ export const loginAnonymouslySchema = Joi.object({
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
-export const passwordlessLoginAnonymouslySchema = Joi.object({
+export const magicLinkLoginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
 })
@@ -127,7 +127,7 @@ export const loginSchema = extendedJoi.object({
   password: Joi.string().required(),
   cookie: Joi.boolean()
 })
-export const passwordlessLoginSchema = extendedJoi.object({
+export const magicLinkLoginSchema = extendedJoi.object({
   email: emailRule,
   cookie: Joi.boolean()
 })

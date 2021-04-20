@@ -23,7 +23,7 @@ let jwtToken: string
  */
 const email = `${generateRandomString()}@${generateRandomString()}.com`
 const password = generateRandomString()
-const passwordlessEmail = `${generateRandomString()}@${generateRandomString()}.com`
+const magicLinkEmail = `${generateRandomString()}@${generateRandomString()}.com`
 
 let request: SuperTest<Test>
 
@@ -61,14 +61,14 @@ it('should create an account without a password when magic link login is enabled
   }, request, async () => {
     const { body, status } = await request
       .post('/auth/register')
-      .send({ email: passwordlessEmail, user_data: { name: 'Test name' } })
+      .send({ email: magicLinkEmail, user_data: { name: 'Test name' } })
 
     expect(status).toEqual(200)
     expect(body.jwt_token).toBeNull()
     expect(body.jwt_expires_in).toBeNull()
     expect(body.user).toBeTruthy()
 
-    const [message] = await mailHogSearch(passwordlessEmail)
+    const [message] = await mailHogSearch(magicLinkEmail)
     expect(message).toBeTruthy()
     const token = message.Content.Headers['X-Token'][0]
     await deleteMailHogEmail(message)
@@ -86,7 +86,7 @@ it('should not create an account without a password when magic link login is dis
   }, request, async () => {
     const { status } = await request
       .post('/auth/register')
-      .send({ email: passwordlessEmail, user_data: { name: 'Test name' } })
+      .send({ email: magicLinkEmail, user_data: { name: 'Test name' } })
 
     expect(status).toEqual(400)
   })
@@ -209,11 +209,11 @@ it('should sign the user in without password when magic link is enabled', async 
   await withEnv({
     ENABLE_MAGIC_LINK: 'true'
   }, request, async () => {
-    const { body, status } = await request.post('/auth/login').send({ email: passwordlessEmail })
+    const { body, status } = await request.post('/auth/login').send({ email: magicLinkEmail })
     expect(status).toEqual(200)
     expect(body.magicLink).toBeTrue()
 
-    const [message] = await mailHogSearch(passwordlessEmail)
+    const [message] = await mailHogSearch(magicLinkEmail)
     expect(message).toBeTruthy()
     const token = message.Content.Headers['X-Token'][0]
     await deleteMailHogEmail(message)
@@ -229,7 +229,7 @@ it('should not sign the user in without password when magic link is disabled', a
   await withEnv({
     ENABLE_MAGIC_LINK: 'false'
   }, request, async () => {
-    const { status } = await request.post('/auth/login').send({ email: passwordlessEmail })
+    const { status } = await request.post('/auth/login').send({ email: magicLinkEmail })
     expect(status).toEqual(400)
   });
 })
