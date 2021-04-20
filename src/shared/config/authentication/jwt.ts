@@ -6,7 +6,7 @@ import { castIntEnv, castStringArrayEnv } from '../utils'
  */
 export const JWT = {
   get KEY() {
-    return process.env.JWT_KEY || ''
+    return process.env.JWT_KEY?.replace(/\\n/g, '\n') || ''
   },
   get ALGORITHM() {
     return process.env.JWT_ALGORITHM || 'RS256'
