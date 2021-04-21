@@ -4,13 +4,12 @@ import disableMfa from './disable'
 import enableMfa from './enable'
 import generateMfa from './generate'
 import totpLogin from './totp'
-import Boom from '@hapi/boom'
 
 const router = Router()
 
 router.use((req, res, next) => {
   if(!MFA.ENABLE) {
-    throw Boom.badImplementation(`Please set the MFA_ENABLE env variable to true to use the auth/mfa routes.`)
+    return res.boom.badImplementation(`Please set the MFA_ENABLE env variable to true to use the auth/mfa routes.`)
   } else {
     return next()
   }

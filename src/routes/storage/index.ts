@@ -5,13 +5,12 @@ import { listGet } from './list_get'
 import { uploadFile } from './upload'
 import { RequestExtended } from '@shared/types'
 import { STORAGE } from '@shared/config'
-import Boom from '@hapi/boom'
 
 const router = Router()
 
 router.use((req, res, next) => {
   if(!STORAGE.ENABLE) {
-    throw Boom.badImplementation(`Please set the STORAGE_ENABLE env variable to true to use the storage routes.`)
+    return res.boom.badImplementation(`Please set the STORAGE_ENABLE env variable to true to use the storage routes.`)
   } else {
     return next();
   }

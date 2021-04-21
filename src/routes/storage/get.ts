@@ -1,13 +1,13 @@
 import { NextFunction, Response } from 'express'
 import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
-import Boom from '@hapi/boom'
 import sharp from 'sharp'
 import { createHash } from 'crypto'
 import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
+import type { S3 } from 'aws-sdk'
 
 function getHash(items: (string | number | Buffer)[]): string {
   const hash = createHash('sha256')
@@ -29,20 +29,28 @@ export const getFile = async (
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
-  const headObject = await getHeadObject(req)
+
+  let headObject: S3.HeadObjectOutput | undefined;
+
+  try {
+    headObject = await getHeadObject(req)
+  } catch {
+    return res.boom.notFound();
+  }
+
   if (!headObject?.Metadata) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
 
   const context = createContext(req, headObject)
 
   if (!hasPermission([rules.get, rules.read], context)) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
   } else {
-      
+
     if (req.query.w || req.query.h || req.query.q || req.query.r || req.query.b) {
       // transform image
       const { w, h, q, r, b } = await imgTransformParams.validateAsync(req.query)
@@ -60,13 +68,13 @@ export const getFile = async (
       const object = await s3.getObject(params).promise()
 
       if (!object.Body) {
-        throw Boom.badImplementation('File found without body')
+        return res.boom.notFound('File found without body')
       }
 
       const transformer = sharp(object.Body as Buffer)
       transformer.rotate() // Rotate the image based on its EXIF data (https://sharp.pixelplumbing.com/api-operation#rotate)
       transformer.resize({ width: w, height: h })
-  
+
       // Add a blur when specified
       if (b) {
         transformer.blur(b)
@@ -77,11 +85,11 @@ export const getFile = async (
         const { height, width } = await transformer.metadata()
 
         if (!height) {
-          throw Boom.badImplementation('Unable to determine image height')
+          return res.boom.badImplementation('Unable to determine image height')
         }
 
         if (!width) {
-          throw Boom.badImplementation('Unable to determine image width')
+          return res.boom.badImplementation('Unable to determine image width')
         }
 
         let imageHeight = height

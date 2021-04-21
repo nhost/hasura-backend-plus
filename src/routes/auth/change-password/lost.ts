@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import Boom from '@hapi/boom'
 
 import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { APPLICATION, AUTHENTICATION } from '@shared/config'
@@ -8,6 +7,7 @@ import { emailClient } from '@shared/email'
 import { forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
+import { AccountData } from '@shared/types'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
@@ -15,17 +15,23 @@ import { request } from '@shared/request'
  */
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
   if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
-    throw Boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
+    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
   }
 
   // smtp must be enabled for request change password to work.
   if (!APPLICATION.EMAILS_ENABLE) {
-    throw Boom.badImplementation('SMTP settings unavailable')
+    return res.boom.badImplementation('SMTP settings unavailable')
   }
 
   const { email } = await forgotSchema.validateAsync(body)
 
-  const account = await selectAccountByEmail(email)
+  let account: AccountData;
+
+  try {
+    account = await selectAccountByEmail(email)
+  } catch(err) {
+    return res.boom.badRequest(err.message)
+  }
 
   if (!account) {
     console.error('Account does not exist')

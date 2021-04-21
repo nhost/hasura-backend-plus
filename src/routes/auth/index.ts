@@ -13,7 +13,6 @@ import activateAccount from './activate'
 import deleteAccount from './delete'
 import magicLink from './magic-link'
 import { AUTHENTICATION } from '@shared/config'
-import Boom from '@hapi/boom'
 
 const router = Router()
 
@@ -21,7 +20,7 @@ router.use(nocache())
 
 router.use((req, res, next) => {
   if (!AUTHENTICATION.ENABLE) {
-    throw Boom.badImplementation(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+    return res.boom.badImplementation(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
   } else {
     return next();
   }

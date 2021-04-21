@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import Boom from '@hapi/boom'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
@@ -48,11 +47,11 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
           }
         })
       } catch (error) {
-        throw Boom.badImplementation('Unable to create user and sign in user anonymously')
+        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
       }
 
       if (!hasura_data.insert_auth_accounts.returning.length) {
-        throw Boom.badImplementation('Unable to create user and sign in user anonymously')
+        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
       }
 
       const account = hasura_data.insert_auth_accounts.returning[0]
@@ -75,7 +74,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const account = await selectAccount(body)
 
   if (!account) {
-    throw Boom.badRequest('Account does not exist.')
+    return res.boom.badRequest('Account does not exist.')
   }
 
   const { id, mfa_enabled, password_hash, active, ticket, email } = account
@@ -106,12 +105,12 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
       return res.send({ magicLink: true });
     } catch (err) {
       console.error(err)
-      throw Boom.badImplementation()
+      return res.boom.badImplementation()
     }
   }
 
   if (!active) {
-    throw Boom.badRequest('Account is not activated.')
+    return res.boom.badRequest('Account is not activated.')
   }
 
   // Handle User Impersonation Check
@@ -120,7 +119,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
   let userImpersonationValid = false;
   if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
-    throw Boom.unauthorized('Invalid x-admin-secret')
+    return res.boom.unauthorized('Invalid x-admin-secret')
   } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
     userImpersonationValid = true;
   }
@@ -128,7 +127,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // Validate Password
   const isPasswordCorrect = await bcrypt.compare(password, password_hash)
   if (!isPasswordCorrect && !userImpersonationValid) {
-    throw Boom.unauthorized('Username and password do not match')
+    return res.boom.unauthorized('Username and password do not match')
   }
 
   if (mfa_enabled) {

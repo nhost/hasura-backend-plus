@@ -1,4 +1,3 @@
-import Boom from '@hapi/boom'
 import { castBooleanEnv } from '../utils'
 import { APPLICATION } from '../application'
 
@@ -94,7 +93,7 @@ const PROVIDERS = {
         }
       }
     } catch (e) {
-      throw Boom.badImplementation(`Invalid Apple OAuth Key file.`)
+      throw new Error(`Invalid Apple OAuth Key file.`)
     }
   },
 
