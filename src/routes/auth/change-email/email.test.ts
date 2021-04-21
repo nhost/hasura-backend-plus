@@ -7,13 +7,17 @@ import { mailHogSearch, deleteMailHogEmail } from '@test/test-utils'
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
 import { AUTHENTICATION, APPLICATION, JWT as CONFIG_JWT } from '@shared/config'
+import { end, saveJwt, validJwt } from '@test/supertest-shared-utils'
 
 let ticket: string
 const new_email = `${generateRandomString()}@${generateRandomString()}.com`
 
-it('should request to change email', async () => {
-  const { status } = await request.post('/auth/change-email/request').send({ new_email })
-  expect(status).toBe(204)
+it('should request to change email', (done) => {
+  request
+    .post('/auth/change-email/request')
+    .send({ new_email })
+    .expect(204)
+    .end(end(done))
 })
 
 it('should receive a ticket by email', async () => {
@@ -25,23 +29,26 @@ it('should receive a ticket by email', async () => {
   await deleteMailHogEmail(message)
 })
 
-it('should change the email from a ticket', async () => {
-  const { status } = await request.post('/auth/change-email/change').send({ ticket })
-  expect(status).toEqual(204)
+it('should change the email from a ticket', (done) => {
+  request
+    .post('/auth/change-email/change')
+    .send({ ticket })
+    .expect(204)
+    .end(end(done))
 })
 
-it('should reconnect using the new email', async () => {
-  const {
-    body: { jwt_token, jwt_expires_in },
-    status
-  } = await request.post('/auth/login').send({ email: new_email, password: account.password })
-  expect(status).toEqual(200)
-  expect(jwt_token).toBeString()
-  expect(jwt_expires_in).toBeNumber()
-  const decodedJwt = JWT.decode(jwt_token) as Token
-  expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
-  expect(status).toEqual(200)
-  account.token = jwt_token
+it('should reconnect using the new email', (done) => {
+  request
+    .post('/auth/login')
+    .send({ email: new_email, password: account.password })
+    .expect(200)
+    .expect(validJwt())
+    .expect((res) => {
+      const decodedJwt = JWT.decode(res.body.jwt_token) as Token
+      expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
+    })
+    .expect(saveJwt(j => account.token = j))
+    .end(end(done))
 })
 
 it('should receive an email notifying the email account has been changed', async () => {
