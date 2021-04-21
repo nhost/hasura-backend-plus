@@ -8,7 +8,6 @@ import {
   replaceMetadata
 } from './utils'
 
-import Boom from '@hapi/boom'
 import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
@@ -24,7 +23,7 @@ export const deleteFile = async (
   const context = createContext(req, headObject)
 
   if (!hasPermission([rules.delete, rules.write], context)) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
 
   if (isMetadataRequest) {
@@ -39,7 +38,7 @@ export const deleteFile = async (
     try {
       await s3.deleteObject(params).promise()
     } catch (err) {
-      throw Boom.badImplementation()
+      return res.boom.badImplementation()
     }
   }
   return res.sendStatus(204)

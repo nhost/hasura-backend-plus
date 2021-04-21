@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { Strategy } from 'passport-windowslive'
-import Boom from '@hapi/boom'
 import { initProvider } from './utils'
 import { PROVIDERS } from '@shared/config'
 
@@ -17,9 +16,9 @@ export default (router: Router): void => {
     ]
   }, (req, res, next) => {
     if(!PROVIDERS.windowslive) {
-      throw Boom.badImplementation(`Please set the WINDOWSLIVE_ENABLE env variable to true to use the auth/providers/windowslive routes.`)
+      return res.boom.badImplementation(`Please set the WINDOWSLIVE_ENABLE env variable to true to use the auth/providers/windowslive routes.`)
     } else if (!options?.clientID || !options?.clientSecret) {
-      throw Boom.badImplementation(`Missing environment variables for Windows Live OAuth.`)
+      return res.boom.badImplementation(`Missing environment variables for Windows Live OAuth.`)
     } else {
       return next();
     }

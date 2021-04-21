@@ -1,6 +1,5 @@
 import { APPLICATION } from './config'
 
-import Boom from '@hapi/boom'
 import { ASTNode } from 'graphql'
 import { GraphQLClient } from 'graphql-request'
 import { Variables } from 'graphql-request/dist/src/types'
@@ -25,7 +24,6 @@ export async function request<T extends unknown>(
   try {
     return (await client.request(print(query), variables)) as T
   } catch (err) {
-    console.error(err)
-    throw Boom.badImplementation()
+    throw new Error('Could not perform request')
   }
 }

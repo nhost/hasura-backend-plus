@@ -7,7 +7,6 @@ import {
   selectAccountByUserId as selectAccountByUserIdQuery
 } from './queries'
 
-import Boom from '@hapi/boom'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
@@ -23,7 +22,7 @@ export async function createQR(secret: string): Promise<string> {
   try {
     return await QRCode.toDataURL(secret)
   } catch (err) {
-    throw Boom.badImplementation()
+    throw new Error('Could not create QR code')
   }
 }
 
@@ -39,23 +38,23 @@ export function asyncWrapper(fn: any) {
 
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByEmailQuery, { email })
-  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }
 
 export const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, { ticket })
-  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }
 
 // TODO await request returns undefined if no user found!
 export const selectAccountByUserId = async (user_id: string | undefined): Promise<AccountData> => {
   if (!user_id) {
-    throw Boom.badRequest('Invalid User Id.')
+    throw new Error('Invalid User Id.')
   }
   const hasuraData = await request<QueryAccountData>(selectAccountByUserIdQuery, { user_id })
-  if (!hasuraData.auth_accounts[0]) throw Boom.badRequest('Account does not exist.')
+  if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }
 
@@ -90,7 +89,7 @@ export const hashPassword = async (password: string): Promise<string> => {
   try {
     return await bcrypt.hash(password, 10)
   } catch (err) {
-    throw Boom.badImplementation()
+    throw new Error('Could not hash password')
   }
 }
 
@@ -100,7 +99,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  */
 export const checkHibp = async (password: string): Promise<void> => {
   if (REGISTRATION.HIBP_ENABLE && (await pwnedPassword(password))) {
-    throw Boom.badRequest('Password is too weak.')
+    throw new Error('Password is too weak.')
   }
 }
 
@@ -118,6 +117,6 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
 
 export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {
   const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
-  if (!permission_variables) throw Boom.unauthorized()
+  if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
 }

@@ -1,7 +1,6 @@
 import safeEval, { FunctionFactory } from 'notevil'
 import { v4 as uuidv4 } from 'uuid'
 
-import Boom from '@hapi/boom'
 import { HeadObjectOutput } from 'aws-sdk/clients/s3'
 import { STORAGE } from '@shared/config'
 import fs from 'fs'
@@ -57,7 +56,7 @@ try {
   try {
     storageRules = yaml.safeLoad(fileContents) as StorageRules
   } catch (e) {
-    throw Boom.badImplementation('Custom storage security rules: invalid YAML file.')
+    throw new Error('Custom storage security rules: invalid YAML file.')
   }
 } catch (e) {
   console.warn('No custom storage security rules found.')
@@ -115,7 +114,7 @@ export const generateMetadata = (metadataParams: object, context: object): objec
         aggr[key] = value
       }
     } catch (err) {
-      throw Boom.badImplementation(`Invalid formula for metadata key ${key}: '${jsCode}'`)
+      throw new Error(`Invalid formula for metadata key ${key}: '${jsCode}'`)
     }
     return aggr
   }, {})
@@ -137,7 +136,7 @@ export const getHeadObject = async (
     if (ignoreErrors) {
       return
     }
-    throw Boom.notFound()
+    throw new Error('Not found')
   }
 }
 
@@ -166,6 +165,6 @@ export const replaceMetadata = async (
   try {
     await s3.copyObject(params).promise()
   } catch (err) {
-    throw Boom.badImplementation('Impossible to update the object metadata.')
+    throw new Error('Impossible to update the object metadata.')
   }
 }

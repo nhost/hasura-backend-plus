@@ -1,7 +1,6 @@
 import { JWT as CONFIG_JWT, REGISTRATION } from './config'
 import { JWK, JWKS, JWT } from 'jose'
 
-import Boom from '@hapi/boom'
 import fs from 'fs'
 import kebabCase from 'lodash.kebabcase'
 import { Claims, Token, AccountData, ClaimValueType } from './types'
@@ -23,7 +22,7 @@ if (RSA_TYPES.includes(CONFIG_JWT.ALGORITHM)) {
       jwtKey = JWK.asKey(jwtKey, { alg: CONFIG_JWT.ALGORITHM })
       jwtKey.toPEM(true)
     } catch (error) {
-      throw Boom.badImplementation('Invalid RSA private key in the JWT_KEY environment variable.')
+      throw new Error('Invalid RSA private key in the JWT_KEY environment variable.')
     }
   } else {
     try {
@@ -36,10 +35,10 @@ if (RSA_TYPES.includes(CONFIG_JWT.ALGORITHM)) {
   }
 } else if (SHA_TYPES.includes(CONFIG_JWT.ALGORITHM)) {
   if (!jwtKey) {
-    throw Boom.badImplementation('Empty JWT secret key.')
+    throw new Error('Empty JWT secret key.')
   }
 } else {
-  throw Boom.badImplementation(`Invalid JWT algorithm: ${CONFIG_JWT.ALGORITHM}`)
+  throw new Error(`Invalid JWT algorithm: ${CONFIG_JWT.ALGORITHM}`)
 }
 
 export const newJwtExpiry = CONFIG_JWT.EXPIRES_IN * 60 * 1000
@@ -105,7 +104,7 @@ export const getJwkStore = (): JWKS.KeyStore => {
     keyStore.add(jwtKey as JWK.RSAKey)
     return keyStore
   }
-  throw Boom.notImplemented('JWKS is not implemented on this server.')
+  throw new Error('JWKS is not implemented on this server.')
 }
 
 /**
@@ -122,14 +121,14 @@ export const sign = (payload: object): string =>
  * @param authorization Authorization header.
  */
 export const getClaims = (authorization: string | undefined): Claims => {
-  if (!authorization) throw Boom.unauthorized('Missing Authorization header.')
+  if (!authorization) throw new Error('Missing Authorization header.')
   const token = authorization.replace('Bearer ', '')
   try {
     const decodedToken = JWT.verify(token, jwtKey) as Token
-    if (!decodedToken[CONFIG_JWT.CLAIMS_NAMESPACE]) throw Boom.unauthorized('Claims namespace not found.')
+    if (!decodedToken[CONFIG_JWT.CLAIMS_NAMESPACE]) throw new Error('Claims namespace not found.')
     return decodedToken[CONFIG_JWT.CLAIMS_NAMESPACE]
   } catch (err) {
-    throw Boom.unauthorized('Invalid or expired JWT token.')
+    throw new Error('Invalid or expired JWT token.')
   }
 }
 
