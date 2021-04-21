@@ -1,5 +1,4 @@
 import { Response } from 'express'
-import Boom from '@hapi/boom'
 import { authenticator } from 'otplib'
 import { asyncWrapper, createQR } from '@shared/helpers'
 import { MFA } from '@shared/config'
@@ -9,7 +8,7 @@ import { RequestExtended } from '@shared/types'
 
 async function generateMfa(req: RequestExtended, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
-    throw Boom.unauthorized('Not logged in')
+    return res.boom.unauthorized('Not logged in')
   }
 
   const { 'user-id': user_id } = req.permission_variables
@@ -22,7 +21,12 @@ async function generateMfa(req: RequestExtended, res: Response): Promise<unknown
 
   await request(updateOtpSecret, { user_id, otp_secret })
 
-  const image_url = await createQR(otpAuth)
+  let image_url: string
+  try {
+    image_url = await createQR(otpAuth)
+  } catch(err) {
+    return res.boom.internal(err.message)
+  }
 
   return res.send({ image_url, otp_secret })
 }

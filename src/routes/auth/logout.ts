@@ -1,6 +1,5 @@
 import { Response } from 'express'
 import { asyncWrapper } from '@shared/helpers'
-import Boom from '@hapi/boom'
 import { request } from '@shared/request'
 import {
   selectRefreshToken,
@@ -16,7 +15,7 @@ interface HasuraData {
 
 async function logout({ body, refresh_token }: RequestExtended, res: Response): Promise<unknown> {
   if (!refresh_token || !refresh_token.value) {
-    throw Boom.unauthorized('Invalid or expired refresh token.')
+    return res.boom.unauthorized('Invalid or expired refresh token.')
   }
 
   // clear cookies
