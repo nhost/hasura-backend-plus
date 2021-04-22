@@ -6,12 +6,14 @@ import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema } from '@shared/validation'
+import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
 
-async function registerAccount({ body }: Request, res: Response): Promise<unknown> {
+async function registerAccount(req: Request, res: Response): Promise<unknown> {
+  const body = req.body
+
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   const {
@@ -19,28 +21,31 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
     password,
     user_data = {},
     register_options = {}
-  } = await registerSchema.validateAsync(body)
+  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkRegisterSchema : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
   }
 
-  try {
-    await checkHibp(password)
-  } catch(err) {
-    return res.boom.badRequest(err.message);
-  }
+  let password_hash: string | null = null;
 
   const ticket = uuidv4()
   const now = new Date()
   const ticket_expires_at = new Date()
   ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
 
-  let password_hash: string
-  try {
-    password_hash = await hashPassword(password)
-  } catch (err) {
-    return res.boom.internal(err.message)
+  if (typeof password !== 'undefined') {
+    try {
+      await checkHibp(password)
+    } catch (err) {
+      return res.boom.badRequest(err.message)
+    }
+
+    try {
+      password_hash = await hashPassword(password)
+    } catch (err) {
+      return res.boom.internal(err.message)
+    }
   }
 
   const defaultRole = register_options.default_role ?? REGISTRATION.DEFAULT_USER_ROLE
@@ -97,6 +102,35 @@ async function registerAccount({ body }: Request, res: Response): Promise<unknow
 
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
+
+    if (typeof password === 'undefined') {
+      try {
+        await emailClient.send({
+          template: 'magic-link',
+          message: {
+            to: user.email,
+            headers: {
+              'x-token': {
+                prepared: true,
+                value: ticket
+              }
+            }
+          },
+          locals: {
+            display_name,
+            token: ticket,
+            url: APPLICATION.SERVER_URL,
+            action: 'sign up'
+          }
+        })
+      } catch (err) {
+        console.error(err)
+        return res.boom.badImplementation()
+      }
+
+      const session: Session = { jwt_token: null, jwt_expires_in: null, user }
+      return res.send(session)
+    }
 
     try {
       await emailClient.send({

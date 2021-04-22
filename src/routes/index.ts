@@ -19,7 +19,7 @@ router.get('/version', (_req, res) =>
 // THIS ENDPOINT IS ONLY TO BE USED FOR TESTS!!
 // It allows us to programmatically enable/disable
 // functionality needed for specific tests.
-if(process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV !== 'production') {
   router.post('/change-env', (req, res) => {
     Object.assign(process.env, req.body)
     res.json(req.body)

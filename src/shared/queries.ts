@@ -140,6 +140,23 @@ export const selectRefreshToken = gql`
   ${accountFragment}
 `
 
+export const accountOfRefreshToken = gql`
+  query($refresh_token: uuid!) {
+    auth_refresh_tokens(
+      where: {
+        _and: [
+          { refresh_token: { _eq: $refresh_token } }
+        ]
+      }
+    ) {
+      account {
+        ...accountFragment
+      }
+    }
+  }
+  ${accountFragment}
+`
+
 export const updateRefreshToken = gql`
   mutation($old_refresh_token: uuid!, $new_refresh_token_data: auth_refresh_tokens_insert_input!) {
     delete_auth_refresh_tokens(where: { refresh_token: { _eq: $old_refresh_token } }) {
@@ -176,6 +193,9 @@ export const activateAccount = gql`
       _set: { active: true, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
+      returning {
+        id
+      }
     }
   }
 `

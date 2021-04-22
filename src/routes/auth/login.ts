@@ -4,10 +4,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
-import { loginAnonymouslySchema, loginSchema } from '@shared/validation'
+import { loginAnonymouslySchema, loginSchema, magicLinkLoginSchema } from '@shared/validation'
 import { insertAccount } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
+import { emailClient } from '@shared/email'
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 
 interface HasuraData {
@@ -68,7 +69,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await loginSchema.validateAsync(body)
+  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkLoginSchema : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -76,7 +77,37 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, active, ticket } = account
+  const { id, mfa_enabled, password_hash, active, ticket, email } = account
+
+  if (typeof password === 'undefined') {
+    const refresh_token = await setRefreshToken(res, id, useCookie)
+
+    try {
+      await emailClient.send({
+        template: 'magic-link',
+        message: {
+          to: email,
+          headers: {
+            'x-token': {
+              prepared: true,
+              value: refresh_token
+            }
+          }
+        },
+        locals: {
+          display_name: account.user.display_name,
+          token: refresh_token,
+          url: APPLICATION.SERVER_URL,
+          action: 'log in'
+        }
+      })
+
+      return res.send({ magicLink: true });
+    } catch (err) {
+      console.error(err)
+      return res.boom.badImplementation()
+    }
+  }
 
   if (!active) {
     return res.boom.badRequest('Account is not activated.')

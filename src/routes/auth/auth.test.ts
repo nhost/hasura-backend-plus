@@ -15,6 +15,8 @@ import { end, saveJwt, validJwt, validRefreshToken } from '@test/supertest-share
 
 import { Response } from 'superagent'
 
+import { withEnv } from '../../test/test-utils'
+
 /**
  * Store variables in memory.
  */
@@ -25,6 +27,7 @@ let jwtToken: string
  */
 const email = `${generateRandomString()}@${generateRandomString()}.com`
 const password = generateRandomString()
+const magicLinkEmail = `${generateRandomString()}@${generateRandomString()}.com`
 
 let request: SuperTest<Test>
 
@@ -60,6 +63,43 @@ it('should create an account', (done) => {
     .send({ email, password, user_data: { name: 'Test name' } })
     .expect(200)
     .end(end(done))
+})
+
+it('should create an account without a password when magic link login is enabled', async () => {
+  await withEnv({
+    ENABLE_MAGIC_LINK: 'true'
+  }, request, async () => {
+    const { body, status } = await request
+      .post('/auth/register')
+      .send({ email: magicLinkEmail, user_data: { name: 'Test name' } })
+
+    expect(status).toEqual(200)
+    expect(body.jwt_token).toBeNull()
+    expect(body.jwt_expires_in).toBeNull()
+    expect(body.user).toBeTruthy()
+
+    const [message] = await mailHogSearch(magicLinkEmail)
+    expect(message).toBeTruthy()
+    const token = message.Content.Headers['X-Token'][0]
+    await deleteMailHogEmail(message)
+
+    {
+      const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+      expect(status).toBe(302)
+    }
+  })
+})
+
+it('should not create an account without a password when magic link login is disabled', (done) => {
+  withEnv({
+    ENABLE_MAGIC_LINK: 'false'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({ email: magicLinkEmail, user_data: { name: 'Test name' } })
+      .expect(400)
+      .end(end(done))
+  })
 })
 
 it('should fail to create account with unallowed role', (done) => {
@@ -185,6 +225,38 @@ it('should sign the user in', (done) => {
     .expect(200)
     .expect(saveJwt(j => jwtToken = j))
     .end(end(done))
+})
+
+it('should sign the user in without password when magic link is enabled', async () => {
+  await withEnv({
+    ENABLE_MAGIC_LINK: 'true'
+  }, request, async () => {
+    const { body, status } = await request.post('/auth/login').send({ email: magicLinkEmail })
+    expect(status).toEqual(200)
+    expect(body.magicLink).toBeTrue()
+
+    const [message] = await mailHogSearch(magicLinkEmail)
+    expect(message).toBeTruthy()
+    const token = message.Content.Headers['X-Token'][0]
+    await deleteMailHogEmail(message)
+
+    {
+      const { status } = await request.get(`/auth/magic-link?action=log-in&token=${token}`)
+      expect(status).toBe(302)
+    }
+  })
+})
+
+it('should not sign the user in without password when magic link is disabled', (done) => {
+  withEnv({
+    ENABLE_MAGIC_LINK: 'false'
+  }, request, async () => {
+    request
+      .post('/auth/login')
+      .send({ email: magicLinkEmail })
+      .expect(400)
+      .end(end(done))
+  });
 })
 
 it('should not sign user in with invalid admin secret', (done) => {
