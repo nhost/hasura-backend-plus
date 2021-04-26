@@ -112,10 +112,12 @@ export const getJwkStore = (): JWKS.KeyStore => {
 /**
  * * Signs a payload with the existing JWT configuration
  */
-export const sign = (payload: object): string =>
+export const sign = (payload: object, accountData: AccountData): string =>
   JWT.sign(payload, jwtKey, {
     algorithm: CONFIG_JWT.ALGORITHM,
-    expiresIn: `${CONFIG_JWT.EXPIRES_IN}m`
+    expiresIn: `${CONFIG_JWT.EXPIRES_IN}m`,
+    subject: accountData.user.id,
+    issuer: 'nhost'
   })
 
 /**
@@ -138,8 +140,9 @@ export const getClaims = (authorization: string | undefined): Claims => {
  * Create JWT token.
  */
 export const createHasuraJwt = (accountData: AccountData): string =>
-  sign({
-    [CONFIG_JWT.CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true),
-    sub: accountData.user.id,
-    iss: 'nhost'
-  })
+  sign(
+    {
+      [CONFIG_JWT.CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true)
+    },
+    accountData
+  )
