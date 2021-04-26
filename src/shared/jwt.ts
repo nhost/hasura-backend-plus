@@ -63,7 +63,9 @@ export function generatePermissionVariables(
   jwt = false
 ): { [key: string]: ClaimValueType } {
   const prefix = jwt ? 'x-hasura-' : ''
-  const role = user.is_anonymous ? REGISTRATION.DEFAULT_ANONYMOUS_ROLE : default_role || REGISTRATION.DEFAULT_USER_ROLE
+  const role = user.is_anonymous
+    ? REGISTRATION.DEFAULT_ANONYMOUS_ROLE
+    : default_role || REGISTRATION.DEFAULT_USER_ROLE
   const accountRoles = account_roles.map(({ role: roleName }) => roleName)
 
   if (!accountRoles.includes(role)) {
@@ -137,5 +139,7 @@ export const getClaims = (authorization: string | undefined): Claims => {
  */
 export const createHasuraJwt = (accountData: AccountData): string =>
   sign({
-    [CONFIG_JWT.CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true)
+    [CONFIG_JWT.CLAIMS_NAMESPACE]: generatePermissionVariables(accountData, true),
+    sub: accountData.user.id,
+    iss: 'nhost'
   })
