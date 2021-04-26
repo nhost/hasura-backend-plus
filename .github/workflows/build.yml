@@ -84,6 +84,8 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install dependencies
         run: yarn
+      - name: Lint files
+        uses: wearerequired/lint-action@v1.9.0
       - name: Run Jest tests
         run: yarn run test:ci
       - name: Upload test results
