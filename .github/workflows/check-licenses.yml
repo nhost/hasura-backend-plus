@@ -1,0 +1,25 @@
+name: Build
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '**'
+      - '!*.md'
+  push:
+    branches: [master]
+    paths:
+      - '**'
+      - '!*.md'
+  release:
+    types: [published]
+jobs:
+  license-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Run license checker
+        run: npx license-checker@v25.0.1 --onlyAllow 'MIT;Apache-2.0;Apache 2.0;BSD-3-Clause;BSD-2-Clause;ISC;CC-BY-4.0;CC-BY-3.0;CC0-1.0;BSD*;BSD;Unlicense;MPL-2.0' --summary
