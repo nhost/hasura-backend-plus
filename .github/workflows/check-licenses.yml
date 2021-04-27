@@ -21,5 +21,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+      - name: Install dependencies
+        run: yarn
       - name: Run license checker
         run: npx license-checker@v25.0.1 --onlyAllow 'MIT;Apache-2.0;Apache 2.0;BSD-3-Clause;BSD-2-Clause;ISC;CC-BY-4.0;CC-BY-3.0;CC0-1.0;BSD*;BSD;Unlicense;MPL-2.0' --summary
