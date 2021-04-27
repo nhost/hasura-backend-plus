@@ -43,7 +43,10 @@ export const selectAccountByEmail = async (email: string): Promise<AccountData> 
 }
 
 export const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
-  const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, { ticket })
+  const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, {
+    ticket,
+    now: new Date()
+  })
   if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }

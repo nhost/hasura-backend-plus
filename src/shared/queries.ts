@@ -102,8 +102,8 @@ export const selectAccountByEmail = gql`
 `
 
 export const selectAccountByTicket = gql`
-  query($ticket: uuid!) {
-    auth_accounts(where: { ticket: { _eq: $ticket } }) {
+  query($ticket: uuid!, $now: timestamptz!) {
+    auth_accounts(where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }) {
       ...accountFragment
     }
   }
@@ -191,6 +191,20 @@ export const activateAccount = gql`
         _and: { active: { _eq: false }, ticket: { _eq: $ticket }, ticket_expires_at: { _gt: $now } }
       }
       _set: { active: true, ticket: $new_ticket, ticket_expires_at: $now }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+
+export const updateTicketExpiration = gql`
+  mutation($email: citext!, $ticket_expires_at: timestamptz!) {
+    update_auth_accounts(
+      where: { email: { _eq: $email } }
+      _set: { ticket_expires_at: $ticket_expires_at }
     ) {
       affected_rows
       returning {
