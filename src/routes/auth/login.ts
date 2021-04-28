@@ -5,7 +5,7 @@ import { asyncWrapper, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
 import { loginAnonymouslySchema, loginSchema, magicLinkLoginSchema } from '@shared/validation'
-import { insertAccount, updateTicketExpiration } from '@shared/queries'
+import { insertAccount, setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
 import { emailClient } from '@shared/email'
@@ -18,8 +18,7 @@ interface HasuraData {
   }
 }
 
-async function loginAccount({ body, headers, query }: Request, res: Response): Promise<unknown> {
-  query;
+async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
@@ -78,7 +77,7 @@ async function loginAccount({ body, headers, query }: Request, res: Response): P
     return res.boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, active, ticket, email } = account
+  const { id, mfa_enabled, password_hash, active, email } = account
 
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
@@ -132,11 +131,14 @@ async function loginAccount({ body, headers, query }: Request, res: Response): P
   }
 
   if (mfa_enabled) {
-    await request(updateTicketExpiration, {
-      email,
-      ticket_expires_at: new Date(
-        +Date.now() + 60 * 60 * 1000
-      )
+    const ticket = uuidv4()
+    const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000)
+
+    // set new ticket
+    await request(setNewTicket, {
+      user_id: account.user.id,
+      ticket,
+      ticket_expires_at
     })
 
     return res.send({ mfa: true, ticket })

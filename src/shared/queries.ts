@@ -200,20 +200,6 @@ export const activateAccount = gql`
   }
 `
 
-export const updateTicketExpiration = gql`
-  mutation($email: citext!, $ticket_expires_at: timestamptz!) {
-    update_auth_accounts(
-      where: { email: { _eq: $email } }
-      _set: { ticket_expires_at: $ticket_expires_at }
-    ) {
-      affected_rows
-      returning {
-        id
-      }
-    }
-  }
-`
-
 export const updateOtpSecret = gql`
   mutation($user_id: uuid!, $otp_secret: String!) {
     update_auth_accounts(
