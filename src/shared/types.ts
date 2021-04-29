@@ -40,6 +40,8 @@ export type Token = {
 } & {
   exp: bigint
   iat: bigint
+  iss: string
+  sub: string
 }
 
 export interface Session {
