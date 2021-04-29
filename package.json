@@ -29,7 +29,9 @@
     "docs:build": "vuepress build docs",
     "docs:dev": "vuepress dev docs",
     "build": "tsc",
-    "start": "node -r ./dist/start.js"
+    "start": "node -r ./dist/start.js",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "npm run lint --fix"
   },
   "config": {
     "commitizen": {
@@ -150,29 +152,6 @@
     "@shared": "./dist/shared",
     "@test": "./dist/test"
   },
-  "eslintConfig": {
-    "root": true,
-    "rules": {
-      "@typescript-eslint/camelcase": "off"
-    },
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "jest"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint",
-      "plugin:jest/recommended"
-    ]
-  },
-  "eslintIgnore": [
-    "dist",
-    "node_modules",
-    "*.js"
-  ],
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -183,11 +162,5 @@
       "eslint --fix",
       "prettier --write"
     ]
-  },
-  "prettier": {
-    "semi": false,
-    "printWidth": 100,
-    "singleQuote": true,
-    "trailingComma": "none"
   }
 }
