@@ -30,9 +30,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   let password_hash: string | null = null;
 
   const ticket = uuidv4()
-  const now = new Date()
-  const ticket_expires_at = new Date()
-  ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
+  const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
 
   if (typeof password !== 'undefined') {
     try {
