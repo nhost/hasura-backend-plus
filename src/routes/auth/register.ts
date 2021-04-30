@@ -6,7 +6,7 @@ import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
+import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -21,7 +21,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkRegisterSchema : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
