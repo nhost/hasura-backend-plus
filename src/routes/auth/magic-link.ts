@@ -81,7 +81,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
     res.status(200).send('You have logged in')
   } else if (action === 'sign-up') {
     if (APPLICATION.REDIRECT_URL_SUCCESS) {
-      return res.redirect(APPLICATION.REDIRECT_URL_SUCCESS)
+      return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
     }
 
     res.status(200).send('Your account has been activated. You can close this window and login')
