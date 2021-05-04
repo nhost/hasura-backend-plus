@@ -8,15 +8,11 @@ export async function applyMigrations(): Promise<void> {
     connectionString: process.env.DATABASE_URL
   }
 
-  console.log(dbConfig)
-
   const client = new Client(dbConfig)
   try {
     await client.connect()
     await migrate({ client }, './migrations')
-    console.log("after migrate")
   } finally {
-    console.log("finally")
     await client.end()
   }
   console.log('Finished applying migrations')
