@@ -4,7 +4,7 @@ services:
     image: postgres:12
     restart: always
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db/data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
   graphql-engine:
@@ -34,13 +34,10 @@ services:
     image: minio/minio
     restart: always
     volumes:
-      - 'minio_data:/data'
+      - ./minio_data:/data
     environment:
       S3_BUCKET: '${S3_BUCKET:-hasura-backend-plus}'
       MINIO_ACCESS_KEY: '${S3_ACCESS_KEY_ID:-minio_access_key}' ## min 8 character
       MINIO_SECRET_KEY: '${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY}' ## min 8 character
     entrypoint: sh
     command: "-c 'mkdir -p /data/$${S3_BUCKET:-hasura-backend-plus} && /usr/bin/minio server /data'"
-volumes:
-  db_data:
-  minio_data:

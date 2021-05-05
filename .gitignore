@@ -3,10 +3,10 @@ dist
 !.env.ci
 !.env*.example
 *.log
-hasura
 coverage
-config.yaml
 private.pem
 node_modules
 yarn-error.log
 package-lock.json
+db/data
+minio_data
