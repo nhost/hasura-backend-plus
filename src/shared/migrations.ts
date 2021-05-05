@@ -11,7 +11,7 @@ export async function applyMigrations(): Promise<void> {
   const client = new Client(dbConfig)
   try {
     await client.connect()
-    await migrate({ client }, './migrations')
+    await migrate({ client }, './db/migrations')
   } finally {
     await client.end()
   }
