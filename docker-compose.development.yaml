@@ -1,6 +1,7 @@
 version: '3.6'
 services:
   hasura-backend-plus:
+    command: npm run dev-command
     build:
       context: .
       dockerfile: Dockerfile.dev
