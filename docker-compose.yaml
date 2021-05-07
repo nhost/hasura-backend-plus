@@ -6,7 +6,6 @@ services:
     volumes:
       - ./db/data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d/
-
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
   graphql-engine:

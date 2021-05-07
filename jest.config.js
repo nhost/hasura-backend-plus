@@ -1,5 +1,5 @@
 module.exports = {
-  globalSetup: '<rootDir>/src/test/global-setup.ts',
+  //globalSetup: '<rootDir>/src/test/global-setup.ts',
   verbose: true,
   moduleNameMapper: {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
