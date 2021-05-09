@@ -115,7 +115,7 @@ export const getFile = async (
         width: newWidth,
         height: newHeight,
         fit,
-        position: ['entropy', 'attention'].includes(crop) ? sharp.strategy[crop] : crop
+        position: ['entropy', 'attention'].includes(crop) ? sharp.strategy[crop as 'entropy' | 'attention'] : crop
       })
 
       // Add a blur when specified
@@ -147,7 +147,7 @@ export const getFile = async (
 
       // Transform to the new format, if explicitly set
       if (contentType !== headObject.ContentType) {
-        const newFormat = contentType.split('image/')[1]
+        const newFormat = contentType.split('image/')[1] as 'avif' | 'jpeg' | 'png' | 'webp'
 
         if (newFormat) {
           transformer.toFormat(newFormat)
