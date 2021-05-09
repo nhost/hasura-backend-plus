@@ -1,4 +1,4 @@
-import { APPLICATION, REGISTRATION } from '@shared/config'
+import { APPLICATION } from '@shared/config'
 import { Request, Response } from 'express'
 import Boom from '@hapi/boom'
 import { accountOfRefreshToken, activateAccount } from '@shared/queries'
@@ -80,12 +80,8 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
 
     res.status(200).send('You have logged in')
   } else if (action === 'sign-up') {
-    if (APPLICATION.REDIRECT_URL_SUCCESS) {
-      return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
-    }
-
-    if(REGISTRATION.ACTIVATE_REDIRECT_URL) {
-      res.redirect(REGISTRATION.ACTIVATE_REDIRECT_URL.replace('JWT_TOKEN', token))
+    if(APPLICATION.REDIRECT_URL_SUCCESS) {
+      res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', token))
     } else
       res.status(200).send('Your account has been activated. You can close this window and login')
   } else {
