@@ -3,160 +3,155 @@ import 'jest-extended'
 import { account, request } from '@test/test-mock-account'
 
 import { authenticator } from 'otplib'
+import { end, saveJwt, validJwt, validRefreshToken } from '@test/supertest-shared-utils'
+
+import { Response } from 'superagent'
 
 let otpSecret: string
 let accountTicket: string
 
-it('should generate a secret', async () => {
-  const { body, status } = await request.post('/auth/mfa/generate')
+function saveTicket() {
+  return (res: Response) => {
+    accountTicket = res.body.ticket
+  }
+}
 
-  /**
-   * Save OTP secret to globally scoped variable.
-   */
-  otpSecret = body.otp_secret
+function validTicket() {
+  return (res: Response) => {
+    expect(res.body.mfa).toBeTrue()
+    expect(res.body.ticket).toBeString()
+  }
+}
 
-  expect(status).toEqual(200)
+function saveOtpSecret() {
+  return (res: Response) => {
+    otpSecret = res.body.otp_secret
+  }
+}
 
-  expect(body.image_url).toBeString()
-  expect(body.otp_secret).toBeString()
+function validOtpSecret() {
+  return (res: Response) => {
+    expect(res.body.image_url).toBeString()
+    expect(res.body.otp_secret).toBeString()
+  }
+}
+
+it('should generate a secret', (done) => {
+  request
+    .post('/auth/mfa/generate')
+    .expect(200)
+    .expect(validOtpSecret())
+    .expect(saveOtpSecret())
+    .end(end(done))
 })
 
-it('should enable mfa for account', async () => {
-  const { status } = await request
+it('should enable mfa for account', (done) => {
+  request
     .post('/auth/mfa/enable')
     .send({ code: authenticator.generate(otpSecret) })
-
-  expect(status).toEqual(204)
+    .expect(204)
+    .end(end(done))
 })
 
-it('should return a ticket', async () => {
-  const { body, status } = await request
+it('should return a ticket', (done) => {
+  request
     .post('/auth/login')
     .send({ email: account.email, password: account.password })
-
-  /**
-   * Save ticket to globally scoped varaible.
-   */
-  accountTicket = body.ticket
-
-  expect(status).toEqual(200)
-
-  expect(body.mfa).toBeTrue()
-  expect(body.ticket).toBeString()
+    .expect(200)
+    .expect(validTicket())
+    .expect(saveTicket())
+    .end(end(done))
 })
 
-it('should sign the account in (mfa)', async () => {
-  const { body, status } = await request.post('/auth/mfa/totp').send({
-    ticket: accountTicket,
-    code: authenticator.generate(otpSecret)
-  })
-
-  /**
-   * Save JWT token to globally scoped varaible.
-   */
-  account.token = body.jwt_token
-
-  expect(status).toEqual(200)
-
-  expect(body.jwt_token).toBeString()
-  expect(body.jwt_expires_in).toBeNumber()
+it('should sign the account in (mfa)', (done) => {
+  request
+    .post('/auth/mfa/totp').send({
+      ticket: accountTicket,
+      code: authenticator.generate(otpSecret)
+    })
+    .expect(200)
+    .expect(saveJwt((j) => account.token = j))
+    .expect(validJwt())
+    .end(end(done))
 })
 
-it('should disable mfa for account', async () => {
-  const { status } = await request
+it('should disable mfa for account', (done) => {
+  request
     .post('/auth/mfa/disable')
     .send({ code: authenticator.generate(otpSecret) })
-
-  expect(status).toEqual(204)
+    .expect(204)
+    .end(end(done))
 })
 
 describe('MFA without cookies', () => {
   let jwtToken: string
 
   // to make sure no cookies are set
-  it('Should logout user', async () => {
-    const { status } = await request.post('/auth/logout')
-    expect(status).toEqual(204)
+  it('Should logout user', (done) => {
+    request
+      .post('/auth/logout')
+      .expect(204)
+      .end(end(done))
   })
 
-  it('Should login without cookies', async () => {
-    const { body, status } = await request
+  it('Should login without cookies', (done) => {
+    request
       .post('/auth/login')
       .send({ email: account.email, password: account.password, cookie: false })
-    // Save JWT token to globally scoped varaible.
-    jwtToken = body.jwt_token
-
-    expect(status).toEqual(200)
+      .expect(200)
+      .expect(saveJwt((j) => jwtToken = j))
+      .end(end(done))
   })
 
-  it('should generate a secret', async () => {
-    const { body, status } = await request
+  it('should generate a secret', (done) => {
+    request
       .post('/auth/mfa/generate')
       .set({ Authorization: `Bearer ${jwtToken}` })
-
-    /**
-     * Save OTP secret to globally scoped variable.
-     */
-    otpSecret = body.otp_secret
-
-    expect(status).toEqual(200)
-
-    expect(body.image_url).toBeString()
-    expect(body.otp_secret).toBeString()
+      .expect(200)
+      .expect(validOtpSecret())
+      .expect(saveOtpSecret())
+      .end(end(done))
   })
 
-  it('should enable mfa for account', async () => {
-    const { status } = await request
+  it('should enable mfa for account', (done) => {
+    request
       .post('/auth/mfa/enable')
       .set({ Authorization: `Bearer ${jwtToken}` })
       .send({ code: authenticator.generate(otpSecret) })
-
-    expect(status).toEqual(204)
+      .expect(204)
+      .end(end(done))
   })
 
-  it('should return a ticket', async () => {
-    const { body, status } = await request
+  it('should return a ticket', (done) => {
+    request
       .post('/auth/login')
       .send({ email: account.email, password: account.password })
-
-    /**
-     * Save ticket to globally scoped varaible.
-     */
-    accountTicket = body.ticket
-
-    expect(status).toEqual(200)
-
-    expect(body.mfa).toBeTrue()
-    expect(body.ticket).toBeString()
+      .expect(200)
+      .expect(validTicket())
+      .expect(saveTicket())
+      .end(end(done))
   })
 
-  it('should sign the account in (mfa)', async () => {
-    const { body, status } = await request.post('/auth/mfa/totp').send({
-      ticket: accountTicket,
-      code: authenticator.generate(otpSecret),
-      cookie: false
-    })
-
-    /**
-     * Save JWT token to globally scoped varaible.
-     */
-    jwtToken = body.jwt_token
-
-    expect(status).toEqual(200)
-
-    expect(body.jwt_token).toBeString()
-    expect(body.jwt_expires_in).toBeNumber()
-
-    const uuid_regex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
-    expect(body.refresh_token).toMatch(uuid_regex)
+  it('should sign the account in (mfa)', (done) => {
+    request
+      .post('/auth/mfa/totp').send({
+        ticket: accountTicket,
+        code: authenticator.generate(otpSecret),
+        cookie: false
+      })
+      .expect(200)
+      .expect(validJwt())
+      .expect(validRefreshToken())
+      .expect(saveJwt((j) => jwtToken = j))
+      .end(end(done))
   })
 
-  it('should disable mfa for account', async () => {
-    const { status } = await request
+  it('should disable mfa for account', (done) => {
+    request
       .post('/auth/mfa/disable')
       .set({ Authorization: `Bearer ${jwtToken}` })
       .send({ code: authenticator.generate(otpSecret) })
-
-    expect(status).toEqual(204)
+      .expect(204)
+      .end(end(done))
   })
 })

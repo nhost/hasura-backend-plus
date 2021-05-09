@@ -1,8 +1,7 @@
 import { NextFunction, Response } from 'express'
 import { PathConfig, createContext, getKey, hasPermission } from './utils'
 
-import Boom from '@hapi/boom'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import archiver from 'archiver'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
@@ -17,10 +16,10 @@ export const listFile = async (
   const key = getKey(req)
   const context = createContext(req)
   if (!hasPermission([rules.list, rules.read], context)) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
   const params = {
-    Bucket: S3_BUCKET as string,
+    Bucket: STORAGE.S3_BUCKET,
     Prefix: key.slice(0, -1)
   }
   const list = await s3.listObjectsV2(params).promise()
@@ -32,7 +31,7 @@ export const listFile = async (
           key: Key as string,
           head: await s3
             .headObject({
-              Bucket: S3_BUCKET as string,
+              Bucket: STORAGE.S3_BUCKET,
               Key: Key as string
             })
             .promise()
@@ -53,7 +52,7 @@ export const listFile = async (
       const archive = archiver('zip')
       headObjectsList.forEach((entry) => {
         const objectStream = s3
-          .getObject({ Bucket: S3_BUCKET as string, Key: entry.key })
+          .getObject({ Bucket: STORAGE.S3_BUCKET, Key: entry.key })
           .createReadStream()
         archive.append(objectStream, { name: entry.key })
       })

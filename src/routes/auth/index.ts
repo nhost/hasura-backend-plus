@@ -1,10 +1,3 @@
-import {
-  MFA_ENABLE,
-  CHANGE_EMAIL_ENABLE,
-  AUTO_ACTIVATE_NEW_USERS,
-  ALLOW_USER_SELF_DELETE,
-  AUTH_LOCAL_USERS_ENABLE
-} from '@shared/config'
 import { Router } from 'express'
 import nocache from 'nocache'
 import changeEmail from './change-email'
@@ -18,40 +11,33 @@ import registerAccount from './register'
 import token from './token'
 import activateAccount from './activate'
 import deleteAccount from './delete'
+import magicLink from './magic-link'
+import { AUTHENTICATION } from '@shared/config'
 
 const router = Router()
 
 router.use(nocache())
 
-if (providers) {
-  router.use('/providers', providers)
-}
+router.use((req, res, next) => {
+  if (!AUTHENTICATION.ENABLE) {
+    return res.boom.badImplementation(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+  } else {
+    return next();
+  }
+})
 
-if (MFA_ENABLE) {
-  router.use('/mfa', mfa)
-}
-
-if (CHANGE_EMAIL_ENABLE) {
-  router.use('/change-email', changeEmail)
-}
-
-if (!AUTO_ACTIVATE_NEW_USERS) {
-  router.get('/activate', activateAccount)
-}
-
-if (ALLOW_USER_SELF_DELETE) {
-  router.post('/delete', deleteAccount)
-}
-
-if (AUTH_LOCAL_USERS_ENABLE) {
-  router
-    .post('/login', loginAccount)
-    .post('/logout', logout)
-    .post('/register', registerAccount)
-    .use('/change-password', changePassword)
-}
-
+router.use('/providers', providers)
+router.use('/mfa', mfa)
+router.use('/change-email', changeEmail)
+router.get('/activate', activateAccount)
+router.post('/delete', deleteAccount)
+router
+  .post('/login', loginAccount)
+  .post('/logout', logout)
+  .post('/register', registerAccount)
+  .use('/change-password', changePassword)
 router.get('/jwks', getJwks)
 router.use('/token', token)
+router.get('/magic-link', magicLink)
 
 export default router

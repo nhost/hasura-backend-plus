@@ -1,13 +1,13 @@
 import { NextFunction, Response } from 'express'
 import { PathConfig, createContext, getHeadObject, getKey, hasPermission } from './utils'
 
-import Boom from '@hapi/boom'
 import sharp from 'sharp'
 import { createHash } from 'crypto'
-import { S3_BUCKET } from '@shared/config'
+import { STORAGE } from '@shared/config'
 import { s3 } from '@shared/s3'
 import { RequestExtended } from '@shared/types'
 import { imgTransformParams } from '@shared/validation'
+import type { S3 } from 'aws-sdk'
 
 const AVIF = 'image/avif'
 const WEBP = 'image/webp'
@@ -34,18 +34,27 @@ export const getFile = async (
   isMetadataRequest = false
 ): Promise<unknown> => {
   const key = getKey(req)
-  const headObject = await getHeadObject(req)
-  if (!headObject?.Metadata) {
-    throw Boom.forbidden()
-  } else if (!req?.headers) {
-    throw Boom.badImplementation('No headers were set')
-  } else if (!req?.headers.accept) {
-    throw Boom.badImplementation('No accept headers were set')
+
+  let headObject: S3.HeadObjectOutput | undefined;
+
+  try {
+    headObject = await getHeadObject(req)
+  } catch {
+    return res.boom.notFound();
   }
+
+  if (!headObject?.Metadata) {
+    return res.boom.forbidden()
+  } else if (!req?.headers) {
+    return res.boom.badImplementation('No headers were set')
+  } else if (!req?.headers.accept) {
+    return res.boom.badImplementation('No accept headers were set')
+  }
+
   const context = createContext(req, headObject)
 
   if (!hasPermission([rules.get, rules.read], context)) {
-    throw Boom.forbidden()
+    return res.boom.forbidden()
   }
   if (isMetadataRequest) {
     return res.status(200).send({ key, ...headObject })
@@ -54,14 +63,14 @@ export const getFile = async (
     if (width || height || quality !== 100 || format || fit || crop || radius || blur) {
 
       const params = {
-        Bucket: S3_BUCKET as string,
+        Bucket: STORAGE.S3_BUCKET,
         Key: key
       }
 
       const object = await s3.getObject(params).promise()
 
       if (!object.Body) {
-        throw Boom.badImplementation('File found without body')
+        return res.boom.notFound('File found without body')
       }
 
       // Find and set the contentType
@@ -77,7 +86,7 @@ export const getFile = async (
       }
 
       if (!contentType) {
-        throw Boom.badImplementation('Unable to determine ContentType')
+        return res.boom.badImplementation('Unable to determine ContentType')
       }
 
       const transformer = sharp(object.Body as Buffer)
@@ -85,11 +94,11 @@ export const getFile = async (
       const { width: originalWidth, height: originalHeight } = await transformer.metadata()
 
       if (!originalHeight) {
-        throw Boom.badImplementation('Unable to determine image height')
+        return res.boom.badImplementation('Unable to determine image height')
       }
 
       if (!originalWidth) {
-        throw Boom.badImplementation('Unable to determine image width')
+        return res.boom.badImplementation('Unable to determine image width')
       }
 
       // Use the newWidth and newHeight variables to not serve an image that is larger than the original
@@ -177,7 +186,7 @@ export const getFile = async (
       }
 
       const params = {
-        Bucket: S3_BUCKET as string,
+        Bucket: STORAGE.S3_BUCKET,
         Key: key,
         Range: range
       }
@@ -193,7 +202,7 @@ export const getFile = async (
       res.set('Content-Length', headObject.ContentLength?.toString())
       res.set('Last-Modified', headObject.LastModified?.toUTCString())
       res.set('Content-Disposition', `inline;`)
-      res.set('Cache-Control', 'public, max-age=3w1557600')
+      res.set('Cache-Control', 'public, max-age=31557600')
       res.set('ETag', headObject.ETag)
 
       // Set Content Range, Length Accepted Ranges

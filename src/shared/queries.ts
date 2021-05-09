@@ -1,4 +1,4 @@
-import { JWT_CUSTOM_FIELDS } from './config'
+import { JWT } from './config'
 import gql from 'graphql-tag'
 
 const accountFragment = gql`
@@ -12,7 +12,7 @@ const accountFragment = gql`
     user {
       id
       display_name
-      ${JWT_CUSTOM_FIELDS.join('\n\t\t\t')}
+      ${JWT.CUSTOM_FIELDS.join('\n\t\t\t')}
     }
     is_anonymous
     ticket
@@ -102,8 +102,8 @@ export const selectAccountByEmail = gql`
 `
 
 export const selectAccountByTicket = gql`
-  query($ticket: uuid!) {
-    auth_accounts(where: { ticket: { _eq: $ticket } }) {
+  query($ticket: uuid!, $now: timestamptz!) {
+    auth_accounts(where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }) {
       ...accountFragment
     }
   }
@@ -129,6 +129,23 @@ export const selectRefreshToken = gql`
           { refresh_token: { _eq: $refresh_token } }
           { account: { active: { _eq: true } } }
           { expires_at: { _gte: $current_timestamp } }
+        ]
+      }
+    ) {
+      account {
+        ...accountFragment
+      }
+    }
+  }
+  ${accountFragment}
+`
+
+export const accountOfRefreshToken = gql`
+  query($refresh_token: uuid!) {
+    auth_refresh_tokens(
+      where: {
+        _and: [
+          { refresh_token: { _eq: $refresh_token } }
         ]
       }
     ) {
@@ -176,6 +193,9 @@ export const activateAccount = gql`
       _set: { active: true, ticket: $new_ticket, ticket_expires_at: $now }
     ) {
       affected_rows
+      returning {
+        id
+      }
     }
   }
 `

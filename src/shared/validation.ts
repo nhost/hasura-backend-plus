@@ -1,4 +1,4 @@
-import { ALLOWED_EMAIL_DOMAINS, REGISTRATION_CUSTOM_FIELDS, MIN_PASSWORD_LENGTH } from './config'
+import { REGISTRATION } from './config'
 import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
@@ -21,9 +21,9 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
         return this.$_addRule({ name: 'allowedDomains' })
       },
       validate(value: string, helpers): unknown {
-        if (ALLOWED_EMAIL_DOMAINS) {
+        if (REGISTRATION.ALLOWED_EMAIL_DOMAINS) {
           const lowerValue = value.toLowerCase()
-          const allowedEmailDomains = ALLOWED_EMAIL_DOMAINS.split(',')
+          const allowedEmailDomains = REGISTRATION.ALLOWED_EMAIL_DOMAINS.split(',')
 
           if (allowedEmailDomains.every((domain) => !lowerValue.endsWith(domain.toLowerCase()))) {
             return helpers.error('string.allowedDomains')
@@ -36,18 +36,24 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(MIN_PASSWORD_LENGTH).max(128).required()
+const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128);
+const passwordRuleRequired = passwordRule.required();
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
 const accountFields = {
+  email: emailRule,
+  password: passwordRuleRequired
+}
+
+const accountFieldsMagicLink = {
   email: emailRule,
   password: passwordRule
 }
 
 export const userDataFields = {
   user_data: Joi.object(
-    REGISTRATION_CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
+    REGISTRATION.CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
       (aggr, key) => ({
         ...aggr,
         [key]: [
@@ -72,6 +78,13 @@ export const registerSchema = Joi.object({
   ...userDataFields,
   cookie: Joi.boolean()
 })
+
+export const registerSchemaMagicLink = Joi.object({
+  ...accountFieldsMagicLink,
+  ...userDataFields,
+  cookie: Joi.boolean()
+})
+
 
 export const registerUserDataSchema = Joi.object(userDataFields)
 
@@ -104,11 +117,21 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
-  email: Joi.string(), // these will be checked more regeriously in `loginSchema`
-  password: Joi.string() // these will be checked more regeriously in `loginSchema`
+  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
+  password: Joi.string() // these will be checked more rigorously in `loginSchema`
+})
+export const magicLinkLoginAnonymouslySchema = Joi.object({
+  anonymous: Joi.boolean(),
+  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
 })
 export const loginSchema = extendedJoi.object({
-  ...accountFields,
+  email: emailRule,
+  password: Joi.string().required(),
+  cookie: Joi.boolean()
+})
+export const loginSchemaMagicLink = extendedJoi.object({
+  email: emailRule,
+  password: Joi.string(),
   cookie: Joi.boolean()
 })
 export const forgotSchema = Joi.object({ email: emailRule })
@@ -165,3 +188,9 @@ export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),
   action: Joi.string().valid('revoke-token').required()
 })
+
+export const magicLinkQuery = Joi.object({
+  token: Joi.string().required(),
+  action: Joi.string().valid('log-in', 'sign-up').required(),
+  cookie: Joi.boolean().optional(),
+});

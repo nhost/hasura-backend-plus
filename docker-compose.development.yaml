@@ -24,7 +24,7 @@ services:
       HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "${JWT_KEY}"}'
   minio:
     ports:
-      - 8000:9000 # Do not use port 9000 in the host machine as developpers using portainer might already use it
+      - '9000:9000' # Do not use port 9000 in the host machine as developpers using portainer might already use it
   mailhog:
     image: mailhog/mailhog
     ports:

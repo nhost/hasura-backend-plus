@@ -4,12 +4,26 @@ import { castIntEnv, castStringArrayEnv } from '../utils'
 /**
  * * Authentication settings
  */
-export const {
-  JWT_KEY,
-  JWT_ALGORITHM = 'RS256',
-  JWT_CLAIMS_NAMESPACE = 'https://hasura.io/jwt/claims'
-} = process.env
-export const JWT_KEY_FILE_PATH = path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
-export const JWT_EXPIRES_IN = castIntEnv('JWT_EXPIRES_IN', 15)
-export const JWT_REFRESH_EXPIRES_IN = castIntEnv('JWT_REFRESH_EXPIRES_IN', 43200)
-export const JWT_CUSTOM_FIELDS = castStringArrayEnv('JWT_CUSTOM_FIELDS')
+export const JWT = {
+  get KEY() {
+    return process.env.JWT_KEY || ''
+  },
+  get ALGORITHM() {
+    return process.env.JWT_ALGORITHM || 'RS256'
+  },
+  get CLAIMS_NAMESPACE() {
+    return process.env.JWT_CLAIMS_NAMESPACE || 'https://hasura.io/jwt/claims'
+  },
+  get KEY_FILE_PATH() {
+    return path.resolve(process.env.PWD || '.', 'custom/keys/private.pem')
+  },
+  get EXPIRES_IN() {
+    return castIntEnv('JWT_EXPIRES_IN', 15)
+  },
+  get REFRESH_EXPIRES_IN() {
+    return castIntEnv('JWT_REFRESH_EXPIRES_IN', 43200)
+  },
+  get CUSTOM_FIELDS() {
+    return castStringArrayEnv('JWT_CUSTOM_FIELDS')
+  },
+}

@@ -40,6 +40,8 @@ export type Token = {
 } & {
   exp: bigint
   iat: bigint
+  iss: string
+  sub: string
 }
 
 export interface Session {
@@ -79,7 +81,9 @@ export interface QueryAccountData {
 export interface UpdateAccountData {
   update_auth_accounts: {
     affected_rows: number
-    // AccountData[]
+    returning: {
+      id: string
+    }[]
   }
 }
 

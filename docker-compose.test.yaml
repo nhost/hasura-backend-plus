@@ -1,7 +1,6 @@
 version: '3.6'
 services:
   hasura-backend-plus:
-    command: yarn run test
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -15,6 +14,8 @@ services:
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       SMTP_SECURE: 'false'
+    ports:
+      - '9229:9229'
     volumes:
       - .:/app
       - /app/node_modules

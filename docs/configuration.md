@@ -418,17 +418,17 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 
 ### General
 
-| Name                          | Default | Description                                                                                                 |
-| ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`                    |         |                                                                                                             |
+| Name                          | Default | Description                                                                                                                                                  |
+| ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NODE_ENV`                    |         |                                                                                                                                                              |
 | `LOG_LEVEL`                   | INFO    | Piped to the Hasura CLI when applying migrations/metadata. Allowed values [here](https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura.html#options). |
-| `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                       |
-| `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**. |
-| `HOST`                        |         | Listening host of the service                                                                               |
-| `PORT`                        | 3000    | Port of the service                                                                                         |
-| `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                             |
-| `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                  |
-| `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                 |
+| `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                                                                        |
+| `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**.                                                  |
+| `HOST`                        |         | Listening host of the service                                                                                                                                |
+| `PORT`                        | 3000    | Port of the service                                                                                                                                          |
+| `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                                                                              |
+| `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                                                                   |
+| `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                                                                  |
 
 ### Authentication
 
@@ -470,7 +470,8 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
-| `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                                     |
+| `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
+| `ENABLE_MAGIC_LINK`        | false                   |
 
 ### Providers
 
