@@ -7,15 +7,7 @@ import { promisify } from 'util'
 import { end } from '@test/supertest-shared-utils'
 
 import { Response } from 'superagent'
-import { getClaims } from '@shared/jwt'
 import { registerAndLoginAccount } from '@test/utils'
-import { SuperTest, Test } from 'supertest'
-
-const getUserId = (token: string): string => getClaims(token)['x-hasura-user-id']
-
-const registerAndLoginAccountUserId = async (agent: SuperTest<Test>) => {
-  return getUserId((await registerAndLoginAccount(agent)).token)
-}
 
 const readFile = promisify(fs.readFile)
 const filePath = 'package.json'
@@ -57,8 +49,9 @@ function setFileToken(saver: (f: string) => any) {
 }
 
 it('new user should not have any files', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request.get(`/storage/m/user/${id}/`)
+      .query({ refresh_token, permission_variables })
       .expect(200)
       .expect(bodyArray(0))
       .end(end(done))
@@ -66,9 +59,10 @@ it('new user should not have any files', (done) => {
 })
 
 it('should be able to upload a new file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end(end(done))
@@ -78,9 +72,10 @@ it('should be able to upload a new file', (done) => {
 it('should be able to revoke and generate new token', (done) => {
   let fileToken = ''
 
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .expect(setFileToken(f => fileToken = f))
@@ -89,6 +84,7 @@ it('should be able to revoke and generate new token', (done) => {
 
         request
           .post(`/storage/m/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
           .send({ action: 'revoke-token' })
           .expect(200)
@@ -101,9 +97,10 @@ it('should be able to revoke and generate new token', (done) => {
 })
 
 it('should fail to revoke token on incorrect admin secret', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -111,6 +108,7 @@ it('should fail to revoke token on incorrect admin secret', (done) => {
 
         request
           .post(`/storage/m/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .set({ 'x-admin-secret': 'incorrect-admin-secret' })
           .send({ action: 'revoke-token' })
           .expect(403)
@@ -120,9 +118,10 @@ it('should fail to revoke token on incorrect admin secret', (done) => {
 })
 
 it('should fail with non existing action with correct admin secret', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -139,9 +138,10 @@ it('should fail with non existing action with correct admin secret', (done) => {
 })
 
 it('should fail to with incorrect action and incorrect admin secret', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -158,9 +158,10 @@ it('should fail to with incorrect action and incorrect admin secret', (done) => 
 })
 
 it('should get the correct amount of files', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -168,6 +169,7 @@ it('should get the correct amount of files', (done) => {
 
         request
           .get(`/storage/m/user/${id}/`)
+          .query({ refresh_token, permission_variables })
           .expect(200)
           .expect(bodyArray(1))
           .end(end(done))
@@ -176,9 +178,10 @@ it('should get the correct amount of files', (done) => {
 })
 
 it('should fail if trying to upload, without a file attached', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -186,6 +189,7 @@ it('should fail if trying to upload, without a file attached', (done) => {
 
         request
           .post(`/storage/o/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .expect(400)
           .end(end(done))
       })
@@ -193,9 +197,10 @@ it('should fail if trying to upload, without a file attached', (done) => {
 })
 
 it('should update an existing file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -203,6 +208,7 @@ it('should update an existing file', (done) => {
 
         request
           .post(`/storage/o/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .attach('file', filePath)
           .expect(200)
           .end(end(done))
@@ -211,9 +217,10 @@ it('should update an existing file', (done) => {
 })
 
 it('should not upload file on missing file name in correct path', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(404)
       .end(end(done))
@@ -221,9 +228,10 @@ it('should not upload file on missing file name in correct path', (done) => {
 })
 
 it('should not upload file on incorrect file path', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/123/`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(403)
       .end(end(done))
@@ -231,9 +239,10 @@ it('should not upload file on incorrect file path', (done) => {
 })
 
 it('should only include one file when updating the same file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -241,6 +250,7 @@ it('should only include one file when updating the same file', (done) => {
 
         request
           .post(`/storage/o/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .attach('file', filePath)
           .expect(200)
           .expect(
@@ -253,6 +263,7 @@ it('should only include one file when updating the same file', (done) => {
 
             request
               .get(`/storage/m/user/${id}/`)
+              .query({ refresh_token, permission_variables })
               .expect(200)
               .expect(bodyArray(1))
               .end(end(done))
@@ -262,9 +273,10 @@ it('should only include one file when updating the same file', (done) => {
 })
 
 it('should not update an hypothetical file of another hypothetical user', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/another-user/another-file`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(403)
       .end(end(done))
@@ -272,9 +284,10 @@ it('should not update an hypothetical file of another hypothetical user', (done)
 })
 
 it('should get file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -283,6 +296,7 @@ it('should get file', (done) => {
         readFile(filePath, 'utf8').then(fileData => {
           request
             .get(`/storage/o/user/${id}/${filePath}`)
+            .query({ refresh_token, permission_variables })
             .expect(200)
             .expect(textIsFileData(fileData))
             .end(end(done))
@@ -295,9 +309,10 @@ describe('Tests as an unauthenticated user', () => {
   it('should get file from the token stored in the file metadata while unauthenticated', (done) => {
     let fileToken = ''
 
-    registerAndLoginAccountUserId(request).then(id => {
+    registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
       request
         .post(`/storage/o/user/${id}/${filePath}`)
+        .query({ refresh_token, permission_variables })
         .attach('file', filePath)
         .expect(200)
         .expect(
@@ -328,9 +343,10 @@ describe('Tests as an unauthenticated user', () => {
   })
 
   it('should not get file from incorrect token while unauthenticated', (done) => {
-    registerAndLoginAccountUserId(request).then(id => {
+    registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
       request
         .post(`/storage/o/user/${id}/${filePath}`)
+        .query({ refresh_token, permission_variables })
         .attach('file', filePath)
         .expect(200)
         .end((err) => {
@@ -354,9 +370,10 @@ describe('Tests as an unauthenticated user', () => {
   })
 
   it('should not get file without authentication nor token', (done) => {
-    registerAndLoginAccountUserId(request).then(id => {
+    registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
       request
         .post(`/storage/o/user/${id}/${filePath}`)
+        .query({ refresh_token, permission_variables })
         .attach('file', filePath)
         .expect(200)
         .end((err) => {
@@ -388,9 +405,10 @@ describe('Tests as an unauthenticated user', () => {
 it('should get file metadata', (done) => {
   let fileToken = ''
 
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .expect(
@@ -404,6 +422,7 @@ it('should get file metadata', (done) => {
 
         request
           .get(`/storage/m/user/${id}/${filePath}`)
+          .query({ refresh_token, permission_variables })
           .expect(200)
           .expect(tokenIsFileToken(fileToken))
           .end(end(done))
@@ -412,9 +431,10 @@ it('should get file metadata', (done) => {
 })
 
 it('should get the headers of all the user files', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .post(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .attach('file', filePath)
       .expect(200)
       .end((err) => {
@@ -422,6 +442,7 @@ it('should get the headers of all the user files', (done) => {
 
         request
           .get(`/storage/m/user/${id}/`)
+          .query({ refresh_token, permission_variables })
           .expect(200)
           .expect(bodyArray(1))
           .end(end(done))
@@ -430,9 +451,10 @@ it('should get the headers of all the user files', (done) => {
 })
 
 it('should get a zip that contains all user files', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .get(`/storage/o/user/${id}/`)
+      .query({ refresh_token, permission_variables })
       .expect(200)
       .expect(text())
       .end(end(done))
@@ -441,9 +463,10 @@ it('should get a zip that contains all user files', (done) => {
 })
 
 it('should delete file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
         .post(`/storage/o/user/${id}/${filePath}`)
+        .query({ refresh_token, permission_variables })
         .attach('file', filePath)
         .expect(200)
         .end((err) => {
@@ -451,6 +474,7 @@ it('should delete file', (done) => {
 
           request
             .delete(`/storage/o/user/${id}/${filePath}`)
+            .query({ refresh_token, permission_variables })
             .expect(204)
             .end(end(done))
         })
@@ -458,18 +482,20 @@ it('should delete file', (done) => {
 })
 
 it('should not be able to get deleted file', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .get(`/storage/o/user/${id}/${filePath}`)
+      .query({ refresh_token, permission_variables })
       .expect(404)
       .end(end(done))
   })
 })
 
 it('should get the headers of no files', (done) => {
-  registerAndLoginAccountUserId(request).then(id => {
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
     request
       .get(`/storage/m/user/${id}/`)
+      .query({ refresh_token, permission_variables })
       .expect(200)
       .expect(bodyArray(0))
       .end(end(done))
@@ -477,72 +503,183 @@ it('should get the headers of no files', (done) => {
 })
 
 it('should upload a new imae', (done) => {
-  request
-    .post(`/storage/o/public/example.jpg`)
-    .attach('file', 'test-mocks/example.jpg')
-    .expect(200)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ id, refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(end(done))
+  })
 })
 
 it('should get image', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg`)
-    .expect(200)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ refresh_token, permission_variables })
+          .expect(200)
+          .end(end(done))
+      })
+  })
 })
 
 it('should get image with width and height parameter', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?w=100&h=200`)
-    .expect(200)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ w: '100', h: '200', refresh_token, permission_variables })
+          .expect(200)
+          .end(end(done))
+      })
+  })
 })
 
 it('should get image with width, height and quality parameter', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?w=100&h=200&q=50`)
-    .expect(200)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ w: '100', h: '200', q: '50', refresh_token, permission_variables })
+          .expect(200)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with width parameter of -1', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?w=-1`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ w: '-1', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with width parameter of 10000', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?w=10000`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ w: '10000', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with height parameter of -1', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?h=-1`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ h: '-1', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with height parameter of 10000', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?h=10000`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ h: '10000', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with quality parameter of -1', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?q=-1`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ q: '-1', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })
 
 it('should fail to get image with quality parameter of 101', (done) => {
-  request
-    .get(`/storage/o/public/example.jpg?q=101`)
-    .expect(400)
-    .end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+    request
+      .post(`/storage/o/public/example.jpg`)
+      .query({ refresh_token, permission_variables })
+      .attach('file', 'test-mocks/example.jpg')
+      .expect(200)
+      .end(err => {
+        if(err) return done(err)
+
+        request
+          .get(`/storage/o/public/example.jpg`)
+          .query({ q: '101', refresh_token, permission_variables })
+          .expect(400)
+          .end(end(done))
+      })
+  })
 })

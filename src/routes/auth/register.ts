@@ -156,13 +156,13 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     return res.send(session)
   }
 
-  const refresh_token = await setRefreshToken(account.id)
+  const [refresh_token, permission_variables] = await setRefreshToken(account.id)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
 
-  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token, permission_variables }
 
   return res.send(session)
 }

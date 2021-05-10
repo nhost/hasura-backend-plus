@@ -46,6 +46,7 @@ export interface Session {
   jwt_token: string | null;
   jwt_expires_in: number | null;
   refresh_token?: string
+  permission_variables?: string
   user: UserData;
 }
 
@@ -108,10 +109,7 @@ export interface InsertAccountProviderToUser {
   }
 }
 
-export interface RefreshTokenMiddleware {
-  value: string | null
-  type: 'query' | null
-}
+export type RefreshTokenMiddleware = string | null
 
 export interface RequestExtended extends Request {
   refresh_token?: RefreshTokenMiddleware

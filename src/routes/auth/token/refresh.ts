@@ -12,13 +12,13 @@ interface HasuraData {
 }
 
 async function refreshToken({ refresh_token }: RequestExtended, res: Response): Promise<any> {
-  if (!refresh_token || !refresh_token.value) {
+  if (!refresh_token) {
     return res.boom.unauthorized('Invalid or expired refresh token.')
   }
 
   // get account based on refresh token
   const { auth_refresh_tokens } = await request<HasuraData>(selectRefreshToken, {
-    refresh_token: refresh_token.value,
+    refresh_token,
     current_timestamp: new Date()
   })
 
@@ -34,7 +34,7 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
   // and insert new refresh token
   try {
     await request(updateRefreshToken, {
-      old_refresh_token: refresh_token.value,
+      old_refresh_token: refresh_token,
       new_refresh_token_data: {
         account_id: account.id,
         refresh_token: new_refresh_token,

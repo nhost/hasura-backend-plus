@@ -35,60 +35,54 @@ function validOtpSecret() {
 }
 
 it('should generate a secret', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request
-      .post('/auth/mfa/generate')
-      .expect(200)
-      .expect(validOtpSecret())
-      .end(end(done))
-  })
-})
+  let jwtToken = ''
 
-it('should enable mfa for account', (done) => {
-  let otpSecret = ''
-
-  registerAndLoginAccount(request).then(() => {
+  registerAccount(request).then(({ email, password }) => {
     request
-      .post('/auth/mfa/generate')
+      .post('/auth/login')
+      .send({ email, password })
       .expect(200)
-      .expect(validOtpSecret())
-      .expect(saveOtpSecret(o => otpSecret = o))
+      .expect(saveJwt((j) => jwtToken = j))
       .end((err) => {
         if(err) return done(err)
 
         request
-          .post('/auth/mfa/enable')
-          .send({ code: authenticator.generate(otpSecret) })
-          .expect(204)
+          .post('/auth/mfa/generate')
+          .set({ Authorization: `Bearer ${jwtToken}` })
+          .expect(200)
+          .expect(validOtpSecret())
           .end(end(done))
       })
   })
 })
 
-it('should return a ticket', (done) => {
+it('should enable mfa for account', (done) => {
+  let jwtToken = ''
   let otpSecret = ''
 
-  registerAndLoginAccount(request).then(({ email, password }) => {
+  registerAccount(request).then(({ email, password }) => {
     request
-      .post('/auth/mfa/generate')
+      .post('/auth/login')
+      .send({ email, password })
       .expect(200)
-      .expect(validOtpSecret())
-      .expect(saveOtpSecret(o => otpSecret = o))
+      .expect(saveJwt((j) => jwtToken = j))
       .end((err) => {
         if(err) return done(err)
 
         request
-          .post('/auth/mfa/enable')
-          .send({ code: authenticator.generate(otpSecret) })
-          .expect(204)
+          .post('/auth/mfa/generate')
+          .set({ Authorization: `Bearer ${jwtToken}` })
+          .expect(200)
+          .expect(validOtpSecret())
+          .expect(saveOtpSecret(o => otpSecret = o))
           .end((err) => {
             if(err) return done(err)
 
             request
-              .post('/auth/login')
-              .send({ email, password })
-              .expect(200)
-              .expect(validTicket())
+              .post('/auth/mfa/enable')
+              .set({ Authorization: `Bearer ${jwtToken}` })
+              .send({ code: authenticator.generate(otpSecret) })
+              .expect(204)
               .end(end(done))
           })
       })
@@ -96,12 +90,13 @@ it('should return a ticket', (done) => {
 })
 
 it('should sign the account in (mfa)', (done) => {
-  let ticket = ''
   let otpSecret = ''
+  let ticket = ''
 
-  registerAndLoginAccount(request).then(({ email, password }) => {
+  registerAndLoginAccount(request).then(({ email, password, refresh_token, permission_variables }) => {
     request
       .post('/auth/mfa/generate')
+      .query({ refresh_token, permission_variables })
       .expect(200)
       .expect(validOtpSecret())
       .expect(saveOtpSecret(o => otpSecret = o))
@@ -110,6 +105,7 @@ it('should sign the account in (mfa)', (done) => {
 
         request
           .post('/auth/mfa/enable')
+          .query({ refresh_token, permission_variables })
           .send({ code: authenticator.generate(otpSecret) })
           .expect(204)
           .end((err) => {
@@ -127,10 +123,11 @@ it('should sign the account in (mfa)', (done) => {
                 request
                   .post('/auth/mfa/totp').send({
                     ticket,
-                    code: authenticator.generate(otpSecret)
+                    code: authenticator.generate(otpSecret),
                   })
                   .expect(200)
                   .expect(validJwt())
+                  .expect(validRefreshToken())
                   .end(end(done))
               })
           })
@@ -140,10 +137,13 @@ it('should sign the account in (mfa)', (done) => {
 
 it('should disable mfa for account', (done) => {
   let otpSecret = ''
+  let ticket = ''
+  let jwtToken = ''
 
-  registerAndLoginAccount(request).then(({ email, password }) => {
+  registerAndLoginAccount(request).then(({ email, password, refresh_token, permission_variables }) => {
     request
       .post('/auth/mfa/generate')
+      .query({ refresh_token, permission_variables })
       .expect(200)
       .expect(validOtpSecret())
       .expect(saveOtpSecret(o => otpSecret = o))
@@ -153,174 +153,41 @@ it('should disable mfa for account', (done) => {
         request
           .post('/auth/mfa/enable')
           .send({ code: authenticator.generate(otpSecret) })
+          .query({ refresh_token, permission_variables })
           .expect(204)
           .end((err) => {
             if(err) return done(err)
 
             request
-              .post('/auth/mfa/disable')
-              .send({ code: authenticator.generate(otpSecret) })
-              .expect(204)
-              .end(end(done))        
+              .post('/auth/login')
+              .send({ email, password })
+              .expect(200)
+              .expect(validTicket())
+              .expect(saveTicket(t => ticket = t))
+              .end((err) => {
+                if(err) return done(err)
+
+                request
+                  .post('/auth/mfa/totp').send({
+                    ticket,
+                    code: authenticator.generate(otpSecret),
+                  })
+                  .expect(200)
+                  .expect(validJwt())
+                  .expect(saveJwt(j => jwtToken = j))
+                  .expect(validRefreshToken())
+                  .end((err) => {
+                    if(err) return done(err)
+
+                    request
+                      .post('/auth/mfa/disable')
+                      .set({ Authorization: `Bearer ${jwtToken}` })
+                      .send({ code: authenticator.generate(otpSecret) })
+                      .expect(204)
+                      .end(end(done))
+                  })
+              })
           })
       })
-  })
-})
-
-describe('MFA without cookies', () => {
-  it('should generate a secret', (done) => {
-    let jwtToken = ''
-
-    registerAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(200)
-        .expect(saveJwt((j) => jwtToken = j))
-        .end((err) => {
-          if(err) return done(err)
-
-          request
-            .post('/auth/mfa/generate')
-            .set({ Authorization: `Bearer ${jwtToken}` })
-            .expect(200)
-            .expect(validOtpSecret())
-            .end(end(done))
-        })
-    })
-  })
-
-  it('should enable mfa for account', (done) => {
-    let jwtToken = ''
-    let otpSecret = ''
-
-    registerAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(200)
-        .expect(saveJwt((j) => jwtToken = j))
-        .end((err) => {
-          if(err) return done(err)
-
-          request
-            .post('/auth/mfa/generate')
-            .set({ Authorization: `Bearer ${jwtToken}` })
-            .expect(200)
-            .expect(validOtpSecret())
-            .expect(saveOtpSecret(o => otpSecret = o))
-            .end((err) => {
-              if(err) return done(err)
-
-              request
-                .post('/auth/mfa/enable')
-                .set({ Authorization: `Bearer ${jwtToken}` })
-                .send({ code: authenticator.generate(otpSecret) })
-                .expect(204)
-                .end(end(done))
-            })
-        })
-    })
-  })
-
-  it('should sign the account in (mfa)', (done) => {
-    let otpSecret = ''
-    let ticket = ''
-
-    registerAndLoginAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/mfa/generate')
-        .expect(200)
-        .expect(validOtpSecret())
-        .expect(saveOtpSecret(o => otpSecret = o))
-        .end((err) => {
-          if(err) return done(err)
-
-          request
-            .post('/auth/mfa/enable')
-            .send({ code: authenticator.generate(otpSecret) })
-            .expect(204)
-            .end((err) => {
-              if(err) return done(err)
-
-              request
-                .post('/auth/login')
-                .send({ email, password })
-                .expect(200)
-                .expect(validTicket())
-                .expect(saveTicket(t => ticket = t))
-                .end((err) => {
-                  if(err) return done(err)
-
-                  request
-                    .post('/auth/mfa/totp').send({
-                      ticket,
-                      code: authenticator.generate(otpSecret),
-                      cookie: false
-                    })
-                    .expect(200)
-                    .expect(validJwt())
-                    .expect(validRefreshToken())
-                    .end(end(done))
-                })
-            })
-        })
-    })
-  })
-
-  it('should disable mfa for account', (done) => {
-    let otpSecret = ''
-    let ticket = ''
-    let jwtToken = ''
-
-    registerAndLoginAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/mfa/generate')
-        .expect(200)
-        .expect(validOtpSecret())
-        .expect(saveOtpSecret(o => otpSecret = o))
-        .end((err) => {
-          if(err) return done(err)
-
-          request
-            .post('/auth/mfa/enable')
-            .send({ code: authenticator.generate(otpSecret) })
-            .expect(204)
-            .end((err) => {
-              if(err) return done(err)
-
-              request
-                .post('/auth/login')
-                .send({ email, password })
-                .expect(200)
-                .expect(validTicket())
-                .expect(saveTicket(t => ticket = t))
-                .end((err) => {
-                  if(err) return done(err)
-
-                  request
-                    .post('/auth/mfa/totp').send({
-                      ticket,
-                      code: authenticator.generate(otpSecret),
-                      cookie: false
-                    })
-                    .expect(200)
-                    .expect(validJwt())
-                    .expect(saveJwt(j => jwtToken = j))
-                    .expect(validRefreshToken())
-                    .end((err) => {
-                      if(err) return done(err)
-
-                      request
-                        .post('/auth/mfa/disable')
-                        .set({ Authorization: `Bearer ${jwtToken}` })
-                        .send({ code: authenticator.generate(otpSecret) })
-                        .expect(204)
-                        .end(end(done))
-                    })
-                })
-            })
-        })
-    })
   })
 })

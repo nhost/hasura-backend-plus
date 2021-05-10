@@ -1,15 +1,16 @@
 import 'jest-extended'
 
-import { mailHogSearch, deleteMailHogEmail, generateRandomEmail, withEnv, registerAccount } from '@test/utils'
+import { mailHogSearch, deleteMailHogEmail, generateRandomEmail, withEnv } from '@test/utils'
 import { registerAndLoginAccount } from '@test/utils'
 
 import { request } from '@test/server'
 import { end } from '@test/supertest-shared-utils'
 
 it('should request to change email', (done) => {
-  registerAccount(request).then(() => {
+  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
     request
-      .post('/auth/change-email/request')
+      .post(`/auth/change-email/request`)
+      .query({ refresh_token, permission_variables })
       .send({ new_email: generateRandomEmail() })
       .expect(204)
       .end(end(done))
@@ -21,11 +22,12 @@ it('should receive a ticket by email', (done) => {
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAccount(request).then(() => {
+    await registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .query({ refresh_token, permission_variables })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -46,11 +48,12 @@ it('should change the email from a ticket', (done) => {
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAndLoginAccount(request).then(() => {
+    await registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .query({ refresh_token, permission_variables })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -63,7 +66,8 @@ it('should change the email from a ticket', (done) => {
           await deleteMailHogEmail(message)
 
           request
-            .post('/auth/change-email/change')
+            .post(`/auth/change-email/change`)
+            .query({ refresh_token, permission_variables })
             .send({ ticket })
             .expect(204)
             .end(end(done))
@@ -77,11 +81,12 @@ it('should reconnect using the new email', (done) => {
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAndLoginAccount(request).then(({ email, password }) => {
+    await registerAndLoginAccount(request).then(({ email, password, refresh_token, permission_variables }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .query({ refresh_token, permission_variables })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -94,7 +99,8 @@ it('should reconnect using the new email', (done) => {
           await deleteMailHogEmail(message)
 
           request
-            .post('/auth/change-email/change')
+            .post(`/auth/change-email/change`)
+            .query({ refresh_token, permission_variables })
             .send({ ticket })
             .expect(204)
             .end(async (err) => {

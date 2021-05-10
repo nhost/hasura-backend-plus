@@ -14,6 +14,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   const { token, action } = await magicLinkQuery.validateAsync(query);
 
   let refresh_token = token;
+  let permission_variables: string | undefined
 
   if (action === 'sign-up') {
     const new_ticket = uuidv4()
@@ -45,7 +46,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
       throw Boom.unauthorized('Invalid or expired token.')
     }
 
-    refresh_token = await setRefreshToken(returning[0].id)
+    [refresh_token, permission_variables] = await setRefreshToken(returning[0].id)
   }
 
   const hasura_data = await request<{
@@ -68,7 +69,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token, permission_variables }
 
   if (action === 'log-in') {
     if (APPLICATION.REDIRECT_URL_SUCCESS) {

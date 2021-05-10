@@ -14,6 +14,7 @@ import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import { AccountData, QueryAccountData, RequestExtended } from './types'
+import { generatePermissionVariables } from './jwt'
 
 /**
  * Create QR code.
@@ -121,18 +122,26 @@ export function newRefreshExpiry(): number {
   return now.setDate(now.getDate() + days)
 }
 
+interface InsertRefreshTokenData {
+  insert_auth_refresh_tokens_one: {
+    account: AccountData
+  }
+}
+
 export const setRefreshToken = async (
   accountId: string,
   refresh_token = uuidv4()
-): Promise<string> => {
+): Promise<[string, string]> => {
 
-  await request(insertRefreshToken, {
+  const account = (await request(insertRefreshToken, {
     refresh_token_data: {
       account_id: accountId,
       refresh_token,
       expires_at: new Date(newRefreshExpiry())
     }
-  })
+  }) as InsertRefreshTokenData).insert_auth_refresh_tokens_one.account
 
-  return refresh_token
+  const permission_variables = JSON.stringify(generatePermissionVariables(account))
+
+  return [refresh_token, permission_variables]
 }

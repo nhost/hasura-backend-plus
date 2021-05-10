@@ -52,12 +52,12 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
 
       const account = hasura_data.insert_auth_accounts.returning[0]
 
-      const refresh_token = await setRefreshToken(account.id)
+      const [refresh_token, permission_variables] = await setRefreshToken(account.id)
 
       const jwt_token = createHasuraJwt(account)
       const jwt_expires_in = newJwtExpiry
 
-      const session: Session = { jwt_token, jwt_expires_in, user: account.user, refresh_token }
+      const session: Session = { jwt_token, jwt_expires_in, user: account.user, refresh_token, permission_variables }
 
       return res.send(session)
     }
@@ -75,7 +75,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const { id, mfa_enabled, password_hash, active, ticket, email } = account
 
   if (typeof password === 'undefined') {
-    const refresh_token = await setRefreshToken(id)
+    const [refresh_token] = await setRefreshToken(id)
 
     try {
       await emailClient.send({
@@ -130,7 +130,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // refresh_token
-  const refresh_token = await setRefreshToken(id)
+  const [refresh_token, permission_variables] = await setRefreshToken(id)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
@@ -141,7 +141,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token, permission_variables }
 
   res.send(session)
 }
