@@ -104,8 +104,6 @@ export const checkHibp = async (password: string): Promise<void> => {
   }
 }
 
-export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
-
 export const rotateTicket = async (ticket: string): Promise<string> => {
   const new_ticket = uuidv4()
   await request(rotateTicketQuery, {

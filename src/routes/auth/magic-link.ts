@@ -81,7 +81,10 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
       return res.redirect(APPLICATION.REDIRECT_URL_SUCCESS)
     }
 
-    res.status(200).send('Your account has been activated. You can close this window and login')
+    if(APPLICATION.REDIRECT_URL_SUCCESS) {
+      res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', token))
+    } else
+      res.status(200).send('Your account has been activated. You can close this window and login')
   } else {
     res.status(400);
   }
