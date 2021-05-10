@@ -118,6 +118,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
+            app_url: APPLICATION.APP_URL,
             action: 'sign up'
           }
         })

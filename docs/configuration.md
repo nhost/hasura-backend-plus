@@ -427,6 +427,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `HOST`                        |         | Listening host of the service                                                                                                                                |
 | `PORT`                        | 3000    | Port of the service                                                                                                                                          |
 | `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                                                                              |
+| `APP_URL`                     |         | Current app URL. Currently used only for creating links from email templates                                                                              |
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                                                                   |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                                                                  |
 

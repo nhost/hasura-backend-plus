@@ -98,6 +98,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
           display_name: account.user.display_name,
           token: refresh_token,
           url: APPLICATION.SERVER_URL,
+          app_url: APPLICATION.APP_URL,
           action: 'log in'
         }
       })
