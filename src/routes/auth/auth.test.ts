@@ -90,7 +90,7 @@ it('should fail to create account with unallowed role', (done) => {
     .end(end(done))
 })
 
-it('should fail to create accunt with default_role that does not overlap allowed_roles', (done) => {
+it('should fail to create account with default_role that does not overlap allowed_roles', (done) => {
   request.post('/auth/register')
     .send({
       email: generateRandomEmail(),

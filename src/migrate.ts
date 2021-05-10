@@ -80,8 +80,8 @@ export default async (
         writeFileSync(
           `${TEMP_MIGRATION_DIR}/config.yaml`,
           // * HBP uses config v1 so far
-          // `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
-          `version: 1\nendpoint: ${hasuraURL}\nadmin_secret: ${APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
+          `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
+          // `version: 1\nendpoint: ${hasuraURL}\nadmin_secret: ${APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
           { encoding: 'utf8' }
         )
         if (migrations && (await pathExists(migrations))) {
@@ -90,15 +90,16 @@ export default async (
           await copy(migrations, `${TEMP_MIGRATION_DIR}/migrations`)
           await hasuraConsole('migrate apply')
         }
-        // * Metadata is used in config v2. HBP uses config v1 so far
-        // if (metadata && (await pathExists(metadata))) {
-        //   // * Apply metadata
-        //   console.log(`Applying metadata '${metadata}'...`)
-        //   await copy(metadata, `${TEMP_MIGRATION_DIR}/metadata`)
-        //   await hasuraConsole('metadata apply')
-        // } else if (migrations && (await pathExists(migrations))) {
-        console.log('Reloading metadata...')
-        await hasuraConsole('metadata reload')
+
+        if (metadata && (await pathExists(metadata))) {
+          // * Apply metadata
+          console.log(`Applying metadata '${metadata}'...`)
+          await copy(metadata, `${TEMP_MIGRATION_DIR}/metadata`)
+          await hasuraConsole('metadata apply')
+        }
+
+        // console.log('Reloading metadata...')
+        // await hasuraConsole('metadata reload')
         // }
         await remove(TEMP_MIGRATION_DIR)
         server.close()
