@@ -74,7 +74,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const account = await selectAccount(body)
 
   if (!account) {
-    return res.boom.badRequest('Account does not exist.')
+    return res.boom.badRequest(typeof password !== 'undefined' ? 'Invalid email or password': 'Invalid email')
   }
 
   const { id, mfa_enabled, password_hash, active, email } = account
