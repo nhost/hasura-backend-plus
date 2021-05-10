@@ -18,12 +18,6 @@ async function logout({ body, refresh_token }: RequestExtended, res: Response): 
     return res.boom.unauthorized('Invalid or expired refresh token.')
   }
 
-  // clear cookies
-  if (refresh_token.type === 'cookie') {
-    res.clearCookie('refresh_token')
-    res.clearCookie('permission_variables')
-  }
-
   // should we delete all refresh tokens to this user or not
   const { all } = await logoutSchema.validateAsync(body)
 

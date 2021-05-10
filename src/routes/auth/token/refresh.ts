@@ -1,9 +1,8 @@
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, newRefreshExpiry } from '@shared/helpers'
 import { Response } from 'express'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
-import { newJwtExpiry, createHasuraJwt, generatePermissionVariables } from '@shared/jwt'
-import { newRefreshExpiry, setCookie } from '@shared/cookies'
+import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { AccountData, UserData, Session, RequestExtended } from '@shared/types'
@@ -46,8 +45,6 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
     return res.boom.badImplementation('Unable to set new refresh token')
   }
 
-  const permission_variables = JSON.stringify(generatePermissionVariables(account))
-
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
   const user: UserData = {
@@ -56,12 +53,7 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (refresh_token.type === 'cookie') {
-    setCookie(res, new_refresh_token, permission_variables)
-  } else {
-    session.refresh_token = new_refresh_token
-  }
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token: new_refresh_token }
   res.send(session)
 }
 

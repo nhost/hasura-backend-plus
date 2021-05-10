@@ -1,6 +1,7 @@
-import { COOKIES, REGISTRATION } from './config'
+import { JWT, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
+  insertRefreshToken,
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
@@ -12,7 +13,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
+import { AccountData, QueryAccountData, RequestExtended } from './types'
 
 /**
  * Create QR code.
@@ -115,8 +116,25 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
   return new_ticket
 }
 
-export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {
-  const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
-  if (!permission_variables) throw new Error('No permission variables')
-  return JSON.parse(permission_variables)
+export function newRefreshExpiry(): number {
+  const now = new Date()
+  const days = JWT.REFRESH_EXPIRES_IN / 1440
+
+  return now.setDate(now.getDate() + days)
+}
+
+export const setRefreshToken = async (
+  accountId: string,
+  refresh_token = uuidv4()
+): Promise<string> => {
+
+  await request(insertRefreshToken, {
+    refresh_token_data: {
+      account_id: accountId,
+      refresh_token,
+      expires_at: new Date(newRefreshExpiry())
+    }
+  })
+
+  return refresh_token
 }

@@ -1,11 +1,10 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
-import { setRefreshToken } from '@shared/cookies'
 import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -13,8 +12,6 @@ import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const body = req.body
-
-  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   const {
     email,
@@ -159,14 +156,13 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     return res.send(session)
   }
 
-  const refresh_token = await setRefreshToken(res, account.id, useCookie)
+  const refresh_token = await setRefreshToken(account.id)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
 
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (!useCookie) session.refresh_token = refresh_token
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   return res.send(session)
 }

@@ -74,13 +74,11 @@ export const userDataFields = {
 export const registerSchema = Joi.object({
   ...accountFields,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
 export const magicLinkRegisterSchema = Joi.object({
   ...magicLinkAccountFields,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
 
@@ -125,18 +123,15 @@ export const magicLinkLoginAnonymouslySchema = Joi.object({
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
-  cookie: Joi.boolean()
 })
 export const magicLinkLoginSchema = extendedJoi.object({
   email: emailRule,
-  cookie: Joi.boolean()
 })
 export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketFields })
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
-  cookie: Joi.boolean()
 })
 
 export const imgTransformParams = Joi.object({
@@ -156,5 +151,4 @@ export const fileMetadataUpdate = Joi.object({
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
   action: Joi.string().valid('log-in', 'sign-up').required(),
-  cookie: Joi.boolean().optional(),
 });

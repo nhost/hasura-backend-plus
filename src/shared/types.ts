@@ -110,7 +110,7 @@ export interface InsertAccountProviderToUser {
 
 export interface RefreshTokenMiddleware {
   value: string | null
-  type: 'query' | 'cookie' | null
+  type: 'query' | null
 }
 
 export interface RequestExtended extends Request {
