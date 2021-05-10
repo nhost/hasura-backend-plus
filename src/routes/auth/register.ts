@@ -5,7 +5,7 @@ import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
-import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
+import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -18,7 +18,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkRegisterSchema : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
@@ -27,9 +27,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   let password_hash: string | null = null;
 
   const ticket = uuidv4()
-  const now = new Date()
-  const ticket_expires_at = new Date()
-  ticket_expires_at.setTime(now.getTime() + 60 * 60 * 1000) // active for 60 minutes
+  const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
 
   if (typeof password !== 'undefined') {
     try {

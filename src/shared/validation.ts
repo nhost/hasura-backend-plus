@@ -36,17 +36,19 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128).required()
+const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128);
+const passwordRuleRequired = passwordRule.required();
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
 const accountFields = {
   email: emailRule,
-  password: passwordRule
+  password: passwordRuleRequired
 }
 
-const magicLinkAccountFields = {
+const accountFieldsMagicLink = {
   email: emailRule,
+  password: passwordRule
 }
 
 export const userDataFields = {
@@ -76,8 +78,8 @@ export const registerSchema = Joi.object({
   ...userDataFields,
 })
 
-export const magicLinkRegisterSchema = Joi.object({
-  ...magicLinkAccountFields,
+export const registerSchemaMagicLink = Joi.object({
+  ...accountFieldsMagicLink,
   ...userDataFields,
 })
 
@@ -124,8 +126,9 @@ export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
 })
-export const magicLinkLoginSchema = extendedJoi.object({
+export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
+  password: Joi.string(),
 })
 export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketFields })
