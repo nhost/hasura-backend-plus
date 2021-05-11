@@ -87,7 +87,7 @@ jobs:
         run: curl -L https://github.com/hasura/graphql-engine/raw/master/cli/get.sh | bash
       - name: Install psql
         run: apt-get update && apt-get install --yes --no-install-recommends postgresql-client
-      - name: Init Postgres
+      - name: Init Database
         run: psql -f ./db/00_init-schema.sql postgresql://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       - name: Install dependencies
         run: yarn
