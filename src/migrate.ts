@@ -31,7 +31,7 @@ const waitFor = async (path: string, attempts = 240): Promise<void> => {
 
 const hasuraConsole = async (action: string): Promise<void> => {
   try {
-    const child = spawn('./node_modules/.bin/hasura', [
+    const child = spawn('/usr/local/bin/hasura', [
       ...action.split(' '),
       '--log-level',
       LOG_LEVEL,
@@ -39,6 +39,9 @@ const hasuraConsole = async (action: string): Promise<void> => {
       '--project',
       TEMP_MIGRATION_DIR
     ])
+    for await (const data of child.stderr) {
+      process.stderr.write(data.toString())
+    }
     for await (const data of child.stdout) {
       process.stdout.write(data.toString())
     }
@@ -79,9 +82,7 @@ export default async (
         // * Set the Hasura CLI config.yaml file
         writeFileSync(
           `${TEMP_MIGRATION_DIR}/config.yaml`,
-          // * HBP uses config v1 so far
           `version: 2\nendpoint: ${hasuraURL}\nadmin_secret: ${APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
-          // `version: 1\nendpoint: ${hasuraURL}\nadmin_secret: ${APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET}\nmetadata_directory: metadata\nenable_telemetry: false`,
           { encoding: 'utf8' }
         )
         if (migrations && (await pathExists(migrations))) {
@@ -98,10 +99,8 @@ export default async (
           await hasuraConsole('metadata apply')
         }
 
-        // console.log('Reloading metadata...')
-        // await hasuraConsole('metadata reload')
-        // }
         await remove(TEMP_MIGRATION_DIR)
+
         server.close()
       })
       server.on('close', () => resolve())
