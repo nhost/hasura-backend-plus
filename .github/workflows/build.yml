@@ -86,8 +86,7 @@ jobs:
       - name: Install Hasura Cli
         run: curl -L https://github.com/hasura/graphql-engine/raw/master/cli/get.sh | bash
       - name: Install psql
-        - run: sudo apt-get update
-        - run: sudo apt-get install --yes --no-install-recommends postgresql-client
+        run: sudo apt-get update && apt-get install --yes --no-install-recommends postgresql-client
       - name: Init Postgres
         run: psql -f ./db/00_init-schema.sql postgresql://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       - name: Install dependencies
