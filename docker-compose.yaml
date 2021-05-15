@@ -4,7 +4,7 @@ services:
     image: postgres:12
     restart: always
     volumes:
-      - ./db/data:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d/
     environment:
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgrespassword}'
@@ -35,7 +35,7 @@ services:
     image: minio/minio
     restart: always
     volumes:
-      - ./minio_data:/data
+      - ./data/minio:/data
     environment:
       S3_BUCKET: '${S3_BUCKET:-hasura-backend-plus}'
       MINIO_ACCESS_KEY: '${S3_ACCESS_KEY_ID:-minio_access_key}' ## min 8 character

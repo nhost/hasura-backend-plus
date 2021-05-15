@@ -6,7 +6,6 @@ dist
 coverage
 private.pem
 node_modules
+data
 yarn-error.log
 package-lock.json
-db/data
-minio_data
