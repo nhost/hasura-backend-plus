@@ -123,3 +123,22 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
 }
+
+export const accountWithEmailExists = async (email: string) => {
+  let account_exists = true
+  try {
+    await selectAccountByEmail(email)
+    // Account using email already exists - pass
+  } catch {
+    // No existing account is using the email address. Good!
+    account_exists = false
+  }
+
+  return account_exists
+}
+
+export const accountIsAnonymous = async (user_id: string) => {
+  const account = await selectAccountByUserId(user_id)
+
+  return account.is_anonymous
+}

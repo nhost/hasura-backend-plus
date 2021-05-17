@@ -85,6 +85,10 @@ export const registerSchemaMagicLink = Joi.object({
   cookie: Joi.boolean()
 })
 
+export const deanonymizeSchema = Joi.object({
+  email: emailRule,
+  password: passwordRuleRequired
+})
 
 export const registerUserDataSchema = Joi.object(userDataFields)
 

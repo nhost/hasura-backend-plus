@@ -274,6 +274,17 @@ export const changeEmailByUserId = gql`
   }
 `
 
+export const deanonymizeByUserId = gql`
+  mutation($user_id: uuid!, $email: citext!, $password_hash: String!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { email: $email, password_hash: $password_hash, is_anonymous: false }
+    ) {
+      affected_rows
+    }
+  }
+`
+
 export const setNewEmail = gql`
   mutation($user_id: uuid!, $new_email: citext!) {
     update_auth_accounts(
