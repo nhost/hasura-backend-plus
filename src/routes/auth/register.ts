@@ -16,6 +16,14 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
+  if(REGISTRATION.ADMIN_ONLY) {
+    const adminSecret = req.headers[HEADERS.ADMIN_SECRET_HEADER]
+
+    if (adminSecret !== APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET) {
+      return res.boom.unauthorized('Invalid x-admin-secret')
+    }
+  }
+
   const {
     email,
     password,
