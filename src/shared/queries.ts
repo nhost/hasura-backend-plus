@@ -51,7 +51,7 @@ export const insertAccountProviderToUser = gql`
 `
 
 export const setNewTicket = gql`
-  mutation($ticket: uuid!, $ticket_expires_at: timestamptz!, $user_id: uuid!) {
+  mutation($ticket: String!, $ticket_expires_at: timestamptz!, $user_id: uuid!) {
     update_auth_accounts(
       _set: { ticket: $ticket, ticket_expires_at: $ticket_expires_at }
       where: { user: { id: { _eq: $user_id } } }
@@ -62,7 +62,7 @@ export const setNewTicket = gql`
 `
 
 export const updatePasswordWithTicket = gql`
-  mutation($now: timestamptz!, $ticket: uuid!, $password_hash: String!, $new_ticket: uuid!) {
+  mutation($now: timestamptz!, $ticket: String!, $password_hash: String!, $new_ticket: String!) {
     update_auth_accounts(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }
       _set: { password_hash: $password_hash, ticket: $new_ticket, ticket_expires_at: $now }
@@ -102,7 +102,7 @@ export const selectAccountByEmail = gql`
 `
 
 export const selectAccountByTicket = gql`
-  query($ticket: uuid!, $now: timestamptz!) {
+  query($ticket: String!, $now: timestamptz!) {
     auth_accounts(where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }) {
       ...accountFragment
     }
@@ -185,7 +185,7 @@ export const deleteRefreshToken = gql`
 `
 
 export const activateAccount = gql`
-  mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
+  mutation($ticket: String!, $new_ticket: String!, $now: timestamptz!) {
     update_auth_accounts(
       where: {
         _and: { active: { _eq: false }, ticket: { _eq: $ticket }, ticket_expires_at: { _gt: $now } }
@@ -234,7 +234,7 @@ export const updateOtpStatus = gql`
 `
 
 export const rotateTicket = gql`
-  mutation($ticket: uuid!, $new_ticket: uuid!, $now: timestamptz!) {
+  mutation($ticket: String!, $new_ticket: String!, $now: timestamptz!) {
     update_auth_accounts(
       where: { _and: { ticket: { _eq: $ticket }, ticket_expires_at: { _gt: $now } } }
       _set: { ticket: $new_ticket, ticket_expires_at: $now }
@@ -253,7 +253,7 @@ export const deleteAccountByUserId = gql`
 `
 
 export const changeEmailByTicket = gql`
-  mutation($now: timestamptz, $ticket: uuid!, $new_email: citext, $new_ticket: uuid!) {
+  mutation($now: timestamptz, $ticket: String!, $new_email: citext, $new_ticket: String!) {
     update_auth_accounts(
       where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }
       _set: { email: $new_email, new_email: null, ticket: $new_ticket, ticket_expires_at: $now }

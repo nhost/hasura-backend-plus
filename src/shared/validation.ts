@@ -93,7 +93,7 @@ export const deanonymizeSchema = Joi.object({
 export const registerUserDataSchema = Joi.object(userDataFields)
 
 const ticketFields = {
-  ticket: Joi.string().uuid({ version: 'uuidv4' }).required()
+  ticket: Joi.string().required()
 }
 
 const codeFields = {
