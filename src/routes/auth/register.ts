@@ -1,4 +1,4 @@
-import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
+import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
