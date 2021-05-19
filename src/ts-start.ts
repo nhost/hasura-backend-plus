@@ -1,15 +1,10 @@
 import { APPLICATION } from '@shared/config'
 import { app } from './server'
-import migrate from './migrate'
+import { applyMigrations } from "./shared/migrations"
 
 const start = async (): Promise<void> => {
-  if (APPLICATION.AUTO_MIGRATE) {
-    const migrationSetup = {
-      migrations: APPLICATION.AUTO_MIGRATE === 'v1' ? './migrations-v1' : './migrations'
-      // metadata: './metadata'
-    }
-    await migrate(migrationSetup)
-  }
+  await applyMigrations()
+
   app.listen(APPLICATION.PORT, APPLICATION.HOST, () => {
     if (APPLICATION.HOST) {
       console.log(`Running on http://${APPLICATION.HOST}:${APPLICATION.PORT}`)

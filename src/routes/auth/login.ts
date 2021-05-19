@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
-import { loginAnonymouslySchema, loginSchema, magicLinkLoginSchema } from '@shared/validation'
-import { insertAccount } from '@shared/queries'
+import { loginAnonymouslySchema, loginSchema, loginSchemaMagicLink } from '@shared/validation'
+import { insertAccount, setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
 import { emailClient } from '@shared/email'
@@ -69,7 +69,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? magicLinkLoginSchema : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? loginSchemaMagicLink : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -77,7 +77,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, active, ticket, email } = account
+  const { id, mfa_enabled, password_hash, active, email } = account
 
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
@@ -131,6 +131,16 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   if (mfa_enabled) {
+    const ticket = uuidv4()
+    const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000)
+
+    // set new ticket
+    await request(setNewTicket, {
+      user_id: account.user.id,
+      ticket,
+      ticket_expires_at
+    })
+
     return res.send({ mfa: true, ticket })
   }
 

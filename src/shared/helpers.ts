@@ -43,7 +43,10 @@ export const selectAccountByEmail = async (email: string): Promise<AccountData> 
 }
 
 export const selectAccountByTicket = async (ticket: string): Promise<AccountData> => {
-  const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, { ticket })
+  const hasuraData = await request<QueryAccountData>(selectAccountByTicketQuery, {
+    ticket,
+    now: new Date()
+  })
   if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }
@@ -102,8 +105,6 @@ export const checkHibp = async (password: string): Promise<void> => {
     throw new Error('Password is too weak.')
   }
 }
-
-export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
 
 export const rotateTicket = async (ticket: string): Promise<string> => {
   const new_ticket = uuidv4()

@@ -1,11 +1,5 @@
 import { castIntEnv, castBooleanEnv } from './utils'
 
-const autoMigrateSettings = (envVal?: string): boolean | string => {
-  if (envVal?.toLowerCase() === 'true') return true
-  if (envVal?.toLowerCase() === 'v1') return 'v1'
-  return false
-}
-
 /**
  * * Application Settings
  */
@@ -58,14 +52,10 @@ export const APPLICATION = {
     return castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
   },
 
-  get AUTO_MIGRATE() {
-    return autoMigrateSettings(process.env.AUTO_MIGRATE)
-  },
-
   get MAX_REQUESTS() {
     return castIntEnv('MAX_REQUESTS', 1000)
   },
   get TIME_FRAME() {
     return castIntEnv('TIME_FRAME', 15 * 60 * 1000)
-  },
+  }
 }
