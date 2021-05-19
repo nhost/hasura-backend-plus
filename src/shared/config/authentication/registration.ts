@@ -31,4 +31,7 @@ export const REGISTRATION = {
   get ALLOWED_USER_ROLES() {
     return castStringArrayEnv('ALLOWED_USER_ROLES', this.DEFAULT_ALLOWED_USER_ROLES)
   },
+  get CONFIRMATION_RESET_TIMEOUT() {
+    return castIntEnv('CONFIRMATION_RESET_TIMEOUT', 5 * 60 * 1000)
+  }
 }
