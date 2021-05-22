@@ -278,7 +278,7 @@ export const deanonymizeByUserId = gql`
   mutation($user_id: uuid!, $email: citext!, $password_hash: String!) {
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
-      _set: { email: $email, password_hash: $password_hash, is_anonymous: false }
+      _set: { email: $email, password_hash: $password_hash, is_anonymous: false, default_role: "user" }
     ) {
       affected_rows
     }
