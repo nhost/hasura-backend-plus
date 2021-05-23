@@ -4,7 +4,8 @@ import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  updateConfirmationResetTimeout as updateConfirmationResetTimeoutQuery,
 } from './queries'
 
 import QRCode from 'qrcode'
@@ -120,4 +121,10 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
+}
+
+export const updateConfirmationResetTimeout = async (): Promise<void> => {
+  await request(updateConfirmationResetTimeoutQuery, {
+    confirmation_reset_timeout: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
+  })
 }

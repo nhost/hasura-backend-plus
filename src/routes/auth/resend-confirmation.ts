@@ -1,19 +1,14 @@
-import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
+import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
-import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
+import { asyncWrapper, selectAccount, updateConfirmationResetTimeout } from '@shared/helpers'
 
 import { emailClient } from '@shared/email'
-import { insertAccount } from '@shared/queries'
-import { setRefreshToken } from '@shared/cookies'
-import { registerSchema, magicLinkRegisterSchema } from '@shared/validation'
-import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { InsertAccountData, UserData, Session, AccountData } from '@shared/types'
+import { UserData, Session, AccountData } from '@shared/types'
 
-async function registerAccount(req: Request, res: Response): Promise<unknown> {
+async function resendConfirmation(req: Request, res: Response): Promise<unknown> {
   if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
-    return res.boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
+    return res.boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/resend-confirmation route.`)
   }
 
   const body = req.body
@@ -22,9 +17,11 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   if (!(account = await selectAccount(body))) {
     return res.boom.badRequest('Account does not exist.')
-  } else if (account!.active) {
+  } else if (account.active) {
     return res.boom.badRequest('Account already activated.')
   }
+
+  console.log('resend', account, typeof account.confirmation_reset_timeout)
 
   const ticket = uuidv4()
   const now = new Date()
@@ -68,8 +65,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     return res.boom.badImplementation()
   }
 
+  await updateConfirmationResetTimeout()
+
   const session: Session = { jwt_token: null, jwt_expires_in: null, user }
   return res.send(session)
 }
 
-export default asyncWrapper(registerAccount)
+export default asyncWrapper(resendConfirmation)

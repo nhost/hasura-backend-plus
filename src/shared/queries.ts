@@ -21,6 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
+    confirmation_reset_timeout
   }
 `
 
@@ -102,8 +103,8 @@ export const selectAccountByEmail = gql`
 `
 
 export const selectAccountByTicket = gql`
-  query($ticket: uuid!, $now: timestamptz!) {
-    auth_accounts(where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }) {
+  query($ticket: uuid!) {
+    auth_accounts(where: { ticket: { _eq: $ticket } }) {
       ...accountFragment
     }
   }
@@ -306,4 +307,15 @@ export const selectAccountProvider = gql`
     }
   }
   ${accountFragment}
+`
+
+export const updateConfirmationResetTimeout = gql`
+  mutation($user_id: uuid!, $confirmation_reset_timeout: timestamptz!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { confirmation_reset_timeout: $confirmation_reset_timeout }
+    ) {
+      affected_rows
+    }
+  }
 `

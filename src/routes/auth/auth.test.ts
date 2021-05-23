@@ -399,6 +399,27 @@ it('should delete an account', (done) => {
   })
 })
 
+it('should resend the confirmation email after the timeout', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: (2 * 1000).toString(),
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLE: 'true'
+  }, request, async () => {
+    await registerAccount(request).then(({ email }) => {
+      request
+        .post('/auth/resend-confirmation')
+        .send({
+          email
+        })
+        .expect(200)
+        .expect(() => {
+          return expect(getHeaderFromLatestEmailAndDelete(email, 'X-Ticket')).resolves.toBeTruthy()
+        })
+        .end(end(done))
+    })
+  })
+})
+
 // test anonymous account
 // const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
 // anonymousAccountIt('should login anonymously', (done) => {
