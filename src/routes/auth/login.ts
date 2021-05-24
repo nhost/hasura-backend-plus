@@ -69,7 +69,10 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? loginSchemaMagicLink : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK
+    ? loginSchemaMagicLink
+    : loginSchema
+  ).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -77,7 +80,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, active, email } = account
+  const { id, mfa_enabled, sms_mfa_enabled, password_hash, active, email } = account
 
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
@@ -102,7 +105,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
         }
       })
 
-      return res.send({ magicLink: true });
+      return res.send({ magicLink: true })
     } catch (err) {
       console.error(err)
       return res.boom.badImplementation()
@@ -117,11 +120,11 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const adminSecret = headers[HEADERS.ADMIN_SECRET_HEADER]
   const hasAdminSecret = Boolean(adminSecret)
   const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
-  let userImpersonationValid = false;
+  let userImpersonationValid = false
   if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
     return res.boom.unauthorized('Invalid x-admin-secret')
   } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
-    userImpersonationValid = true;
+    userImpersonationValid = true
   }
 
   // Validate Password
@@ -130,7 +133,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.unauthorized('Username and password do not match')
   }
 
-  if (mfa_enabled) {
+  if (mfa_enabled || sms_mfa_enabled) {
     const ticket = uuidv4()
     const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000)
 
@@ -141,7 +144,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
       ticket_expires_at
     })
 
-    return res.send({ mfa: true, ticket })
+    return res.send({ mfa: mfa_enabled, sms_mfa: sms_mfa_enabled, ticket })
   }
 
   // refresh_token

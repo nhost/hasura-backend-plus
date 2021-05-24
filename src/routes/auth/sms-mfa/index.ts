@@ -5,7 +5,6 @@ import disableMfa from './sms-disable'
 import enableSmsMfa from './sms-enable'
 import generateSmsMfa from './sms-generate'
 import resendSms from './sms-resend'
-import smsTotpLogin from './sms-totp'
 
 const router = Router()
 
@@ -24,4 +23,3 @@ export default router
   .post('/enable', enableSmsMfa)
   .post('/generate', generateSmsMfa)
   .post('/resend', resendSms)
-  .post('/totp', smsTotpLogin)
