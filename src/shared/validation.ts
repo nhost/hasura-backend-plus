@@ -1,5 +1,6 @@
-import { REGISTRATION } from './config'
 import Joi from '@hapi/joi'
+
+import { REGISTRATION } from './config'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
@@ -36,8 +37,9 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   }
 }))
 
-const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128);
-const passwordRuleRequired = passwordRule.required();
+const passwordRule = Joi.string().min(REGISTRATION.MIN_PASSWORD_LENGTH).max(128)
+
+const passwordRuleRequired = passwordRule.required()
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
@@ -85,7 +87,6 @@ export const registerSchemaMagicLink = Joi.object({
   cookie: Joi.boolean()
 })
 
-
 export const registerUserDataSchema = Joi.object(userDataFields)
 
 const ticketFields = {
@@ -117,6 +118,9 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 
 export const smsMfaSchema = Joi.object(codeFields)
+
+// TODO add improved phone number validation
+// ex: https://github.com/Salesflare/joi-phone-number
 export const smsMFaGenerateSchema = Joi.object({
   phone_number: Joi.string().required()
 })
@@ -126,22 +130,28 @@ export const loginAnonymouslySchema = Joi.object({
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
+
 export const magicLinkLoginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
-  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
+  email: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
+
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
   cookie: Joi.boolean()
 })
+
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
   cookie: Joi.boolean()
 })
+
 export const forgotSchema = Joi.object({ email: emailRule })
+
 export const verifySchema = Joi.object({ ...ticketFields })
+
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
@@ -165,5 +175,5 @@ export const fileMetadataUpdate = Joi.object({
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
   action: Joi.string().valid('log-in', 'sign-up').required(),
-  cookie: Joi.boolean().optional(),
-});
+  cookie: Joi.boolean().optional()
+})

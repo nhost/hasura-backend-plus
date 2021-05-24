@@ -21,5 +21,6 @@ export const STORAGE = {
   },
   get S3_SECRET_ACCESS_KEY() {
     return process.env.S3_SECRET_ACCESS_KEY || ''
-  },
+  }
 }
+
