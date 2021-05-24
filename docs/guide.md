@@ -215,7 +215,8 @@ The first step to activate MFA is to generate a secret through the `/auth/mfa/sm
 curl -H "Content-Type: application/json" -X POST http://localhost:3000/auth/mfa/sms/generate` --data {"phone_number": "phone-number"}
 ```
 
-All other steps work the same as [mfa](#multi-factor-authenciation). Just use the endpoints `/auth/mfa/sms` in place of `/auth/mfa`.
+The given phone number will recieve a SMS with the body: `Your
+
 
 ## Enable an OAuth provider
 

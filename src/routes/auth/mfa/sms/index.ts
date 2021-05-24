@@ -1,4 +1,4 @@
-import { MFA } from '@shared/config'
+import { SMS_MFA } from '@shared/config'
 import { Router } from 'express'
 
 import disableMfa from './sms-disable'
@@ -9,7 +9,7 @@ import resendSms from './sms-resend'
 const router = Router()
 
 router.use((req, res, next) => {
-  if (!MFA.ENABLE) {
+  if (!SMS_MFA.ENABLE) {
     return res.boom.badImplementation(
       `Please set the SMS_MFA_ENABLE env variable to true to use the auth/mfa routes.`
     )

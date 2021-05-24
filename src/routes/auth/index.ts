@@ -15,7 +15,7 @@ import token from './token'
 import activateAccount from './activate'
 import deleteAccount from './delete'
 import magicLink from './magic-link'
-import smsMfa from './sms-mfa'
+import smsMfa from './mfa/sms'
 
 const router = Router()
 
