@@ -5,7 +5,7 @@ import {
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
   selectAccountByUserId as selectAccountByUserIdQuery,
-  updateConfirmationResetTimeout as updateConfirmationResetTimeoutQuery,
+  updateLastSentConfirmation as updateLastSentConfirmationQuery,
 } from './queries'
 
 import QRCode from 'qrcode'
@@ -123,8 +123,9 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   return JSON.parse(permission_variables)
 }
 
-export const updateConfirmationResetTimeout = async (): Promise<void> => {
-  await request(updateConfirmationResetTimeoutQuery, {
-    confirmation_reset_timeout: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
+export const updateLastSentConfirmation = async (user_id: string): Promise<void> => {
+  await request(updateLastSentConfirmationQuery, {
+    user_id,
+    last_sent_confirmation: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
   })
 }

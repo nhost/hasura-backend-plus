@@ -21,7 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
-    confirmation_reset_timeout
+    last_sent_confirmation
   }
 `
 
@@ -309,11 +309,11 @@ export const selectAccountProvider = gql`
   ${accountFragment}
 `
 
-export const updateConfirmationResetTimeout = gql`
-  mutation($user_id: uuid!, $confirmation_reset_timeout: timestamptz!) {
+export const updateLastSentConfirmation = gql`
+  mutation($user_id: uuid!, $last_sent_confirmation: timestamptz!) {
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
-      _set: { confirmation_reset_timeout: $confirmation_reset_timeout }
+      _set: { last_sent_confirmation: $last_sent_confirmation }
     ) {
       affected_rows
     }

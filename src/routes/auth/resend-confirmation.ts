@@ -1,10 +1,10 @@
 import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, selectAccount, updateConfirmationResetTimeout } from '@shared/helpers'
+import { asyncWrapper, selectAccount, updateLastSentConfirmation } from '@shared/helpers'
 
 import { emailClient } from '@shared/email'
 import { v4 as uuidv4 } from 'uuid'
-import { UserData, Session, AccountData } from '@shared/types'
+import { UserData, Session } from '@shared/types'
 
 async function resendConfirmation(req: Request, res: Response): Promise<unknown> {
   if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
@@ -13,15 +13,19 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
 
   const body = req.body
 
-  let account: AccountData | undefined;
+  const account = await selectAccount(body)
 
-  if (!(account = await selectAccount(body))) {
+  if (!account) {
     return res.boom.badRequest('Account does not exist.')
   } else if (account.active) {
     return res.boom.badRequest('Account already activated.')
+  } else if (
+    +new Date(
+      +new Date(account.last_sent_confirmation) + REGISTRATION.CONFIRMATION_RESET_TIMEOUT
+    ) > +new Date()
+  ) {
+    return res.boom.badRequest('Please wait before resending the confirmation email.')
   }
-
-  console.log('resend', account, typeof account.confirmation_reset_timeout)
 
   const ticket = uuidv4()
   const now = new Date()
@@ -65,7 +69,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
     return res.boom.badImplementation()
   }
 
-  await updateConfirmationResetTimeout()
+  await updateLastSentConfirmation(account.user.id)
 
   const session: Session = { jwt_token: null, jwt_expires_in: null, user }
   return res.send(session)

@@ -72,7 +72,7 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
-  confirmation_reset_timeout: number
+  last_sent_confirmation: string
 }
 
 export interface QueryAccountData {

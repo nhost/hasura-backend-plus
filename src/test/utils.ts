@@ -37,6 +37,8 @@ export const createAccountLoginData = (): AccountLoginData => ({
 export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<string, any> = {}): Promise<AccountLoginData> => {
   const accountLoginData = createAccountLoginData();
 
+  const oldAutoActivateNewUsers = await agent.get('/env/AUTO_ACTIVATE_NEW_USERS').then(res => res.text)
+
   await withEnv({
     AUTO_ACTIVATE_NEW_USERS: 'true'
   }, agent, async () => {
@@ -44,6 +46,8 @@ export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<
       ...accountLoginData,
       user_data,
     })
+  }, {
+    AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
   })
 
   return accountLoginData;
