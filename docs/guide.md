@@ -185,6 +185,37 @@ It will return the same kind of payload as in `/auth/login`, with a new JWT:
 }
 ```
 
+## SMS MFA
+
+Multi-factor authentication also works with SMS.
+
+### Config
+
+SMS MFA currently uses [Amazon's SNS service](https://aws.amazon.com/sns/) for sending SMS message.
+
+Set the following environmental variables to enable:
+
+```shell
+#------------ SMS Multi-Factor Authentication ------------#
+## Enable SMS Multi-Factor Authentication
+# SMS_MFA_ENABLE=true
+# SMS_OTP_ISSUER=''
+# SNS_API_VERSION='2010-03-31'
+# SNS_AWS_ACCESS_KEY_ID=''
+# SNS_AWS_SECRET_ACCESS_KEY=''
+# SNS_REGION=''
+```
+
+### Generate
+
+The first step to activate MFA is to generate a secret through the `/auth/mfa/sms/generate` POST endpoint and provide a phone number:
+
+```shell
+curl -H "Content-Type: application/json" -X POST http://localhost:3000/auth/mfa/sms/generate` --data {"phone_number": "phone-number"}
+```
+
+All other steps work the same as [mfa](#multi-factor-authenciation). Just use the endpoints `/auth/mfa/sms` in place of `/auth/mfa`.
+
 ## Enable an OAuth provider
 
 ### Backend

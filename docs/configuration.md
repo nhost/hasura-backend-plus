@@ -470,6 +470,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
+| `SMS_MFA_ENABLE`             | false                   | Enable SMS mutli-factor authentication                                                                                                                                                       |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
 | `ENABLE_MAGIC_LINK`        | false                   |
 

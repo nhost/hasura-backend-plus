@@ -69,9 +69,12 @@ export interface AccountData {
   ticket?: string
   otp_secret?: string
   mfa_enabled: boolean
+  sms_otp_secret?: string
+  sms_mfa_enabled: boolean
   password_hash: string
   email: string
   new_email?: string
+  phone_number: string
 }
 
 export interface QueryAccountData {

@@ -115,6 +115,12 @@ export const logoutSchema = Joi.object({
 })
 
 export const mfaSchema = Joi.object(codeFields)
+
+export const smsMfaSchema = Joi.object(codeFields)
+export const smsMFaGenerateSchema = Joi.object({
+  phone_number: Joi.string().required()
+})
+
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`

@@ -1,32 +1,36 @@
 # API
 
-| Category                          | Endpoint                                                       | Description                               |
-| --------------------------------- | -------------------------------------------------------------- | ----------------------------------------- |
-| [Authentication](#authentication) | [POST /auth/register](#registration)                           | Account registration                      |
-| ^^                                | [POST /auth/login](#login)                                     | Login                                     |
-| ^^                                | [POST /auth/logout](#logout)                                   | Logout                                    |
-| ^^                                | [GET /auth/jwks](#jwks)                                        | JWK Set                                   |
-| ^^                                | [POST /auth/activate](#activate-account)                       | Activate account                          |
-| ^^                                | [POST /auth/delete](#delete-account)                           | Delete account                            |
-| ^^                                | [POST /auth/change-password/](#change-password)                | Change password                           |
-| ^^                                | [POST /auth/change-password/request](#change-password-request) | Request to change password password       |
-| ^^                                | [POST /auth/change-password/change](#change-password-change)   | Change password                           |
-| ^^                                | [POST /auth/change-email/](#)                                  | Change email (without email verification) |
-| ^^                                | [POST /auth/change-email/request](#)                           | Request email change                      |
-| ^^                                | [POST /auth/change-email/change](#)                            | Change email                              |
-| ^^                                | [GET /auth/token/refresh](#refresh-token)                      | Get new refresh token                     |
-| ^^                                | [POST /auth/token/revoke](#revoke-refresh-token)               | Revoke tokens                             |
-| ^^                                | [POST /auth/mfa/generate](#generate-mfa-qr-code)               | Generate MFA QR code                      |
-| ^^                                | [POST /auth/mfa/enable](#enable-mfa)                           | Enable MFA                                |
-| ^^                                | [POST /auth/mfa/disable](#disable-mfa)                         | Disable MFA                               |
-| ^^                                | [POST /auth/mfa/totp](#totp)                                   | TOTP                                      |
-| [Storage](storage)                | [GET /storage/o/\<rule-path\>](#file)                          | Get file                                  |
-| ^^                                | [GET /storage/m/\<rule-path\>](#file-metadata)                 | Get metadata of file                      |
-| ^^                                | [GET /storage/o/\<rule-path\>/](#file-directory)               | Get zip of all files in directory         |
-| ^^                                | [GET /storage/m/\<rule-path\>/](#file-directory-metadata)      | Get metadata of all files in direcotry    |
-| ^^                                | [POST /storage/o/\<rule-path\>](#upload-file)                  | Upload a file                             |
-| ^^                                | [DELETE /storage/o/\<rule-path\>](#delete-file)                | Delete a file                             |
-| [Other](#other)                   | [GET /healthz](#health-check)                                  | Health Check                              |
+| Category                           | Endpoint                                                       | Description                               |
+| ---------------------------------  | -------------------------------------------------------------- | ----------------------------------------- |
+| [Authentication](#authentication)  | [POST /auth/register](#registration)                           | Account registration                      |
+| ^^                                 | [POST /auth/login](#login)                                     | Login                                     |
+| ^^                                 | [POST /auth/logout](#logout)                                   | Logout                                    |
+| ^^                                 | [GET /auth/jwks](#jwks)                                        | JWK Set                                   |
+| ^^                                 | [POST /auth/activate](#activate-account)                       | Activate account                          |
+| ^^                                 | [POST /auth/delete](#delete-account)                           | Delete account                            |
+| ^^                                 | [POST /auth/change-password/](#change-password)                | Change password                           |
+| ^^                                 | [POST /auth/change-password/request](#change-password-request) | Request to change password password       |
+| ^^                                 | [POST /auth/change-password/change](#change-password-change)   | Change password                           |
+| ^^                                 | [POST /auth/change-email/](#)                                  | Change email (without email verification) |
+| ^^                                 | [POST /auth/change-email/request](#)                           | Request email change                      |
+| ^^                                 | [POST /auth/change-email/change](#)                            | Change email                              |
+| ^^                                 | [GET /auth/token/refresh](#refresh-token)                      | Get new refresh token                     |
+| ^^                                 | [POST /auth/token/revoke](#revoke-refresh-token)               | Revoke tokens                             |
+| [MFA](#mfa)                        | [POST /auth/mfa/generate](#generate-mfa-qr-code)               | Generate MFA QR code                      |
+| ^^                                 | [POST /auth/mfa/enable](#enable-mfa)                           | Enable MFA                                |
+| ^^                                 | [POST /auth/mfa/disable](#disable-mfa)                         | Disable MFA                               |
+| ^^                                 | [POST /auth/mfa/totp](#totp)                                   | Time-based One-time Password (TOTP)       |
+| [SMS MFA](#sms-mfa)                | [POST /auth/mfa/sms/generate](#generate-sms-mfa-code)          | Generate SMS MFA code                     |
+| ^^                                 | [POST /auth/mfa/sms/enable](#enable-sms-mfa)                   | Enable SMS MFA                            |
+| ^^                                 | [POST /auth/mfa/sms/disable](#disable-sms-mfa)                 | Disable SMS MFA                           |
+| ^^                                 | [POST /auth/mfa/sms/totp](#sms-totp)                           | SMS Time-based One-time Password (TOTP)   |
+| [Storage](#storage)                | [GET /storage/o/\<rule-path\>](#file)                          | Get file                                  |
+| ^^                                 | [GET /storage/m/\<rule-path\>](#file-metadata)                 | Get metadata of file                      |
+| ^^                                 | [GET /storage/o/\<rule-path\>/](#file-directory)               | Get zip of all files in directory         |
+| ^^                                 | [GET /storage/m/\<rule-path\>/](#file-directory-metadata)      | Get metadata of all files in direcotry    |
+| ^^                                 | [POST /storage/o/\<rule-path\>](#upload-file)                  | Upload a file                             |
+| ^^                                 | [DELETE /storage/o/\<rule-path\>](#delete-file)                | Delete a file                             |
+| [Other](#other)                    | [GET /healthz](#health-check)                                  | Health Check                              |
 
 ## Authentication
 
@@ -354,6 +358,10 @@ Cookie: permission_variables=...
 
 ---
 
+## MFA
+
+Multi-factor authentication.
+
 ### Generate MFA QR code
 
 #### Request
@@ -424,6 +432,101 @@ Time-based One-time Password. Use the `ticket` from [Login](#login) that is retu
 ```json
 {
   "code": "code-from-mfa-client",
+  "ticket": "uuid-ticket"
+}
+```
+
+#### Response
+
+```
+Set-Cookie: refresh_token=...
+Set-Cookie: permission_variables=...
+```
+
+```json
+{
+  "jwt_token": "jwt-token",
+  "jwt_expires_in": 900000
+}
+```
+
+---
+
+## SMS MFA
+
+Multi-factor authentication using SMS.
+
+### Generate SMS MFA Code
+
+#### Request
+
+`POST /auth/mfa/sms/generate`
+
+```
+{
+  "phone_number": "phone-number"
+}
+```
+
+#### Response
+
+The MFA code is sent as a text message with the body: `Your authentication code is: {code}`
+
+```json
+204 No Content
+```
+
+### Enable SMS MFA
+
+Enable Multi Factor Authentication.
+
+#### Request
+
+`POST /auth/mfa/sms/enable`
+
+```json
+{
+  "code": "892723"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+### Disable SMS MFA
+
+Disable Multi Facetor Authentication.
+
+#### Request
+
+`POST /auth/mfa/sms/disable`
+
+```json
+{
+  "code": "code-from-mfa-client"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+
+### TOTP
+
+Time-based One-time Password. Use the `ticket` from [Login](#login) that is returned if the account has activated MFA.
+
+#### Request
+
+`POST /auth/mfa/sms/totp`
+
+```json
+{
+  "code": "code-from-mfa-sms",
   "ticket": "uuid-ticket"
 }
 ```
