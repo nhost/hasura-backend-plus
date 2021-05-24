@@ -22,19 +22,6 @@ function validTicket() {
   }
 }
 
-function saveOtpSecret(saver: (o: string) => any) {
-  return (res: Response) => {
-    saver(res.body.otp_secret)
-  }
-}
-
-function validOtpSecret() {
-  return (res: Response) => {
-    expect(res.body.image_url).toBeString()
-    expect(res.body.otp_secret).toBeString()
-  }
-}
-
 it('should generate a sms otp secret', (done) => {
   registerAndLoginAccount(request).then(({ email }) => {
     request
@@ -155,7 +142,7 @@ it('should sign the account in (sms mfa)', (done) => {
 it('should disable sms mfa for account', (done) => {
   let smsOtpSecret = ''
 
-  registerAndLoginAccount(request).then(({ email, password }) => {
+  registerAndLoginAccount(request).then(({ email }) => {
     request
       .post('/auth/mfa/sms/generate')
       .expect(204)
