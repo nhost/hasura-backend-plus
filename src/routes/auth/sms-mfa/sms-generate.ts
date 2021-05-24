@@ -6,6 +6,7 @@ import { request } from '@shared/request'
 import { updateSmsOtpSecretAndPhoneNumber } from '@shared/queries'
 import { RequestExtended } from '@shared/types'
 import { smsMFaGenerateSchema } from '@shared/validation'
+import { verificationMsg } from '.'
 
 async function generateSmsMfa(req: RequestExtended, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
@@ -24,7 +25,7 @@ async function generateSmsMfa(req: RequestExtended, res: Response): Promise<unkn
   /**
    * Send SMS with verification code.
    */
-  await sendSms(phone_number, code)
+  await sendSms(phone_number, verificationMsg(code))
 
   await request(updateSmsOtpSecretAndPhoneNumber, { user_id, sms_otp_secret, phone_number })
 

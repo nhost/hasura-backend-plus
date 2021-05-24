@@ -3,6 +3,7 @@ import { RequestExtended, AccountData } from '@shared/types'
 import { Response } from 'express'
 import { sendSms } from '@shared/sns'
 import { authenticator } from 'otplib'
+import { verificationMsg } from '.'
 
 async function resendSms(req: RequestExtended, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
@@ -38,7 +39,7 @@ async function resendSms(req: RequestExtended, res: Response): Promise<unknown> 
    * Generate code and send via SMS
    */
   const code = authenticator.generate(sms_otp_secret)
-  await sendSms(phone_number, code)
+  await sendSms(phone_number, verificationMsg(code))
 
   return res.status(204).send()
 }

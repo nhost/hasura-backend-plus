@@ -2,11 +2,11 @@ import { SMS_MFA } from './config'
 
 import AWS from 'aws-sdk'
 
-const sendSms = async (number: string, otp: string) => {
+const sendSms = async (number: string, message: string) => {
   const { SNS_REGION: region, SNS_API_VERSION: apiVersion } = SMS_MFA
 
   const publishParams = {
-    Message: `Your valdation code is: ${otp}`,
+    Message: message,
     PhoneNumber: number
   }
 

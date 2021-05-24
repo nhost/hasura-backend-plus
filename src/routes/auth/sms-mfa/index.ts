@@ -18,6 +18,8 @@ router.use((req, res, next) => {
   }
 })
 
+export const verificationMsg = (code: string): string => `Your verification code is: ${code}`
+
 export default router
   .post('/disable', disableMfa)
   .post('/enable', enableSmsMfa)
