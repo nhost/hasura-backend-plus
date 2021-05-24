@@ -133,6 +133,7 @@ When an user enabled MFA, they still send their user/email credentials to `/auth
 ```json
 {
   "mfa": true,
+  "sms_mfa": true,
   "ticket": "<an automatically one-time only generated ticket>"
 }
 ```
