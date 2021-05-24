@@ -4,6 +4,10 @@ import { Client } from 'pg'
 export async function applyMigrations(): Promise<void> {
   console.log('Applying migrations')
 
+  if (!process.env.DATABASE_URL) {
+    throw new Error('Missing DATBASE_URL environment variable.')
+  }
+
   const dbConfig = {
     connectionString: process.env.DATABASE_URL
   }
