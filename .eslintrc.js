@@ -3,7 +3,8 @@ module.exports = {
   rules: {
     '@typescript-eslint/camelcase': 'off',
     'jest/expect-expect': 'off',
-    'jest/no-test-callback': 'off'
+    'jest/no-test-callback': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off'
   },
   parser: '@typescript-eslint/parser',
   plugins: [
@@ -15,6 +16,6 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier/@typescript-eslint',
-    'plugin:jest/recommended'
+    'plugin:jest/recommended',
   ]
 }

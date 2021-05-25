@@ -30,5 +30,5 @@ export const REGISTRATION = {
   },
   get ALLOWED_USER_ROLES() {
     return castStringArrayEnv('ALLOWED_USER_ROLES', this.DEFAULT_ALLOWED_USER_ROLES)
-  },
+  }
 }
