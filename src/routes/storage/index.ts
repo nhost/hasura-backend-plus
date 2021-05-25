@@ -65,4 +65,6 @@ for (const path in STORAGE_RULES.paths) {
   router.use(META_PREFIX, createRoutes(path, rules, true))
 }
 
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/storage', router)
+}

@@ -1,22 +1,28 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { setNewTicket, setNewEmail } from '@shared/queries'
-import { asyncWrapper } from '@shared/helpers'
 import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
 import { SetNewEmailData } from '@shared/types'
-
-import { getRequestInfo } from './utils'
 import { RequestExtended } from '@shared/types'
+import { EmailResetSchema, emailResetSchema } from '@shared/validation'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
+import { accountExists, asyncWrapper } from '@shared/helpers'
 
-async function requestChangeEmail(req: RequestExtended, res: Response): Promise<any> {
+async function requestChangeEmail(req: RequestExtended<Schema>, res: Response): Promise<any> {
   if(!AUTHENTICATION.VERIFY_EMAILS) {
     return res.boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/request route.`)
   }
 
-  const { user_id, new_email } = await getRequestInfo(req, res)
+  const user_id = req.permission_variables?.['user-id']
+
+  const new_email = req.body.new_email
+
+  if(await accountExists(new_email)) {
+    return res.boom.badRequest('Cannot use this email')
+  }
 
   // smtp must be enabled for request change password to work.
   if (!APPLICATION.EMAILS_ENABLE) {
@@ -77,4 +83,10 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
   return res.status(204).send()
 }
 
-export default asyncWrapper(requestChangeEmail)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: EmailResetSchema
+}
+
+export default (router: Router) => {
+  router.post('/request', createValidator().body(emailResetSchema), asyncWrapper(requestChangeEmail))
+}

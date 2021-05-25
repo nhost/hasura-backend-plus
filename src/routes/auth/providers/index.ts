@@ -20,4 +20,6 @@ windowslive(router)
 linkedin(router)
 spotify(router)
 
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/providers', router)
+}

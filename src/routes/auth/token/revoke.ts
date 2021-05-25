@@ -1,8 +1,8 @@
-import { Response } from 'express'
-import { asyncWrapper } from '@shared/helpers'
+import { Response, Router } from 'express'
 import { deleteAllAccountRefreshTokens } from '@shared/queries'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
+import { asyncWrapper } from '@shared/helpers'
 
 async function revokeToken(req: RequestExtended, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
@@ -16,4 +16,6 @@ async function revokeToken(req: RequestExtended, res: Response): Promise<unknown
   return res.status(204).send()
 }
 
-export default asyncWrapper(revokeToken)
+export default (router: Router) => {
+  router.post('/revoke', asyncWrapper(revokeToken))
+}

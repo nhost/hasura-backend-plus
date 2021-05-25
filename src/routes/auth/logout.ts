@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
@@ -6,14 +6,15 @@ import {
   deleteAllAccountRefreshTokens,
   deleteRefreshToken
 } from '@shared/queries'
-import { logoutSchema } from '@shared/validation'
+import { LogoutSchema, logoutSchema } from '@shared/validation'
 import { AccountData, RequestExtended } from '@shared/types'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
 
 interface HasuraData {
   auth_refresh_tokens: { account: AccountData }[]
 }
 
-async function logout({ body, refresh_token }: RequestExtended, res: Response): Promise<unknown> {
+async function logout({ body, refresh_token }: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if (!refresh_token || !refresh_token.value) {
     return res.boom.unauthorized('Invalid or expired refresh token.')
   }
@@ -25,7 +26,7 @@ async function logout({ body, refresh_token }: RequestExtended, res: Response): 
   }
 
   // should we delete all refresh tokens to this user or not
-  const { all } = await logoutSchema.validateAsync(body)
+  const { all } = body
 
   if (all) {
     // get user based on refresh token
@@ -67,4 +68,10 @@ async function logout({ body, refresh_token }: RequestExtended, res: Response): 
   return res.status(204).send()
 }
 
-export default asyncWrapper(logout)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: LogoutSchema
+}
+
+export default (router: Router) => {
+  router.post('/logout', createValidator().body(logoutSchema), asyncWrapper(logout))
+}

@@ -7,9 +7,9 @@ const router = Router()
 
 router.use(boom())
 
-router.use('/auth', auth)
+auth(router)
 
-router.use('/storage', storage)
+storage(router)
 
 router.get('/healthz', (_req, res) => res.send('OK'))
 router.get('/version', (_req, res) =>

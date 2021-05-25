@@ -1,19 +1,20 @@
 import { APPLICATION } from '@shared/config'
-import { Request, Response } from 'express'
+import { Response, Router } from 'express'
 import Boom from '@hapi/boom'
 import { accountOfRefreshToken, activateAccount } from '@shared/queries'
 import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { magicLinkQuery } from '@shared/validation'
+import { MagicLinkQuery, magicLinkQuery } from '@shared/validation'
 import { AccountData, Session, UpdateAccountData, UserData } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
-async function magicLink({ query }: Request, res: Response): Promise<unknown> {
-  const { token, action } = await magicLinkQuery.validateAsync(query);
+async function magicLink({ query }: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
+  const { token, action } = query;
 
-  const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
+  const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === true : true
 
   let refresh_token = token;
 
@@ -89,4 +90,10 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   res.send(session)
 }
 
-export default asyncWrapper(magicLink)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Query]: MagicLinkQuery
+}
+
+export default (router: Router) => {
+  router.get('/magic-link', createValidator().query(magicLinkQuery), asyncWrapper(magicLink))
+}

@@ -1,5 +1,5 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
-import { Request, Response } from 'express'
+import { Request, Response, Router } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
@@ -169,4 +169,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   return res.send(session)
 }
 
-export default asyncWrapper(registerAccount)
+export default (router: Router) => {
+  router.post('/register', asyncWrapper(registerAccount))
+}

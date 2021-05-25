@@ -1,14 +1,15 @@
 import { APPLICATION, REGISTRATION } from '@shared/config'
-import { Request, Response } from 'express'
+import { Response, Router } from 'express'
 
 import { activateAccount } from '@shared/queries'
-import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { verifySchema } from '@shared/validation'
+import { VerifySchema, verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
+import { asyncWrapper } from '@shared/helpers'
 
-async function activateUser({ query }: Request, res: Response): Promise<unknown> {
+async function activateUser({ query }: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     return res.boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
   }
@@ -51,4 +52,10 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     res.status(200).send('Your account has been activated. You can close this window and login')
 }
 
-export default asyncWrapper(activateUser)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Query]: VerifySchema
+}
+
+export default (router: Router) => {
+  router.get('/activate', createValidator().query(verifySchema), asyncWrapper(activateUser))
+}

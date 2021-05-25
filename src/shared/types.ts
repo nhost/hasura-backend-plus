@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { ValidatedRequest, ValidatedRequestSchema } from 'express-joi-validation'
 
 export type ClaimValueType =
   | string
@@ -115,7 +115,7 @@ export interface RefreshTokenMiddleware {
   type: 'query' | 'cookie' | null
 }
 
-export interface RequestExtended extends Request {
+export interface RequestExtended<T extends ValidatedRequestSchema = ValidatedRequestSchema> extends ValidatedRequest<T> {
   refresh_token?: RefreshTokenMiddleware
   permission_variables?: PermissionVariables
 }

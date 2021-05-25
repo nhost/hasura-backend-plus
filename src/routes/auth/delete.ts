@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 
 import { asyncWrapper } from '@shared/helpers'
 import { deleteAccountByUserId } from '@shared/queries'
@@ -29,4 +29,6 @@ async function deleteUser(req: RequestExtended, res: Response): Promise<unknown>
   return res.status(204).send()
 }
 
-export default asyncWrapper(deleteUser)
+export default (router: Router) => {
+  router.post('/delete', asyncWrapper(deleteUser))
+}

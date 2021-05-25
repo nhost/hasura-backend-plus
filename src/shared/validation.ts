@@ -1,5 +1,5 @@
 import { REGISTRATION } from './config'
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
@@ -46,9 +46,19 @@ const accountFields = {
   password: passwordRuleRequired
 }
 
+type AccountFields = {
+  email: string
+  password?: string
+}
+
 const accountFieldsMagicLink = {
   email: emailRule,
   password: passwordRule
+}
+
+type AccountFieldsMagicLink = {
+  email: string
+  password?: string
 }
 
 export const userDataFields = {
@@ -73,11 +83,23 @@ export const userDataFields = {
   })
 }
 
+export type UserDataFields = {
+  user_data: any,
+  register_options?: {
+    allowed_roles?: string[],
+    default_role?: string
+  }
+}
+
 export const registerSchema = Joi.object({
   ...accountFields,
   ...userDataFields,
   cookie: Joi.boolean()
 })
+
+export type RegisterSchema = AccountFields & UserDataFields & {
+  cookie?: boolean
+}
 
 export const registerSchemaMagicLink = Joi.object({
   ...accountFieldsMagicLink,
@@ -85,15 +107,28 @@ export const registerSchemaMagicLink = Joi.object({
   cookie: Joi.boolean()
 })
 
+export type RegisterSchemaMagicLink = AccountFieldsMagicLink & UserDataFields & {
+  cookie?: boolean
+}
 
 export const registerUserDataSchema = Joi.object(userDataFields)
+
+export type RegisterUserDataSchema = UserDataFields
 
 const ticketFields = {
   ticket: Joi.string().uuid({ version: 'uuidv4' }).required()
 }
 
+type TicketFields = {
+  ticket: string
+}
+
 const codeFields = {
   code: Joi.string().length(6).required()
+}
+
+type CodeFields = {
+  code: string
 }
 
 export const resetPasswordWithTicketSchema = Joi.object({
@@ -101,46 +136,105 @@ export const resetPasswordWithTicketSchema = Joi.object({
   new_password: passwordRule
 })
 
+export type ResetPasswordWithTicketSchema = TicketFields & {
+  new_password: string
+}
+
 export const changePasswordFromOldSchema = Joi.object({
   old_password: passwordRule,
   new_password: passwordRule
 })
 
+export type ChangePasswordFromOldSchema = {
+  old_password: string
+  new_password: string
+}
+
 export const emailResetSchema = Joi.object({
   new_email: emailRule
 })
+
+export type EmailResetSchema = {
+  new_email: string
+}
 
 export const logoutSchema = Joi.object({
   all: Joi.boolean()
 })
 
+export type LogoutSchema = {
+  all?: boolean
+}
+
 export const mfaSchema = Joi.object(codeFields)
+
+export type MfaSchema = CodeFields
+
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
+
+export type LoginAnonymouslySchema = {
+  anonymous?: boolean
+  email?: string
+  password?: string
+}
+
 export const magicLinkLoginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
 })
+
+export type MagicLinkLoginAnonymouslySchema = {
+  anonymous?: boolean
+  email?: string
+}
+
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
   cookie: Joi.boolean()
 })
+
+export type LoginSchema = {
+  email: string
+  password: string
+  cookie?: boolean
+}
+
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
   cookie: Joi.boolean()
 })
+
+export type LoginSchemaMagicLink = {
+  email: string
+  password?: string
+  cookie?: boolean
+}
+
 export const forgotSchema = Joi.object({ email: emailRule })
+
+export type ForgotSchema = {
+  email?: string
+}
+
 export const verifySchema = Joi.object({ ...ticketFields })
+
+export type VerifySchema = TicketFields
+
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
   cookie: Joi.boolean()
 })
+
+export type TotpSchema = CodeFields & TicketFields & {
+  cookie?: boolean
+}
 
 export const imgTransformParams = Joi.object({
   w: Joi.number().integer().min(0).max(8192),
@@ -151,13 +245,32 @@ export const imgTransformParams = Joi.object({
   token: Joi.string().uuid()
 })
 
+export type ImgTransformParams = {
+  w?: number
+  h?: number
+  q?: number
+  b?: number
+  r?: number|'full'
+  token?: string
+}
+
 export const fileMetadataUpdate = Joi.object({
   // action: Joi.string().valid('revoke-token','some-other-action').required(),
   action: Joi.string().valid('revoke-token').required()
 })
+
+export type FileMetadataUpdate = {
+  action: 'revoke-token'
+}
 
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
   action: Joi.string().valid('log-in', 'sign-up').required(),
   cookie: Joi.boolean().optional(),
 });
+
+export type MagicLinkQuery = {
+  token: string
+  action: string
+  cookie?: boolean
+}

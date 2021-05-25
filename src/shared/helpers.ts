@@ -66,10 +66,7 @@ export const selectAccountByUserId = async (user_id: string | undefined): Promis
  * @param httpBody
  * @return account data, null if account is not found
  */
-export const selectAccount = async (httpBody: {
-  [key: string]: string
-}): Promise<AccountData | undefined> => {
-  const { email, ticket } = httpBody
+export const selectAccount = async ({ email = '', ticket = '' }: { email?: string, ticket?: string }): Promise<AccountData | undefined> => {
   try {
     return await selectAccountByEmail(email)
   } catch {
@@ -120,4 +117,16 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
+}
+
+export const accountExists = async (email: string) => {
+  let account_exists = true
+
+  try {
+    await selectAccountByEmail(email)
+  } catch {
+    account_exists = false
+  }
+
+  return account_exists
 }

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response, Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount } from '@shared/helpers'
@@ -162,4 +162,6 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   res.send(session)
 }
 
-export default asyncWrapper(loginAccount)
+export default (router: Router) => {
+  router.post('/login', asyncWrapper(loginAccount))
+}
