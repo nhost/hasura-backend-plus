@@ -117,6 +117,17 @@ const PROVIDERS = {
         return process.env.SPOTIFY_CLIENT_SECRET || ''
       },
     }
+  },
+
+  get steam() {
+    return !castBooleanEnv('STEAM_ENABLE') ? null : {
+      get apiKey() {
+        return process.env.STEAM_API_KEY || ''
+      },
+      get realm() {
+        return process.env.STEAM_REALM || ''
+      },
+    }
   }
 }
 

@@ -3,7 +3,7 @@ import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
+import { PROVIDERS, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -131,7 +131,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'steam',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
   middleware?: RequestHandler
@@ -155,6 +155,8 @@ export const initProvider = <T extends Strategy>(
 
   let registered = false
 
+  const callbackUrl = `http://localhost:3000/auth/providers/${strategyName}/callback`
+
   subRouter.use((req, res, next) => {
     if (!registered) {
       passport.use(
@@ -162,7 +164,8 @@ export const initProvider = <T extends Strategy>(
           {
             ...PROVIDERS[strategyName],
             ...options,
-            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
+            callbackURL: callbackUrl,
+            returnURL: callbackUrl, // Steam uses returnURL instead of callbackURL
             passReqToCallback: true
           },
           manageProviderStrategy(strategyName, transformProfile)
