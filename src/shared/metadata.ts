@@ -11,7 +11,7 @@ interface Relationship {
   name: string
   source: Table
   destination?: Table
-  isArray?: Boolean
+  isArray?: boolean
 }
 
 function trackTable(table: Table) {
