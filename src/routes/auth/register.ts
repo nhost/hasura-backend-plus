@@ -21,7 +21,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')

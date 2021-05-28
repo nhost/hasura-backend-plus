@@ -53,7 +53,7 @@ it('should create an account', (done) => {
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      ENABLE_MAGIC_LINK: 'true'
+      MAGIC_LINK_ENABLE: 'true'
     },
     request,
     async () => {
@@ -84,7 +84,7 @@ it('should create an account without a password when magic link login is enabled
 it('should not create an account without a password when magic link login is disabled', (done) => {
   withEnv(
     {
-      ENABLE_MAGIC_LINK: 'false'
+      MAGIC_LINK_ENABLE: 'false'
     },
     request,
     async () => {
@@ -255,7 +255,7 @@ it('should sign the user in', (done) => {
 it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv(
     {
-      ENABLE_MAGIC_LINK: 'true',
+      MAGIC_LINK_ENABLE: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
       VERIFY_EMAILS: 'true'
     },
@@ -298,7 +298,7 @@ it('should sign the user in without password when magic link is enabled', async 
 it('should not sign the user in without password when magic link is disabled', (done) => {
   withEnv(
     {
-      ENABLE_MAGIC_LINK: 'false'
+      MAGIC_LINK_ENABLE: 'false'
     },
     request,
     async () => {
