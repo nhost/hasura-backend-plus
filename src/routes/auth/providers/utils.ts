@@ -131,7 +131,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'strava',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
   middleware?: RequestHandler

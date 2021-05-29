@@ -117,6 +117,17 @@ const PROVIDERS = {
         return process.env.SPOTIFY_CLIENT_SECRET || ''
       },
     }
+  },
+
+  get strava() {
+    return !castBooleanEnv('STRAVA_ENABLE') ? null : {
+      get clientID() {
+        return process.env.STRAVA_CLIENT_ID || ''
+      },
+      get clientSecret() {
+        return process.env.STRAVA_CLIENT_SECRET || ''
+      },
+    }
   }
 }
 

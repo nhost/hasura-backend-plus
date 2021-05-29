@@ -9920,6 +9920,15 @@ passport-oauth2@1.x.x:
     uid2 "0.0.x"
     utils-merge "1.x.x"
 
+passport-oauth@0.1.x:
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/passport-oauth/-/passport-oauth-0.1.15.tgz#fb74e0afe84614bfa256c5fc716cc56bbfc8cec0"
+  integrity sha1-+3Tgr+hGFL+iVsX8cWzFa7/IzsA=
+  dependencies:
+    oauth "0.9.x"
+    passport "~0.1.1"
+    pkginfo "0.2.x"
+
 passport-oauth@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-oauth/-/passport-oauth-1.0.0.tgz#90aff63387540f02089af28cdad39ea7f80d77df"
@@ -9941,6 +9950,14 @@ passport-strategy@1.x.x, passport-strategy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
   integrity sha1-tVOaqPwiWj0a0XlHbd8ja0QPUuQ=
+
+passport-strava@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/passport-strava/-/passport-strava-0.2.0.tgz#d6eeb65b4c68b5c1fb3a3f4c8539504ae5eb8a51"
+  integrity sha1-1u62W0xotcH7Oj9MhTlQSuXrilE=
+  dependencies:
+    passport-oauth "0.1.x"
+    pkginfo "0.2.x"
 
 passport-twitter@^1.0.4:
   version "1.0.4"
@@ -9964,6 +9981,14 @@ passport@0.4.1:
   dependencies:
     passport-strategy "1.x.x"
     pause "0.0.1"
+
+passport@~0.1.1:
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/passport/-/passport-0.1.18.tgz#c8264479dcb6414cadbb66752d12b37e0b6525a1"
+  integrity sha1-yCZEedy2QUytu2Z1LRKzfgtlJaE=
+  dependencies:
+    pause "0.0.1"
+    pkginfo "0.2.x"
 
 path-browserify@0.0.1:
   version "0.0.1"
@@ -10185,6 +10210,11 @@ pkg-dir@^4.1.0, pkg-dir@^4.2.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
+
+pkginfo@0.2.x:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/pkginfo/-/pkginfo-0.2.3.tgz#7239c42a5ef6c30b8f328439d9b9ff71042490f8"
+  integrity sha1-cjnEKl72wwuPMoQ52bn/cQQkkPg=
 
 please-upgrade-node@^3.2.0:
   version "3.2.0"

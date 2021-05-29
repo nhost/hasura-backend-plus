@@ -78,6 +78,7 @@
     "passport-google-oauth20": "2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
     "passport-spotify": "^2.0.0",
+    "passport-strava": "^0.2.0",
     "passport-twitter": "^1.0.4",
     "passport-windowslive": "^1.0.2",
     "path-exists-cli": "^1.0.0",
