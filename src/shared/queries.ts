@@ -274,13 +274,27 @@ export const changeEmailByUserId = gql`
   }
 `
 
-export const deanonymizeByUserId = gql`
-  mutation($user_id: uuid!, $email: citext!, $password_hash: String!) {
+export const deanonymizeAccount = gql`
+  mutation($account_id: uuid!, $email: citext!, $password_hash: String!, $default_role: String!, $roles: [auth_account_roles_insert_input!]!) {
     update_auth_accounts(
-      where: { user: { id: { _eq: $user_id } } }
-      _set: { email: $email, password_hash: $password_hash, is_anonymous: false, default_role: "user" }
+      where: { id: { _eq: $account_id } }
+      _set: { email: $email, password_hash: $password_hash, is_anonymous: false, default_role: $default_role }
     ) {
       affected_rows
+    }
+
+    delete_auth_account_roles(where: {account: { id: { _eq: $account_id } } }) {
+      returning {
+        id
+      }
+    }
+
+    insert_auth_account_roles(
+      objects: $roles
+    ) {
+      returning {
+        id
+      }
     }
   }
 `

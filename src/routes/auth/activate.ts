@@ -1,8 +1,8 @@
 import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
 
-import { activateAccount, deanonymizeByUserId, setNewTicket } from '@shared/queries'
-import { accountWithEmailExists, asyncWrapper, selectAccountByTicket } from '@shared/helpers'
+import { activateAccount, setNewTicket } from '@shared/queries'
+import { accountWithEmailExists, asyncWrapper, deanonymizeAccount, selectAccountByTicket } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/validation'
@@ -36,11 +36,11 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
       return res.boom.badRequest('Cannot use this email.')
     }
 
-    await request(deanonymizeByUserId, {
-      user_id: account.user.id,
+    await deanonymizeAccount(
+      account.id,
       email,
-      password_hash
-    })
+      password_hash,
+    )
 
     await request(setNewTicket, {
       user_id: account.user.id,

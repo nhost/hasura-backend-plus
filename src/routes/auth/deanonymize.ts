@@ -1,10 +1,10 @@
 import { Response } from 'express'
 import { APPLICATION, AUTHENTICATION, REGISTRATION } from "@shared/config";
-import { accountIsAnonymous, accountWithEmailExists, asyncWrapper, checkHibp, hashPassword } from "@shared/helpers";
+import { accountIsAnonymous, accountWithEmailExists, asyncWrapper, checkHibp, hashPassword, deanonymizeAccount as deanonymizeAccountHelper, selectAccountByUserId } from "@shared/helpers";
 import { deanonymizeSchema } from '@shared/validation';
 import { RequestExtended } from '@shared/types';
 import { request } from '@shared/request';
-import { deanonymizeByUserId, setNewTicket } from '@shared/queries';
+import { setNewTicket } from '@shared/queries';
 import { emailClient } from '@shared/email';
 import cryptr from '@shared/cryptr'
 
@@ -42,11 +42,11 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
   }
 
   if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
-    await request(deanonymizeByUserId, {
-      user_id: req.permission_variables['user-id'],
+    await deanonymizeAccountHelper(
+      await selectAccountByUserId(req.permission_variables['user-id']).then(acc => acc.id),
       email,
-      password_hash: passwordHash
-    })
+      passwordHash,
+    )
   } else {
     const ticket = cryptr.encrypt(`${email}\0${passwordHash}`) // will be decrypted on the auth/activate call
     const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000) // active for 60 minutes

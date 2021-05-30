@@ -39,7 +39,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
             is_anonymous: true,
             default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
             account_roles: {
-              data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
+              data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }, { role: 'user' }]
             },
             user: {
               data: { display_name: 'Anonymous user' }

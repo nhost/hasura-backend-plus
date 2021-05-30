@@ -1,6 +1,7 @@
 import { COOKIES, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
+  deanonymizeAccount as deanonymizeAccountQuery,
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
@@ -139,4 +140,18 @@ export const accountIsAnonymous = async (user_id: string) => {
   const account = await selectAccountByUserId(user_id)
 
   return account.is_anonymous
+}
+
+export const deanonymizeAccount = async (accountId: string, email: string, passwordHash: string) => {
+  await request(deanonymizeAccountQuery, {
+    account_id: accountId,
+    email,
+    password_hash: passwordHash,
+    default_role: REGISTRATION.DEFAULT_USER_ROLE,
+    roles: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map(role => ({
+      account_id: accountId,
+      created_at: new Date(),
+      role
+    }))
+  })
 }
