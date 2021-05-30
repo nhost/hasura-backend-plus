@@ -117,6 +117,31 @@ const PROVIDERS = {
         return process.env.SPOTIFY_CLIENT_SECRET || ''
       },
     }
+  },
+
+  get gitlab() {
+    return !castBooleanEnv('GITLAB_ENABLE') ? null : {
+      get clientID() {
+        return process.env.GITLAB_CLIENT_ID || ''
+      },
+      get clientSecret() {
+        return process.env.GITLAB_CLIENT_SECRET || ''
+      },
+      get baseUrl() {
+        return process.env.GITLAB_BASE_URL || ''
+      }
+    }
+  },
+
+  get bitbucket() {
+    return !castBooleanEnv('BITBUCKET_ENABLE') ? null : {
+      get clientID() {
+        return process.env.BITBUCKET_CLIENT_ID || ''
+      },
+      get clientSecret() {
+        return process.env.BITBUCKET_CLIENT_SECRET || ''
+      },
+    }
   }
 }
 

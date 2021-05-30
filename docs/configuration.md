@@ -508,6 +508,13 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `SPOTIFY_ENABLE`             | false   |             |
 | `SPOTIFY_CLIENT_ID`          |         |             |
 | `SPOTIFY_CLIENT_SECRET`      |         |             |
+| `GITLAB_ENABLE`              | false   |             |
+| `GITLAB_CLIENT_ID`           |         |             |
+| `GITLAB_CLIENT_SECRET`       |         |             |
+| `GITLAB_BASE_URL`            |         |             |
+| `BITBUCKET_ENABLE`           | false   |             |
+| `BITBUCKET_CLIENT_ID`        |         |             |
+| `BITBUCKET_CLIENT_SECRET`    |         |             |
 
 ### Storage
 

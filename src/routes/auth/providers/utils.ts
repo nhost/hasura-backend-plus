@@ -3,7 +3,7 @@ import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
+import { PROVIDERS, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -131,7 +131,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'gitlab' | 'bitbucket',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
   middleware?: RequestHandler
@@ -144,6 +144,7 @@ export const initProvider = <T extends Strategy>(
       avatar_url: photos?.[0].value
     }),
     callbackMethod = 'GET',
+    scope,
     ...options
   } = settings
 
@@ -162,7 +163,7 @@ export const initProvider = <T extends Strategy>(
           {
             ...PROVIDERS[strategyName],
             ...options,
-            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
+            callbackURL: `http://139.59.154.242:3000/auth/providers/${strategyName}/callback`,
             passReqToCallback: true
           },
           manageProviderStrategy(strategyName, transformProfile)
@@ -174,7 +175,7 @@ export const initProvider = <T extends Strategy>(
     next()
   })
 
-  subRouter.get('/', passport.authenticate(strategyName, { session: false }))
+  subRouter.get('/', passport.authenticate(strategyName, { session: false, scope }))
 
   const handlers = [
     passport.authenticate(strategyName, {
