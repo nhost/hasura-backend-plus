@@ -4,7 +4,7 @@ import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
 import { PROVIDERS, REGISTRATION } from '@shared/config'
-import { addProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
+import { addProviderRequest, deleteProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
@@ -128,6 +128,10 @@ const providerCallback = asyncWrapper(async (req: RequestExtended & RequestWithS
   const { redirect_url_success, redirect_url_failure } = await request<QueryProviderRequests>(getProviderRequest, {
     state: req.state
   }).then(query => query.auth_provider_requests_by_pk)
+
+  await request(deleteProviderRequest, {
+    state: req.state
+  })
 
   // passport js defaults data to req.user.
   // However, we send account data.
