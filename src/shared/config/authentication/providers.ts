@@ -80,7 +80,7 @@ const PROVIDERS = {
         return process.env.LINKEDIN_CLIENT_SECRET || ''
       },
       get scope() {
-        return castStringArrayEnv('APPLE_SCOPE', ['r_emailaddress', 'r_liteprofile'])
+        return castStringArrayEnv('LINKEDIN_SCOPE', ['r_emailaddress', 'r_liteprofile'])
       }
     }
   },
