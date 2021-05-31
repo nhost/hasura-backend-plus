@@ -83,8 +83,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Install Hasura Cli
-        run: curl -L https://github.com/hasura/graphql-engine/raw/master/cli/get.sh | bash
       - name: Install psql
         run: apt-get update && apt-get install --yes --no-install-recommends postgresql-client
       - name: Init Database
