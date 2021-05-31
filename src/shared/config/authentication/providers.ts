@@ -1,4 +1,4 @@
-import { castBooleanEnv } from '../utils'
+import { castBooleanEnv, castStringArrayEnv } from '../utils'
 import { APPLICATION } from '../application'
 
 const PROVIDERS = {
@@ -129,6 +129,9 @@ const PROVIDERS = {
       },
       get baseUrl() {
         return process.env.GITLAB_BASE_URL || ''
+      },
+      get scope() {
+        return castStringArrayEnv('GITLAB_SCOPE', ['read_user'])
       }
     }
   },

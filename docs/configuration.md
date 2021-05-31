@@ -512,6 +512,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `GITLAB_CLIENT_ID`           |         |             |
 | `GITLAB_CLIENT_SECRET`       |         |             |
 | `GITLAB_BASE_URL`            |         |             |
+| `GITLAB_SCOPE`               | read_user |             |
 | `BITBUCKET_ENABLE`           | false   |             |
 | `BITBUCKET_CLIENT_ID`        |         |             |
 | `BITBUCKET_CLIENT_SECRET`    |         |             |

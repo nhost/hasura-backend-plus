@@ -7,7 +7,7 @@ export default (router: Router): void => {
   const options = PROVIDERS.gitlab
 
   initProvider(router, 'gitlab', Strategy, {
-    scope: 'openid profile email read_user',
+    scope: PROVIDERS.gitlab?.scope.join(' '),
     ...(options?.baseUrl && { baseURL: options.baseUrl })
   }, (req, res, next) => {
     if(!PROVIDERS.gitlab) {
