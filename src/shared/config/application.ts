@@ -1,4 +1,4 @@
-import { castIntEnv, castBooleanEnv } from './utils'
+import { castIntEnv, castBooleanEnv, castStringArrayEnv } from './utils'
 
 /**
  * * Application Settings
@@ -12,6 +12,13 @@ export const APPLICATION = {
   },
   get REDIRECT_URL_SUCCESS() {
     return process.env.REDIRECT_URL_SUCCESS || ''
+  },
+  get ALLOWED_REDIRECT_URLS() {
+    return [
+      this.REDIRECT_URL_SUCCESS,
+      this.REDIRECT_URL_ERROR,
+      ...castStringArrayEnv('ALLOWED_REDIRECT_URLS')
+    ]
   },
   get HASURA_GRAPHQL_ADMIN_SECRET() {
     return process.env.HASURA_GRAPHQL_ADMIN_SECRET || ''
