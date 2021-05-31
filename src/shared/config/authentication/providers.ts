@@ -1,4 +1,4 @@
-import { castBooleanEnv } from '../utils'
+import { castBooleanEnv, castStringArrayEnv } from '../utils'
 import { APPLICATION } from '../application'
 
 const PROVIDERS = {
@@ -25,6 +25,9 @@ const PROVIDERS = {
       },
       get userProfileURL() {
         return process.env.GITHUB_USER_PROFILE_URL
+      },
+      get scope() {
+        return castStringArrayEnv('GITHUB_SCOPE', ['user:email'])
       }
     }
   },
@@ -37,6 +40,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.GOOGLE_CLIENT_SECRET || ''
       },
+      get scope() {
+        return castStringArrayEnv('GOOGLE_SCOPE', ['email', 'profile'])
+      }
     }
   },
 
@@ -48,6 +54,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.FACEBOOK_CLIENT_SECRET || ''
       },
+      get profileFields() {
+        return castStringArrayEnv('FACEBOOK_PROFILE_FIELDS', ['email', 'photos', 'displayName'])
+      }
     }
   },
 
@@ -70,6 +79,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.LINKEDIN_CLIENT_SECRET || ''
       },
+      get scope() {
+        return castStringArrayEnv('APPLE_SCOPE', ['r_emailaddress', 'r_liteprofile'])
+      }
     }
   },
 
@@ -90,6 +102,9 @@ const PROVIDERS = {
           return process.env.APPLE_PRIVATE_KEY &&
           // Convert contents from base64 string to string to avoid issues with line breaks in the environment variable
           Buffer.from(process.env.APPLE_PRIVATE_KEY, 'base64').toString('ascii') || ''
+        },
+        get scope() {
+          return castStringArrayEnv('APPLE_SCOPE', ['name', 'email'])
         }
       }
     } catch (e) {
@@ -105,6 +120,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.WINDOWS_LIVE_CLIENT_SECRET || ''
       },
+      get scope() {
+        return castStringArrayEnv('WINDOWS_LIVE_SCOPE', ['wl.basic', 'wl.emails'])
+      }
     }
   },
 
@@ -116,6 +134,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.SPOTIFY_CLIENT_SECRET || ''
       },
+      get scope() {
+        return castStringArrayEnv('SPOTIFY_SCOPE', ['user-read-email', 'user-read-private'])
+      }
     }
   }
 }
