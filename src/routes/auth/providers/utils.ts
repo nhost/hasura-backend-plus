@@ -57,30 +57,32 @@ const manageProviderStrategy = (
 
     // See if email already exist.
     // if email exist, merge this provider with the current user.
-    try {
-      // try fetching the account using email
-      // if we're unable to fetch the account using the email
-      // we'll throw out of this try/catch
-      const account = await selectAccountByEmail(email as string)
+    if(email) {
+      try {
+        // try fetching the account using email
+        // if we're unable to fetch the account using the email
+        // we'll throw out of this try/catch
+        const account = await selectAccountByEmail(email)
 
-      // account was successfully fetched
-      // add provider and activate account
-      const insertAccountProviderToUserData = await request<InsertAccountProviderToUser>(
-        insertAccountProviderToUser,
-        {
-          account_provider: {
-            account_id: account.id,
-            auth_provider: provider,
-            auth_provider_unique_id: id
-          },
-          account_id: account.id
-        }
-      )
+        // account was successfully fetched
+        // add provider and activate account
+        const insertAccountProviderToUserData = await request<InsertAccountProviderToUser>(
+          insertAccountProviderToUser,
+          {
+            account_provider: {
+              account_id: account.id,
+              auth_provider: provider,
+              auth_provider_unique_id: id
+            },
+            account_id: account.id
+          }
+        )
 
-      return done(null, insertAccountProviderToUserData.insert_auth_account_providers_one.account)
-    } catch (error) {
-      // We were unable to fetch the account
-      // noop continue to register user
+        return done(null, insertAccountProviderToUserData.insert_auth_account_providers_one.account)
+      } catch (error) {
+        // We were unable to fetch the account
+        // noop continue to register user
+      }
     }
 
     // register useruser, account, account_provider
@@ -168,7 +170,16 @@ export const initProvider = <T extends Strategy>(
             returnURL: callbackUrl, // Steam uses returnURL instead of callbackURL
             passReqToCallback: true
           },
-          manageProviderStrategy(strategyName, transformProfile)
+          (...args: any[]) => {
+            // Steam uses (identifier, profile, done)
+            // instead of (accessToken, refreshToken, profile, done)
+            // used by other passports
+            if(args?.[2]?.provider === 'steam') {
+              return manageProviderStrategy(strategyName, transformProfile)(args[0], '', '', args[2], args[3])
+            } else {
+              return manageProviderStrategy(strategyName, transformProfile)(...args as [any, any, any, any, any])
+            }
+          }
         )
       )
 
