@@ -3,7 +3,7 @@ import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import { PROVIDERS, REGISTRATION } from '@shared/config'
+import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -157,7 +157,7 @@ export const initProvider = <T extends Strategy>(
 
   let registered = false
 
-  const callbackUrl = `http://localhost:3000/auth/providers/${strategyName}/callback`
+  const callbackUrl = `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`
 
   subRouter.use((req, res, next) => {
     if (!registered) {
