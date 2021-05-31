@@ -70,7 +70,8 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
       locals: {
         ticket,
         url: APPLICATION.SERVER_URL,
-        display_name: account.user.display_name
+        display_name: account.user.display_name,
+        locale: account.locale
       },
       message: {
         to: email,

@@ -21,6 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
+    locale
   }
 `
 
@@ -306,4 +307,14 @@ export const selectAccountProvider = gql`
     }
   }
   ${accountFragment}
+`
+
+export const getEmailTemplate = gql`
+  query($id: String!, $locale: String!) {
+    auth_email_templates_by_pk(id: $id, locale: $locale) {
+      title,
+      html,
+      no_html
+    }
+  }
 `

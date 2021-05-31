@@ -6,7 +6,7 @@ import { Response } from 'express'
 export const getRequestInfo = async (
   req: RequestExtended,
   res: Response
-): Promise<{ user_id: string | number; new_email: string }> => {
+): Promise<{ user_id: string; new_email: string }> => {
   if (!req.permission_variables) {
     throw res.boom.unauthorized('Not logged in')
   }

@@ -1,4 +1,4 @@
-import { REGISTRATION } from './config'
+import { APPLICATION, REGISTRATION } from './config'
 import Joi from '@hapi/joi'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
@@ -43,12 +43,14 @@ const emailRule = extendedJoi.string().email().required().allowedDomains()
 
 const accountFields = {
   email: emailRule,
-  password: passwordRuleRequired
+  password: passwordRuleRequired,
+  locale: Joi.string().length(2).default(APPLICATION.EMAILS_DEFAULT_LOCALE)
 }
 
 const accountFieldsMagicLink = {
   email: emailRule,
-  password: passwordRule
+  password: passwordRule,
+  locale: Joi.string().length(2).default(APPLICATION.EMAILS_DEFAULT_LOCALE)
 }
 
 export const userDataFields = {

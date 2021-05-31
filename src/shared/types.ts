@@ -72,6 +72,7 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
+  locale: string
 }
 
 export interface QueryAccountData {
@@ -126,5 +127,13 @@ export interface SetNewEmailData {
       user: UserData
     }[]
     affected_rows: number
+  }
+}
+
+export interface QueryEmailTemplate {
+  auth_email_templates_by_pk: {
+    title: string
+    html: string
+    no_html: string
   }
 }

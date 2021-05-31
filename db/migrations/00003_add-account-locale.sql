@@ -1,0 +1,3 @@
+ALTER TABLE auth.accounts
+  ADD COLUMN locale VARCHAR(2),
+  ALTER COLUMN locale SET NOT NULL;

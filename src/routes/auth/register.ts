@@ -20,7 +20,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     email,
     password,
     user_data = {},
-    register_options = {}
+    register_options = {},
+    locale
   } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
@@ -70,6 +71,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         ticket,
         ticket_expires_at,
         active: REGISTRATION.AUTO_ACTIVATE_NEW_USERS,
+        locale,
         default_role: defaultRole,
         account_roles: {
           data: accountRoles
@@ -118,7 +120,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
-            action: 'sign up'
+            action: 'sign up',
+            locale: account.locale
           }
         })
       } catch (err) {
@@ -145,7 +148,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         locals: {
           display_name,
           ticket,
-          url: APPLICATION.SERVER_URL
+          url: APPLICATION.SERVER_URL,
+          locale: account.locale
         }
       })
     } catch (err) {
