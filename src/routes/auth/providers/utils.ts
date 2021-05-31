@@ -3,7 +3,7 @@ import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
-import { PROVIDERS, REGISTRATION } from '@shared/config'
+import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
 import { selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -163,7 +163,7 @@ export const initProvider = <T extends Strategy>(
           {
             ...PROVIDERS[strategyName],
             ...options,
-            callbackURL: `http://139.59.154.242:3000/auth/providers/${strategyName}/callback`,
+            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
             passReqToCallback: true
           },
           manageProviderStrategy(strategyName, transformProfile)
