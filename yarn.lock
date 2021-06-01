@@ -9951,10 +9951,10 @@ passport-strategy@1.x.x, passport-strategy@^1.0.0:
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
   integrity sha1-tVOaqPwiWj0a0XlHbd8ja0QPUuQ=
 
-passport-strava@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/passport-strava/-/passport-strava-0.2.0.tgz#d6eeb65b4c68b5c1fb3a3f4c8539504ae5eb8a51"
-  integrity sha1-1u62W0xotcH7Oj9MhTlQSuXrilE=
+passport-strava-oauth2@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/passport-strava-oauth2/-/passport-strava-oauth2-0.1.3.tgz#8f53c79af53f07b0a616bc5e43052799fb495666"
+  integrity sha1-j1PHmvU/B7CmFrxeQwUnmftJVmY=
   dependencies:
     passport-oauth "0.1.x"
     pkginfo "0.2.x"
