@@ -1,6 +1,5 @@
 import { Router } from 'express'
-// @ts-ignore
-import { Strategy } from 'passport-strava-oauth2'
+import { Strategy } from '@riderize/passport-strava-oauth2'
 import { PROVIDERS } from '@shared/config'
 import { initProvider } from './utils'
 
