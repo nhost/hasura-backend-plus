@@ -1,8 +1,7 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { asyncWrapper, checkHibp, getGravatarUrl, hashPassword, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
-
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
@@ -61,6 +60,9 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
+  
+  const avatarUrl = getGravatarUrl(email)
+
   let accounts: InsertAccountData
   try {
     accounts = await request<InsertAccountData>(insertAccount, {
@@ -75,8 +77,12 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
           data: accountRoles
         },
         user: {
-          data: { display_name: email, ...user_data }
-        }
+          data: {
+            display_name: email,
+            avatar_url: avatarUrl,
+            ...user_data
+          }
+        },
       }
     })
   } catch (e) {

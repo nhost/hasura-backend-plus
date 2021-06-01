@@ -1,4 +1,4 @@
-import { COOKIES, REGISTRATION } from './config'
+import { APPLICATION, COOKIES, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
   rotateTicket as rotateTicketQuery,
@@ -6,7 +6,7 @@ import {
   selectAccountByTicket as selectAccountByTicketQuery,
   selectAccountByUserId as selectAccountByUserIdQuery
 } from './queries'
-
+import * as gravatar from 'gravatar'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
@@ -120,4 +120,14 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
+}
+
+export const getGravatarUrl = (email: string) => {
+  if(APPLICATION.GRAVATAR_ENABLE) {
+    return gravatar.url(email, {
+      r: APPLICATION.RATING,
+      protocol: 'https',
+      default: APPLICATION.GRAVATAR_DEFAULT
+    })
+  }
 }

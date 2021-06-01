@@ -473,6 +473,13 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
 | `MAGIC_LINK_ENABLE`          | false                   |
 
+### Gravatar
+
+| Name                         | Default | Description |
+| ---------------------------- | ------- | ----------- |
+| `GRAVATER_ENABLE`            | true    |             |
+| `GRAVATAR_DEFAULT`           | mp      |             |
+
 ### Providers
 
 | Name                         | Default | Description |

@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { selectAccountByEmail } from '@shared/helpers'
+import { getGravatarUrl, selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -141,7 +141,7 @@ export const initProvider = <T extends Strategy>(
       id,
       email: emails?.[0].value,
       display_name: displayName,
-      avatar_url: photos?.[0].value
+      avatar_url: photos?.[0].value || emails?.[0] && getGravatarUrl(emails[0].value)
     }),
     callbackMethod = 'GET',
     ...options
