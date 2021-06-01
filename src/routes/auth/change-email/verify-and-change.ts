@@ -41,21 +41,23 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
   }
 
   if (AUTHENTICATION.NOTIFY_EMAIL_CHANGE && APPLICATION.EMAILS_ENABLE) {
-    try {
-      await emailClient.send({
-        template: 'notify-email-change',
-        locals: {
-          url: APPLICATION.SERVER_URL,
-          display_name: user.display_name
-        },
-        message: {
-          to: email
-        }
-      })
-    } catch (err) {
-      console.error('Unable to send email')
-      console.error(err)
-      return res.boom.badImplementation()
+    if(email) {
+      try {
+        await emailClient.send({
+          template: 'notify-email-change',
+          locals: {
+            url: APPLICATION.SERVER_URL,
+            display_name: user.display_name
+          },
+          message: {
+            to: email
+          }
+        })
+      } catch (err) {
+        console.error('Unable to send email')
+        console.error(err)
+        return res.boom.badImplementation()
+      }
     }
   }
   await rotateTicket(ticket)
