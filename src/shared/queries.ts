@@ -307,3 +307,19 @@ export const selectAccountProvider = gql`
   }
   ${accountFragment}
 `
+
+export const isWhitelistedEmail = gql`
+  query($email: String!) {
+    auth_whitelist_by_pk(email: $email) {
+      email
+    }
+  }
+`
+
+export const insertWhitelistedEmail = gql`
+  mutation($email: String!) {
+    insert_auth_whitelist_one(object: { email: $email }) {
+      email
+    }
+  }
+`

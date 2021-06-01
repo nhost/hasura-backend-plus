@@ -161,3 +161,7 @@ export const magicLinkQuery = Joi.object({
   action: Joi.string().valid('log-in', 'sign-up').required(),
   cookie: Joi.boolean().optional(),
 });
+
+export const whitelistQuery = Joi.object({
+  email: emailRule
+})

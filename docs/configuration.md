@@ -472,6 +472,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
 | `MAGIC_LINK_ENABLE`          | false                   |
+| `WHITELIST_ENABLE`           | false                   |
 
 ### Providers
 

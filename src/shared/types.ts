@@ -128,3 +128,9 @@ export interface SetNewEmailData {
     affected_rows: number
   }
 }
+
+export interface IsWhitelistedEmail {
+  auth_whitelist_by_pk: {
+    email: string
+  } | null
+}

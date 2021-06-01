@@ -1,6 +1,6 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, isWhitelistedEmail, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
@@ -22,6 +22,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     user_data = {},
     register_options = {}
   } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+
+  if(REGISTRATION.WHITELIST && !await isWhitelistedEmail(email)) {
+    return res.boom.unauthorized('Email not whitelisted')
+  }
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
