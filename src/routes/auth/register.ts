@@ -18,7 +18,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
@@ -115,7 +115,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
-            action: 'sign up'
+            action: 'sign up',
+            action_url: 'sign-up'
           }
         })
       } catch (err) {

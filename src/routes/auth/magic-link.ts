@@ -71,22 +71,12 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   if (action === 'log-in') {
-    if (APPLICATION.REDIRECT_URL_SUCCESS) {
-      return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
-    }
-
-    res.status(200).send('You have logged in')
+    return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
   } else if (action === 'sign-up') {
-    if (APPLICATION.REDIRECT_URL_SUCCESS) {
-      return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
-    }
-
     if(APPLICATION.REDIRECT_URL_SUCCESS) {
-      res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', token))
+      return res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', token))
     } else
-      res.status(200).send('Your account has been activated. You can close this window and login')
-  } else {
-    res.status(400);
+      return res.status(200).send('Your account has been activated. You can close this window and login')
   }
 
   res.send(session)

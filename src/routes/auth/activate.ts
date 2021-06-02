@@ -45,10 +45,6 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     return res.boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if (APPLICATION.REDIRECT_URL_SUCCESS) {
-    return res.redirect(302, APPLICATION.REDIRECT_URL_SUCCESS)
-  }
-
   if(APPLICATION.REDIRECT_URL_SUCCESS) {
     res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', ticket))
   } else

@@ -64,7 +64,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? loginSchemaMagicLink : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? loginSchemaMagicLink : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -93,7 +93,8 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
           display_name: account.user.display_name,
           token: refresh_token,
           url: APPLICATION.SERVER_URL,
-          action: 'log in'
+          action: 'log in',
+          action_url: 'log-in'
         }
       })
 
