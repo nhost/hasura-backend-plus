@@ -24,15 +24,9 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
     req.permission_variables = claims_sanatized as PermissionVariables
   }
 
-  // check for refresh token in body?
   if ('refresh_token' in req.query) {
     req.refresh_token = req.query.refresh_token as string
     delete req.query.refresh_token
-  }
-
-  if ('permission_variables' in req.query) {
-    req.permission_variables = JSON.parse(req.query.permission_variables as string)
-    delete req.query.permission_variables
   }
 
   next()

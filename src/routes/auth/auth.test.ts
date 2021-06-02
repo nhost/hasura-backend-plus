@@ -312,7 +312,9 @@ it('should decode a valid custom user claim', (done) => {
 
 it('should logout', (done) => {
   registerAndLoginAccount(request).then(({ refresh_token }) => {
-    request.post(`/auth/logout?refresh_token=${refresh_token}`)
+    request
+      .post(`/auth/logout`)
+      .query({ refresh_token })
       .send()
       .expect(204)
       .end(end(done))
@@ -320,10 +322,10 @@ it('should logout', (done) => {
 })
 
 it('should delete an account', (done) => {
-  registerAndLoginAccount(request).then(({ refresh_token, permission_variables }) => {
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
     request
       .post(`/auth/delete`)
-      .query({ refresh_token, permission_variables })
+      .set({ Authorization: `Bearer ${jwtToken}` })
       .expect(204)
       .end(end(done))
   })

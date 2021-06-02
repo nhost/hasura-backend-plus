@@ -15,7 +15,7 @@ export type AccountData = AccountLoginData & {
   id: string
   token: string
   refresh_token: string
-  permission_variables: string
+  jwtToken: string
 }
 
 export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
@@ -64,7 +64,7 @@ export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: Acc
     ...accountLoginData,
     token: login.body.jwt_token as string,
     refresh_token: login.body.refresh_token as string,
-    permission_variables: login.body.permission_variables as string,
+    jwtToken: login.body.jwt_token as string,
     id: getUserId(login.body.jwt_token)
   }
 }
