@@ -6,8 +6,7 @@ import { asyncWrapper } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { magicLinkQuery } from '@shared/validation'
-import { AccountData, Session, UpdateAccountData, UserData } from '@shared/types'
-import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
+import { AccountData, UpdateAccountData } from '@shared/types'
 import { setRefreshToken } from '@shared/cookies'
 
 async function magicLink({ query }: Request, res: Response): Promise<unknown> {
@@ -62,27 +61,9 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
     throw Boom.unauthorized('Invalid or expired token.')
   }
 
-  const jwt_token = createHasuraJwt(account)
-  const jwt_expires_in = newJwtExpiry
-  const user: UserData = {
-    id: account.user.id,
-    display_name: account.user.display_name,
-    email: account.email,
-    avatar_url: account.user.avatar_url
-  }
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (!useCookie) session.refresh_token = refresh_token
-
-  if (action === 'log-in') {
-    return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
-  } else if (action === 'sign-up') {
-    if(APPLICATION.REDIRECT_URL_SUCCESS) {
-      return res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', token))
-    } else
-      return res.status(200).send('Your account has been activated. You can close this window and login')
-  }
-
-  res.send(session)
+  // Redirect user with refresh token.
+  // This is both for when users log in and register.
+  return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export default asyncWrapper(magicLink)
