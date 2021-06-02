@@ -120,6 +120,7 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
 
 export function newRefreshExpiry(): number {
   const now = new Date()
+  // 1 day = 1440 minutes
   const days = JWT.REFRESH_EXPIRES_IN / 1440
 
   return now.setDate(now.getDate() + days)
