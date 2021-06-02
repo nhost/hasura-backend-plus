@@ -118,15 +118,14 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   const account = req.user as AccountData
 
   let refresh_token = ''
-  let permission_variables = ''
   try {
-    [refresh_token, permission_variables] = await setRefreshToken(account.id)
+    refresh_token = await setRefreshToken(account.id)
   } catch (e) {
     res.redirect(PROVIDERS.REDIRECT_FAILURE)
   }
 
   // redirect back user to app url
-  res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}&permission_variables=${permission_variables}`)
+  res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export const initProvider = <T extends Strategy>(

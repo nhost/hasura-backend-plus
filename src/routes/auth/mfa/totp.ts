@@ -37,7 +37,7 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     return res.boom.unauthorized('Invalid two-factor code.')
   }
 
-  const [refresh_token, permission_variables] = await setRefreshToken(id)
+  const refresh_token = await setRefreshToken(id)
   await rotateTicket(ticket)
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
@@ -48,7 +48,7 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     avatar_url: account.user.avatar_url
   }
 
-  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token, permission_variables }
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   res.send(session)
 }

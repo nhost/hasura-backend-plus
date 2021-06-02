@@ -48,7 +48,6 @@ export interface Session {
   jwt_token: string | null;
   jwt_expires_in: number | null;
   refresh_token?: string
-  permission_variables?: string
   user: UserData;
 }
 
