@@ -508,6 +508,9 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `SPOTIFY_ENABLE`             | false   |             |
 | `SPOTIFY_CLIENT_ID`          |         |             |
 | `SPOTIFY_CLIENT_SECRET`      |         |             |
+| `STRAVA_ENABLE`              | false   |             |
+| `STRAVA_CLIENT_ID`           |         |             |
+| `STRAVA_CLIENT_SECRET`       |         |             |
 
 ### Storage
 
