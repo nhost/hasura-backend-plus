@@ -167,11 +167,9 @@ export const accountIsAnonymous = async (user_id: string) => {
   return account.is_anonymous
 }
 
-export const deanonymizeAccount = async (accountId: string, email: string, passwordHash: string) => {
+export const deanonymizeAccount = async (accountId: string) => {
   await request(deanonymizeAccountQuery, {
     account_id: accountId,
-    email,
-    password_hash: passwordHash,
     default_role: REGISTRATION.DEFAULT_USER_ROLE,
     roles: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map(role => ({
       account_id: accountId,

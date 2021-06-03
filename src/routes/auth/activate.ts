@@ -2,12 +2,11 @@ import { APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
 
 import { activateAccount, setNewTicket } from '@shared/queries'
-import { accountWithEmailExists, asyncWrapper, deanonymizeAccount, selectAccountByTicket } from '@shared/helpers'
+import { asyncWrapper, deanonymizeAccount, selectAccountByTicket } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/validation'
 import { AccountData, UpdateAccountData } from '@shared/types'
-import cryptr from '@shared/cryptr'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
   if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
@@ -30,16 +29,8 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   const new_ticket = uuidv4()
 
   if(account.is_anonymous) {
-    const [email, password_hash] = cryptr.decrypt(ticket).split('\0')
-
-    if (await accountWithEmailExists(email)) {
-      return res.boom.badRequest('Cannot use this email.')
-    }
-
     await deanonymizeAccount(
       account.id,
-      email,
-      password_hash,
     )
 
     await request(setNewTicket, {

@@ -4,9 +4,9 @@ import { accountIsAnonymous, accountWithEmailExists, asyncWrapper, checkHibp, ha
 import { deanonymizeSchema } from '@shared/validation';
 import { RequestExtended } from '@shared/types';
 import { request } from '@shared/request';
-import { setNewTicket } from '@shared/queries';
+import { changeEmailByUserId, changePasswordHashByUserId, deactivateAccount, setNewTicket } from '@shared/queries';
 import { emailClient } from '@shared/email';
-import cryptr from '@shared/cryptr'
+import { v4 as uuid4 } from 'uuid'
 
 async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<unknown> {
   const body = req.body
@@ -41,20 +41,34 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
     return res.boom.badRequest('Cannot use this email.')
   }
 
+  const user_id = req.permission_variables['user-id']
+
+  await request(changeEmailByUserId, {
+    user_id,
+    new_email: email
+  })
+
+  await request(changePasswordHashByUserId, {
+    user_id,
+    new_password_hash: passwordHash
+  })
+
   if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     await deanonymizeAccountHelper(
-      await selectAccountByUserId(req.permission_variables['user-id']).then(acc => acc.id),
-      email,
-      passwordHash,
+      await selectAccountByUserId(user_id).then(acc => acc.id),
     )
   } else {
-    const ticket = cryptr.encrypt(`${email}\0${passwordHash}`) // will be decrypted on the auth/activate call
+    const ticket = uuid4() // will be decrypted on the auth/activate call
     const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000) // active for 60 minutes
 
     await request(setNewTicket, {
-      user_id: req.permission_variables['user-id'],
+      user_id,
       ticket,
       ticket_expires_at
+    })
+
+    await request(deactivateAccount, {
+      user_id
     })
 
     await emailClient.send({
