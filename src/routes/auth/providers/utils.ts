@@ -1,4 +1,4 @@
-import express, { RequestHandler, Response, Router } from 'express'
+import express, { NextFunction, RequestHandler, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
@@ -173,7 +173,15 @@ export const initProvider = <T extends Strategy>(
     next()
   })
 
-  subRouter.get('/', passport.authenticate(strategyName, { session: false }))
+  subRouter.get('/', [
+    async (req: Request, res: Response, next: NextFunction) => {
+      if(REGISTRATION.ADMIN_ONLY) {
+        return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
+      }
+      await next()
+    },
+    passport.authenticate(strategyName, { session: false })
+  ])
 
   const handlers = [
     passport.authenticate(strategyName, {
