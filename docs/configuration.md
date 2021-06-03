@@ -469,7 +469,8 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
-| `MAGIC_LINK_ENABLE`          | false                   |
+| `ENABLE_MAGIC_LINK`          | false                   |
+| `ADMIN_ONLY_REGISTRATION`    | false                   | Allow registration only with x-admin-secret
 
 ### Providers
 

@@ -1,4 +1,4 @@
-import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
+import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
@@ -12,6 +12,14 @@ import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const body = req.body
+
+  if(REGISTRATION.ADMIN_ONLY) {
+    const adminSecret = req.headers[HEADERS.ADMIN_SECRET_HEADER]
+
+    if (adminSecret !== APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET) {
+      return res.boom.unauthorized('Invalid x-admin-secret')
+    }
+  }
 
   const {
     email,

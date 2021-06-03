@@ -571,3 +571,56 @@ it('should not be able to log in anonymously when anonymous login is disabled', 
       .end(end(done))
   })
 })
+
+it('should not be able to register with admin only registration', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .expect(401)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
+
+it('should not be able to register with admin only registration with incorrect x-admin-secret', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .set({ 'x-admin-secret': generateRandomString() })
+      .expect(401)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
+
+it('should be able to register with admin only registration with correct x-admin-secret', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
+      .expect(200)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
