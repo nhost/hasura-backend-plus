@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { addProviderRequest, deleteProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
+import { asyncWrapper, selectAccountByEmail, setRefreshToken } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -16,7 +16,6 @@ import {
   InsertAccountProviderToUser,
   QueryProviderRequests
 } from '@shared/types'
-import { setRefreshToken } from '@shared/cookies'
 import { providerCallbackQuery, providerQuery } from '@shared/validation'
 import { v4 as uuidv4 } from 'uuid'
 
