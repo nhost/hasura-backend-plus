@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { selectAccountByEmail } from '@shared/helpers'
+import { selectAccountByEmail, setRefreshToken } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -15,7 +15,6 @@ import {
   RequestExtended,
   InsertAccountProviderToUser
 } from '@shared/types'
-import { setRefreshToken } from '@shared/cookies'
 
 interface Constructable<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,7 +119,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
 
   let refresh_token = ''
   try {
-    refresh_token = await setRefreshToken(res, account.id, true)
+    refresh_token = await setRefreshToken(account.id)
   } catch (e) {
     res.redirect(PROVIDERS.REDIRECT_FAILURE)
   }
