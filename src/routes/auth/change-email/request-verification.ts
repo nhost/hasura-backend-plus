@@ -49,6 +49,9 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
     console.error(error)
     return res.boom.badImplementation('unable to set new email')
   }
+
+  const account = await selectAccountByUserId(user_id)
+
   // send email
   try {
     await emailClient.send({
@@ -57,7 +60,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
         ticket,
         url: APPLICATION.SERVER_URL,
         display_name,
-        locale: await selectAccountByUserId(user_id).then(acc => acc.locale)
+        locale: account.locale
       },
       message: {
         to: new_email,
