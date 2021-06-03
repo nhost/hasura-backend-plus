@@ -98,3 +98,6 @@
           name: accounts
         column_mapping:
           id: user_id
+- table:
+    schema: auth
+    name: provider_requests

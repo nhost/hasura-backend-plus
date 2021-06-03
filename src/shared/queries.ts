@@ -366,6 +366,31 @@ export const selectAccountProvider = gql`
   ${accountFragment}
 `
 
+export const addProviderRequest = gql`
+  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!) {
+    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure } ) {
+      id
+    }
+  }
+`
+
+export const getProviderRequest = gql`
+  query($state: uuid!) {
+    auth_provider_requests_by_pk(id: $state) {
+      redirect_url_success,
+      redirect_url_failure
+    }
+  }
+`
+
+export const deleteProviderRequest = gql`
+  mutation($state: uuid!) {
+    delete_auth_provider_requests_by_pk(id: $state) {
+      id
+    }
+  }
+`
+
 export const deactivateAccount = gql`
   mutation($user_id: uuid!) {
     update_auth_accounts(

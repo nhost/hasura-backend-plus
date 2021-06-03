@@ -1,11 +1,11 @@
-import express, { NextFunction, RequestHandler, Response, Router } from 'express'
+import express, { NextFunction, Request, RequestHandler, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
 import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
-import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { selectAccountByEmail, setRefreshToken } from '@shared/helpers'
+import { addProviderRequest, deleteProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
+import { asyncWrapper, selectAccountByEmail, setRefreshToken } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -13,8 +13,15 @@ import {
   AccountData,
   UserData,
   RequestExtended,
-  InsertAccountProviderToUser
+  InsertAccountProviderToUser,
+  QueryProviderRequests
 } from '@shared/types'
+import { providerCallbackQuery, providerQuery } from '@shared/validation'
+import { v4 as uuidv4 } from 'uuid'
+
+interface RequestWithState extends Request {
+  state: string
+}
 
 interface Constructable<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,9 +116,21 @@ const manageProviderStrategy = (
     return done(null, hasura_account_provider_data.insert_auth_accounts.returning[0])
   }
 
-const providerCallback = async (req: RequestExtended, res: Response): Promise<void> => {
+const providerCallback = asyncWrapper(async (req: RequestExtended & RequestWithState, res: Response): Promise<void> => {
   // Successful authentication, redirect home.
   // generate tokens and redirect back home
+
+  await providerCallbackQuery.validateAsync(req.query)
+
+  req.state = req.query.state as string
+
+  const { redirect_url_success, redirect_url_failure } = await request<QueryProviderRequests>(getProviderRequest, {
+    state: req.state
+  }).then(query => query.auth_provider_requests_by_pk)
+
+  await request(deleteProviderRequest, {
+    state: req.state
+  })
 
   // passport js defaults data to req.user.
   // However, we send account data.
@@ -121,12 +140,12 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   try {
     refresh_token = await setRefreshToken(account.id)
   } catch (e) {
-    res.redirect(PROVIDERS.REDIRECT_FAILURE)
+    res.redirect(redirect_url_failure)
   }
 
   // redirect back user to app url
-  res.redirect(`${PROVIDERS.REDIRECT_SUCCESS}?refresh_token=${refresh_token}`)
-}
+  res.redirect(`${redirect_url_success}?refresh_token=${refresh_token}`)
+})
 
 export const initProvider = <T extends Strategy>(
   router: Router,
@@ -180,6 +199,22 @@ export const initProvider = <T extends Strategy>(
         return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
       }
       await next()
+    },
+    asyncWrapper(async (req: RequestWithState, res: Response, next: NextFunction) => {
+      req.state = uuidv4()
+
+      const { redirect_url_success, redirect_url_failure } = await providerQuery.validateAsync(req.query)
+
+      await request(addProviderRequest, {
+        state: req.state,
+        redirect_url_success,
+        redirect_url_failure
+      })
+
+      await next()
+    }),
+    (req: RequestWithState, ...rest: any) => {
+      return passport.authenticate(strategyName, { session: false, state: req.state })(req, ...rest)
     },
     passport.authenticate(strategyName, { session: false, scope })
   ])

@@ -46,6 +46,7 @@
     "aws-sdk": "2.656.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "1.19.0",
+    "compare-urls": "^2.0.0",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
     "ejs": "3.0.2",

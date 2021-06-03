@@ -110,6 +110,13 @@ export interface InsertAccountProviderToUser {
   }
 }
 
+export interface QueryProviderRequests {
+  auth_provider_requests_by_pk: {
+    redirect_url_success: string,
+    redirect_url_failure: string
+  }
+}
+
 export type RefreshTokenMiddleware = string | null
 
 export interface RequestExtended extends Request {
