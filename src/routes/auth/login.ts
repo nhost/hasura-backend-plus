@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
-import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { asyncWrapper, selectAccount, setRefreshToken } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
-import { setRefreshToken } from '@shared/cookies'
 import { loginAnonymouslySchema, loginSchema, loginSchemaMagicLink } from '@shared/validation'
 import { insertAccount, setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
@@ -19,9 +18,6 @@ interface HasuraData {
 }
 
 async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
-  // default to true
-  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
-
   if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
@@ -56,13 +52,12 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
 
       const account = hasura_data.insert_auth_accounts.returning[0]
 
-      const refresh_token = await setRefreshToken(res, account.id, useCookie)
+      const refresh_token = await setRefreshToken(account.id)
 
       const jwt_token = createHasuraJwt(account)
       const jwt_expires_in = newJwtExpiry
 
-      const session: Session = { jwt_token, jwt_expires_in, user: account.user }
-      if (useCookie) session.refresh_token = refresh_token
+      const session: Session = { jwt_token, jwt_expires_in, user: account.user, refresh_token }
 
       return res.send(session)
     }
@@ -80,7 +75,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const { id, mfa_enabled, password_hash, active, email } = account
 
   if (typeof password === 'undefined') {
-    const refresh_token = await setRefreshToken(res, id, useCookie)
+    const refresh_token = await setRefreshToken(id)
 
     try {
       await emailClient.send({
@@ -146,7 +141,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // refresh_token
-  const refresh_token = await setRefreshToken(res, id, useCookie)
+  const refresh_token = await setRefreshToken(id)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
@@ -157,8 +152,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (!useCookie) session.refresh_token = refresh_token
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   res.send(session)
 }

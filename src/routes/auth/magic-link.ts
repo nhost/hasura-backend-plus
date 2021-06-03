@@ -8,12 +8,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { magicLinkQuery } from '@shared/validation'
 import { AccountData, Session, UpdateAccountData, UserData } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
-import { setRefreshToken } from '@shared/cookies'
+import { setRefreshToken } from '@shared/helpers'
 
 async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   const { token, action } = await magicLinkQuery.validateAsync(query);
-
-  const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
 
   let refresh_token = token;
 
@@ -47,7 +45,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
       throw Boom.unauthorized('Invalid or expired token.')
     }
 
-    refresh_token = await setRefreshToken(res, returning[0].id, useCookie)
+    refresh_token = await setRefreshToken(returning[0].id)
   }
 
   const hasura_data = await request<{
@@ -70,8 +68,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
     email: account.email,
     avatar_url: account.user.avatar_url
   }
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (!useCookie) session.refresh_token = refresh_token
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   if (action === 'log-in') {
     return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
