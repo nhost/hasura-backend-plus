@@ -4,7 +4,6 @@ export * from './registration'
 export * from './jwt'
 export * from './providers'
 export * from './mfa'
-export * from './cookies'
 
 /**
  * * Authentication settings

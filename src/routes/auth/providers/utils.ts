@@ -1,11 +1,11 @@
-import express, { RequestHandler, Response, Router } from 'express'
+import express, { NextFunction, RequestHandler, Response, Router } from 'express'
 import passport, { Profile } from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
 import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { selectAccountByEmail } from '@shared/helpers'
+import { selectAccountByEmail, setRefreshToken } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -15,7 +15,6 @@ import {
   RequestExtended,
   InsertAccountProviderToUser
 } from '@shared/types'
-import { setRefreshToken } from '@shared/cookies'
 
 interface Constructable<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,7 +119,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
 
   let refresh_token = ''
   try {
-    refresh_token = await setRefreshToken(res, account.id, true)
+    refresh_token = await setRefreshToken(account.id)
   } catch (e) {
     res.redirect(PROVIDERS.REDIRECT_FAILURE)
   }
@@ -175,7 +174,15 @@ export const initProvider = <T extends Strategy>(
     next()
   })
 
-  subRouter.get('/', passport.authenticate(strategyName, { session: false, scope }))
+  subRouter.get('/', [
+    async (req: Request, res: Response, next: NextFunction) => {
+      if(REGISTRATION.ADMIN_ONLY) {
+        return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
+      }
+      await next()
+    },
+    passport.authenticate(strategyName, { session: false, scope })
+  ])
 
   const handlers = [
     passport.authenticate(strategyName, {
