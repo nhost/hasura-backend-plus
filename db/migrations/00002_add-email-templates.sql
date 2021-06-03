@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS auth.email_templates (
+CREATE TABLE auth.email_templates (
   id text NOT NULL,
   title text NOT NULL,
   html text NOT NULL,
