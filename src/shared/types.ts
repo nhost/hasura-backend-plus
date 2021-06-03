@@ -117,10 +117,7 @@ export interface QueryProviderRequests {
   }
 }
 
-export interface RefreshTokenMiddleware {
-  value: string | null
-  type: 'query' | 'cookie' | null
-}
+export type RefreshTokenMiddleware = string | null
 
 export interface RequestExtended extends Request {
   refresh_token?: RefreshTokenMiddleware

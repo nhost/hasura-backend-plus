@@ -139,7 +139,7 @@ const providerCallback = asyncWrapper(async (req: RequestExtended & RequestWithS
 
   let refresh_token = ''
   try {
-    refresh_token = await setRefreshToken(res, account.id, true)
+    refresh_token = await setRefreshToken(account.id)
   } catch (e) {
     res.redirect(redirect_url_failure)
   }
@@ -150,7 +150,7 @@ const providerCallback = asyncWrapper(async (req: RequestExtended & RequestWithS
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'gitlab' | 'bitbucket',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
   middleware?: RequestHandler
@@ -163,6 +163,7 @@ export const initProvider = <T extends Strategy>(
       avatar_url: photos?.[0].value
     }),
     callbackMethod = 'GET',
+    scope,
     ...options
   } = settings
 
@@ -194,6 +195,9 @@ export const initProvider = <T extends Strategy>(
   })
 
   subRouter.get('/', [
+    (req: RequestWithState, ...rest: any) => {
+      return passport.authenticate(strategyName, { session: false, state: req.state })(req, ...rest)
+    },
     asyncWrapper(async (req: RequestWithState, res: Response, next: NextFunction) => {
       req.state = uuidv4()
 
@@ -207,10 +211,14 @@ export const initProvider = <T extends Strategy>(
 
       await next()
     }),
-    (req: RequestWithState, ...rest: any) => {
-      return passport.authenticate(strategyName, { session: false, state: req.state })(req, ...rest)
-    }
-  ]) 
+    async (req: Request, res: Response, next: NextFunction) => {
+      if(REGISTRATION.ADMIN_ONLY) {
+        return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
+      }
+      await next()
+    },
+    passport.authenticate(strategyName, { session: false, scope })
+  ])
 
   const handlers = [
     passport.authenticate(strategyName, {

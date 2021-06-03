@@ -7,6 +7,9 @@ export const APPLICATION = {
   get SERVER_URL() {
     return process.env.SERVER_URL || ''
   },
+  get APP_URL() {
+    return process.env.APP_URL || ''
+  },
   get REDIRECT_URL_ERROR() {
     return process.env.REDIRECT_URL_ERROR || ''
   },
