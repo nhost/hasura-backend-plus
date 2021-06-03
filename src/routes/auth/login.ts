@@ -74,7 +74,12 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const account = await selectAccount(body)
 
   if (!account) {
-    return res.boom.badRequest(typeof password !== 'undefined' ? 'Invalid email or password': 'Invalid email')
+    // Undefined password = magic link login
+    if(typeof password === 'undefined') {
+      return res.boom.badRequest('Invalid email')
+    } else {
+      return res.boom.badRequest('Invalid email or password')
+    }
   }
 
   const { id, mfa_enabled, password_hash, active, email } = account
