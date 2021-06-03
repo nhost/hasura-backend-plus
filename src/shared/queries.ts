@@ -121,9 +121,39 @@ export const insertRefreshToken = gql`
   ${accountFragment}
 `
 
+// WHERE
+//   refresh_token = $refresh_token
+//   AND (
+//     account.active = ture
+//     OR (
+//       account.active =  false
+//       AND account.is_anonymous
+//     )
+//   )
+// The reason is, we don't want users to select a refresh token if their account
+// is not active. Except if the user anonymous. Then we can allow it.
+// A user can be anonymous but with active = false when the user conver their
+// anonymous account to a real account but have not yet activated their account
+// aka verified their email.
 export const selectRefreshToken = gql`
 query ($refresh_token: uuid!, $current_timestamp: timestamptz!) {
-  auth_refresh_tokens(where: {_and: [{refresh_token: {_eq: $refresh_token}}, {_or: [{account: {active: {_eq: true}}}, {_and: [{account: {active: {_eq: false}}}, {account: {is_anonymous: {_eq: true}}}]}]}, {expires_at: {_gte: $current_timestamp}}]}) {
+  auth_refresh_tokens(
+    where: {
+      _and: [
+        { refresh_token: { _eq: $refresh_token } },
+        {
+          _or: [
+            { account: { active: { _eq: true }}}, {
+              _and: [
+                { account: { active: { _eq: false }}},
+                { account: { is_anonymous: { _eq: true }}}
+              ]
+            }
+          ]
+        },
+        { expires_at: { _gte: $current_timestamp }}
+      ]
+    }) {
     account {
         ...accountFragment
     }
