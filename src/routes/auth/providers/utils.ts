@@ -194,8 +194,11 @@ export const initProvider = <T extends Strategy>(
   })
 
   subRouter.get('/', [
-    (req: RequestWithState, ...rest: any) => {
-      return passport.authenticate(strategyName, { session: false, state: req.state })(req, ...rest)
+    async (req: Request, res: Response, next: NextFunction) => {
+      if(REGISTRATION.ADMIN_ONLY) {
+        return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
+      }
+      await next()
     },
     asyncWrapper(async (req: RequestWithState, res: Response, next: NextFunction) => {
       req.state = uuidv4()
@@ -210,11 +213,8 @@ export const initProvider = <T extends Strategy>(
 
       await next()
     }),
-    async (req: Request, res: Response, next: NextFunction) => {
-      if(REGISTRATION.ADMIN_ONLY) {
-        return res.boom.notImplemented('Provider authentication cannot be used when registration when ADMIN_ONLY_REGISTRATION=true')
-      }
-      await next()
+    (req: RequestWithState, ...rest: any) => {
+      return passport.authenticate(strategyName, { session: false, state: req.state })(req, ...rest)
     },
     passport.authenticate(strategyName, { session: false, scope })
   ])
