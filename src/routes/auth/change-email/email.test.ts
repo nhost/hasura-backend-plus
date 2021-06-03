@@ -1,31 +1,22 @@
 import 'jest-extended'
 
-import { mailHogSearch, deleteMailHogEmail, generateRandomEmail, withEnv, registerAccount } from '@test/utils'
+import { mailHogSearch, deleteMailHogEmail, generateRandomEmail, withEnv } from '@test/utils'
 import { registerAndLoginAccount } from '@test/utils'
 
 import { request } from '@test/server'
 import { end } from '@test/supertest-shared-utils'
 
-it('should request to change email', (done) => {
-  registerAccount(request).then(() => {
-    request
-      .post('/auth/change-email/request')
-      .send({ new_email: generateRandomEmail() })
-      .expect(204)
-      .end(end(done))
-  });
-})
-
-it('should receive a ticket by email', (done) => {
+it('should request to change email and receive a ticket by email', (done) => {
   withEnv({
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAccount(request).then(() => {
+    await registerAndLoginAccount(request).then(({ jwtToken }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .set({ Authorization: `Bearer ${jwtToken}` })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -46,11 +37,12 @@ it('should change the email from a ticket', (done) => {
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAndLoginAccount(request).then(() => {
+    await registerAndLoginAccount(request).then(({ jwtToken }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .set({ Authorization: `Bearer ${jwtToken}` })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -63,7 +55,8 @@ it('should change the email from a ticket', (done) => {
           await deleteMailHogEmail(message)
 
           request
-            .post('/auth/change-email/change')
+            .post(`/auth/change-email/change`)
+            .set({ Authorization: `Bearer ${jwtToken}` })
             .send({ ticket })
             .expect(204)
             .end(end(done))
@@ -77,11 +70,12 @@ it('should reconnect using the new email', (done) => {
     EMAILS_ENABLE: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
-    await registerAndLoginAccount(request).then(({ email, password }) => {
+    await registerAndLoginAccount(request).then(({ email, password, jwtToken }) => {
       const new_email = generateRandomEmail()
 
       request
-        .post('/auth/change-email/request')
+        .post(`/auth/change-email/request`)
+        .set({ Authorization: `Bearer ${jwtToken}` })
         .send({ new_email })
         .expect(204)
         .end(async (err) => {
@@ -94,7 +88,8 @@ it('should reconnect using the new email', (done) => {
           await deleteMailHogEmail(message)
 
           request
-            .post('/auth/change-email/change')
+            .post(`/auth/change-email/change`)
+            .set({ Authorization: `Bearer ${jwtToken}` })
             .send({ ticket })
             .expect(204)
             .end(async (err) => {

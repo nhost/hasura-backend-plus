@@ -14,7 +14,7 @@ import {
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
-import { end, saveJwt, validJwt, validRefreshToken } from '@test/supertest-shared-utils'
+import { end, saveJwt, validJwt } from '@test/supertest-shared-utils'
 
 import { Response } from 'superagent'
 
@@ -62,7 +62,7 @@ it('should create an account', (done) => {
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      ENABLE_MAGIC_LINK: 'true'
+      MAGIC_LINK_ENABLE: 'true'
     },
     request,
     async () => {
@@ -93,7 +93,7 @@ it('should create an account without a password when magic link login is enabled
 it('should not create an account without a password when magic link login is disabled', (done) => {
   withEnv(
     {
-      ENABLE_MAGIC_LINK: 'false'
+      MAGIC_LINK_ENABLE: 'false'
     },
     request,
     async () => {
@@ -264,7 +264,7 @@ it('should sign the user in', (done) => {
 it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv(
     {
-      ENABLE_MAGIC_LINK: 'true',
+      MAGIC_LINK_ENABLE: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
       VERIFY_EMAILS: 'true'
     },
@@ -307,7 +307,7 @@ it('should sign the user in without password when magic link is enabled', async 
 it('should not sign the user in without password when magic link is disabled', (done) => {
   withEnv(
     {
-      ENABLE_MAGIC_LINK: 'false'
+      MAGIC_LINK_ENABLE: 'false'
     },
     request,
     async () => {
@@ -361,50 +361,23 @@ it('should decode a valid custom user claim', (done) => {
 })
 
 it('should logout', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request.post('/auth/logout').send().expect(204).end(end(done))
-  })
-})
-
-describe('Tests without cookies', () => {
-  it('Should login without cookies', (done) => {
-    registerAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(validJwt())
-        .expect(validRefreshToken())
-        .end(end(done))
-    })
-  })
-
-  it('should decode a valid custom user claim', (done) => {
-    let jwtToken = ''
-
-    registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(validJwt())
-        .expect(validRefreshToken())
-        .expect(saveJwt((j) => (jwtToken = j)))
-        .end((err) => {
-          if (err) return done(err)
-
-          const decodedJwt = JWT.decode(jwtToken) as Token
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
-          // Test if the custom claims work
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
-
-          done()
-        })
-    })
-  })
+  registerAndLoginAccount(request).then(({ refresh_token }) => {
+    request
+      .post(`/auth/logout`)
+      .query({ refresh_token })
+      .send()
+      .expect(204)
+      .end(end(done))
+  });
 })
 
 it('should delete an account', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request.post('/auth/delete').expect(204).end(end(done))
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
+    request
+      .post(`/auth/delete`)
+      .set({ Authorization: `Bearer ${jwtToken}` })
+      .expect(204)
+      .end(end(done))
   })
 })
 
@@ -430,6 +403,7 @@ it('should log in anonymously', (done) => {
 
 it('should be able to deanonymize anonymous user', (done) => {
   const anonymousRole = 'anonymous'
+  let jwtToken = ''
 
   withEnv({
     ANONYMOUS_USERS_ENABLE: 'true',
@@ -444,7 +418,8 @@ it('should be able to deanonymize anonymous user', (done) => {
       })
       .expect(200)
       .expect(validJwt())
-      .expect((isAnonymous()))
+      .expect(saveJwt(j => jwtToken = j))
+      .expect(isAnonymous())
       .end((err) => {
         if(err) return done(err)
 
@@ -453,6 +428,7 @@ it('should be able to deanonymize anonymous user', (done) => {
 
         request
           .post('/auth/deanonymize')
+          .set({ Authorization: `Bearer ${jwtToken}` })
           .send({
             email,
             password
@@ -474,6 +450,7 @@ it('should be able to deanonymize anonymous user', (done) => {
 
 it('should be able to deanonymize anonymous user without auto activation', (done) => {
   const anonymousRole = 'anonymous'
+  let jwtToken = ''
 
   withEnv({
     ANONYMOUS_USERS_ENABLE: 'true',
@@ -490,6 +467,7 @@ it('should be able to deanonymize anonymous user without auto activation', (done
       })
       .expect(200)
       .expect(validJwt())
+      .expect(saveJwt(j => jwtToken = j))
       .expect((isAnonymous()))
       .end((err) => {
         if(err) return done(err)
@@ -499,6 +477,7 @@ it('should be able to deanonymize anonymous user without auto activation', (done
 
         request
           .post('/auth/deanonymize')
+          .set({ Authorization: `Bearer ${jwtToken}` })
           .send({
             email,
             password
@@ -529,6 +508,7 @@ it('should be able to deanonymize anonymous user without auto activation', (done
 
 it('should not be able to deanonymize normal account', (done) => {
   const anonymousRole = 'anonymous'
+  let jwtToken = ''
 
   withEnv({
     ANONYMOUS_USERS_ENABLE: 'true',
@@ -540,12 +520,14 @@ it('should not be able to deanonymize normal account', (done) => {
         .post('/auth/login')
         .send({ email, password })
         .expect(validJwt())
+        .expect(saveJwt(j => jwtToken = j))
         .expect(200)
         .end((err) => {
           if(err) return done(err)
 
           request
             .post('/auth/deanonymize')
+            .set({ Authorization: `Bearer ${jwtToken}` })
             .send({
               email: generateRandomEmail(),
               password: generateRandomString()

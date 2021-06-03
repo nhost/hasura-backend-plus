@@ -311,9 +311,9 @@ paths:
 
 > It is not possible to call storage functions inside other functions
 
-Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
 
-You can have a look at the permission variables by examining the `permission_variables` cookie. This is a URL-encoded string, in the following template:
+You can have a look at the permission variables by examining the `permission_variables`. This is a URL-encoded string, in the following template:
 
 ```txt
 s:<request.auth>.<checksum>
@@ -402,7 +402,7 @@ paths:
 ```
 
 How does this work? The `:companyId` path creates a variable called `companyId`, which can be passed into a function.
-This gets passed into the `employedBy()` function, (called `companyId`), and can be compared to `request.auth['company-id']` from the `permission_variables` cookie.
+This gets passed into the `employedBy()` function, (called `companyId`), and can be compared to `request.auth['company-id']` from the `permission_variables`.
 
 ### Email templates
 
@@ -427,6 +427,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `HOST`                        |         | Listening host of the service                                                                                                                                |
 | `PORT`                        | 3000    | Port of the service                                                                                                                                          |
 | `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                                                                              |
+| `APP_URL`                     |         | Current app URL. Currently used only for creating links from email templates                                                                              |
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                                                                   |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                                                                  |
 
@@ -440,9 +441,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
 | `CHANGE_EMAIL_ENABLE`        |                         |                                                                                                                                                                                              |
 | `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
-| `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
-| `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
-| `COOKIE_SAME_SITE`           | lax                     | SameSite cookie attribute. Accepts true, false, lax, none or strict. If none of these values it will be set to 'lax'                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
 | `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of default allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                          |
 | `ALLOWED_USER_ROLES`         | user                    | Comma spearated list of allowed roles users can specify on registration. Defaults to DEFAULT_ALLOWED_USER_ROLES.                                                                             |
@@ -471,7 +469,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
-| `ENABLE_MAGIC_LINK`        | false                   |
+| `MAGIC_LINK_ENABLE`          | false                   |
 
 ### Providers
 
