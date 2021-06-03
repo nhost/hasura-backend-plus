@@ -1,4 +1,4 @@
-import { selectAccountByEmail } from '@shared/helpers'
+import { accountWithEmailExists } from '@shared/helpers'
 import { emailResetSchema } from '@shared/validation'
 import { RequestExtended } from '@shared/types'
 import { Response } from 'express'
@@ -16,19 +16,10 @@ export const getRequestInfo = async (
   // validate new email
   const { new_email } = await emailResetSchema.validateAsync(req.body)
 
-  // make sure new_email is not attached to an account yet
-  let account_exists = true
-  try {
-    await selectAccountByEmail(new_email)
-    // Account using new_email already exists - pass
-  } catch {
-    // No existing account is using the new email address. Good!
-    account_exists = false
-  }
-
-  if (account_exists) {
+  if (await accountWithEmailExists(new_email)) {
     throw res.boom.badRequest('Cannot use this email.')
   }
+
   return {
     user_id,
     new_email

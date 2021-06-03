@@ -47,8 +47,9 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
         template: 'notify-email-change',
         locals: {
           url: APPLICATION.SERVER_URL,
-          display_name: user.display_name,
-          locale: account.locale
+          locale: account.locale,
+          app_url: APPLICATION.APP_URL,
+          display_name: user.display_name
         },
         message: {
           to: email

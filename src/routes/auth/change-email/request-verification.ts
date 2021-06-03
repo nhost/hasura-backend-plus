@@ -59,8 +59,9 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
       locals: {
         ticket,
         url: APPLICATION.SERVER_URL,
-        display_name,
-        locale: account.locale
+        locale: account.locale,
+        app_url: APPLICATION.APP_URL,
+        display_name
       },
       message: {
         to: new_email,

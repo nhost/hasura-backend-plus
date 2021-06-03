@@ -122,22 +122,44 @@ export const insertRefreshToken = gql`
   ${accountFragment}
 `
 
+// WHERE
+//   refresh_token = $refresh_token
+//   AND (
+//     account.active = ture
+//     OR (
+//       account.active =  false
+//       AND account.is_anonymous
+//     )
+//   )
+// The reason is, we don't want users to select a refresh token if their account
+// is not active. Except if the user anonymous. Then we can allow it.
+// A user can be anonymous but with active = false when the user conver their
+// anonymous account to a real account but have not yet activated their account
+// aka verified their email.
 export const selectRefreshToken = gql`
-  query($refresh_token: uuid!, $current_timestamp: timestamptz!) {
-    auth_refresh_tokens(
-      where: {
-        _and: [
-          { refresh_token: { _eq: $refresh_token } }
-          { account: { active: { _eq: true } } }
-          { expires_at: { _gte: $current_timestamp } }
-        ]
-      }
-    ) {
-      account {
+query ($refresh_token: uuid!, $current_timestamp: timestamptz!) {
+  auth_refresh_tokens(
+    where: {
+      _and: [
+        { refresh_token: { _eq: $refresh_token } },
+        {
+          _or: [
+            { account: { active: { _eq: true }}}, {
+              _and: [
+                { account: { active: { _eq: false }}},
+                { account: { is_anonymous: { _eq: true }}}
+              ]
+            }
+          ]
+        },
+        { expires_at: { _gte: $current_timestamp }}
+      ]
+    }) {
+    account {
         ...accountFragment
-      }
     }
   }
+}
   ${accountFragment}
 `
 
@@ -275,6 +297,42 @@ export const changeEmailByUserId = gql`
   }
 `
 
+export const changePasswordHashByUserId = gql`
+  mutation($user_id: uuid!, $new_password_hash: String!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { password_hash: $new_password_hash }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const deanonymizeAccount = gql`
+  mutation($account_id: uuid!, $default_role: String!, $roles: [auth_account_roles_insert_input!]!) {
+    update_auth_accounts(
+      where: { id: { _eq: $account_id } }
+      _set: { active: true, is_anonymous: false, default_role: $default_role }
+    ) {
+      affected_rows
+    }
+
+    delete_auth_account_roles(where: {account: { id: { _eq: $account_id } } }) {
+      returning {
+        id
+      }
+    }
+
+    insert_auth_account_roles(
+      objects: $roles
+    ) {
+      returning {
+        id
+      }
+    }
+  }
+`
+
 export const setNewEmail = gql`
   mutation($user_id: uuid!, $new_email: citext!) {
     update_auth_accounts(
@@ -315,6 +373,47 @@ export const getEmailTemplate = gql`
       title,
       html,
       no_html
+    }
+  }
+`
+
+export const addProviderRequest = gql`
+  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!) {
+    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure } ) {
+      id
+    }
+  }
+`
+
+export const getProviderRequest = gql`
+  query($state: uuid!) {
+    auth_provider_requests_by_pk(id: $state) {
+      redirect_url_success,
+      redirect_url_failure
+    }
+  }
+`
+
+export const deleteProviderRequest = gql`
+  mutation($state: uuid!) {
+    delete_auth_provider_requests_by_pk(id: $state) {
+      id
+    }
+  }
+`
+
+export const deactivateAccount = gql`
+  mutation($user_id: uuid!) {
+    update_auth_accounts(
+      where: {
+        _and: { active: { _eq: true }, user: { id: { _eq: $user_id } } }
+      }
+      _set: { active: false }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
     }
   }
 `
