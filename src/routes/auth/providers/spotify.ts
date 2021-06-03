@@ -7,7 +7,7 @@ export default (router: Router): void => {
   const options = PROVIDERS.spotify
 
   initProvider(router, 'spotify', Strategy, {
-      scope: ['user-read-email', 'user-read-private']
+      scope: PROVIDERS.spotify?.scope
   }, (req, res, next) => {
     if(!PROVIDERS.spotify) {
       return res.boom.badImplementation(`Please set the SPOTIFY_ENABLE env variable to true to use the auth/providers/spotify routes.`)
