@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS auth.provider_requests (
+CREATE TABLE auth.provider_requests (
   id uuid NOT NULL,
   redirect_url_success text NOT NULL,
   redirect_url_failure text NOT NULL,
