@@ -24,7 +24,7 @@
   <h2>Hello <%= display_name %>
   </h2>
   <p>Use this link to securely <%= action %>:</p>
-  <a href="<%= url %>/auth/magic-link?token=<%= token %>&action=<%= action.replace(/ /g, '-') %>">
+  <a href="<%= url %>/auth/magic-link?token=<%= token %>&action=<%= action_url %>">
     <button>
       <%= action %>
     </button>
@@ -32,7 +32,7 @@
   <p>
     You can also copy & paste this URL into your browser:
 
-    <%= url %>/auth/magic-link?token=<%= token %>&action=<%= action.replace(/ /g, '-' ) %>
+    <%= url %>/auth/magic-link?token=<%= token %>&action=<%= action_url %>
   </p>
   <p>Thanks,<br />The Team</p>
 </body>

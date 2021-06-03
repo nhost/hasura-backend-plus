@@ -65,6 +65,7 @@ jobs:
         S3_BUCKET: ${{ env.S3_BUCKET }}
         S3_ACCESS_KEY_ID: ${{ env.S3_ACCESS_KEY_ID }}
         S3_SECRET_ACCESS_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
+        DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
@@ -82,6 +83,12 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name: Install Hasura Cli
+        run: curl -L https://github.com/hasura/graphql-engine/raw/master/cli/get.sh | bash
+      - name: Install psql
+        run: apt-get update && apt-get install --yes --no-install-recommends postgresql-client
+      - name: Init Database
+        run: psql -f ./db/00_init-schema.sql postgresql://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       - name: Install dependencies
         run: yarn
       - name: Lint files
