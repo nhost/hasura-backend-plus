@@ -67,7 +67,7 @@ export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: Acc
   try {
     getUserId(login.body.jwt_token)
   } catch(e) {
-    console.log('jwt', login.body.jwt_token)
+    console.log('jwt', login.body)
   }
 
   return {
