@@ -1,4 +1,4 @@
-import { castIntEnv, castBooleanEnv } from './utils'
+import { castIntEnv, castBooleanEnv, castStringArrayEnv } from './utils'
 
 /**
  * * Application Settings
@@ -7,11 +7,21 @@ export const APPLICATION = {
   get SERVER_URL() {
     return process.env.SERVER_URL || ''
   },
+  get APP_URL() {
+    return process.env.APP_URL || ''
+  },
   get REDIRECT_URL_ERROR() {
     return process.env.REDIRECT_URL_ERROR || ''
   },
   get REDIRECT_URL_SUCCESS() {
     return process.env.REDIRECT_URL_SUCCESS || ''
+  },
+  get ALLOWED_REDIRECT_URLS() {
+    return [
+      this.REDIRECT_URL_SUCCESS,
+      this.REDIRECT_URL_ERROR,
+      ...castStringArrayEnv('ALLOWED_REDIRECT_URLS')
+    ]
   },
   get HASURA_GRAPHQL_ADMIN_SECRET() {
     return process.env.HASURA_GRAPHQL_ADMIN_SECRET || ''
@@ -50,6 +60,10 @@ export const APPLICATION = {
   },
   get SMTP_SECURE() {
     return castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
+  },
+
+  get EMAILS_DEFAULT_LOCALE() {
+    return process.env.EMAILS_DEFAULT_LOCALE || 'en'
   },
 
   get MAX_REQUESTS() {

@@ -16,7 +16,7 @@ export default (router: Router): void => {
   const options = PROVIDERS.apple
 
   initProvider(router, 'apple', Strategy, {
-    scope: ['name', 'email'],
+    scope: PROVIDERS.apple?.scope,
     transformProfile,
     callbackMethod: 'POST'
   }, (req, res, next) => {
