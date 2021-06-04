@@ -91,7 +91,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   } catch (e) {
     console.error('Error inserting user account')
     console.error(e)
-    return res.boom.badImplementation('Error inserting user account')
+    return res.boom.badRequest('Error inserting user account')
   }
 
   const account = accounts.insert_auth_accounts.returning[0]
@@ -105,7 +105,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
     if (!APPLICATION.EMAILS_ENABLE) {
       console.log('smtp')
-      return res.boom.badImplementation('SMTP settings unavailable')
+      return res.boom.badRequest('SMTP settings unavailable')
     }
 
     // use display name from `user_data` if available
@@ -136,7 +136,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         })
       } catch (err) {
         console.error(err)
-        return res.boom.badImplementation()
+        return res.boom.badRequest('dfdsf' + JSON.stringify(err, null, 2))
       }
 
       const session: Session = { jwt_token: null, jwt_expires_in: null, user }
@@ -164,7 +164,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
       })
     } catch (err) {
       console.error('eml', err)
-      return res.boom.badImplementation()
+      return res.boom.badRequest('eewe' + JSON.stringify(err, null, 2))
     }
 
     const session: Session = { jwt_token: null, jwt_expires_in: null, user }
@@ -182,7 +182,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   return res.send(session)
 } catch(e) {
   console.log('shee', e)
-return res.boom.badImplementation()
+return res.boom.badRequest('weee', JSON.stringify(e, null, 2))
 }
 }
 
