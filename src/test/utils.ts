@@ -50,10 +50,10 @@ export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<
   await withEnv({
     AUTO_ACTIVATE_NEW_USERS: 'true'
   }, agent, async () => {
-    await agent.post('/auth/register').send({
+    console.log('register', accountLoginData.email, await agent.post('/auth/register').send({
       ...accountLoginData,
       user_data,
-    })
+    }))
   }, {
     AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
   })
