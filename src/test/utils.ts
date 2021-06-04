@@ -67,7 +67,11 @@ export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: Acc
   try {
     getUserId(login.body.jwt_token)
   } catch(e) {
-    console.log('jwt', login.body)
+    console.log('jwt', accountLoginData, login.body)
+  }
+
+  if(login.body.error) {
+    throw new Error(`${login.body.statusCode} ${login.body.error}: ${login.body.message}`)
   }
 
   return {
