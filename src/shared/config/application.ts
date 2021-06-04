@@ -59,14 +59,13 @@ export const APPLICATION = {
     return castIntEnv('TIME_FRAME', 15 * 60 * 1000)
   },
 
-  get RATING() {
-    return process.env.RATING || 'g'
-  },
-
   get GRAVATAR_ENABLE() {
     return castBooleanEnv('GRAVATAR_ENABLE', true)
   },
   get GRAVATAR_DEFAULT() {
     return process.env.GRAVATAR_DEFAULT || 'mp'
-  }
+  },
+  get RATING() {
+    return process.env.GRAVATAR_RATING || 'g'
+  },
 }
