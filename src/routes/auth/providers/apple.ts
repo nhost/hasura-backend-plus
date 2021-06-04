@@ -9,7 +9,7 @@ const transformProfile = ({ id, name, email, photos }: Profile): UserData => ({
   id,
   email,
   display_name: name ? `${name.firstName} ${name.lastName}` : email,
-  avatar_url: photos?.[0].value || email && getGravatarUrl(email)
+  avatar_url: photos?.[0].value || getGravatarUrl(email)
 })
 
 export default (router: Router): void => {

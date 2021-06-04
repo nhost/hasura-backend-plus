@@ -122,8 +122,8 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   return JSON.parse(permission_variables)
 }
 
-export const getGravatarUrl = (email: string) => {
-  if(APPLICATION.GRAVATAR_ENABLE) {
+export const getGravatarUrl = (email?: string) => {
+  if(APPLICATION.GRAVATAR_ENABLE && email) {
     return gravatar.url(email, {
       r: APPLICATION.RATING,
       protocol: 'https',

@@ -141,7 +141,7 @@ export const initProvider = <T extends Strategy>(
       id,
       email: emails?.[0].value,
       display_name: displayName,
-      avatar_url: photos?.[0].value || emails?.[0] && getGravatarUrl(emails[0].value)
+      avatar_url: photos?.[0].value || getGravatarUrl(emails?.[0].value)
     }),
     callbackMethod = 'GET',
     ...options
