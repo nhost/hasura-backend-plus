@@ -63,7 +63,7 @@ export const APPLICATION = {
     return castBooleanEnv('GRAVATAR_ENABLE', true)
   },
   get GRAVATAR_DEFAULT() {
-    return process.env.GRAVATAR_DEFAULT || 'mp'
+    return process.env.GRAVATAR_DEFAULT || 'blank'
   },
   get RATING() {
     return process.env.GRAVATAR_RATING || 'g'

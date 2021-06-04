@@ -478,7 +478,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | Name                         | Default | Description |
 | ---------------------------- | ------- | ----------- |
 | `GRAVATER_ENABLE`            | true    |             |
-| `GRAVATAR_DEFAULT`           | mp      |             |
+| `GRAVATAR_DEFAULT`           | blank   |             |
 | `GRAVATAR_RATING`            | g       |             |
 
 ### Providers
