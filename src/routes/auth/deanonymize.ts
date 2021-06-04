@@ -71,6 +71,8 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
       user_id
     })
 
+    const account = await selectAccountByUserId(user_id)
+
     await emailClient.send({
       template: 'activate-account',
       message: {
@@ -85,7 +87,8 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
       locals: {
         display_name: email,
         ticket,
-        url: APPLICATION.SERVER_URL
+        url: APPLICATION.SERVER_URL,
+        locale: account.locale
       }
     })
   }

@@ -56,14 +56,19 @@ const passwordRuleRequired = passwordRule.required();
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
+const localeRule = Joi.string().length(2)
+const localeRuleWithDefault = localeRule.default(APPLICATION.EMAILS_DEFAULT_LOCALE)
+
 const accountFields = {
   email: emailRule,
-  password: passwordRuleRequired
+  password: passwordRuleRequired,
+  locale: localeRuleWithDefault
 }
 
 const accountFieldsMagicLink = {
   email: emailRule,
-  password: passwordRule
+  password: passwordRule,
+  locale: localeRuleWithDefault
 }
 
 export const userDataFields = {
@@ -183,3 +188,7 @@ export const providerQuery = Joi.object({
 export const providerCallbackQuery = Joi.object({
   state: Joi.string().uuid().required()
 }).unknown(true)
+
+export const localeQuery = Joi.object({
+  locale: localeRule
+})

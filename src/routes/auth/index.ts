@@ -14,6 +14,7 @@ import deleteAccount from './delete'
 import magicLink from './magic-link'
 import { AUTHENTICATION } from '@shared/config'
 import deanonymize from './deanonymize'
+import changeLocale from './change-locale'
 
 const router = Router()
 
@@ -41,5 +42,6 @@ router.get('/jwks', getJwks)
 router.use('/token', token)
 router.get('/magic-link', magicLink)
 router.post('/deanonymize', deanonymize)
+router.post('/change-locale', changeLocale)
 
 export default router

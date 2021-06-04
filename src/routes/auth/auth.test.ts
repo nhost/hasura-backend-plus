@@ -624,3 +624,16 @@ it('should be able to register with admin only registration with correct x-admin
     ADMIN_ONLY_REGISTRATION: 'false'
   })
 })
+
+it('should be able to change account locale', (done) => {
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
+    request
+      .post('/auth/change-locale')
+      .set({ Authorization: `Bearer ${jwtToken}` })
+      .send({
+        locale: 'gr'
+      })
+      .expect(204)
+      .end(end(done))
+  })
+})

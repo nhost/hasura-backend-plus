@@ -62,6 +62,10 @@ export const APPLICATION = {
     return castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
   },
 
+  get EMAILS_DEFAULT_LOCALE() {
+    return process.env.EMAILS_DEFAULT_LOCALE || 'en'
+  },
+
   get MAX_REQUESTS() {
     return castIntEnv('MAX_REQUESTS', 1000)
   },
