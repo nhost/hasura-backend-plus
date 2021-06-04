@@ -26,7 +26,6 @@
     "strict": true,
     "target": "es2019",
     "baseUrl": ".",
-    "noUnusedLocals": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "strictNullChecks": true,

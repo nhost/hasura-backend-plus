@@ -1,8 +1,11 @@
 import { APPLICATION } from '@shared/config'
 
 import Email from 'email-templates'
+import { request } from '@shared/request'
 import nodemailer from 'nodemailer'
-import path from 'path'
+import ejs from 'ejs'
+import { getEmailTemplate } from '@shared/queries'
+import { QueryEmailTemplate } from '@shared/types'
 
 /**
  * SMTP transport.
@@ -21,14 +24,22 @@ const transport = nodemailer.createTransport({
 /**
  * Reusable email client.
  */
-export const emailClient = new Email({
+export const emailClient: Email<any> = new Email({
   transport,
   message: { from: APPLICATION.SMTP_SENDER },
   send: APPLICATION.EMAILS_ENABLE,
-  views: {
-    root: path.resolve(process.env.PWD || '.', 'custom/emails'),
-    options: {
-      extension: 'ejs'
-    }
-  }
+  render: async (view, locals) => {
+    const [id, field] = view.split('/')
+    const locale = locals.locale
+
+    const email = await request<QueryEmailTemplate>(getEmailTemplate, {
+      id,
+      locale
+    }).then(query => query.auth_email_templates_by_pk)
+
+    if(field === 'subject') return email.title
+    else if(field === 'html') return await emailClient.juiceResources(ejs.render(email.html, locals))
+    else if(field === 'text') return email.no_html
+    else throw new Error(`Unknown field ${field}`)
+  },
 })

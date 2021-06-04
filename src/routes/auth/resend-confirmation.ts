@@ -20,9 +20,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
   } else if (account.active) {
     return res.boom.badRequest('Account already activated.')
   } else if (
-    +new Date(
-      +new Date(account.last_confirmation_email_sent_at) + REGISTRATION.CONFIRMATION_RESET_TIMEOUT
-    ) > +new Date()
+    +new Date(account.last_confirmation_email_sent_at) + REGISTRATION.CONFIRMATION_RESET_TIMEOUT > +new Date()
   ) {
     return res.boom.badRequest('Please wait before resending the confirmation email.')
   }
@@ -61,7 +59,8 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
       locals: {
         display_name,
         ticket,
-        url: APPLICATION.SERVER_URL
+        url: APPLICATION.SERVER_URL,
+        locale: account.locale
       }
     })
   } catch (err) {
