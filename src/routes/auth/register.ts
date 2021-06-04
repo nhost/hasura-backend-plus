@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
+  try {
   const body = req.body
 
   if(REGISTRATION.ADMIN_ONLY) {
@@ -48,6 +49,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     try {
       password_hash = await hashPassword(password)
     } catch (err) {
+      console.log('hash')
       return res.boom.internal(err.message)
     }
   }
@@ -102,6 +104,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
     if (!APPLICATION.EMAILS_ENABLE) {
+      console.log('smtp')
       return res.boom.badImplementation('SMTP settings unavailable')
     }
 
@@ -160,7 +163,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         }
       })
     } catch (err) {
-      console.error(err)
+      console.error('eml', err)
       return res.boom.badImplementation()
     }
 
@@ -177,6 +180,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   return res.send(session)
+} catch(e) {
+  console.log('shee', e)
+return res.boom.badImplementation()
+}
 }
 
 export default asyncWrapper(registerAccount)
