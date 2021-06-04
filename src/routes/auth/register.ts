@@ -91,7 +91,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   } catch (e) {
     console.error('Error inserting user account')
     console.error(e)
-    return res.status(400).send(e)
+    return res.boom.badRequest('Error inserting user account ' + JSON.stringify(e, null, 2))
   }
 
   const account = accounts.insert_auth_accounts.returning[0]
