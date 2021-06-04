@@ -126,6 +126,6 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
 export const updateLastSentConfirmation = async (user_id: string): Promise<void> => {
   await request(updateLastSentConfirmationQuery, {
     user_id,
-    last_sent_confirmation: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
+    last_confirmation_email_sent_at: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
   })
 }

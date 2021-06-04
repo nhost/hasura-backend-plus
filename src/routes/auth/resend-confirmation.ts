@@ -21,7 +21,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
     return res.boom.badRequest('Account already activated.')
   } else if (
     +new Date(
-      +new Date(account.last_sent_confirmation) + REGISTRATION.CONFIRMATION_RESET_TIMEOUT
+      +new Date(account.last_confirmation_email_sent_at) + REGISTRATION.CONFIRMATION_RESET_TIMEOUT
     ) > +new Date()
   ) {
     return res.boom.badRequest('Please wait before resending the confirmation email.')

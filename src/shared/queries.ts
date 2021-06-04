@@ -21,7 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
-    last_sent_confirmation
+    last_confirmation_email_sent_at
   }
 `
 
@@ -310,10 +310,10 @@ export const selectAccountProvider = gql`
 `
 
 export const updateLastSentConfirmation = gql`
-  mutation($user_id: uuid!, $last_sent_confirmation: timestamptz!) {
+  mutation($user_id: uuid!, $last_confirmation_email_sent_at: timestamptz!) {
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
-      _set: { last_sent_confirmation: $last_sent_confirmation }
+      _set: { last_confirmation_email_sent_at: $last_confirmation_email_sent_at }
     ) {
       affected_rows
     }
