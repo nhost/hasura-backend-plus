@@ -60,6 +60,12 @@ export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<
 export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData): Promise<AccountData> => {
   const login = await agent.post('/auth/login').send(accountLoginData)
 
+  try {
+    getUserId(login.body.jwt_token)
+  } catch(e) {
+    console.log('jwt', login.body.jwt_token)
+  }
+
   return {
     ...accountLoginData,
     token: login.body.jwt_token as string,
