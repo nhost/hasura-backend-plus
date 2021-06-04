@@ -19,9 +19,10 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
   let email: AccountData['email']
   let new_email: AccountData['new_email']
   let user: AccountData['user']
+  let account: AccountData
 
   try {
-    const account = await selectAccountByTicket(ticket)
+    account = await selectAccountByTicket(ticket)
     email = account.email
     new_email = account.new_email
     user = account.user
@@ -46,6 +47,8 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
         template: 'notify-email-change',
         locals: {
           url: APPLICATION.SERVER_URL,
+          locale: account.locale,
+          app_url: APPLICATION.APP_URL,
           display_name: user.display_name
         },
         message: {

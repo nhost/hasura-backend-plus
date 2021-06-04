@@ -72,6 +72,7 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
+  locale: string
 }
 
 export interface QueryAccountData {
@@ -110,10 +111,14 @@ export interface InsertAccountProviderToUser {
   }
 }
 
-export interface RefreshTokenMiddleware {
-  value: string | null
-  type: 'query' | 'cookie' | null
+export interface QueryProviderRequests {
+  auth_provider_requests_by_pk: {
+    redirect_url_success: string,
+    redirect_url_failure: string
+  }
 }
+
+export type RefreshTokenMiddleware = string | null
 
 export interface RequestExtended extends Request {
   refresh_token?: RefreshTokenMiddleware
@@ -126,5 +131,13 @@ export interface SetNewEmailData {
       user: UserData
     }[]
     affected_rows: number
+  }
+}
+
+export interface QueryEmailTemplate {
+  auth_email_templates_by_pk: {
+    title: string
+    html: string
+    no_html: string
   }
 }

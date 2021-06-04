@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { setNewTicket, setNewEmail } from '@shared/queries'
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
 import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
@@ -49,6 +49,9 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
     console.error(error)
     return res.boom.badImplementation('unable to set new email')
   }
+
+  const account = await selectAccountByUserId(user_id)
+
   // send email
   try {
     await emailClient.send({
@@ -56,6 +59,8 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
       locals: {
         ticket,
         url: APPLICATION.SERVER_URL,
+        locale: account.locale,
+        app_url: APPLICATION.APP_URL,
         display_name
       },
       message: {
