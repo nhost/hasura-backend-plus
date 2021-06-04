@@ -21,6 +21,8 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
+    last_confirmation_email_sent_at
+    locale
   }
 `
 
@@ -366,6 +368,27 @@ export const selectAccountProvider = gql`
   ${accountFragment}
 `
 
+export const updateLastSentConfirmation = gql`
+  mutation($user_id: uuid!, $last_confirmation_email_sent_at: timestamptz!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { last_confirmation_email_sent_at: $last_confirmation_email_sent_at }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const getEmailTemplate = gql`
+  query($id: String!, $locale: String!) {
+    auth_email_templates_by_pk(id: $id, locale: $locale) {
+      title,
+      html,
+      no_html
+    }
+  }
+`
+
 export const addProviderRequest = gql`
   mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!) {
     insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure } ) {
@@ -403,6 +426,14 @@ export const deactivateAccount = gql`
       returning {
         id
       }
+    }
+  }
+`
+
+export const changeLocaleByUserId = gql`
+  mutation($user_id: uuid!, $locale: String!) {
+    update_auth_accounts(_set: { locale: $locale }, where: { user: { id: { _eq: $user_id } } }) {
+      affected_rows
     }
   }
 `

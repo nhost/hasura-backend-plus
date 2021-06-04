@@ -624,3 +624,113 @@ it('should be able to register with admin only registration with correct x-admin
     ADMIN_ONLY_REGISTRATION: 'false'
   })
 })
+
+it('should resend the confirmation email after the timeout', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLE: 'true'
+  }, request, async () => {
+    const email = generateRandomEmail()
+    const password = generateRandomString()
+
+    request
+      .post('/auth/register')
+      .send({
+        email,
+        password
+      })
+      .expect(200)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/resend-confirmation')
+          .send({
+            email
+          })
+          .expect(200)
+          .expect(() => {
+            return expect(getHeaderFromLatestEmailAndDelete(email, 'X-Ticket')).resolves.toBeTruthy()
+          })
+          .end(end(done))
+      })
+  })
+})
+
+it('should not resend the confirmation email on an activated account', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLE: 'true'
+  }, request, async () => {
+    registerAccount(request).then(({ email }) => {
+      request
+        .post('/auth/resend-confirmation')
+        .send({
+          email
+        })
+        .expect(400)
+        .end(end(done))
+    })
+  })
+})
+
+it('should not resend the confirmation email on a non-existant account', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/resend-confirmation')
+      .send({
+        email: generateRandomEmail()
+      })
+      .expect(400)
+      .end(end(done))
+  })
+})
+
+it('should not resend the confirmation email before the timeout', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '5000',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLE: 'true'
+  }, request, async () => {
+    const email = generateRandomEmail()
+    const password = generateRandomString()
+
+    request
+      .post('/auth/register')
+      .send({
+        email,
+        password
+      })
+      .expect(200)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/resend-confirmation')
+          .send({
+            email
+          })
+          .expect(400)
+          .end(end(done))
+      })
+  })
+})
+
+it('should be able to change account locale', (done) => {
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
+    request
+      .post('/auth/change-locale')
+      .set({ Authorization: `Bearer ${jwtToken}` })
+      .send({
+        locale: 'gr'
+      })
+      .expect(204)
+      .end(end(done))
+  })
+})
