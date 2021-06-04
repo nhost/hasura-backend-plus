@@ -21,6 +21,7 @@ const accountFragment = gql`
     otp_secret
     mfa_enabled
     password_hash
+    last_confirmation_email_sent_at
     locale
   }
 `
@@ -365,6 +366,17 @@ export const selectAccountProvider = gql`
     }
   }
   ${accountFragment}
+`
+
+export const updateLastSentConfirmation = gql`
+  mutation($user_id: uuid!, $last_confirmation_email_sent_at: timestamptz!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { last_confirmation_email_sent_at: $last_confirmation_email_sent_at }
+    ) {
+      affected_rows
+    }
+  }
 `
 
 export const getEmailTemplate = gql`

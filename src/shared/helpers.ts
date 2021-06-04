@@ -6,7 +6,8 @@ import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  updateLastSentConfirmation as updateLastSentConfirmationQuery,
 } from './queries'
 
 import QRCode from 'qrcode'
@@ -176,5 +177,12 @@ export const deanonymizeAccount = async (accountId: string) => {
       created_at: new Date(),
       role
     }))
+  })
+}
+
+export const updateLastSentConfirmation = async (user_id: string): Promise<void> => {
+  await request(updateLastSentConfirmationQuery, {
+    user_id,
+    last_confirmation_email_sent_at: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
   })
 }

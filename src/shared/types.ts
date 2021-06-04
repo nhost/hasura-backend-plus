@@ -72,6 +72,7 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
+  last_confirmation_email_sent_at: string
   locale: string
 }
 
