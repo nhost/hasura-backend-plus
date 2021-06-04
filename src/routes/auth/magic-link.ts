@@ -11,6 +11,7 @@ import { setRefreshToken } from '@shared/cookies'
 
 async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   const { token, action } = await magicLinkQuery.validateAsync(query);
+  const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
   let refresh_token = token;
   if (action === 'sign-up') {
     const new_ticket = uuidv4()
@@ -37,7 +38,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
       /* istanbul ignore next */
       throw Boom.unauthorized('Invalid or expired token.')
     }
-    refresh_token = await setRefreshToken(returning[0].id)
+    refresh_token = await setRefreshToken(res, returning[0].id, useCookie)
   }
   const hasura_data = await request<{
     auth_refresh_tokens: { account: AccountData }[]
