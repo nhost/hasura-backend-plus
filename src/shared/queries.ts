@@ -417,3 +417,11 @@ export const deactivateAccount = gql`
     }
   }
 `
+
+export const changeLocaleByUserId = gql`
+  mutation($user_id: uuid!, $locale: String!) {
+    update_auth_accounts(_set: { locale: $locale }, where: { user: { id: { _eq: $user_id } } }) {
+      affected_rows
+    }
+  }
+`
