@@ -55,7 +55,7 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
 
   if(REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     await deanonymizeAccountHelper(
-      await selectAccountByUserId(user_id).then(acc => acc.id),
+      await selectAccountByUserId(user_id),
     )
   } else {
     const ticket = uuid4() // will be decrypted on the auth/activate call

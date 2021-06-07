@@ -473,6 +473,14 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `ENABLE_MAGIC_LINK`          | false                   |
 | `ADMIN_ONLY_REGISTRATION`    | false                   | Allow registration only with x-admin-secret
 
+### Gravatar
+
+| Name                         | Default | Description |
+| ---------------------------- | ------- | ----------- |
+| `GRAVATER_ENABLE`            | true    |             |
+| `GRAVATAR_DEFAULT`           | blank   |             |
+| `GRAVATAR_RATING`            | g       |             |
+
 ### Providers
 
 | Name                         | Default                               | Description |

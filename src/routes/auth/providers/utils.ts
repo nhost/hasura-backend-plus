@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { addProviderRequest, deleteProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { asyncWrapper, selectAccountByEmail, setRefreshToken } from '@shared/helpers'
+import { asyncWrapper, selectAccountByEmail, setRefreshToken, getGravatarUrl } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -159,7 +159,7 @@ export const initProvider = <T extends Strategy>(
       id,
       email: emails?.[0].value,
       display_name: displayName,
-      avatar_url: photos?.[0].value
+      avatar_url: photos?.[0].value || getGravatarUrl(emails?.[0].value)
     }),
     callbackMethod = 'GET',
     scope,
