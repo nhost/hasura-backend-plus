@@ -30,7 +30,7 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
 
   if(account.is_anonymous) {
     await deanonymizeAccount(
-      account.id,
+      account,
     )
 
     await request(setNewTicket, {
