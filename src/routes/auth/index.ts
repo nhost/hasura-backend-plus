@@ -13,6 +13,7 @@ import activateAccount from './activate'
 import deleteAccount from './delete'
 import magicLink from './magic-link'
 import { AUTHENTICATION } from '@shared/config'
+import allowlist from './allowlist'
 
 const router = Router()
 
@@ -39,5 +40,6 @@ router
 router.get('/jwks', getJwks)
 router.use('/token', token)
 router.get('/magic-link', magicLink)
+router.post('/allowlist', allowlist)
 
 export default router

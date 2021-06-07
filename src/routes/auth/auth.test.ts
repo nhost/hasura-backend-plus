@@ -322,7 +322,7 @@ it('should sign in user with valid admin secret', (done) => {
   registerAccount(request).then(({ email, password }) => {
     request
       .post('/auth/login')
-      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET as string)
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
       .send({ email, password })
       .expect(200)
       .expect(validJwt())
@@ -396,6 +396,66 @@ describe('Tests without cookies', () => {
 it('should delete an account', (done) => {
   registerAndLoginAccount(request).then(() => {
     request.post('/auth/delete').expect(204).end(end(done))
+  })
+})
+
+it('should disable login for arbitrary emails when allowlist is enabled', (done) => {
+  withEnv({
+    ALLOWLIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .expect(401)
+      .end(end(done))
+  })
+})
+
+it('should enable login for allowed emails when allowlist is enabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    ALLOWLIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/allowlist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(204)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/register')
+          .send({
+            email,
+            password: generateRandomString()
+          })
+          .expect(200)
+          .end(end(done))
+      })
+  })
+})
+
+it('Should disable the allowlist endpoint when the allowlist is disabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    ALLOWLIST_ENABLE: 'false'
+  }, request, async () => {
+    request
+      .post('/auth/allowlist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(501)
+      .end(end(done))
   })
 })
 

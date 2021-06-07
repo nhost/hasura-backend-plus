@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
 import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { selectAccountByEmail } from '@shared/helpers'
+import { isAllowedEmail, selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -44,6 +44,10 @@ const manageProviderStrategy = (
     // find or create the user
     // check if user exists, using profile.id
     const { id, email, display_name, avatar_url } = transformProfile(profile)
+
+    if(REGISTRATION.ALLOWLIST && (!email || !isAllowedEmail(email))) {
+      return done(new Error('Email not allowed'))
+    }
 
     const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
       provider,

@@ -4,7 +4,8 @@ import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  isAllowedEmail as isAllowedEmailQuery
 } from './queries'
 
 import QRCode from 'qrcode'
@@ -12,7 +13,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
+import { AccountData, QueryAccountData, PermissionVariables, RequestExtended, IsAllowedEmail } from './types'
 
 /**
  * Create QR code.
@@ -120,4 +121,10 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
+}
+
+export const isAllowedEmail = async (email: string) => {
+  return request<IsAllowedEmail>(isAllowedEmailQuery, {
+    email
+  }).then(q => !!q.auth_allowlist_by_pk)
 }

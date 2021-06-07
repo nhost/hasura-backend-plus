@@ -135,7 +135,7 @@ Other email templates are available and described [here](#email-templates)
 
 ### Limit email domains
 
-You can limit registration to ranges of emails that are only part of a whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
+You can limit registration to ranges of emails that are only part of an allowlist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
 
 ```
 ALLOWED_EMAIL_DOMAINS=gmail.com,yourorganisation.com
@@ -472,6 +472,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
 | `MAGIC_LINK_ENABLE`          | false                   |
+| `ALLOWLIST_ENABLE`           | false                   |
 
 ### Providers
 

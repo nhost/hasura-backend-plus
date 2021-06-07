@@ -307,3 +307,19 @@ export const selectAccountProvider = gql`
   }
   ${accountFragment}
 `
+
+export const isAllowedEmail = gql`
+  query($email: String!) {
+    auth_allowlist_by_pk(email: $email) {
+      email
+    }
+  }
+`
+
+export const insertAllowedEmail = gql`
+  mutation($email: String!) {
+    insert_auth_allowlist_one(object: { email: $email }) {
+      email
+    }
+  }
+`

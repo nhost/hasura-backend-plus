@@ -128,3 +128,9 @@ export interface SetNewEmailData {
     affected_rows: number
   }
 }
+
+export interface IsAllowedEmail {
+  auth_allowlist_by_pk: {
+    email: string
+  } | null
+}
