@@ -3,19 +3,20 @@ import { Strategy, Profile } from '@nicokaiser/passport-apple'
 import { PROVIDERS } from '@shared/config'
 import { initProvider } from './utils'
 import { UserData } from '@shared/types'
+import { getGravatarUrl } from '@shared/helpers'
 
 const transformProfile = ({ id, name, email, photos }: Profile): UserData => ({
   id,
   email,
   display_name: name ? `${name.firstName} ${name.lastName}` : email,
-  avatar_url: photos?.[0].value
+  avatar_url: photos?.[0].value || getGravatarUrl(email)
 })
 
 export default (router: Router): void => {
   const options = PROVIDERS.apple
 
   initProvider(router, 'apple', Strategy, {
-    scope: ['name', 'email'],
+    scope: PROVIDERS.apple?.scope,
     transformProfile,
     callbackMethod: 'POST'
   }, (req, res, next) => {

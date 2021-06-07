@@ -101,3 +101,9 @@
 - table:
     schema: auth
     name: allowlist
+- table:
+    schema: auth
+    name: email_templates
+- table:
+    schema: auth
+    name: provider_requests

@@ -7,7 +7,7 @@ export default (router: Router): void => {
   const options = PROVIDERS.linkedin
 
   initProvider(router, 'linkedin', Strategy, {
-    scope: ['r_emailaddress', 'r_liteprofile']
+    scope: PROVIDERS.linkedin?.scope
   }, (req, res, next) => {
     if(!PROVIDERS.linkedin) {
       return res.boom.badImplementation(`Please set the LINKEDIN_ENABLE env variable to true to use the auth/providers/linkedin routes.`)

@@ -33,5 +33,11 @@ export const REGISTRATION = {
   },
   get ALLOWLIST() {
     return castBooleanEnv('ALLOWLIST_ENABLE', false)
+  },
+  get CONFIRMATION_RESET_TIMEOUT() {
+    return castIntEnv('CONFIRMATION_RESET_TIMEOUT', 5 * 60 * 1000)
+  },
+  get ADMIN_ONLY() {
+    return castBooleanEnv('ADMIN_ONLY_REGISTRATION', false)
   }
 }

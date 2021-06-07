@@ -3,18 +3,26 @@ import { SuperTest, Test } from 'supertest'
 
 import { APPLICATION } from '@shared/config'
 
+import { getClaims } from '@shared/jwt'
+
+
 export interface AccountLoginData {
   email: string
   password: string
 }
 
 export type AccountData = AccountLoginData & {
+  id: string
   token: string
+  refresh_token: string
+  jwtToken: string
 }
 
 export const generateRandomString = (): string => Math.random().toString(36).replace('0.', '')
 
 export const generateRandomEmail = () => `${generateRandomString()}@${generateRandomString()}.com`
+
+const getUserId = (token: string): string => getClaims(token)['x-hasura-user-id']
 
 export async function withEnv(
   env: Record<string, string>,
@@ -37,6 +45,8 @@ export const createAccountLoginData = (): AccountLoginData => ({
 export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<string, any> = {}): Promise<AccountLoginData> => {
   const accountLoginData = createAccountLoginData();
 
+  const oldAutoActivateNewUsers = await agent.get('/env/AUTO_ACTIVATE_NEW_USERS').then(res => res.text)
+
   await withEnv({
     AUTO_ACTIVATE_NEW_USERS: 'true'
   }, agent, async () => {
@@ -44,16 +54,22 @@ export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<
       ...accountLoginData,
       user_data,
     })
+  }, {
+    AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
   })
 
   return accountLoginData;
 }
 
-export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData) => {
-  // * Set the use variable so it is accessible to the jest test file
+export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData): Promise<AccountData> => {
+  const login = await agent.post('/auth/login').send(accountLoginData)
+
   return {
     ...accountLoginData,
-    token: (await agent.post('/auth/login').send(accountLoginData)).body.jwt_token as string
+    token: login.body.jwt_token as string,
+    refresh_token: login.body.refresh_token as string,
+    jwtToken: login.body.jwt_token as string,
+    id: getUserId(login.body.jwt_token)
   }
 }
 

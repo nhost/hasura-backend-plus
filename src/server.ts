@@ -1,5 +1,3 @@
-import { COOKIES } from '@shared/config'
-import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { errors } from './errors'
 import express from 'express'
@@ -30,15 +28,6 @@ app.use(cors({ credentials: true, origin: true }))
 app.use(fileUpload())
 
 app.use(passport.initialize())
-
-/**
- * Set a cookie secret to enable server validation of cookies.
- */
-if (COOKIES.SECRET) {
-  app.use(cookieParser(COOKIES.SECRET))
-} else {
-  app.use(cookieParser())
-}
 
 app.use(authMiddleware)
 app.use(router)
