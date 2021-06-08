@@ -1,4 +1,5 @@
 ALTER TABLE auth.accounts
-  ADD COLUMN locale VARCHAR(2),
-  ALTER COLUMN locale SET DEFAULT 'en',
-  ALTER COLUMN locale SET NOT NULL;
+  ADD COLUMN locale VARCHAR(2) DEFAULT '' NOT NULL;
+
+ALTER TABLE auth.accounts
+  ALTER COLUMN locale DROP DEFAULT;
