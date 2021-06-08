@@ -2,7 +2,7 @@ import { castBooleanEnv } from '../utils'
 
 // Multi-Factor Authentication configuration
 export const MFA = {
-  get ENABLE() {
+  get ENABLED() {
     return castBooleanEnv('MFA_ENABLED') || castBooleanEnv('MFA_ENABLE') || true
   },
   get OTP_ISSUER() {

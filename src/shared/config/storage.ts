@@ -4,7 +4,7 @@ import { castBooleanEnv } from './utils'
  * * Storage Settings
  */
 export const STORAGE = {
-  get ENABLE() {
+  get ENABLED() {
     return castBooleanEnv('STORAGE_ENABLED') || castBooleanEnv('STORAGE_ENABLE') || true
   },
   get S3_SSL_ENABLED() {
