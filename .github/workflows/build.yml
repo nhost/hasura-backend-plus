@@ -24,7 +24,7 @@ env:
   S3_BUCKET: test-bucket
   S3_ACCESS_KEY_ID: 'minio_access_key'
   S3_SECRET_ACCESS_KEY: 'minio_secret_key'
-  DATABASE_URL: 'postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres'
+  DATABASE_URL: 'url'
 jobs:
   test:
     runs-on: ubuntu-latest
