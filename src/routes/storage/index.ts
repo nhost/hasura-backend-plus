@@ -10,7 +10,7 @@ const router = Router()
 
 router.use((req, res, next) => {
   if(!STORAGE.ENABLE) {
-    return res.boom.badImplementation(`Please set the STORAGE_ENABLE env variable to true to use the storage routes.`)
+    return res.boom.badImplementation(`Please set the STORAGE_ENABLED env variable to true to use the storage routes.`)
   } else {
     return next();
   }

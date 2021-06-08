@@ -37,7 +37,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
     avatar_url: account.user.avatar_url
   }
 
-  if (!APPLICATION.EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLED) {
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 

@@ -11,8 +11,8 @@ import { v4 as uuid4 } from 'uuid'
 async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<unknown> {
   const body = req.body
 
-  if(!AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
-    return res.boom.badImplementation(`Please set the ANONYMOUS_USERS_ENABLE env variable to true to use the auth/deanonymize route.`)
+  if(!AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
+    return res.boom.badImplementation(`Please set the ANONYMOUS_USERS_ENABLED env variable to true to use the auth/deanonymize route.`)
   }
 
   if (!req.permission_variables || !await accountIsAnonymous(req.permission_variables['user-id'])) {

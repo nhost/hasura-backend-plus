@@ -5,10 +5,10 @@ import { castBooleanEnv } from './utils'
  */
 export const STORAGE = {
   get ENABLE() {
-    return castBooleanEnv('STORAGE_ENABLE', true)
+    return castBooleanEnv('STORAGE_ENABLED') || castBooleanEnv('STORAGE_ENABLE') || true
   },
   get S3_SSL_ENABLED() {
-    return castBooleanEnv('S3_SSL_ENABLED', true)
+    return castBooleanEnv('S3_SSL_ENABLED') || castBooleanEnv('S3_SSL_ENABLE') || true
   },
   get S3_BUCKET() {
     return process.env.S3_BUCKET || ''
