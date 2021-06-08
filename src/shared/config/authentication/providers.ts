@@ -10,7 +10,7 @@ const PROVIDERS = {
   },
 
   get github() {
-    return !castBooleanEnv('GITHUB_ENABLE') ? null : {
+    return !(castBooleanEnv('GITHUB_ENABLED') || castBooleanEnv('GITHUB_ENABLE')) ? null : {
       get clientID() {
         return process.env.GITHUB_CLIENT_ID
       },
@@ -33,7 +33,7 @@ const PROVIDERS = {
   },
 
   get google() {
-    return !castBooleanEnv('GOOGLE_ENABLE') ? null : {
+    return !(castBooleanEnv('GOOGLE_ENABLED') || castBooleanEnv('GOOGLE_ENABLE')) ? null : {
       get clientID() {
         return process.env.GOOGLE_CLIENT_ID || ''
       },
@@ -47,7 +47,7 @@ const PROVIDERS = {
   },
 
   get facebook() {
-    return !castBooleanEnv('FACEBOOK_ENABLE') ? null : {
+    return !(castBooleanEnv('FACEBOOK_ENABLED') || castBooleanEnv('FACEBOOK_ENABLE')) ? null : {
       get clientID() {
         return process.env.FACEBOOK_CLIENT_ID || ''
       },
@@ -61,7 +61,7 @@ const PROVIDERS = {
   },
 
   get twitter() {
-    return !castBooleanEnv('TWITTER_ENABLE') ? null : {
+    return !(castBooleanEnv('TWITTER_ENABLED') || castBooleanEnv('TWITTER_ENABLE')) ? null : {
       get consumerKey() {
         return process.env.TWITTER_CONSUMER_KEY || ''
       },
@@ -72,7 +72,7 @@ const PROVIDERS = {
   },
 
   get linkedin() {
-    return !castBooleanEnv('LINKEDIN_ENABLE') ? null : {
+    return !(castBooleanEnv('LINKEDIN_ENABLED') || castBooleanEnv('LINKEDIN_ENABLE')) ? null : {
       get clientID() {
         return process.env.LINKEDIN_CLIENT_ID || ''
       },
@@ -86,7 +86,7 @@ const PROVIDERS = {
   },
 
   get apple() {
-    if (!castBooleanEnv('APPLE_ENABLE')) return null;
+    if (!(castBooleanEnv('APPLE_ENABLED') || castBooleanEnv('APPLE_ENABLE'))) return null;
     try {
       return {
         get clientID() {
@@ -113,7 +113,7 @@ const PROVIDERS = {
   },
 
   get windowslive() {
-    return !castBooleanEnv('WINDOWS_LIVE_ENABLE') ? null : {
+    return !(castBooleanEnv('WINDOWS_LIVE_ENABLED') || castBooleanEnv('WINDOWS_LIVE_ENABLE')) ? null : {
       get clientID() {
         return process.env.WINDOWS_LIVE_CLIENT_ID || ''
       },
@@ -127,7 +127,7 @@ const PROVIDERS = {
   },
 
   get spotify() {
-    return !castBooleanEnv('SPOTIFY_ENABLE') ? null : {
+    return !(castBooleanEnv('SPOTIFY_ENABLED') || castBooleanEnv('SPOTIFY_ENABLE')) ? null : {
       get clientID() {
         return process.env.SPOTIFY_CLIENT_ID || ''
       },
@@ -141,7 +141,7 @@ const PROVIDERS = {
   },
 
   get gitlab() {
-    return !castBooleanEnv('GITLAB_ENABLE') ? null : {
+    return !(castBooleanEnv('GITLAB_ENABLED') || castBooleanEnv('GITLAB_ENABLE')) ? null : {
       get clientID() {
         return process.env.GITLAB_CLIENT_ID || ''
       },
@@ -158,7 +158,7 @@ const PROVIDERS = {
   },
 
   get bitbucket() {
-    return !castBooleanEnv('BITBUCKET_ENABLE') ? null : {
+    return!(castBooleanEnv('BITBUCKET_ENABLED') || castBooleanEnv('BITBUCKET_ENABLE')) ? null : {
       get clientID() {
         return process.env.BITBUCKET_CLIENT_ID || ''
       },

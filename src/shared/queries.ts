@@ -12,6 +12,7 @@ const accountFragment = gql`
     user {
       id
       display_name
+      avatar_url
       ${JWT.CUSTOM_FIELDS.join('\n\t\t\t')}
     }
     is_anonymous
@@ -310,10 +311,17 @@ export const changePasswordHashByUserId = gql`
 `
 
 export const deanonymizeAccount = gql`
-  mutation($account_id: uuid!, $default_role: String!, $roles: [auth_account_roles_insert_input!]!) {
+  mutation($account_id: uuid!, $account: auth_accounts_set_input!, $user_id: uuid!, $user: users_set_input!, $roles: [auth_account_roles_insert_input!]!) {
     update_auth_accounts(
       where: { id: { _eq: $account_id } }
-      _set: { active: true, is_anonymous: false, default_role: $default_role }
+      _set: $account
+    ) {
+      affected_rows
+    }
+
+    update_users(
+      where: { id: { _eq: $user_id } }
+      _set: $user
     ) {
       affected_rows
     }

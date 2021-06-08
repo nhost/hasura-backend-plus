@@ -8,7 +8,7 @@ import { end } from '@test/supertest-shared-utils'
 
 it('should request to change email and receive a ticket by email', (done) => {
   withEnv({
-    EMAILS_ENABLE: 'true',
+    EMAILS_ENABLED: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
     await registerAndLoginAccount(request).then(({ jwtToken }) => {
@@ -34,7 +34,7 @@ it('should request to change email and receive a ticket by email', (done) => {
 
 it('should change the email from a ticket', (done) => {
   withEnv({
-    EMAILS_ENABLE: 'true',
+    EMAILS_ENABLED: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
     await registerAndLoginAccount(request).then(({ jwtToken }) => {
@@ -67,7 +67,7 @@ it('should change the email from a ticket', (done) => {
 
 it('should reconnect using the new email', (done) => {
   withEnv({
-    EMAILS_ENABLE: 'true',
+    EMAILS_ENABLED: 'true',
     VERIFY_EMAILS: 'true'
   }, request, async () => {
     await registerAndLoginAccount(request).then(({ email, password, jwtToken }) => {
