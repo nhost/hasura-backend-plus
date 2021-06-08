@@ -26,7 +26,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     user_data = {},
     register_options = {},
     locale
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
@@ -107,7 +107,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
-    if (!APPLICATION.EMAILS_ENABLE) {
+    if (!APPLICATION.EMAILS_ENABLED) {
       return res.boom.badImplementation('SMTP settings unavailable')
     }
 

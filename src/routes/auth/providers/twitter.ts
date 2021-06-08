@@ -12,7 +12,7 @@ export default (router: Router): void => {
     includeEmail: true,
   }, (req, res, next) => {
     if(!PROVIDERS.twitter) {
-      return res.boom.badImplementation(`Please set the TWITTER_ENABLE env variable to true to use the auth/providers/twitter routes.`)
+      return res.boom.badImplementation(`Please set the TWITTER_ENABLED env variable to true to use the auth/providers/twitter routes.`)
     } else if (!options?.consumerKey || !options?.consumerSecret) {
       return res.boom.badImplementation(`Missing environment variables for Twitter OAuth.`)
     } else {

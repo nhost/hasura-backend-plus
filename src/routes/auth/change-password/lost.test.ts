@@ -9,7 +9,7 @@ describe('Reset lost password', () => {
 
   beforeAll(async () => {
     await withEnv({
-      LOST_PASSWORD_ENABLE: 'true'
+      LOST_PASSWORD_ENABLED: 'true'
     }, request)
   })
 

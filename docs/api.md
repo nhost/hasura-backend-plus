@@ -194,7 +194,7 @@ Change password of an account. The account must be logged in for this endpoint t
 
 ### Change Password Request
 
-Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 ::: warning
 This endpoint will always return HTTP status code 204 in order to not leak information about the database.
@@ -218,7 +218,7 @@ This endpoint will always return HTTP status code 204 in order to not leak infor
 
 ### Change Password Change
 
-Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 #### Request
 
