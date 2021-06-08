@@ -19,7 +19,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
   const { user_id, new_email } = await getRequestInfo(req, res)
 
   // smtp must be enabled for request change password to work.
-  if (!APPLICATION.EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLED) {
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 

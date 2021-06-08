@@ -36,7 +36,7 @@ function isAnonymous() {
 
 it('should tell the password has been pwned', (done) => {
   withEnv({
-    HIBP_ENABLE: 'true'
+    HIBP_ENABLED: 'true'
   }, request, async () => {
     request
       .post('/auth/register')
@@ -62,7 +62,7 @@ it('should create an account', (done) => {
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true'
+      MAGIC_LINK_ENABLED: 'true'
     },
     request,
     async () => {
@@ -93,7 +93,7 @@ it('should create an account without a password when magic link login is enabled
 it('should not create an account without a password when magic link login is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -190,7 +190,7 @@ it('should fail to activate an user from a wrong ticket', (done) => {
   withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true',
+      EMAILS_ENABLED: 'true',
       REDIRECT_URL_ERROR: ''
     },
     request,
@@ -207,7 +207,7 @@ it('should activate the account from a valid ticket', async () => {
   await withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true'
+      EMAILS_ENABLED: 'true'
     },
     request,
     async () => {
@@ -264,7 +264,7 @@ it('should sign the user in', (done) => {
 it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true',
+      MAGIC_LINK_ENABLED: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
       VERIFY_EMAILS: 'true'
     },
@@ -307,7 +307,7 @@ it('should sign the user in without password when magic link is enabled', async 
 it('should not sign the user in without password when magic link is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -385,7 +385,7 @@ it('should log in anonymously', (done) => {
   const anonymousRole = 'anonymous'
 
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'true',
+    ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
     ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
   }, request, async () => {
@@ -406,7 +406,7 @@ it('should be able to deanonymize anonymous user', (done) => {
   let jwtToken = ''
 
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'true',
+    ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
     ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
     AUTO_ACTIVATE_NEW_USERS: 'true'
@@ -453,7 +453,7 @@ it('should be able to deanonymize anonymous user without auto activation', (done
   let jwtToken = ''
 
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'true',
+    ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
     ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
     AUTO_ACTIVATE_NEW_USERS: 'false',
@@ -511,7 +511,7 @@ it('should not be able to deanonymize normal account', (done) => {
   let jwtToken = ''
 
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'true',
+    ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
     ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
   }, request, async () => {
@@ -543,7 +543,7 @@ it('should log in normally when anonymous login is enabled', (done) => {
   const anonymousRole = 'anonymous'
 
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'true',
+    ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
     ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
   }, request, async () => {
@@ -560,7 +560,7 @@ it('should log in normally when anonymous login is enabled', (done) => {
 
 it('should not be able to log in anonymously when anonymous login is disabled', (done) => {
   withEnv({
-    ANONYMOUS_USERS_ENABLE: 'false',
+    ANONYMOUS_USERS_ENABLED: 'false',
   }, request, async () => {
     request
       .post('/auth/login')
@@ -629,7 +629,7 @@ it('should resend the confirmation email after the timeout', (done) => {
   withEnv({
     CONFIRMATION_RESET_TIMEOUT: '0',
     AUTO_ACTIVATE_NEW_USERS: 'false',
-    EMAILS_ENABLE: 'true'
+    EMAILS_ENABLED: 'true'
   }, request, async () => {
     const email = generateRandomEmail()
     const password = generateRandomString()
@@ -662,7 +662,7 @@ it('should not resend the confirmation email on an activated account', (done) =>
   withEnv({
     CONFIRMATION_RESET_TIMEOUT: '0',
     AUTO_ACTIVATE_NEW_USERS: 'false',
-    EMAILS_ENABLE: 'true'
+    EMAILS_ENABLED: 'true'
   }, request, async () => {
     registerAccount(request).then(({ email }) => {
       request
@@ -680,7 +680,7 @@ it('should not resend the confirmation email on a non-existant account', (done) 
   withEnv({
     CONFIRMATION_RESET_TIMEOUT: '0',
     AUTO_ACTIVATE_NEW_USERS: 'false',
-    EMAILS_ENABLE: 'true'
+    EMAILS_ENABLED: 'true'
   }, request, async () => {
     request
       .post('/auth/resend-confirmation')
@@ -696,7 +696,7 @@ it('should not resend the confirmation email before the timeout', (done) => {
   withEnv({
     CONFIRMATION_RESET_TIMEOUT: '5000',
     AUTO_ACTIVATE_NEW_USERS: 'false',
-    EMAILS_ENABLE: 'true'
+    EMAILS_ENABLED: 'true'
   }, request, async () => {
     const email = generateRandomEmail()
     const password = generateRandomString()

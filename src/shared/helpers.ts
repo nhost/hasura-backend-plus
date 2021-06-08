@@ -1,4 +1,4 @@
-import { JWT, REGISTRATION } from './config'
+import { APPLICATION, JWT, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
   deanonymizeAccount as deanonymizeAccountQuery,
@@ -9,7 +9,7 @@ import {
   selectAccountByUserId as selectAccountByUserIdQuery,
   updateLastSentConfirmation as updateLastSentConfirmationQuery,
 } from './queries'
-
+import * as gravatar from 'gravatar'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
@@ -105,7 +105,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (REGISTRATION.HIBP_ENABLE && (await pwnedPassword(password))) {
+  if (REGISTRATION.HIBP_ENABLED && (await pwnedPassword(password))) {
     throw new Error('Password is too weak.')
   }
 }
@@ -169,12 +169,35 @@ export const accountIsAnonymous = async (user_id: string) => {
   return account.is_anonymous
 }
 
-export const deanonymizeAccount = async (accountId: string) => {
+export const getGravatarUrl = (email?: string) => {
+  if(APPLICATION.GRAVATAR_ENABLED && email) {
+    return gravatar.url(email, {
+      r: APPLICATION.RATING,
+      protocol: 'https',
+      default: APPLICATION.GRAVATAR_DEFAULT
+    })
+  }
+}
+
+export const deanonymizeAccount = async (account: AccountData) => {
+  // Gravatar is enabled and anonymous user has not added
+  // an avatar yet
+  const useGravatar = APPLICATION.GRAVATAR_ENABLED && !account.user.avatar_url
+
   await request(deanonymizeAccountQuery, {
-    account_id: accountId,
-    default_role: REGISTRATION.DEFAULT_USER_ROLE,
+    account_id: account.id,
+    account: {
+      default_role: REGISTRATION.DEFAULT_USER_ROLE,
+      active: true
+    },
+    ...(useGravatar && {
+      user_id: account.user.id,
+      user: {
+        avatar_url: getGravatarUrl(account.email)
+      }
+    }),
     roles: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map(role => ({
-      account_id: accountId,
+      account_id: account.id,
       created_at: new Date(),
       role
     }))

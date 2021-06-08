@@ -1,8 +1,7 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
-
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
@@ -28,7 +27,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     user_data = {},
     register_options = {},
     locale
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
@@ -69,6 +68,9 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
+  
+  const avatarUrl = getGravatarUrl(email)
+
   let accounts: InsertAccountData
   try {
     accounts = await request<InsertAccountData>(insertAccount, {
@@ -84,8 +86,12 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
           data: accountRoles
         },
         user: {
-          data: { display_name: email, ...user_data }
-        }
+          data: {
+            display_name: email,
+            avatar_url: avatarUrl,
+            ...user_data
+          }
+        },
       }
     })
   } catch (e) {
@@ -103,9 +109,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
-    if (!APPLICATION.EMAILS_ENABLE) {
-      console.log('smtp')
-      return res.boom.badRequest('SMTP settings unavailable')
+    if (!APPLICATION.EMAILS_ENABLED) {
+      return res.boom.badImplementation('SMTP settings unavailable')
     }
 
     // use display name from `user_data` if available

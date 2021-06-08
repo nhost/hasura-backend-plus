@@ -38,7 +38,7 @@ jobs:
       graphql-engine:
         image: hasura/graphql-engine:v1.3.2
         env:
-          HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
+          HASURA_GRAPHQL_ENABLED_TELEMETRY: 'false'
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
           HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
           HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
