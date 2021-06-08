@@ -158,6 +158,6 @@ export const fileMetadataUpdate = Joi.object({
 
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
-  action: Joi.string().valid('log-in', 'sign-up').required(),
+  action: Joi.string().valid('log-in', 'register').required(),
   cookie: Joi.boolean().optional(),
 });
