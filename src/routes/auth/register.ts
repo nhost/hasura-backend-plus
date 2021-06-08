@@ -118,8 +118,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
-            action: 'sign up',
-            action_url: 'sign-up'
+            action: 'register',
+            action_url: 'register'
           }
         })
       } catch (err) {

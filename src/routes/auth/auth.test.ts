@@ -74,7 +74,7 @@ it('should create an account without a password when magic link login is enabled
       await deleteMailHogEmail(message)
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
     }
@@ -275,7 +275,7 @@ it('should sign the user in without password when magic link is enabled', async 
       const token = await getHeaderFromLatestEmailAndDelete(email, 'X-Token')
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
 
