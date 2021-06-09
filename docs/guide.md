@@ -20,6 +20,8 @@ Create the following `docker-compose.yaml` file, and modify the Hasura Admin Sec
 
 <<< @/examples/simple-hasura-minio/docker-compose.yaml
 
+**Note:** Create a directory called `custom` in the same folder as your `docker-compose.yaml` file to customize Hasura Backend Plus.
+
 Then start the services:
 
 ```shell
