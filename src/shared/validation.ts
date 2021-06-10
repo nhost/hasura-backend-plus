@@ -182,7 +182,8 @@ export const magicLinkQuery = Joi.object({
 
 export const providerQuery = Joi.object({
   redirect_url_success: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_SUCCESS),
-  redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR)
+  redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR),
+  jwt_token: Joi.string()
 });
 
 export const providerCallbackQuery = Joi.object({

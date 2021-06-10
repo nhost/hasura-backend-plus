@@ -398,8 +398,8 @@ export const getEmailTemplate = gql`
 `
 
 export const addProviderRequest = gql`
-  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!) {
-    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure } ) {
+  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!, $jwt_token: String) {
+    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure, jwt_token: $jwt_token } ) {
       id
     }
   }
@@ -409,7 +409,8 @@ export const getProviderRequest = gql`
   query($state: uuid!) {
     auth_provider_requests_by_pk(id: $state) {
       redirect_url_success,
-      redirect_url_failure
+      redirect_url_failure,
+      jwt_token
     }
   }
 `
@@ -445,3 +446,11 @@ export const changeLocaleByUserId = gql`
     }
   }
 `
+
+// export const insertAccountProvider = gql`
+//   mutation($account_id: uuid!, $auth_provider: citext!, $auth_provider_unique_id: citext!) {
+//     insert_auth_account_providers_one(object: { account_id: $account_id, auth_provider: $auth_provider, auth_provider_unique_id: $auth_provider_unique_id }) {
+//       id
+//     }
+//   }
+// `
