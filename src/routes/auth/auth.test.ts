@@ -345,7 +345,8 @@ it('should sign in user with valid admin secret', (done) => {
 it('should decode a valid custom user claim', (done) => {
   let jwtToken = ''
 
-  registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
+  // registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
+  registerAccount(request).then(({ email, password }) => {
     request
       .post('/auth/login')
       .send({ email, password })
