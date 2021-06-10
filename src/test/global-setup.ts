@@ -1,3 +1,4 @@
+require('tsconfig-paths/register')
 import { applyMigrations } from '../shared/migrations'
 import { applyMetadata } from '../shared/metadata'
 
