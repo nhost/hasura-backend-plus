@@ -1,11 +1,9 @@
-import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
+import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
-
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
-import { setRefreshToken } from '@shared/cookies'
 import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
@@ -14,14 +12,21 @@ import { InsertAccountData, UserData, Session } from '@shared/types'
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const body = req.body
 
-  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
+  if(REGISTRATION.ADMIN_ONLY) {
+    const adminSecret = req.headers[HEADERS.ADMIN_SECRET_HEADER]
+
+    if (adminSecret !== APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET) {
+      return res.boom.unauthorized('Invalid x-admin-secret')
+    }
+  }
 
   const {
     email,
     password,
     user_data = {},
-    register_options = {}
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+    register_options = {},
+    locale
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
@@ -61,6 +66,9 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
+  
+  const avatarUrl = getGravatarUrl(email)
+
   let accounts: InsertAccountData
   try {
     accounts = await request<InsertAccountData>(insertAccount, {
@@ -70,13 +78,18 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         ticket,
         ticket_expires_at,
         active: REGISTRATION.AUTO_ACTIVATE_NEW_USERS,
+        locale,
         default_role: defaultRole,
         account_roles: {
           data: accountRoles
         },
         user: {
-          data: { display_name: email, ...user_data }
-        }
+          data: {
+            display_name: email,
+            avatar_url: avatarUrl,
+            ...user_data
+          }
+        },
       }
     })
   } catch (e) {
@@ -94,7 +107,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
-    if (!APPLICATION.EMAILS_ENABLE) {
+    if (!APPLICATION.EMAILS_ENABLED) {
       return res.boom.badImplementation('SMTP settings unavailable')
     }
 
@@ -118,6 +131,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
+            locale: account.locale,
+            app_url: APPLICATION.APP_URL,
             action: 'sign up',
             action_url: 'sign-up'
           }
@@ -146,7 +161,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         locals: {
           display_name,
           ticket,
-          url: APPLICATION.SERVER_URL
+          url: APPLICATION.SERVER_URL,
+          locale: account.locale
         }
       })
     } catch (err) {
@@ -158,14 +174,13 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     return res.send(session)
   }
 
-  const refresh_token = await setRefreshToken(res, account.id, useCookie)
+  const refresh_token = await setRefreshToken(account.id)
 
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
 
-  const session: Session = { jwt_token, jwt_expires_in, user }
-  if (!useCookie) session.refresh_token = refresh_token
+  const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   return res.send(session)
 }

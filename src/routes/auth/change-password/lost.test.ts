@@ -8,8 +8,8 @@ import { end } from '@test/supertest-shared-utils'
 describe('Reset lost password', () => {
 
   beforeAll(async () => {
-    withEnv({
-      LOST_PASSWORD_ENABLE: 'true'
+    await withEnv({
+      LOST_PASSWORD_ENABLED: 'true'
     }, request)
   })
 

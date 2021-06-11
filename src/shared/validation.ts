@@ -1,8 +1,10 @@
-import { REGISTRATION } from './config'
+import { APPLICATION, REGISTRATION } from './config'
 import Joi from '@hapi/joi'
+import compareUrls from 'compare-urls'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
+  allowedRedirectUrls(): this
 }
 
 interface ExtendedJoi extends Joi.Root {
@@ -13,7 +15,8 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   type: 'string',
   base: joi.string(),
   messages: {
-    'string.allowedDomains': '{{#label}} is not in an authorised domain'
+    'string.allowedDomains': '{{#label}} is not in an authorised domain',
+    'string.allowedRedirectUrls': '{{#label}} is not an authorised redirect url'
   },
   rules: {
     allowedDomains: {
@@ -32,6 +35,18 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
 
         return value
       }
+    },
+    allowedRedirectUrls: {
+      method(): unknown {
+        return this.$_addRule({ name: 'allowedRedirectUrls' })
+      },
+      validate(value: string, helpers): unknown {
+        if(APPLICATION.ALLOWED_REDIRECT_URLS.some(allowedUrl => compareUrls(value, allowedUrl))) {
+          return value
+        } else {
+          return helpers.error('string.allowedRedirectUrls')
+        }
+      }
     }
   }
 }))
@@ -41,14 +56,19 @@ const passwordRuleRequired = passwordRule.required();
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
+const localeRule = Joi.string().length(2)
+const localeRuleWithDefault = localeRule.default(APPLICATION.EMAILS_DEFAULT_LOCALE)
+
 const accountFields = {
   email: emailRule,
-  password: passwordRuleRequired
+  password: passwordRuleRequired,
+  locale: localeRuleWithDefault
 }
 
 const accountFieldsMagicLink = {
   email: emailRule,
-  password: passwordRule
+  password: passwordRule,
+  locale: localeRuleWithDefault
 }
 
 export const userDataFields = {
@@ -76,15 +96,17 @@ export const userDataFields = {
 export const registerSchema = Joi.object({
   ...accountFields,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
 export const registerSchemaMagicLink = Joi.object({
   ...accountFieldsMagicLink,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
+export const deanonymizeSchema = Joi.object({
+  email: emailRule,
+  password: passwordRuleRequired
+})
 
 export const registerUserDataSchema = Joi.object(userDataFields)
 
@@ -117,6 +139,7 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
+  locale: localeRuleWithDefault,
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
@@ -127,19 +150,16 @@ export const magicLinkLoginAnonymouslySchema = Joi.object({
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
-  cookie: Joi.boolean()
 })
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
-  cookie: Joi.boolean()
 })
 export const forgotSchema = Joi.object({ email: emailRule })
 export const verifySchema = Joi.object({ ...ticketFields })
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
-  cookie: Joi.boolean()
 })
 
 export const imgTransformParams = Joi.object({
@@ -159,5 +179,17 @@ export const fileMetadataUpdate = Joi.object({
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
   action: Joi.string().valid('log-in', 'sign-up').required(),
-  cookie: Joi.boolean().optional(),
 });
+
+export const providerQuery = Joi.object({
+  redirect_url_success: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_SUCCESS),
+  redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR)
+});
+
+export const providerCallbackQuery = Joi.object({
+  state: Joi.string().uuid().required()
+}).unknown(true)
+
+export const localeQuery = Joi.object({
+  locale: localeRule
+})

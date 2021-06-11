@@ -16,8 +16,8 @@ export const REGISTRATION = {
   get AUTO_ACTIVATE_NEW_USERS() {
     return castBooleanEnv('AUTO_ACTIVATE_NEW_USERS', true)
   },
-  get HIBP_ENABLE() {
-    return castBooleanEnv('HIBP_ENABLE')
+  get HIBP_ENABLED() {
+    return castBooleanEnv('HIBP_ENABLED') || castBooleanEnv('HIBP_ENABLE')
   },
   get CUSTOM_FIELDS() {
     return castStringArrayEnv('REGISTRATION_CUSTOM_FIELDS')
@@ -30,5 +30,11 @@ export const REGISTRATION = {
   },
   get ALLOWED_USER_ROLES() {
     return castStringArrayEnv('ALLOWED_USER_ROLES', this.DEFAULT_ALLOWED_USER_ROLES)
+  },
+  get CONFIRMATION_RESET_TIMEOUT() {
+    return castIntEnv('CONFIRMATION_RESET_TIMEOUT', 5 * 60 * 1000)
+  },
+  get ADMIN_ONLY() {
+    return castBooleanEnv('ADMIN_ONLY_REGISTRATION', false)
   }
 }

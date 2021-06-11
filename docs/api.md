@@ -70,11 +70,6 @@ Login an account.
 
 #### Response
 
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
-
 ```json
 {
   "mfa": false,
@@ -199,7 +194,7 @@ Change password of an account. The account must be logged in for this endpoint t
 
 ### Change Password Request
 
-Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 ::: warning
 This endpoint will always return HTTP status code 204 in order to not leak information about the database.
@@ -223,7 +218,7 @@ This endpoint will always return HTTP status code 204 in order to not leak infor
 
 ### Change Password Change
 
-Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 #### Request
 
@@ -306,23 +301,13 @@ Change email to the new email that you specified in [Change Email Request](#chan
 
 ### Refresh token
 
-Get new refresh token. The browser will send the cookie automatically.
+Get new refresh token.
 
 #### Request
 
 `GET /auth/token/refresh`
 
-```
-Cookie: refresh_token=...
-Cookie: permission_variables=...
-```
-
 #### Response
-
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
 
 ```json
 {
@@ -340,11 +325,6 @@ Revoke a refresh token.
 #### Request
 
 `POST /auth/token/revoke/`
-
-```
-Cookie: refresh_token=...
-Cookie: permission_variables=...
-```
 
 #### Response
 
@@ -429,11 +409,6 @@ Time-based One-time Password. Use the `ticket` from [Login](#login) that is retu
 ```
 
 #### Response
-
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
 
 ```json
 {
