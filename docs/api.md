@@ -168,8 +168,8 @@ This can be called when the activate account token has expired and the user need
 
 #### Response
 
-```
-204 No Content
+```json
+{ jwt_token: null, jwt_expires_in: null, user }
 ```
 ---
 
@@ -188,7 +188,7 @@ Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true`
 #### Response
 
 ```
-{ jwt_token: null, jwt_expires_in: null, user }
+204 No Content
 ```
 
 ---
