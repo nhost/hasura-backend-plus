@@ -161,9 +161,7 @@ This can be called when the activate account token has expired and the user need
 `POST /auth/resend-confirmation`
 
 ```json
-{
-  "email": "hello@example.com"
-}
+{ "email": "hello@example.com" }
 ```
 
 #### Response
