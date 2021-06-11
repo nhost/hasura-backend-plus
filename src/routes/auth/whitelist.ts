@@ -27,7 +27,7 @@ async function whitelist(req: Request, res: Response): Promise<unknown> {
     })
 
     if(REGISTRATION.WHITELIST_SEND_INVITE) {
-      if(!APPLICATION.EMAILS_ENABLE) {
+      if(!APPLICATION.EMAILS_ENABLED) {
         return res.boom.badImplementation('Emails have to be enabled when WHITELIST_SEND_INVITE=true')
       }
 
