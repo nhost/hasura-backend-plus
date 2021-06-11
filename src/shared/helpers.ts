@@ -42,7 +42,6 @@ export function asyncWrapper(fn: any) {
 
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByEmailQuery, { email })
-  console.log('res', hasuraData)
   if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
   return hasuraData.auth_accounts[0]
 }

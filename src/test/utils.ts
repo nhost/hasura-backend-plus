@@ -5,7 +5,6 @@ import { APPLICATION } from '@shared/config'
 
 import { getClaims } from '@shared/jwt'
 
-
 export interface AccountLoginData {
   email: string
   password: string
@@ -31,8 +30,8 @@ export async function withEnv(
   rollbackEnv?: Record<string, string>
 ) {
   await agent.post('/change-env').send(env)
-  if(cb) await cb()
-  if(rollbackEnv) {
+  if (cb) await cb()
+  if (rollbackEnv) {
     await agent.post('/change-env').send(rollbackEnv)
   }
 }
@@ -42,35 +41,51 @@ export const createAccountLoginData = (): AccountLoginData => ({
   password: generateRandomString()
 })
 
-export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<string, any> = {}): Promise<AccountLoginData> => {
-  const accountLoginData = createAccountLoginData();
+export const registerAccount = async (
+  agent: SuperTest<Test>,
+  user_data: Record<string, any> = {}
+): Promise<AccountLoginData> => {
+  const accountLoginData = createAccountLoginData()
 
-  const oldAutoActivateNewUsers = await agent.get('/env/AUTO_ACTIVATE_NEW_USERS').then(res => res.text)
+  const oldAutoActivateNewUsers = await agent
+    .get('/env/AUTO_ACTIVATE_NEW_USERS')
+    .then((res) => res.text)
 
-  await withEnv({
-    AUTO_ACTIVATE_NEW_USERS: 'true'
-  }, agent, async () => {
-    console.log('register', accountLoginData.email, await agent.post('/auth/register').send({
-      ...accountLoginData,
-      user_data,
-    }).then(res => res.body))
-  }, {
-    AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
-  })
+  await withEnv(
+    {
+      AUTO_ACTIVATE_NEW_USERS: 'true'
+    },
+    agent,
+    async () => {
+      await agent
+        .post('/auth/register')
+        .send({
+          ...accountLoginData,
+          user_data
+        })
+        .then((res) => res.body)
+    },
+    {
+      AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
+    }
+  )
 
-  return accountLoginData;
+  return accountLoginData
 }
 
-export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData): Promise<AccountData> => {
+export const loginAccount = async (
+  agent: SuperTest<Test>,
+  accountLoginData: AccountLoginData
+): Promise<AccountData> => {
   const login = await agent.post('/auth/login').send(accountLoginData)
 
   try {
     getUserId(login.body.jwt_token)
-  } catch(e) {
+  } catch (e) {
     console.log('jwt', accountLoginData, login.body)
   }
 
-  if(login.body.error) {
+  if (login.body.error) {
     throw new Error(`${login.body.statusCode} ${login.body.error}: ${login.body.message}`)
   }
 
@@ -142,10 +157,10 @@ export const deleteMailHogEmail = async ({ ID }: MailhogMessage): Promise<Respon
 export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
   (await mailHogSearch(email)).forEach(async (message) => await deleteMailHogEmail(message))
 
-export const getHeaderFromLatestEmailAndDelete = async(email: string, header: string) => {
+export const getHeaderFromLatestEmailAndDelete = async (email: string, header: string) => {
   const [message] = await mailHogSearch(email)
 
-  if(!message) return
+  if (!message) return
 
   const headerValue = message.Content.Headers[header][0]
   await deleteMailHogEmail(message)
