@@ -378,7 +378,7 @@ export const selectAccountProvider = gql`
 
 export const isAllowedEmail = gql`
   query($email: String!) {
-    auth_allowlist_by_pk(email: $email) {
+    auth_whitelist_by_pk(email: $email) {
       email
     }
   }
@@ -397,7 +397,7 @@ export const updateLastSentConfirmation = gql`
 
 export const insertAllowedEmail = gql`
   mutation($email: String!) {
-    insert_auth_allowlist_one(object: { email: $email }) {
+    insert_auth_whitelist_one(object: { email: $email }) {
       email
     }
   }

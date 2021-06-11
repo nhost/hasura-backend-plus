@@ -136,7 +136,7 @@ export interface SetNewEmailData {
 }
 
 export interface IsAllowedEmail {
-  auth_allowlist_by_pk: {
+  auth_whitelist_by_pk: {
     email: string
   } | null
 }

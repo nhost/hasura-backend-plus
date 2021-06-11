@@ -51,7 +51,7 @@ const manageProviderStrategy = (
     // check if user exists, using profile.id
     const { id, email, display_name, avatar_url } = transformProfile(profile)
 
-    if(REGISTRATION.ALLOWLIST && (!email || !isAllowedEmail(email))) {
+    if(REGISTRATION.WHITELIST && (!email || !isAllowedEmail(email))) {
       return done(new Error('Email not allowed'))
     }
 

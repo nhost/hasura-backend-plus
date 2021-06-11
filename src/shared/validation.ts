@@ -180,7 +180,7 @@ export const magicLinkQuery = Joi.object({
   action: Joi.string().valid('log-in', 'sign-up').required(),
 });
 
-export const allowlistQuery = Joi.object({
+export const whitelistQuery = Joi.object({
   email: emailRule
 })
 export const providerQuery = Joi.object({

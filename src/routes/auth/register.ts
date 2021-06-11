@@ -28,7 +28,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     locale
   } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
-  if(REGISTRATION.ALLOWLIST && !await isAllowedEmail(email)) {
+  if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
     return res.boom.unauthorized('Email not allowed')
   }
 

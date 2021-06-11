@@ -31,8 +31,11 @@ export const REGISTRATION = {
   get ALLOWED_USER_ROLES() {
     return castStringArrayEnv('ALLOWED_USER_ROLES', this.DEFAULT_ALLOWED_USER_ROLES)
   },
-  get ALLOWLIST() {
-    return castBooleanEnv('ALLOWLIST_ENABLE', false)
+  get WHITELIST() {
+    return castBooleanEnv('WHITELIST_ENABLE', false)
+  },
+  get WHITELIST_SEND_INVITE() {
+    return castBooleanEnv('WHITELIST_SEND_INVITE')
   },
   get CONFIRMATION_RESET_TIMEOUT() {
     return castIntEnv('CONFIRMATION_RESET_TIMEOUT', 5 * 60 * 1000)

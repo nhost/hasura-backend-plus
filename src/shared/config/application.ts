@@ -10,6 +10,9 @@ export const APPLICATION = {
   get APP_URL() {
     return process.env.APP_URL || ''
   },
+  get APP_NAME() {
+    return process.env.APP_NAME
+  },
   get REDIRECT_URL_ERROR() {
     return process.env.REDIRECT_URL_ERROR || ''
   },

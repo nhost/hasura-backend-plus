@@ -722,9 +722,9 @@ it('should not resend the confirmation email before the timeout', (done) => {
   })
 })
 
-it('should disable login for arbitrary emails when allowlist is enabled', (done) => {
+it('should disable login for arbitrary emails when whitelist is enabled', (done) => {
   withEnv({
-    ALLOWLIST_ENABLE: 'true'
+    WHITELIST_ENABLE: 'true'
   }, request, async () => {
     request
       .post('/auth/register')
@@ -737,14 +737,14 @@ it('should disable login for arbitrary emails when allowlist is enabled', (done)
   })
 })
 
-it('should enable login for allowed emails when allowlist is enabled', (done) => {
+it('should enable login for allowed emails when whitelist is enabled', (done) => {
   const email = generateRandomEmail()
 
   withEnv({
-    ALLOWLIST_ENABLE: 'true'
+    WHITELIST_ENABLE: 'true'
   }, request, async () => {
     request
-      .post('/auth/allowlist')
+      .post('/auth/whitelist')
       .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
       .send({
         email
@@ -765,14 +765,14 @@ it('should enable login for allowed emails when allowlist is enabled', (done) =>
   })
 })
 
-it('Should disable the allowlist endpoint when the allowlist is disabled', (done) => {
+it('Should disable the whitelist endpoint when the whitelist is disabled', (done) => {
   const email = generateRandomEmail()
 
   withEnv({
-    ALLOWLIST_ENABLE: 'false'
+    WHITELIST_ENABLE: 'false'
   }, request, async () => {
     request
-      .post('/auth/allowlist')
+      .post('/auth/whitelist')
       .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
       .send({
         email

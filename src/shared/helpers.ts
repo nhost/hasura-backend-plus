@@ -214,5 +214,5 @@ export const updateLastSentConfirmation = async (user_id: string): Promise<void>
 export const isAllowedEmail = async (email: string) => {
   return request<IsAllowedEmail>(isAllowedEmailQuery, {
     email
-  }).then(q => !!q.auth_allowlist_by_pk)
+  }).then(q => !!q.auth_whitelist_by_pk)
 }
