@@ -10,7 +10,7 @@ export default (router: Router): void => {
     scope: PROVIDERS.linkedin?.scope
   }, (req, res, next) => {
     if(!PROVIDERS.linkedin) {
-      return res.boom.badImplementation(`Please set the LINKEDIN_ENABLE env variable to true to use the auth/providers/linkedin routes.`)
+      return res.boom.badImplementation(`Please set the LINKEDIN_ENABLED env variable to true to use the auth/providers/linkedin routes.`)
     } else if (!options?.clientID || !options?.clientSecret) {
       return res.boom.badImplementation(`Missing environment variables for LinkedIn OAuth.`)
     } else {

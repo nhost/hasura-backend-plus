@@ -18,8 +18,8 @@ interface HasuraData {
 }
 
 async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
-  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
-    const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
+    const { anonymous, locale } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
     if (anonymous) {
@@ -33,6 +33,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
             ticket,
             active: true,
             is_anonymous: true,
+            locale,
             default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
             account_roles: {
               data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
@@ -64,7 +65,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? loginSchemaMagicLink : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? loginSchemaMagicLink : loginSchema).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -121,9 +122,9 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const hasAdminSecret = Boolean(adminSecret)
   const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
   let userImpersonationValid = false;
-  if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
+  if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && !isAdminSecretCorrect) {
     return res.boom.unauthorized('Invalid x-admin-secret')
-  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
+  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && isAdminSecretCorrect) {
     userImpersonationValid = true;
   }
 

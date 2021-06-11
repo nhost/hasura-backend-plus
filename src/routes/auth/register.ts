@@ -26,7 +26,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     user_data = {},
     register_options = {},
     locale
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
 
   if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
     return res.boom.unauthorized('Email not allowed')
@@ -111,7 +111,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
-    if (!APPLICATION.EMAILS_ENABLE) {
+    if (!APPLICATION.EMAILS_ENABLED) {
       return res.boom.badImplementation('SMTP settings unavailable')
     }
 
@@ -137,8 +137,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             url: APPLICATION.SERVER_URL,
             locale: account.locale,
             app_url: APPLICATION.APP_URL,
-            action: 'sign up',
-            action_url: 'sign-up'
+            action: 'register',
+            action_url: 'register'
           }
         })
       } catch (err) {

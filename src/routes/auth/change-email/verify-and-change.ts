@@ -41,7 +41,7 @@ async function changeEmail({ body }: Request, res: Response): Promise<unknown> {
     return res.boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if (AUTHENTICATION.NOTIFY_EMAIL_CHANGE && APPLICATION.EMAILS_ENABLE) {
+  if (AUTHENTICATION.NOTIFY_EMAIL_CHANGE && APPLICATION.EMAILS_ENABLED) {
     try {
       await emailClient.send({
         template: 'notify-email-change',

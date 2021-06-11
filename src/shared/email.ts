@@ -27,7 +27,7 @@ const transport = nodemailer.createTransport({
 export const emailClient: Email<any> = new Email({
   transport,
   message: { from: APPLICATION.SMTP_SENDER },
-  send: APPLICATION.EMAILS_ENABLE,
+  send: APPLICATION.EMAILS_ENABLED,
   render: async (view, locals) => {
     const [id, field] = view.split('/')
     const locale = locals.locale

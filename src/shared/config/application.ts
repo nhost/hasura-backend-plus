@@ -55,8 +55,8 @@ export const APPLICATION = {
   get SMTP_AUTH_METHOD() {
     return process.env.SMTP_AUTH_METHOD || 'PLAIN'
   },
-  get EMAILS_ENABLE() {
-    return castBooleanEnv('EMAILS_ENABLE')
+  get EMAILS_ENABLED() {
+    return castBooleanEnv('EMAILS_ENABLED') || castBooleanEnv('EMAILS_ENABLE')
   },
   get SMTP_PORT() {
     return castIntEnv('SMTP_PORT', 587)
@@ -76,8 +76,8 @@ export const APPLICATION = {
     return castIntEnv('TIME_FRAME', 15 * 60 * 1000)
   },
 
-  get GRAVATAR_ENABLE() {
-    return castBooleanEnv('GRAVATAR_ENABLE', true)
+  get GRAVATAR_ENABLED() {
+    return castBooleanEnv('GRAVATAR_ENABLED') || castBooleanEnv('GRAVATAR_ENABLE') || true
   },
   get GRAVATAR_DEFAULT() {
     return process.env.GRAVATAR_DEFAULT || 'blank'

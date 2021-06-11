@@ -8,7 +8,7 @@ export default (router: Router): void => {
 
   initProvider(router, 'bitbucket', Strategy, {}, (req, res, next) => {
     if(!options) {
-      return res.boom.badImplementation(`Please set the BITBUCKET_ENABLE env variable to true to use the auth/providers/bitbucket routes.`)
+      return res.boom.badImplementation(`Please set the BITBUCKET_ENABLED env variable to true to use the auth/providers/bitbucket routes.`)
     } else if (!options?.clientID || !options?.clientSecret) {
       return res.boom.badImplementation(`Missing environment variables for Bitbucket OAuth.`)
     } else {

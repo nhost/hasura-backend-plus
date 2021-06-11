@@ -105,7 +105,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (REGISTRATION.HIBP_ENABLE && (await pwnedPassword(password))) {
+  if (REGISTRATION.HIBP_ENABLED && (await pwnedPassword(password))) {
     throw new Error('Password is too weak.')
   }
 }
@@ -170,7 +170,7 @@ export const accountIsAnonymous = async (user_id: string) => {
 }
 
 export const getGravatarUrl = (email?: string) => {
-  if(APPLICATION.GRAVATAR_ENABLE && email) {
+  if(APPLICATION.GRAVATAR_ENABLED && email) {
     return gravatar.url(email, {
       r: APPLICATION.RATING,
       protocol: 'https',
@@ -182,7 +182,7 @@ export const getGravatarUrl = (email?: string) => {
 export const deanonymizeAccount = async (account: AccountData) => {
   // Gravatar is enabled and anonymous user has not added
   // an avatar yet
-  const useGravatar = APPLICATION.GRAVATAR_ENABLE && !account.user.avatar_url
+  const useGravatar = APPLICATION.GRAVATAR_ENABLED && !account.user.avatar_url
 
   await request(deanonymizeAccountQuery, {
     account_id: account.id,

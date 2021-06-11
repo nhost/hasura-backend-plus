@@ -49,8 +49,8 @@
 
 ## v2.0.0-rc.3
 
-- server: Added S3_SSL_ENABLED env var
-- server: Added AUTH_LOCAL_USERS_ENABLE env variable to enable local (email/pw) users to register and login
+- server: Added S3_SSL_ENABLEDD env var
+- server: Added AUTH_LOCAL_USERS_ENABLED env variable to enable local (email/pw) users to register and login
 - server: Added support for multiple default allowed user roles (#246)
 
 ## v2.0.0-rc.2
