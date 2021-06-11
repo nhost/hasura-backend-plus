@@ -181,6 +181,9 @@ export const magicLinkQuery = Joi.object({
   action: Joi.string().valid('log-in', 'register').required(),
 });
 
+export const whitelistQuery = Joi.object({
+  email: emailRule
+})
 export const providerQuery = Joi.object({
   redirect_url_success: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_SUCCESS),
   redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR)

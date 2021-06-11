@@ -1,6 +1,6 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl } from '@shared/helpers'
+import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl, isAllowedEmail } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
@@ -27,6 +27,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     register_options = {},
     locale
   } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+
+  if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
+    return res.boom.unauthorized('Email not allowed')
+  }
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
