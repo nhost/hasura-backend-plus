@@ -1,6 +1,7 @@
 import { APPLICATION } from '@shared/config'
 import { app } from './server'
 import { applyMigrations } from "./shared/migrations"
+import './env-vars-check'
 import './enabled-deprecation-warning'
 
 const start = async (): Promise<void> => {

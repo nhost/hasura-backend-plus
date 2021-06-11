@@ -9,7 +9,7 @@ import { STORAGE } from '@shared/config'
 const router = Router()
 
 router.use((req, res, next) => {
-  if(!STORAGE.ENABLE) {
+  if(!STORAGE.ENABLED) {
     return res.boom.badImplementation(`Please set the STORAGE_ENABLED env variable to true to use the storage routes.`)
   } else {
     return next();
