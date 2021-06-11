@@ -139,6 +139,7 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
+  locale: localeRuleWithDefault,
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
