@@ -13,7 +13,7 @@ async function magicLink({ query }: Request, res: Response): Promise<unknown> {
   const { token, action } = await magicLinkQuery.validateAsync(query);
 
   let refresh_token = token;
-  if (action === 'sign-up') {
+  if (action === 'register') {
     const new_ticket = uuidv4()
     let hasuraData: UpdateAccountData
     try {
