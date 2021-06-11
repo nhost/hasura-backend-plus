@@ -133,8 +133,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             url: APPLICATION.SERVER_URL,
             locale: account.locale,
             app_url: APPLICATION.APP_URL,
-            action: 'sign up',
-            action_url: 'sign-up'
+            action: 'register',
+            action_url: 'register'
           }
         })
       } catch (err) {
