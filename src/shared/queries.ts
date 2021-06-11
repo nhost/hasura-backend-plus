@@ -446,11 +446,3 @@ export const changeLocaleByUserId = gql`
     }
   }
 `
-
-// export const insertAccountProvider = gql`
-//   mutation($account_id: uuid!, $auth_provider: citext!, $auth_provider_unique_id: citext!) {
-//     insert_auth_account_providers_one(object: { account_id: $account_id, auth_provider: $auth_provider, auth_provider_unique_id: $auth_provider_unique_id }) {
-//       id
-//     }
-//   }
-// `
