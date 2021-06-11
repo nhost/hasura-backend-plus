@@ -7,6 +7,7 @@
 | ^^                                | [POST /auth/logout](#logout)                                   | Logout                                    |
 | ^^                                | [GET /auth/jwks](#jwks)                                        | JWK Set                                   |
 | ^^                                | [POST /auth/activate](#activate-account)                       | Activate account                          |
+| ^^                                | [POST /auth/resend-confirmation](#resend-confirmation)         | Resend Confirmation                       |
 | ^^                                | [POST /auth/delete](#delete-account)                           | Delete account                            |
 | ^^                                | [POST /auth/change-password/](#change-password)                | Change password                           |
 | ^^                                | [POST /auth/change-password/request](#change-password-request) | Request to change password password       |
@@ -149,6 +150,29 @@ Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=fa
 
 ---
 
+### Resend Confirmation
+
+Resend confirmation. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=false` (default `true`).
+
+This can be called when the activate account token has expired and the user needs to request a new one so they can activate their account. This will update the user's token and resend the confirmation email.
+
+#### Request
+
+`POST /auth/resend-confirmation`
+
+```json
+{
+  "email": "hello@example.com"
+}
+```
+
+#### Response
+
+```
+204 No Content
+```
+---
+
 ### Delete Account
 
 Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true` (default `false`).
@@ -164,7 +188,7 @@ Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true`
 #### Response
 
 ```
-204 No Content
+{ jwt_token: null, jwt_expires_in: null, user }
 ```
 
 ---
