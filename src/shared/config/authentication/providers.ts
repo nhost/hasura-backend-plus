@@ -1,4 +1,4 @@
-import { castBooleanEnv } from '../utils'
+import { castBooleanEnv, castStringArrayEnv } from '../utils'
 import { APPLICATION } from '../application'
 
 const PROVIDERS = {
@@ -127,6 +127,9 @@ const PROVIDERS = {
       get clientSecret() {
         return process.env.STRAVA_CLIENT_SECRET || ''
       },
+      get scope() {
+        return castStringArrayEnv('STRAVA_SCOPE', ['profile:read_all'])
+      }
     }
   }
 }
