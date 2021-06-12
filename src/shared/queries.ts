@@ -414,8 +414,8 @@ export const getEmailTemplate = gql`
 `
 
 export const addProviderRequest = gql`
-  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!) {
-    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure } ) {
+  mutation($state: uuid!, $redirect_url_success: String!, $redirect_url_failure: String!, $jwt_token: String) {
+    insert_auth_provider_requests_one(object: { id: $state, redirect_url_success: $redirect_url_success, redirect_url_failure: $redirect_url_failure, jwt_token: $jwt_token } ) {
       id
     }
   }
@@ -425,7 +425,8 @@ export const getProviderRequest = gql`
   query($state: uuid!) {
     auth_provider_requests_by_pk(id: $state) {
       redirect_url_success,
-      redirect_url_failure
+      redirect_url_failure,
+      jwt_token
     }
   }
 `

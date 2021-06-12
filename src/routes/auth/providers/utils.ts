@@ -5,7 +5,7 @@ import { Strategy } from 'passport'
 
 import { APPLICATION, PROVIDERS, REGISTRATION } from '@shared/config'
 import { addProviderRequest, deleteProviderRequest, getProviderRequest, insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
-import { asyncWrapper, selectAccountByEmail, setRefreshToken, getGravatarUrl, isAllowedEmail } from '@shared/helpers'
+import { asyncWrapper, selectAccountByEmail, setRefreshToken, getGravatarUrl, isAllowedEmail, selectAccountByUserId } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
   InsertAccountData,
@@ -14,10 +14,12 @@ import {
   UserData,
   RequestExtended,
   InsertAccountProviderToUser,
-  QueryProviderRequests
+  QueryProviderRequests,
+  PermissionVariables
 } from '@shared/types'
 import { providerCallbackQuery, providerQuery } from '@shared/validation'
 import { v4 as uuidv4 } from 'uuid'
+import { getClaims, getPermissionVariablesFromClaims } from '@shared/jwt'
 
 interface RequestWithState extends Request {
   state: string
@@ -39,12 +41,14 @@ const manageProviderStrategy = (
   provider: string,
   transformProfile: TransformProfileFunction
 ) => async (
-  _req: RequestExtended,
+  _req: RequestExtended & RequestWithState,
   _accessToken: string,
   _refreshToken: string,
   profile: Profile,
   done: VerifyCallback
 ): Promise<void> => {
+    _req.state = _req.query.state as string
+
     // TODO How do we handle REGISTRATION_CUSTOM_FIELDS with OAuth?
 
     // find or create the user
@@ -91,6 +95,39 @@ const manageProviderStrategy = (
     } catch (error) {
       // We were unable to fetch the account
       // noop continue to register user
+    }
+
+    // Check whether logged in user is trying to add a provider
+    const { jwt_token } = await request<QueryProviderRequests>(getProviderRequest, {
+      state: _req.state
+    }).then(query => query.auth_provider_requests_by_pk)
+
+    if(jwt_token) {
+      let permissionVariables: PermissionVariables
+
+      try {
+        permissionVariables = getPermissionVariablesFromClaims(
+          getClaims(jwt_token)
+        )
+      } catch(err) {
+        return done(new Error('Invalid JWT Token'))
+      }
+
+      const account = await selectAccountByUserId(permissionVariables['user-id'])
+
+      const insertAccountProviderToUserData = await request<InsertAccountProviderToUser>(
+        insertAccountProviderToUser,
+        {
+          account_provider: {
+            account_id: account.id,
+            auth_provider: provider,
+            auth_provider_unique_id: id
+          },
+          account_id: account.id
+        }
+      )
+
+      return done(null, insertAccountProviderToUserData.insert_auth_account_providers_one.account)
     }
 
     // register useruser, account, account_provider
@@ -185,7 +222,7 @@ export const initProvider = <T extends Strategy>(
           {
             ...PROVIDERS[strategyName],
             ...options,
-            callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
+            callbackURL: `http://localhost/auth/providers/${strategyName}/callback`,
             passReqToCallback: true
           },
           manageProviderStrategy(strategyName, transformProfile)
@@ -207,12 +244,13 @@ export const initProvider = <T extends Strategy>(
     asyncWrapper(async (req: RequestWithState, res: Response, next: NextFunction) => {
       req.state = uuidv4()
 
-      const { redirect_url_success, redirect_url_failure } = await providerQuery.validateAsync(req.query)
+      const { redirect_url_success, redirect_url_failure, jwt_token } = await providerQuery.validateAsync(req.query)
 
       await request(addProviderRequest, {
         state: req.state,
         redirect_url_success,
-        redirect_url_failure
+        redirect_url_failure,
+        jwt_token
       })
 
       await next()
