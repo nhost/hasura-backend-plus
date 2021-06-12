@@ -71,7 +71,7 @@ const accountFieldsMagicLink = {
   locale: localeRuleWithDefault
 }
 
-export const userDataFields = {
+export const userDataFields = () => ({
   user_data: Joi.object(
     REGISTRATION.CUSTOM_FIELDS.reduce<{ [k: string]: Joi.Schema[] }>(
       (aggr, key) => ({
@@ -91,24 +91,22 @@ export const userDataFields = {
     allowed_roles: Joi.array().items(Joi.string()),
     default_role: Joi.string()
   })
-}
-
-export const registerSchema = Joi.object({
-  ...accountFields,
-  ...userDataFields,
 })
 
-export const registerSchemaMagicLink = Joi.object({
+export const registerSchema = () => Joi.object({
+  ...accountFields,
+  ...userDataFields(),
+})
+
+export const registerSchemaMagicLink = () => Joi.object({
   ...accountFieldsMagicLink,
-  ...userDataFields,
+  ...userDataFields(),
 })
 
 export const deanonymizeSchema = Joi.object({
   email: emailRule,
   password: passwordRuleRequired
 })
-
-export const registerUserDataSchema = Joi.object(userDataFields)
 
 const ticketFields = {
   ticket: Joi.string().uuid({ version: 'uuidv4' }).required()

@@ -26,7 +26,7 @@ const getUserId = (token: string): string => getClaims(token)['x-hasura-user-id'
 export async function withEnv(
   env: Record<string, string>,
   agent: SuperTest<Test>,
-  cb?: () => Promise<any>,
+  cb?: () => Promise<unknown>,
   rollbackEnv?: Record<string, string>
 ) {
   await agent.post('/change-env').send(env)
@@ -43,17 +43,21 @@ export const createAccountLoginData = (): AccountLoginData => ({
 
 export const registerAccount = async (
   agent: SuperTest<Test>,
-  user_data: Record<string, any> = {}
+  user_data: Record<string, unknown> = {}
 ): Promise<AccountLoginData> => {
   const accountLoginData = createAccountLoginData()
 
   const oldAutoActivateNewUsers = await agent
     .get('/env/AUTO_ACTIVATE_NEW_USERS')
     .then((res) => res.text)
+  const customFields = await agent.get('/env/REGISTRATION_CUSTOM_FIELDS').then((res) => res.text)
 
   await withEnv(
     {
-      AUTO_ACTIVATE_NEW_USERS: 'true'
+      AUTO_ACTIVATE_NEW_USERS: 'true',
+      REGISTRATION_CUSTOM_FIELDS: Object.keys(user_data).join(','),
+      JWT_CUSTOM_FIELDS: Object.keys(user_data).join(','),
+      MAGIC_LINK_ENABLED: 'false'
     },
     agent,
     async () => {
@@ -66,7 +70,8 @@ export const registerAccount = async (
         .then((res) => res.body)
     },
     {
-      AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers
+      AUTO_ACTIVATE_NEW_USERS: oldAutoActivateNewUsers,
+      REGISTRATION_CUSTOM_FIELDS: customFields
     }
   )
 

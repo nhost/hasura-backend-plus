@@ -1,8 +1,20 @@
 require('tsconfig-paths/register')
 import { applyMigrations } from '../shared/migrations'
 import { applyMetadata } from '../shared/metadata'
+import { Client } from 'pg'
 
 export default async (): Promise<void> => {
   await applyMigrations()
   await applyMetadata()
+  
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL
+  })
+  try {
+    await client.connect()
+    await client.query(`ALTER TABLE "public"."users" ADD COLUMN IF NOT EXISTS "name" text NULL;
+  INSERT INTO auth.roles (role) VALUES ('editor'), ('super-admin') ON CONFLICT DO NOTHING;;`)
+  } finally {
+    await client.end()
+  }
 }
