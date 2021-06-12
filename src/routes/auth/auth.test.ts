@@ -124,7 +124,8 @@ it('should fail to create account with unallowed role', (done) => {
       password: generateRandomString(),
       // user_data: { name: 'Test name' },
       register_options: {
-        allowed_roles: ['user', 'me', 'super-admin']
+        // allowed_roles: ['user', 'me', 'super-admin']
+        allowed_roles: ['user', 'me']
       }
     })
     .expect(400)
@@ -582,7 +583,6 @@ it('should not be able to deanonymize normal account', (done) => {
 
 it('should log in normally when anonymous login is enabled', (done) => {
   const anonymousRole = 'anonymous'
-
   withEnv(
     {
       ANONYMOUS_USERS_ENABLED: 'true',
