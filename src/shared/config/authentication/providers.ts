@@ -166,6 +166,20 @@ const PROVIDERS = {
         return process.env.BITBUCKET_CLIENT_SECRET || ''
       },
     }
+  },
+
+  get strava() {
+    return !castBooleanEnv('STRAVA_ENABLE') ? null : {
+      get clientID() {
+        return process.env.STRAVA_CLIENT_ID || ''
+      },
+      get clientSecret() {
+        return process.env.STRAVA_CLIENT_SECRET || ''
+      },
+      get scope() {
+        return castStringArrayEnv('STRAVA_SCOPE', ['profile:read_all'])
+      }
+    }
   }
 }
 

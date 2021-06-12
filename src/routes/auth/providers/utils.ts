@@ -61,7 +61,7 @@ const manageProviderStrategy = (
 
     const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
       provider,
-      profile_id: id
+      profile_id: id.toString()
     })
 
     // IF user is already registered
@@ -85,7 +85,7 @@ const manageProviderStrategy = (
           account_provider: {
             account_id: account.id,
             auth_provider: provider,
-            auth_provider_unique_id: id
+            auth_provider_unique_id: id.toString()
           },
           account_id: account.id
         }
@@ -144,7 +144,7 @@ const manageProviderStrategy = (
         data: [
           {
             auth_provider: provider,
-            auth_provider_unique_id: id
+            auth_provider_unique_id: id.toString()
           }
         ]
       }
@@ -190,7 +190,7 @@ const providerCallback = asyncWrapper(async (req: RequestExtended & RequestWithS
 
 export const initProvider = <T extends Strategy>(
   router: Router,
-  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'gitlab' | 'bitbucket',
+  strategyName: 'github' | 'google' | 'facebook' | 'twitter' | 'linkedin' | 'apple' | 'windowslive' | 'spotify' | 'gitlab' | 'bitbucket' | 'strava',
   strategy: Constructable<T>,
   settings: InitProviderSettings & ConstructorParameters<Constructable<T>>[0], // TODO: Strategy option type is not inferred correctly
   middleware?: RequestHandler

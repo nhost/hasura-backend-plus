@@ -38,6 +38,7 @@
   "dependencies": {
     "@hapi/joi": "17.1.1",
     "@nicokaiser/passport-apple": "^0.2.1",
+    "@riderize/passport-strava-oauth2": "^1.1.1",
     "@types/sharp": "^0.27.1",
     "archiver": "4.0.1",
     "aws-sdk": "2.656.0",
