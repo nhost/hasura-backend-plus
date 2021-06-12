@@ -116,7 +116,8 @@ it('should fail to create account with unallowed role', (done) => {
       password: generateRandomString(),
       // user_data: { name: 'Test name' },
       register_options: {
-        allowed_roles: ['user', 'me', 'super-admin']
+        // allowed_roles: ['user', 'me', 'super-admin']
+        allowed_roles: ['user', 'me']
       }
     })
     .expect(400)
@@ -131,7 +132,8 @@ it('should fail to create account with default_role that does not overlap allowe
       password: generateRandomString(),
       // user_data: { name: 'Test name' },
       register_options: {
-        default_role: 'editor',
+        // default_role: 'editor',
+        default_role: 'user',
         allowed_roles: ['user', 'me']
       }
     })
@@ -147,7 +149,8 @@ it('should create account with default_role that is in the ALLOWED_USER_ROLES va
       password: generateRandomString(),
       // user_data: { name: 'Test name' },
       register_options: {
-        default_role: 'editor'
+        default_role: 'user'
+        // default_role: 'editor'
       }
     })
     .expect(200)
@@ -391,7 +394,8 @@ it('should log in anonymously', (done) => {
   withEnv({
     ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
-    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+    // ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+    ALLOWED_USER_ROLES: ['user', 'me', anonymousRole].join(',')
   }, request, async () => {
     request
       .post('/auth/login')
@@ -412,7 +416,8 @@ it('should be able to deanonymize anonymous user', (done) => {
   withEnv({
     ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
-    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
+    ALLOWED_USER_ROLES: ['user', 'me', anonymousRole].join(','),
+    // ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
     AUTO_ACTIVATE_NEW_USERS: 'true'
   }, request, async () => {
     request
@@ -459,7 +464,8 @@ it('should be able to deanonymize anonymous user without auto activation', (done
   withEnv({
     ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
-    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
+    // ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
+    ALLOWED_USER_ROLES: ['user', 'me', anonymousRole].join(','),
     AUTO_ACTIVATE_NEW_USERS: 'false',
     REDIRECT_URL_SUCCESS: '',
     REDIRECT_URL_ERROR: ''
@@ -517,7 +523,8 @@ it('should not be able to deanonymize normal account', (done) => {
   withEnv({
     ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
-    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+    ALLOWED_USER_ROLES: ['user', 'me', anonymousRole].join(',')
+    // ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
   }, request, async () => {
     registerAccount(request).then(({ email, password }) => {
       request
@@ -549,7 +556,8 @@ it('should log in normally when anonymous login is enabled', (done) => {
   withEnv({
     ANONYMOUS_USERS_ENABLED: 'true',
     DEFAULT_ANONYMOUS_ROLE: anonymousRole,
-    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+    // ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+    ALLOWED_USER_ROLES: ['user', 'me', anonymousRole].join(',')
   }, request, async () => {
     registerAccount(request).then(({ email, password }) => {
       request
