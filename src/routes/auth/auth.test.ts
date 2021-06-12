@@ -1,7 +1,7 @@
 import 'jest-extended'
 import { v4 as uuidv4 } from 'uuid'
 
-import { APPLICATION, JWT as CONFIG_JWT, REGISTRATION, HEADERS } from '@shared/config'
+import { APPLICATION, JWT as CONFIG_JWT, HEADERS } from '@shared/config'
 import {
   generateRandomEmail,
   generateRandomString,
@@ -14,7 +14,7 @@ import {
 
 import { JWT } from 'jose'
 import { Token } from '@shared/types'
-import { end, saveJwt, validJwt, validRefreshToken } from '@test/supertest-shared-utils'
+import { end, saveJwt, validJwt } from '@test/supertest-shared-utils'
 
 import { Response } from 'superagent'
 
@@ -28,14 +28,23 @@ function errorMessageEqual(msg: string) {
   }
 }
 
-const pwndPasswordIt = REGISTRATION.HIBP_ENABLE ? it : it.skip
-pwndPasswordIt('should tell the password has been pwned', (done) => {
-  request
-    .post('/auth/register')
-    .send({ email: generateRandomEmail(), password: '123456' })
-    .expect(400)
-    .expect(errorMessageEqual('Password is too weak.'))
-    .end(end(done))
+function isAnonymous() {
+  return (res: Response) => {
+    expect(res.body.user.name).toBeNull()
+  }
+}
+
+it('should tell the password has been pwned', (done) => {
+  withEnv({
+    HIBP_ENABLED: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({ email: generateRandomEmail(), password: '123456' })
+      .expect(400)
+      .expect(errorMessageEqual('Password is too weak.'))
+      .end(end(done))
+  })
 })
 
 it('should create an account', (done) => {
@@ -53,7 +62,7 @@ it('should create an account', (done) => {
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true'
+      MAGIC_LINK_ENABLED: 'true'
     },
     request,
     async () => {
@@ -74,7 +83,7 @@ it('should create an account without a password when magic link login is enabled
       await deleteMailHogEmail(message)
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
     }
@@ -84,7 +93,7 @@ it('should create an account without a password when magic link login is enabled
 it('should not create an account without a password when magic link login is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -177,19 +186,19 @@ it('should tell the account already exists', (done) => {
     })
 })
 
-it('should fail to activate an user from a wrong ticket', async () => {
-  await withEnv(
+it('should fail to activate an user from a wrong ticket', (done) => {
+  withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true'
+      EMAILS_ENABLED: 'true',
+      REDIRECT_URL_ERROR: ''
     },
     request,
     async () => {
-      const { status, redirect, header } = await request.get(`/auth/activate?ticket=${uuidv4()}`)
-      expect(
-        status === 500 ||
-          (status === 302 && redirect && header?.location === APPLICATION.REDIRECT_URL_ERROR)
-      ).toBeTrue()
+      request
+        .get(`/auth/activate?ticket=${uuidv4()}`)
+        .expect(401)
+        .end(end(done))
     }
   )
 })
@@ -198,7 +207,7 @@ it('should activate the account from a valid ticket', async () => {
   await withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true'
+      EMAILS_ENABLED: 'true'
     },
     request,
     async () => {
@@ -255,7 +264,7 @@ it('should sign the user in', (done) => {
 it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true',
+      MAGIC_LINK_ENABLED: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
       VERIFY_EMAILS: 'true'
     },
@@ -275,7 +284,7 @@ it('should sign the user in without password when magic link is enabled', async 
       const token = await getHeaderFromLatestEmailAndDelete(email, 'X-Token')
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
 
@@ -298,7 +307,7 @@ it('should sign the user in without password when magic link is enabled', async 
 it('should not sign the user in without password when magic link is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -322,7 +331,7 @@ it('should sign in user with valid admin secret', (done) => {
   registerAccount(request).then(({ email, password }) => {
     request
       .post('/auth/login')
-      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET as string)
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
       .send({ email, password })
       .expect(200)
       .expect(validJwt())
@@ -352,58 +361,436 @@ it('should decode a valid custom user claim', (done) => {
 })
 
 it('should logout', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request.post('/auth/logout').send().expect(204).end(end(done))
+  registerAndLoginAccount(request).then(({ refresh_token }) => {
+    request
+      .post(`/auth/logout`)
+      .query({ refresh_token })
+      .send()
+      .expect(204)
+      .end(end(done))
+  });
+})
+
+it('should delete an account', (done) => {
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
+    request
+      .post(`/auth/delete`)
+      .set({ Authorization: `Bearer ${jwtToken}` })
+      .expect(204)
+      .end(end(done))
   })
 })
 
-describe('Tests without cookies', () => {
-  it('Should login without cookies', (done) => {
+it('should log in anonymously', (done) => {
+  const anonymousRole = 'anonymous'
+
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'true',
+    DEFAULT_ANONYMOUS_ROLE: anonymousRole,
+    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+  }, request, async () => {
+    request
+      .post('/auth/login')
+      .send({
+        anonymous: true
+      })
+      .expect(200)
+      .expect(validJwt())
+      .expect((isAnonymous()))
+      .end(end(done))
+  })
+})
+
+it('should be able to deanonymize anonymous user', (done) => {
+  const anonymousRole = 'anonymous'
+  let jwtToken = ''
+
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'true',
+    DEFAULT_ANONYMOUS_ROLE: anonymousRole,
+    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
+    AUTO_ACTIVATE_NEW_USERS: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/login')
+      .send({
+        anonymous: true
+      })
+      .expect(200)
+      .expect(validJwt())
+      .expect(saveJwt(j => jwtToken = j))
+      .expect(isAnonymous())
+      .end((err) => {
+        if(err) return done(err)
+
+        const email = generateRandomEmail()
+        const password = generateRandomString()
+
+        request
+          .post('/auth/deanonymize')
+          .set({ Authorization: `Bearer ${jwtToken}` })
+          .send({
+            email,
+            password
+          })
+          .expect(204)
+          .end((err) => {
+            if(err) return done(err)
+
+            request
+              .post('/auth/login')
+              .send({ email, password })
+              .expect(200)
+              .expect(validJwt())
+              .end(end(done))
+          })
+      })
+  })
+})
+
+it('should be able to deanonymize anonymous user without auto activation', (done) => {
+  const anonymousRole = 'anonymous'
+  let jwtToken = ''
+
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'true',
+    DEFAULT_ANONYMOUS_ROLE: anonymousRole,
+    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(','),
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    REDIRECT_URL_SUCCESS: '',
+    REDIRECT_URL_ERROR: ''
+  }, request, async () => {
+    request
+      .post('/auth/login')
+      .send({
+        anonymous: true
+      })
+      .expect(200)
+      .expect(validJwt())
+      .expect(saveJwt(j => jwtToken = j))
+      .expect((isAnonymous()))
+      .end((err) => {
+        if(err) return done(err)
+
+        const email = generateRandomEmail()
+        const password = generateRandomString()
+
+        request
+          .post('/auth/deanonymize')
+          .set({ Authorization: `Bearer ${jwtToken}` })
+          .send({
+            email,
+            password
+          })
+          .expect(204)
+          .end(async (err) => {
+            if(err) return done(err)
+
+            const ticket = await getHeaderFromLatestEmailAndDelete(email, 'X-Ticket')
+
+            request
+              .get(`/auth/activate?ticket=${ticket}`)
+              .expect(200)
+              .end((err) => {
+                if(err) return done(err)
+
+                request
+                  .post('/auth/login')
+                  .send({ email, password })
+                  .expect(200)
+                  .expect(validJwt())
+                  .end(end(done))
+              })
+          })
+      })
+  })
+})
+
+it('should not be able to deanonymize normal account', (done) => {
+  const anonymousRole = 'anonymous'
+  let jwtToken = ''
+
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'true',
+    DEFAULT_ANONYMOUS_ROLE: anonymousRole,
+    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+  }, request, async () => {
     registerAccount(request).then(({ email, password }) => {
       request
         .post('/auth/login')
-        .send({ email, password, cookie: false })
+        .send({ email, password })
         .expect(validJwt())
-        .expect(validRefreshToken())
-        .end(end(done))
-    })
-  })
-
-  it('should decode a valid custom user claim', (done) => {
-    let jwtToken = ''
-
-    registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(validJwt())
-        .expect(validRefreshToken())
-        .expect(saveJwt((j) => (jwtToken = j)))
+        .expect(saveJwt(j => jwtToken = j))
+        .expect(200)
         .end((err) => {
-          if (err) return done(err)
+          if(err) return done(err)
 
-          const decodedJwt = JWT.decode(jwtToken) as Token
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
-          // Test if the custom claims work
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
-
-          done()
+          request
+            .post('/auth/deanonymize')
+            .set({ Authorization: `Bearer ${jwtToken}` })
+            .send({
+              email: generateRandomEmail(),
+              password: generateRandomString()
+            })
+            .expect(401)
+            .end(end(done))
         })
     })
   })
 })
 
-it('should delete an account', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request.post('/auth/delete').expect(204).end(end(done))
+it('should log in normally when anonymous login is enabled', (done) => {
+  const anonymousRole = 'anonymous'
+
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'true',
+    DEFAULT_ANONYMOUS_ROLE: anonymousRole,
+    ALLOWED_USER_ROLES: ['user', 'me', 'editor', anonymousRole].join(',')
+  }, request, async () => {
+    registerAccount(request).then(({ email, password }) => {
+      request
+        .post('/auth/login')
+        .send({ email, password })
+        .expect(validJwt())
+        .expect(200)
+        .end(end(done))
+    })
   })
 })
 
-// test anonymous account
-// const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
-// anonymousAccountIt('should login anonymously', (done) => {
-//   const { body, status } = await request.post('/auth/login').send({ anonymous: true })
-//   expect(status).toEqual(200)
-//   expect(body.jwt_token).toBeString()
-//   expect(body.jwt_expires_in).toBeNumber()
-// })
+it('should not be able to log in anonymously when anonymous login is disabled', (done) => {
+  withEnv({
+    ANONYMOUS_USERS_ENABLED: 'false',
+  }, request, async () => {
+    request
+      .post('/auth/login')
+      .send({
+        anonymous: true
+      })
+      .expect(400)
+      .end(end(done))
+  })
+})
+
+it('should not be able to register with admin only registration', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .expect(401)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
+
+it('should not be able to register with admin only registration with incorrect x-admin-secret', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .set({ 'x-admin-secret': generateRandomString() })
+      .expect(401)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
+
+it('should be able to register with admin only registration with correct x-admin-secret', (done) => {
+  withEnv({
+    ADMIN_ONLY_REGISTRATION: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .set({ 'x-admin-secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET })
+      .expect(200)
+      .end(end(done))
+  }, {
+    ADMIN_ONLY_REGISTRATION: 'false'
+  })
+})
+
+it('should resend the confirmation email after the timeout', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLED: 'true'
+  }, request, async () => {
+    const email = generateRandomEmail()
+    const password = generateRandomString()
+
+    request
+      .post('/auth/register')
+      .send({
+        email,
+        password
+      })
+      .expect(200)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/resend-confirmation')
+          .send({
+            email
+          })
+          .expect(200)
+          .expect(() => {
+            return expect(getHeaderFromLatestEmailAndDelete(email, 'X-Ticket')).resolves.toBeTruthy()
+          })
+          .end(end(done))
+      })
+  })
+})
+
+it('should not resend the confirmation email on an activated account', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLED: 'true'
+  }, request, async () => {
+    registerAccount(request).then(({ email }) => {
+      request
+        .post('/auth/resend-confirmation')
+        .send({
+          email
+        })
+        .expect(400)
+        .end(end(done))
+    })
+  })
+})
+
+it('should not resend the confirmation email on a non-existant account', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '0',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLED: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/resend-confirmation')
+      .send({
+        email: generateRandomEmail()
+      })
+      .expect(400)
+      .end(end(done))
+  })
+})
+
+it('should not resend the confirmation email before the timeout', (done) => {
+  withEnv({
+    CONFIRMATION_RESET_TIMEOUT: '5000',
+    AUTO_ACTIVATE_NEW_USERS: 'false',
+    EMAILS_ENABLED: 'true'
+  }, request, async () => {
+    const email = generateRandomEmail()
+    const password = generateRandomString()
+
+    request
+      .post('/auth/register')
+      .send({
+        email,
+        password
+      })
+      .expect(200)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/resend-confirmation')
+          .send({
+            email
+          })
+          .expect(400)
+          .end(end(done))
+      })
+  })
+})
+
+it('should disable login for arbitrary emails when whitelist is enabled', (done) => {
+  withEnv({
+    WHITELIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .expect(401)
+      .end(end(done))
+  })
+})
+
+it('should enable login for allowed emails when whitelist is enabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    WHITELIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/whitelist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(204)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/register')
+          .send({
+            email,
+            password: generateRandomString()
+          })
+          .expect(200)
+          .end(end(done))
+      })
+  })
+})
+
+it('Should disable the whitelist endpoint when the whitelist is disabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    WHITELIST_ENABLE: 'false'
+  }, request, async () => {
+    request
+      .post('/auth/whitelist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(501)
+      .end(end(done))
+  })
+})
+
+it('should be able to change account locale', (done) => {
+  registerAndLoginAccount(request).then(({ jwtToken }) => {
+    request
+      .post('/auth/change-locale')
+      .set({ Authorization: `Bearer ${jwtToken}` })
+      .send({
+        locale: 'gr'
+      })
+      .expect(204)
+      .end(end(done))
+  })
+})
