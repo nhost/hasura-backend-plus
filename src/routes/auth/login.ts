@@ -19,7 +19,7 @@ interface HasuraData {
 
 async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
   if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
-    const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
+    const { anonymous, locale } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
     if (anonymous) {
@@ -33,6 +33,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
             ticket,
             active: true,
             is_anonymous: true,
+            locale,
             default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
             account_roles: {
               data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]

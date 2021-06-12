@@ -7,6 +7,7 @@ import {
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
   selectAccountByUserId as selectAccountByUserIdQuery,
+  isAllowedEmail as isAllowedEmailQuery,
   updateLastSentConfirmation as updateLastSentConfirmationQuery,
 } from './queries'
 import * as gravatar from 'gravatar'
@@ -15,7 +16,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, RequestExtended } from './types'
+import { AccountData, IsAllowedEmail, QueryAccountData, RequestExtended } from './types'
 
 /**
  * Create QR code.
@@ -208,4 +209,10 @@ export const updateLastSentConfirmation = async (user_id: string): Promise<void>
     user_id,
     last_confirmation_email_sent_at: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
   })
+}
+
+export const isAllowedEmail = async (email: string) => {
+  return request<IsAllowedEmail>(isAllowedEmailQuery, {
+    email
+  }).then(q => !!q.auth_whitelist_by_pk)
 }

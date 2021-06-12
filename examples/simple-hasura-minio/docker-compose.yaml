@@ -24,6 +24,8 @@ services:
     ports:
       - '3000:3000'
     restart: always
+    volumes:
+      - ./custom:/app/custom
     environment:
       SERVER_URL: http://localhost:3000
       HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql

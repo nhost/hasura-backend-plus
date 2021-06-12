@@ -139,6 +139,7 @@ export const logoutSchema = Joi.object({
 export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
+  locale: localeRuleWithDefault,
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
@@ -177,9 +178,12 @@ export const fileMetadataUpdate = Joi.object({
 
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
-  action: Joi.string().valid('log-in', 'sign-up').required(),
+  action: Joi.string().valid('log-in', 'register').required(),
 });
 
+export const whitelistQuery = Joi.object({
+  email: emailRule
+})
 export const providerQuery = Joi.object({
   redirect_url_success: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_SUCCESS),
   redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR),

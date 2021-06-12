@@ -135,7 +135,7 @@ Other email templates are available and described [here](#email-templates)
 
 ### Limit email domains
 
-You can limit registration to ranges of emails that are only part of a whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
+You can limit registration to ranges of emails that are only part of an whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
 
 ```
 ALLOWED_EMAIL_DOMAINS=gmail.com,yourorganisation.com
@@ -422,12 +422,13 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NODE_ENV`                    |         |                                                                                                                                                              |
 | `LOG_LEVEL`                   | INFO    | Piped to the Hasura CLI when applying migrations/metadata. Allowed values [here](https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura.html#options). |
+| `APP_NAME`                    |         | Application's name. Used on emails **Required**                                                                                                              |
 | `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                                                                        |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**.                                                  |
 | `HOST`                        |         | Listening host of the service                                                                                                                                |
 | `PORT`                        | 3000    | Port of the service                                                                                                                                          |
 | `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                                                                              |
-| `APP_URL`                     |         | Current app URL. Currently used only for creating links from email templates                                                                              |
+| `APP_URL`                     |         | Current app URL. Currently used only for creating links from email templates                                                                                 |
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                                                                   |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                                                                  |
 
@@ -468,9 +469,11 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `REGISTRATION_CUSTOM_FIELDS` |                         | Fields that need to be passed on to the registration patload, and that correspond to columns of the `public.users`table.                                                                     |
 | `JWT_CUSTOM_FIELDS`          |                         | List of comma-separated column names from the `public.users` tables that will be added to the `https://hasura.io/jwt/claims`JWT claims. Column names are kebab-cased and prefixed with `x-`. |
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
-| `MFA_ENABLED`                 | false                   |                                                                                                                                                                                              |
-| `USER_IMPERSONATION_ENABLED`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
-| `ENABLE_MAGIC_LINK`          | false                   |
+| `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
+| `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
+| `MAGIC_LINK_ENABLE`          | false                   |
+| `WHITELIST_ENABLE`           | false                   |
+| `WHITELIST_SEND_INVITE`      | false                   |
 | `ADMIN_ONLY_REGISTRATION`    | false                   | Allow registration only with x-admin-secret
 
 ### Gravatar

@@ -136,6 +136,11 @@ export interface SetNewEmailData {
   }
 }
 
+export interface IsAllowedEmail {
+  auth_whitelist_by_pk: {
+    email: string
+  } | null
+}
 export interface QueryEmailTemplate {
   auth_email_templates_by_pk: {
     title: string

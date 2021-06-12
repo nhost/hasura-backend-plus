@@ -100,6 +100,9 @@
           id: user_id
 - table:
     schema: auth
+    name: whitelist
+- table:
+    schema: auth
     name: email_templates
 - table:
     schema: auth

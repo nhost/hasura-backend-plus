@@ -376,6 +376,14 @@ export const selectAccountProvider = gql`
   ${accountFragment}
 `
 
+export const isAllowedEmail = gql`
+  query($email: String!) {
+    auth_whitelist_by_pk(email: $email) {
+      email
+    }
+  }
+`
+
 export const updateLastSentConfirmation = gql`
   mutation($user_id: uuid!, $last_confirmation_email_sent_at: timestamptz!) {
     update_auth_accounts(
@@ -383,6 +391,14 @@ export const updateLastSentConfirmation = gql`
       _set: { last_confirmation_email_sent_at: $last_confirmation_email_sent_at }
     ) {
       affected_rows
+    }
+  }
+`
+
+export const insertAllowedEmail = gql`
+  mutation($email: String!) {
+    insert_auth_whitelist_one(object: { email: $email }) {
+      email
     }
   }
 `

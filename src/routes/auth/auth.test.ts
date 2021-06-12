@@ -83,7 +83,7 @@ it('should create an account without a password when magic link login is enabled
       await deleteMailHogEmail(message)
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
     }
@@ -284,7 +284,7 @@ it('should sign the user in without password when magic link is enabled', async 
       const token = await getHeaderFromLatestEmailAndDelete(email, 'X-Token')
 
       {
-        const { status } = await request.get(`/auth/magic-link?action=sign-up&token=${token}`)
+        const { status } = await request.get(`/auth/magic-link?action=register&token=${token}`)
         expect(status).toBe(302)
       }
 
@@ -331,7 +331,7 @@ it('should sign in user with valid admin secret', (done) => {
   registerAccount(request).then(({ email, password }) => {
     request
       .post('/auth/login')
-      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET as string)
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
       .send({ email, password })
       .expect(200)
       .expect(validJwt())
@@ -719,6 +719,66 @@ it('should not resend the confirmation email before the timeout', (done) => {
           .expect(400)
           .end(end(done))
       })
+  })
+})
+
+it('should disable login for arbitrary emails when whitelist is enabled', (done) => {
+  withEnv({
+    WHITELIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/register')
+      .send({
+        email: generateRandomEmail(),
+        password: generateRandomString()
+      })
+      .expect(401)
+      .end(end(done))
+  })
+})
+
+it('should enable login for allowed emails when whitelist is enabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    WHITELIST_ENABLE: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/whitelist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(204)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/register')
+          .send({
+            email,
+            password: generateRandomString()
+          })
+          .expect(200)
+          .end(end(done))
+      })
+  })
+})
+
+it('Should disable the whitelist endpoint when the whitelist is disabled', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    WHITELIST_ENABLE: 'false'
+  }, request, async () => {
+    request
+      .post('/auth/whitelist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email
+      })
+      .expect(501)
+      .end(end(done))
   })
 })
 
