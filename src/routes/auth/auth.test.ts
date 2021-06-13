@@ -232,6 +232,7 @@ it('should activate the account from a valid ticket', async () => {
   await withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
+      VERIFY_EMAILS: 'true',
       EMAILS_ENABLED: 'true'
     },
     request,
@@ -248,6 +249,7 @@ it('should activate the account from a valid ticket', async () => {
     },
     {
       AUTO_ACTIVATE_NEW_USERS: 'true',
+      VERIFY_EMAILS: 'false',
       EMAILS_ENABLED: 'false'
     }
   )
