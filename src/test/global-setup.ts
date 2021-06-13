@@ -5,8 +5,7 @@ import { Client } from 'pg'
 
 export default async (): Promise<void> => {
   await applyMigrations()
-  await applyMetadata()
-  
+
   const client = new Client({
     connectionString: process.env.DATABASE_URL
   })
@@ -17,4 +16,5 @@ export default async (): Promise<void> => {
   } finally {
     await client.end()
   }
+  await applyMetadata()
 }
