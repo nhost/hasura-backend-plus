@@ -8,6 +8,7 @@ import apple from './apple'
 import windowslive from './windowslive'
 import linkedin from './linkedin'
 import spotify from './spotify'
+import strava from './strava'
 import gitlab from './gitlab'
 import bitbucket from './bitbucket'
 
@@ -21,6 +22,7 @@ apple(router)
 windowslive(router)
 linkedin(router)
 spotify(router)
+strava(router)
 gitlab(router)
 bitbucket(router)
 

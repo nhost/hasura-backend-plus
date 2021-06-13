@@ -436,16 +436,16 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 
 | Name                         | Default                 | Description                                                                                                                                                                                  |
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_LOCAL_USERS_ENABLED`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
-| `ANONYMOUS_USERS_ENABLED`     | false                   |                                                                                                                                                                                              |
+| `AUTH_LOCAL_USERS_ENABLED`   | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
+| `ANONYMOUS_USERS_ENABLED`    | false                   |                                                                                                                                                                                              |
 | `DEFAULT_ANONYMOUS_ROLE`     |                         |                                                                                                                                                                                              |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
-| `CHANGE_EMAIL_ENABLED`        |                         |                                                                                                                                                                                              |
+| `CHANGE_EMAIL_ENABLED`       |                         |                                                                                                                                                                                              |
 | `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
 | `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of default allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                          |
 | `ALLOWED_USER_ROLES`         | user                    | Comma spearated list of allowed roles users can specify on registration. Defaults to DEFAULT_ALLOWED_USER_ROLES.                                                                             |
-| `HIBP_ENABLED`                | false                   |                                                                                                                                                                                              |
+| `HIBP_ENABLED`               | false                   |                                                                                                                                                                                              |
 | `JWT_ALGORITHM`              | RS256                   | Valid values: RS256, RS384, RS512, HS256, HS384, HS512                                                                                                                                       |
 | `JWT_KEY`                    |                         | Encryption secret. Required when using a SHA (RS*) algorithm. When using a RSA algorithm (RS*), should contain a valid RSA PEM key, otherwise `JWT_KEY_FILE_PATH` will be used.              |
 | `JWT_EXPIRES_IN`             | 15                      |                                                                                                                                                                                              |
@@ -456,7 +456,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
 | `VERIFY_EMAILS`              | false                   | Enable verification emails                                                                                                                                                                   |
 | `JWT_REFRESH_EXPIRES_IN`     | 43200                   |                                                                                                                                                                                              |
-| `EMAILS_ENABLED`              | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
+| `EMAILS_ENABLED`             | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
 | `EMAILS_DEFAULT_LOCALE`      | en                      |
 | `SMTP_HOST`                  |                         | SMTP server path to use for sending emails.                                                                                                                                                  |
 | `SMTP_PASS`                  |                         | Password to authenticate on the SMTP server.                                                                                                                                                 |
@@ -480,7 +480,7 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 
 | Name                         | Default | Description |
 | ---------------------------- | ------- | ----------- |
-| `GRAVATER_ENABLED`            | true    |             |
+| `GRAVATER_ENABLED`           | true    |             |
 | `GRAVATAR_DEFAULT`           | blank   |             |
 | `GRAVATAR_RATING`            | g       |             |
 
@@ -490,51 +490,54 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | ---------------------------- | ------------------------------------- | ----------- |
 | `PROVIDER_SUCCESS_REDIRECT`  |                                       |             |
 | `PROVIDER_FAILURE_REDIRECT`  |                                       |             |
-| `GOOGLE_ENABLED`              | false                                 |             |
+| `GOOGLE_ENABLED`             | false                                 |             |
 | `GOOGLE_CLIENT_ID`           |                                       |             |
 | `GOOGLE_CLIENT_SECRET`       |                                       |             |
 | `GOOGLE_SCOPE`               | email,profile                         |             |
-| `FACEBOOK_ENABLED`            | false                                 |             |
+| `FACEBOOK_ENABLED`           | false                                 |             |
 | `FACEBOOK_CLIENT_ID`         |                                       |             |
 | `FACEBOOK_CLIENT_SECRET`     |                                       |             |
 | `FACEBOOK_PROFILE_FIELDS`    | email,photos,displayName              |             |
-| `TWITTER_ENABLED`             | false                                 |             |
+| `TWITTER_ENABLED`            | false                                 |             |
 | `TWITTER_CONSUMER_KEY`       |                                       |             |
 | `TWITTER_CONSUMER_SECRET`    |                                       |             |
-| `LINKEDIN_ENABLED`            | false                                 |             |
+| `LINKEDIN_ENABLED`           | false                                 |             |
 | `LINKEDIN_CLIENT_ID`         |                                       |             |
 | `LINKEDIN_CLIENT_SECRET`     |                                       |             |
 | `LINKEDIN_SCOPE`             | r_emailaddress,r_liteprofile          |             |
-| `APPLE_ENABLED`               | false                                 |             |
+| `APPLE_ENABLED`              | false                                 |             |
 | `APPLE_CLIENT_ID`            |                                       |             |
 | `APPLE_KEY_ID`               |                                       |             |
 | `APPLE_PRIVATE_KEY`          |                                       |             |
 | `APPLE_TEAM_ID`              |                                       |             |
 | `APPLE_SCOPE`                | name,email                            |             |
-| `GITHUB_ENABLED`              | false                                 |             |
+| `GITHUB_ENABLED`             | false                                 |             |
 | `GITHUB_AUTHORIZATION_URL`   |                                       |             |
 | `GITHUB_CLIENT_ID`           |                                       |             |
 | `GITHUB_CLIENT_SECRET`       |                                       |             |
 | `GITHUB_TOKEN_URL`           |                                       |             |
 | `GITHUB_USER_PROFILE_URL`    |                                       |             |
 | `GITHUB_SCOPE`               | user:email                            |             |
-| `WINDOWS_LIVE_ENABLED`        | false                                 |             |
+| `WINDOWS_LIVE_ENABLED`       | false                                 |             |
 | `WINDOWS_LIVE_CLIENT_ID`     |                                       |             |
 | `WINDOWS_LIVE_CLIENT_SECRET` |                                       |             |
 | `WINDOWS_LIVE_SCOPE`         | wl.basic,wl.emails,wl.contacts_emails |             |
-| `SPOTIFY_ENABLED`             | false                                 |             |
+| `SPOTIFY_ENABLED`            | false                                 |             |
 | `SPOTIFY_CLIENT_ID`          |                                       |             |
 | `SPOTIFY_CLIENT_SECRET`      |                                       |             |
 | `SPOTIFY_SCOPE`              | user-read-email,user-read-private     |             |
-| `GITLAB_ENABLED`              | false                                 |             |
+| `GITLAB_ENABLED`             | false                                 |             |
 | `GITLAB_CLIENT_ID`           |                                       |             |
 | `GITLAB_CLIENT_SECRET`       |                                       |             |
 | `GITLAB_BASE_URL`            |                                       |             |
 | `GITLAB_SCOPE`               | read_user                             |             |
-| `BITBUCKET_ENABLED`           | false                                 |             |
+| `BITBUCKET_ENABLED`          | false                                 |             |
 | `BITBUCKET_CLIENT_ID`        |                                       |             |
 | `BITBUCKET_CLIENT_SECRET`    |                                       |             |
-
+| `STRAVA_ENABLE`              | false                                 |             |
+| `STRAVA_CLIENT_ID`           |                                       |             |
+| `STRAVA_CLIENT_SECRET`       |                                       |             |
+| `STRAVA_SCOPE`               | profile:read_all                      |             |
 ### Storage
 
 | Name                   | Default | Description |
@@ -543,6 +546,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `S3_BUCKET`            |         |             |
 | `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
-| `S3_SSL_ENABLEDD`       | true    |             |
+| `S3_SSL_ENABLEDD`      | true    |             |
 | `OBJECT_PREFIX`        | /o      |             |
 | `META_PREFIX`          | /m      |             |

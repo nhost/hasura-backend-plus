@@ -3,7 +3,7 @@ import { JWK, JWKS, JWT } from 'jose'
 
 import fs from 'fs'
 import kebabCase from 'lodash.kebabcase'
-import { Claims, Token, AccountData, ClaimValueType } from './types'
+import { Claims, Token, AccountData, ClaimValueType, PermissionVariables } from './types'
 
 const RSA_TYPES = ['RS256', 'RS384', 'RS512']
 const SHA_TYPES = ['HS256', 'HS384', 'HS512']
@@ -134,6 +134,16 @@ export const getClaims = (authorization: string | undefined): Claims => {
   } catch (err) {
     throw new Error('Invalid or expired JWT token.')
   }
+}
+
+export const getPermissionVariablesFromClaims = (claims: Claims): PermissionVariables => {
+  // remove `x-hasura-` from claim props
+  const claims_sanatized: { [k: string]: any } = {}
+  for (const claimKey in claims) {
+    claims_sanatized[claimKey.replace('x-hasura-', '') as string] = claims[claimKey]
+  }
+
+  return claims_sanatized as PermissionVariables
 }
 
 /**
