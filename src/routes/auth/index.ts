@@ -13,14 +13,18 @@ import activateAccount from './activate'
 import deleteAccount from './delete'
 import magicLink from './magic-link'
 import { AUTHENTICATION } from '@shared/config'
+import whitelist from './whitelist'
+import resendConfirmation from './resend-confirmation'
+import deanonymize from './deanonymize'
+import changeLocale from './change-locale'
 
 const router = Router()
 
 router.use(nocache())
 
 router.use((req, res, next) => {
-  if (!AUTHENTICATION.ENABLE) {
-    return res.boom.badImplementation(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+  if (!AUTHENTICATION.ENABLED) {
+    return res.boom.badImplementation(`Please set the AUTH_ENABLED env variable to true to use the auth routes.`)
   } else {
     return next();
   }
@@ -38,6 +42,10 @@ changePassword(router)
 getJwks(router)
 token(router)
 magicLink(router)
+whitelist(router)
+resendConfirmation(router)
+deanonymize(router)
+changeLocale(router)
 
 export default (parentRouter: Router) => {
   parentRouter.use('/auth', router)

@@ -7,6 +7,7 @@
 | ^^                                | [POST /auth/logout](#logout)                                   | Logout                                    |
 | ^^                                | [GET /auth/jwks](#jwks)                                        | JWK Set                                   |
 | ^^                                | [POST /auth/activate](#activate-account)                       | Activate account                          |
+| ^^                                | [POST /auth/resend-confirmation](#resend-confirmation)         | Resend Confirmation                       |
 | ^^                                | [POST /auth/delete](#delete-account)                           | Delete account                            |
 | ^^                                | [POST /auth/change-password/](#change-password)                | Change password                           |
 | ^^                                | [POST /auth/change-password/request](#change-password-request) | Request to change password password       |
@@ -69,11 +70,6 @@ Login an account.
 ```
 
 #### Response
-
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
 
 ```json
 {
@@ -154,6 +150,27 @@ Activate account. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=fa
 
 ---
 
+### Resend Confirmation
+
+Resend confirmation. This endpoint is active if env var `AUTO_ACTIVATE_NEW_USERS=false` (default `true`).
+
+This can be called when the activate account token has expired and the user needs to request a new one so they can activate their account. This will update the user's token and resend the confirmation email.
+
+#### Request
+
+`POST /auth/resend-confirmation`
+
+```json
+{ "email": "hello@example.com" }
+```
+
+#### Response
+
+```json
+{ jwt_token: null, jwt_expires_in: null, user }
+```
+---
+
 ### Delete Account
 
 Delete account. This endpoint is active if env var `ALLOW_USER_SELF_DELETE=true` (default `false`).
@@ -199,7 +216,7 @@ Change password of an account. The account must be logged in for this endpoint t
 
 ### Change Password Request
 
-Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Request to change password. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 ::: warning
 This endpoint will always return HTTP status code 204 in order to not leak information about the database.
@@ -223,7 +240,7 @@ This endpoint will always return HTTP status code 204 in order to not leak infor
 
 ### Change Password Change
 
-Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLE=true`.
+Change password based on a ticket. This endpoint is active if env var `LOST_PASSWORD_ENABLED=true`.
 
 #### Request
 
@@ -306,23 +323,13 @@ Change email to the new email that you specified in [Change Email Request](#chan
 
 ### Refresh token
 
-Get new refresh token. The browser will send the cookie automatically.
+Get new refresh token.
 
 #### Request
 
 `GET /auth/token/refresh`
 
-```
-Cookie: refresh_token=...
-Cookie: permission_variables=...
-```
-
 #### Response
-
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
 
 ```json
 {
@@ -340,11 +347,6 @@ Revoke a refresh token.
 #### Request
 
 `POST /auth/token/revoke/`
-
-```
-Cookie: refresh_token=...
-Cookie: permission_variables=...
-```
 
 #### Response
 
@@ -429,11 +431,6 @@ Time-based One-time Password. Use the `ticket` from [Login](#login) that is retu
 ```
 
 #### Response
-
-```
-Set-Cookie: refresh_token=...
-Set-Cookie: permission_variables=...
-```
 
 ```json
 {

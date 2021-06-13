@@ -1,18 +1,22 @@
-import { COOKIES, REGISTRATION } from './config'
+import { APPLICATION, JWT, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
+  deanonymizeAccount as deanonymizeAccountQuery,
+  insertRefreshToken,
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  isAllowedEmail as isAllowedEmailQuery,
+  updateLastSentConfirmation as updateLastSentConfirmationQuery,
 } from './queries'
-
+import * as gravatar from 'gravatar'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
+import { AccountData, IsAllowedEmail, QueryAccountData, RequestExtended } from './types'
 
 /**
  * Create QR code.
@@ -98,7 +102,7 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @param password Password to check.
  */
 export const checkHibp = async (password: string): Promise<void> => {
-  if (REGISTRATION.HIBP_ENABLE && (await pwnedPassword(password))) {
+  if (REGISTRATION.HIBP_ENABLED && (await pwnedPassword(password))) {
     throw new Error('Password is too weak.')
   }
 }
@@ -113,20 +117,99 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
   return new_ticket
 }
 
-export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {
-  const { permission_variables } = COOKIES.SECRET ? req.signedCookies : req.cookies
-  if (!permission_variables) throw new Error('No permission variables')
-  return JSON.parse(permission_variables)
+export function newRefreshExpiry(): number {
+  const now = new Date()
+  // 1 day = 1440 minutes
+  const days = JWT.REFRESH_EXPIRES_IN / 1440
+
+  return now.setDate(now.getDate() + days)
 }
 
-export const accountExists = async (email: string) => {
-  let account_exists = true
+interface InsertRefreshTokenData {
+  insert_auth_refresh_tokens_one: {
+    account: AccountData
+  }
+}
 
+export const setRefreshToken = async (
+  accountId: string,
+  refresh_token = uuidv4()
+): Promise<string> => {
+
+  await request<InsertRefreshTokenData>(insertRefreshToken, {
+    refresh_token_data: {
+      account_id: accountId,
+      refresh_token,
+      expires_at: new Date(newRefreshExpiry())
+    }
+  })
+
+  return refresh_token
+}
+
+export const accountWithEmailExists = async (email: string) => {
+  let account_exists = true
   try {
     await selectAccountByEmail(email)
+    // Account using email already exists - pass
   } catch {
+    // No existing account is using the email address. Good!
     account_exists = false
   }
 
   return account_exists
+}
+
+export const accountIsAnonymous = async (user_id: string) => {
+  const account = await selectAccountByUserId(user_id)
+
+  return account.is_anonymous
+}
+
+export const getGravatarUrl = (email?: string) => {
+  if(APPLICATION.GRAVATAR_ENABLED && email) {
+    return gravatar.url(email, {
+      r: APPLICATION.RATING,
+      protocol: 'https',
+      default: APPLICATION.GRAVATAR_DEFAULT
+    })
+  }
+}
+
+export const deanonymizeAccount = async (account: AccountData) => {
+  // Gravatar is enabled and anonymous user has not added
+  // an avatar yet
+  const useGravatar = APPLICATION.GRAVATAR_ENABLED && !account.user.avatar_url
+
+  await request(deanonymizeAccountQuery, {
+    account_id: account.id,
+    account: {
+      default_role: REGISTRATION.DEFAULT_USER_ROLE,
+      active: true
+    },
+    ...(useGravatar && {
+      user_id: account.user.id,
+      user: {
+        avatar_url: getGravatarUrl(account.email)
+      }
+    }),
+    roles: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map(role => ({
+      account_id: account.id,
+      created_at: new Date(),
+      role
+    }))
+  })
+}
+
+export const updateLastSentConfirmation = async (user_id: string): Promise<void> => {
+  await request(updateLastSentConfirmationQuery, {
+    user_id,
+    last_confirmation_email_sent_at: new Date(+Date.now() + REGISTRATION.CONFIRMATION_RESET_TIMEOUT)
+  })
+}
+
+export const isAllowedEmail = async (email: string) => {
+  return request<IsAllowedEmail>(isAllowedEmailQuery, {
+    email
+  }).then(q => !!q.auth_whitelist_by_pk)
 }

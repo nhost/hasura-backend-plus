@@ -1,8 +1,10 @@
-import { REGISTRATION } from './config'
+import { APPLICATION, REGISTRATION } from './config'
 import Joi from 'joi'
+import compareUrls from 'compare-urls'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
+  allowedRedirectUrls(): this
 }
 
 interface ExtendedJoi extends Joi.Root {
@@ -13,7 +15,8 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
   type: 'string',
   base: joi.string(),
   messages: {
-    'string.allowedDomains': '{{#label}} is not in an authorised domain'
+    'string.allowedDomains': '{{#label}} is not in an authorised domain',
+    'string.allowedRedirectUrls': '{{#label}} is not an authorised redirect url'
   },
   rules: {
     allowedDomains: {
@@ -32,6 +35,18 @@ const extendedJoi: ExtendedJoi = Joi.extend((joi) => ({
 
         return value
       }
+    },
+    allowedRedirectUrls: {
+      method(): unknown {
+        return this.$_addRule({ name: 'allowedRedirectUrls' })
+      },
+      validate(value: string, helpers): unknown {
+        if(APPLICATION.ALLOWED_REDIRECT_URLS.some(allowedUrl => compareUrls(value, allowedUrl))) {
+          return value
+        } else {
+          return helpers.error('string.allowedRedirectUrls')
+        }
+      }
     }
   }
 }))
@@ -41,9 +56,13 @@ const passwordRuleRequired = passwordRule.required();
 
 const emailRule = extendedJoi.string().email().required().allowedDomains()
 
+const localeRule = Joi.string().length(2)
+const localeRuleWithDefault = localeRule.default(APPLICATION.EMAILS_DEFAULT_LOCALE)
+
 const accountFields = {
   email: emailRule,
-  password: passwordRuleRequired
+  password: passwordRuleRequired,
+  locale: localeRuleWithDefault
 }
 
 type AccountFields = {
@@ -53,7 +72,8 @@ type AccountFields = {
 
 const accountFieldsMagicLink = {
   email: emailRule,
-  password: passwordRule
+  password: passwordRule,
+  locale: localeRuleWithDefault
 }
 
 type AccountFieldsMagicLink = {
@@ -94,21 +114,25 @@ export type UserDataFields = {
 export const registerSchema = Joi.object({
   ...accountFields,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
-export type RegisterSchema = AccountFields & UserDataFields & {
-  cookie?: boolean
-}
+export type RegisterSchema = AccountFields & UserDataFields
 
 export const registerSchemaMagicLink = Joi.object({
   ...accountFieldsMagicLink,
   ...userDataFields,
-  cookie: Joi.boolean()
 })
 
-export type RegisterSchemaMagicLink = AccountFieldsMagicLink & UserDataFields & {
-  cookie?: boolean
+export type RegisterSchemaMagicLink = AccountFieldsMagicLink & UserDataFields
+
+export const deanonymizeSchema = Joi.object({
+  email: emailRule,
+  password: passwordRuleRequired
+})
+
+export type DeanonymizeSchema = {
+  email: string,
+  password: string
 }
 
 export const registerUserDataSchema = Joi.object(userDataFields)
@@ -172,6 +196,7 @@ export type MfaSchema = CodeFields
 
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
+  locale: localeRuleWithDefault,
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
@@ -195,25 +220,21 @@ export type MagicLinkLoginAnonymouslySchema = {
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
-  cookie: Joi.boolean()
 })
 
 export type LoginSchema = {
   email: string
   password: string
-  cookie?: boolean
 }
 
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
-  cookie: Joi.boolean()
 })
 
 export type LoginSchemaMagicLink = {
   email: string
   password?: string
-  cookie?: boolean
 }
 
 export const forgotSchema = Joi.object({ email: emailRule })
@@ -229,12 +250,9 @@ export type VerifySchema = TicketFields
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
-  cookie: Joi.boolean()
 })
 
-export type TotpSchema = CodeFields & TicketFields & {
-  cookie?: boolean
-}
+export type TotpSchema = CodeFields & TicketFields
 
 export const imgTransformParams = Joi.object({
   w: Joi.number().integer().min(0).max(8192),
@@ -265,12 +283,55 @@ export type FileMetadataUpdate = {
 
 export const magicLinkQuery = Joi.object({
   token: Joi.string().required(),
-  action: Joi.string().valid('log-in', 'sign-up').required(),
-  cookie: Joi.boolean().optional(),
+  action: Joi.string().valid('log-in', 'register').required(),
 });
 
 export type MagicLinkQuery = {
   token: string
   action: string
-  cookie?: boolean
+}
+
+export const whitelistQuery = Joi.object({
+  email: emailRule
+})
+
+export type WhitelistQuery = {
+  email: string
+}
+
+export const providerQuery = Joi.object({
+  redirect_url_success: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_SUCCESS),
+  redirect_url_failure: extendedJoi.string().allowedRedirectUrls().default(APPLICATION.REDIRECT_URL_ERROR),
+  jwt_token: Joi.string()
+});
+
+export type ProviderQuery = {
+  redirect_url_success?: string
+  redirect_url_failure?: string
+  jwt_token?: string
+}
+
+export const providerCallbackQuery = Joi.object({
+  state: Joi.string().uuid().required()
+}).unknown(true)
+
+export type ProviderCallbackQuery = {
+  state: string
+  [key: string]: any
+}
+
+export const localeQuery = Joi.object({
+  locale: localeRuleWithDefault
+})
+
+export type LocaleQuery = {
+  locale: string
+}
+
+export const resendConfirmationSchema = Joi.object({
+  email: emailRule
+})
+
+export type ResendConfirmationSchema = {
+  email: string
 }

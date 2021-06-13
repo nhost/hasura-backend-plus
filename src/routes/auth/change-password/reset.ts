@@ -13,7 +13,7 @@ import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express
  * Reset the password, either from a valid ticket or from a valid JWT and a valid password
  */
 async function resetPassword(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
-  if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
+  if(!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
     return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/change route.`)
   }
 

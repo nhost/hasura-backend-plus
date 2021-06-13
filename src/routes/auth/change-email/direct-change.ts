@@ -6,7 +6,7 @@ import { RequestExtended } from '@shared/types'
 import { AUTHENTICATION } from '@shared/config'
 import { ContainerTypes, createValidator, ValidatedRequestSchema } from 'express-joi-validation'
 import { emailResetSchema, EmailResetSchema } from '@shared/validation'
-import { accountExists, asyncWrapper } from '@shared/helpers'
+import { accountWithEmailExists, asyncWrapper } from '@shared/helpers'
 
 async function directChange(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if(AUTHENTICATION.VERIFY_EMAILS) {
@@ -17,7 +17,7 @@ async function directChange(req: RequestExtended<Schema>, res: Response): Promis
 
   const new_email = req.body.new_email
 
-  if(await accountExists(new_email)) {
+  if(await accountWithEmailExists(new_email)) {
     return res.boom.badRequest('Cannot use this email')
   }
 

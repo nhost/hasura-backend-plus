@@ -15,12 +15,12 @@ import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedReque
  * Always return status code 204 in order to not leak information about emails in the database
  */
 async function requestChangePassword({ body }: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
-  if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
+  if(!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
     return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
   }
 
   // smtp must be enabled for request change password to work.
-  if (!APPLICATION.EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLED) {
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -71,6 +71,8 @@ async function requestChangePassword({ body }: ValidatedRequest<Schema>, res: Re
       locals: {
         ticket,
         url: APPLICATION.SERVER_URL,
+        locale: account.locale,
+        app_url: APPLICATION.APP_URL,
         display_name: account.user.display_name
       },
       message: {

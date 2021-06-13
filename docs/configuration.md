@@ -2,7 +2,7 @@
 
 ## General
 
-<!-- TODO AUTH_ENABLE and STORAGE_ENABLE -->
+<!-- TODO AUTH_ENABLED and STORAGE_ENABLED -->
 <!-- TODO SERVER_URL, HOST, PORT -->
 <!-- TODO REDIRECT_URL_SUCCESS, REDIRECT_URL_ERROR -->
 
@@ -135,7 +135,7 @@ Other email templates are available and described [here](#email-templates)
 
 ### Limit email domains
 
-You can limit registration to ranges of emails that are only part of a whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
+You can limit registration to ranges of emails that are only part of an whitelist. For instance, you may want to limit registration only to the email addresses of your own organisation. You can pass a list of comma-separated email domains to the `ALLOWED_EMAIL_DOMAINS` environment variable, for instance:
 
 ```
 ALLOWED_EMAIL_DOMAINS=gmail.com,yourorganisation.com
@@ -152,7 +152,7 @@ MIN_PASSWORD_LENGTH=6
 You can ask HBP to check on [Have I Been Pwned](https://haveibeenpwned.com/Passwords) if the password has been previously exposed in data breaches. If so, the registration will fail. This option is disabled by default. You can change it to:
 
 ```
-HIBP_ENABLE=true
+HIBP_ENABLED=true
 ```
 
 ### Additional registration fields
@@ -311,9 +311,9 @@ paths:
 
 > It is not possible to call storage functions inside other functions
 
-Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
 
-You can have a look at the permission variables by examining the `permission_variables` cookie. This is a URL-encoded string, in the following template:
+You can have a look at the permission variables by examining the `permission_variables`. This is a URL-encoded string, in the following template:
 
 ```txt
 s:<request.auth>.<checksum>
@@ -402,7 +402,7 @@ paths:
 ```
 
 How does this work? The `:companyId` path creates a variable called `companyId`, which can be passed into a function.
-This gets passed into the `employedBy()` function, (called `companyId`), and can be compared to `request.auth['company-id']` from the `permission_variables` cookie.
+This gets passed into the `employedBy()` function, (called `companyId`), and can be compared to `request.auth['company-id']` from the `permission_variables`.
 
 ### Email templates
 
@@ -422,11 +422,13 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `NODE_ENV`                    |         |                                                                                                                                                              |
 | `LOG_LEVEL`                   | INFO    | Piped to the Hasura CLI when applying migrations/metadata. Allowed values [here](https://hasura.io/docs/latest/graphql/core/hasura-cli/hasura.html#options). |
+| `APP_NAME`                    |         | Application's name. Used on emails **Required**                                                                                                              |
 | `HASURA_ENDPOINT` (required)  |         | Url of the Hasura GraphQL engine endpoint used by the backend to access the database.                                                                        |
 | `HASURA_GRAPHQL_ADMIN_SECRET` |         | The secret set in the Hasura GraphQL Engine to allow admin access to the service. **Strongly recommended**.                                                  |
 | `HOST`                        |         | Listening host of the service                                                                                                                                |
 | `PORT`                        | 3000    | Port of the service                                                                                                                                          |
 | `SERVER_URL`                  |         | Current server URL. Currently used only for creating links from email templates                                                                              |
+| `APP_URL`                     |         | Current app URL. Currently used only for creating links from email templates                                                                                 |
 | `MAX_REQUESTS`                | 100     | Maximum requests per IP within the following `TIME_FRAME`.                                                                                                   |
 | `TIME_FRAME`                  | 900000  | Timeframe used to limit requests from the same IP, in milliseconds. Defaults to 15 minutes.                                                                  |
 
@@ -434,19 +436,16 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 
 | Name                         | Default                 | Description                                                                                                                                                                                  |
 | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_LOCAL_USERS_ENABLE`    | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
-| `ANONYMOUS_USERS_ENABLE`     | false                   |                                                                                                                                                                                              |
+| `AUTH_LOCAL_USERS_ENABLED`   | true                    | Enable local users (email/pw) to register and login                                                                                                                                          |
+| `ANONYMOUS_USERS_ENABLED`    | false                   |                                                                                                                                                                                              |
 | `DEFAULT_ANONYMOUS_ROLE`     |                         |                                                                                                                                                                                              |
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
-| `CHANGE_EMAIL_ENABLE`        |                         |                                                                                                                                                                                              |
+| `CHANGE_EMAIL_ENABLED`       |                         |                                                                                                                                                                                              |
 | `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
-| `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
-| `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
-| `COOKIE_SAME_SITE`           | lax                     | SameSite cookie attribute. Accepts true, false, lax, none or strict. If none of these values it will be set to 'lax'                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
 | `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of default allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                          |
 | `ALLOWED_USER_ROLES`         | user                    | Comma spearated list of allowed roles users can specify on registration. Defaults to DEFAULT_ALLOWED_USER_ROLES.                                                                             |
-| `HIBP_ENABLE`                | false                   |                                                                                                                                                                                              |
+| `HIBP_ENABLED`               | false                   |                                                                                                                                                                                              |
 | `JWT_ALGORITHM`              | RS256                   | Valid values: RS256, RS384, RS512, HS256, HS384, HS512                                                                                                                                       |
 | `JWT_KEY`                    |                         | Encryption secret. Required when using a SHA (RS*) algorithm. When using a RSA algorithm (RS*), should contain a valid RSA PEM key, otherwise `JWT_KEY_FILE_PATH` will be used.              |
 | `JWT_EXPIRES_IN`             | 15                      |                                                                                                                                                                                              |
@@ -457,7 +456,8 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `REDIRECT_URL_SUCCESS`       |                         |                                                                                                                                                                                              |
 | `VERIFY_EMAILS`              | false                   | Enable verification emails                                                                                                                                                                   |
 | `JWT_REFRESH_EXPIRES_IN`     | 43200                   |                                                                                                                                                                                              |
-| `EMAILS_ENABLE`              | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
+| `EMAILS_ENABLED`             | false                   | When set to true, emails are sent on certain steps, like after registration for account activation when autoactivation is deactivated, or for changing emails or passwords                   |
+| `EMAILS_DEFAULT_LOCALE`      | en                      |
 | `SMTP_HOST`                  |                         | SMTP server path to use for sending emails.                                                                                                                                                  |
 | `SMTP_PASS`                  |                         | Password to authenticate on the SMTP server.                                                                                                                                                 |
 | `SMTP_USER`                  |                         | Username to authenticate on the SMTP server.                                                                                                                                                 |
@@ -471,44 +471,73 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `OTP_ISSUER`                 | HBP                     | One-Time Password issuer name used with Muti-factor authentication.                                                                                                                          |
 | `MFA_ENABLE`                 | false                   |                                                                                                                                                                                              |
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
-| `ENABLE_MAGIC_LINK`        | false                   |
+| `MAGIC_LINK_ENABLE`          | false                   |
+| `WHITELIST_ENABLE`           | false                   |
+| `WHITELIST_SEND_INVITE`      | false                   |
+| `ADMIN_ONLY_REGISTRATION`    | false                   | Allow registration only with x-admin-secret
 
-### Providers
+### Gravatar
 
 | Name                         | Default | Description |
 | ---------------------------- | ------- | ----------- |
-| `PROVIDER_SUCCESS_REDIRECT`  |         |             |
-| `PROVIDER_FAILURE_REDIRECT`  |         |             |
-| `GOOGLE_ENABLE`              | false   |             |
-| `GOOGLE_CLIENT_ID`           |         |             |
-| `GOOGLE_CLIENT_SECRET`       |         |             |
-| `FACEBOOK_ENABLE`            | false   |             |
-| `FACEBOOK_CLIENT_ID`         |         |             |
-| `FACEBOOK_CLIENT_SECRET`     |         |             |
-| `TWITTER_ENABLE`             | false   |             |
-| `TWITTER_CONSUMER_KEY`       |         |             |
-| `TWITTER_CONSUMER_SECRET`    |         |             |
-| `LINKEDIN_ENABLE`            | false   |             |
-| `LINKEDIN_CLIENT_ID`         |         |             |
-| `LINKEDIN_CLIENT_SECRET`     |         |             |
-| `APPLE_ENABLE`               | false   |             |
-| `APPLE_CLIENT_ID`            |         |             |
-| `APPLE_KEY_ID`               |         |             |
-| `APPLE_PRIVATE_KEY`          |         |             |
-| `APPLE_TEAM_ID`              |         |             |
-| `GITHUB_ENABLE`              | false   |             |
-| `GITHUB_AUTHORIZATION_URL`   |         |             |
-| `GITHUB_CLIENT_ID`           |         |             |
-| `GITHUB_CLIENT_SECRET`       |         |             |
-| `GITHUB_TOKEN_URL`           |         |             |
-| `GITHUB_USER_PROFILE_URL`    |         |             |
-| `WINDOWS_LIVE_ENABLE`        | false   |             |
-| `WINDOWS_LIVE_CLIENT_ID`     |         |             |
-| `WINDOWS_LIVE_CLIENT_SECRET` |         |             |
-| `SPOTIFY_ENABLE`             | false   |             |
-| `SPOTIFY_CLIENT_ID`          |         |             |
-| `SPOTIFY_CLIENT_SECRET`      |         |             |
+| `GRAVATER_ENABLED`           | true    |             |
+| `GRAVATAR_DEFAULT`           | blank   |             |
+| `GRAVATAR_RATING`            | g       |             |
 
+### Providers
+
+| Name                         | Default                               | Description |
+| ---------------------------- | ------------------------------------- | ----------- |
+| `PROVIDER_SUCCESS_REDIRECT`  |                                       |             |
+| `PROVIDER_FAILURE_REDIRECT`  |                                       |             |
+| `GOOGLE_ENABLED`             | false                                 |             |
+| `GOOGLE_CLIENT_ID`           |                                       |             |
+| `GOOGLE_CLIENT_SECRET`       |                                       |             |
+| `GOOGLE_SCOPE`               | email,profile                         |             |
+| `FACEBOOK_ENABLED`           | false                                 |             |
+| `FACEBOOK_CLIENT_ID`         |                                       |             |
+| `FACEBOOK_CLIENT_SECRET`     |                                       |             |
+| `FACEBOOK_PROFILE_FIELDS`    | email,photos,displayName              |             |
+| `TWITTER_ENABLED`            | false                                 |             |
+| `TWITTER_CONSUMER_KEY`       |                                       |             |
+| `TWITTER_CONSUMER_SECRET`    |                                       |             |
+| `LINKEDIN_ENABLED`           | false                                 |             |
+| `LINKEDIN_CLIENT_ID`         |                                       |             |
+| `LINKEDIN_CLIENT_SECRET`     |                                       |             |
+| `LINKEDIN_SCOPE`             | r_emailaddress,r_liteprofile          |             |
+| `APPLE_ENABLED`              | false                                 |             |
+| `APPLE_CLIENT_ID`            |                                       |             |
+| `APPLE_KEY_ID`               |                                       |             |
+| `APPLE_PRIVATE_KEY`          |                                       |             |
+| `APPLE_TEAM_ID`              |                                       |             |
+| `APPLE_SCOPE`                | name,email                            |             |
+| `GITHUB_ENABLED`             | false                                 |             |
+| `GITHUB_AUTHORIZATION_URL`   |                                       |             |
+| `GITHUB_CLIENT_ID`           |                                       |             |
+| `GITHUB_CLIENT_SECRET`       |                                       |             |
+| `GITHUB_TOKEN_URL`           |                                       |             |
+| `GITHUB_USER_PROFILE_URL`    |                                       |             |
+| `GITHUB_SCOPE`               | user:email                            |             |
+| `WINDOWS_LIVE_ENABLED`       | false                                 |             |
+| `WINDOWS_LIVE_CLIENT_ID`     |                                       |             |
+| `WINDOWS_LIVE_CLIENT_SECRET` |                                       |             |
+| `WINDOWS_LIVE_SCOPE`         | wl.basic,wl.emails,wl.contacts_emails |             |
+| `SPOTIFY_ENABLED`            | false                                 |             |
+| `SPOTIFY_CLIENT_ID`          |                                       |             |
+| `SPOTIFY_CLIENT_SECRET`      |                                       |             |
+| `SPOTIFY_SCOPE`              | user-read-email,user-read-private     |             |
+| `GITLAB_ENABLED`             | false                                 |             |
+| `GITLAB_CLIENT_ID`           |                                       |             |
+| `GITLAB_CLIENT_SECRET`       |                                       |             |
+| `GITLAB_BASE_URL`            |                                       |             |
+| `GITLAB_SCOPE`               | read_user                             |             |
+| `BITBUCKET_ENABLED`          | false                                 |             |
+| `BITBUCKET_CLIENT_ID`        |                                       |             |
+| `BITBUCKET_CLIENT_SECRET`    |                                       |             |
+| `STRAVA_ENABLE`              | false                                 |             |
+| `STRAVA_CLIENT_ID`           |                                       |             |
+| `STRAVA_CLIENT_SECRET`       |                                       |             |
+| `STRAVA_SCOPE`               | profile:read_all                      |             |
 ### Storage
 
 | Name                   | Default | Description |
@@ -517,6 +546,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `S3_BUCKET`            |         |             |
 | `S3_ACCESS_KEY_ID`     |         |             |
 | `S3_SECRET_ACCESS_KEY` |         |             |
-| `S3_SSL_ENABLED`       | true    |             |
+| `S3_SSL_ENABLEDD`      | true    |             |
 | `OBJECT_PREFIX`        | /o      |             |
 | `META_PREFIX`          | /m      |             |

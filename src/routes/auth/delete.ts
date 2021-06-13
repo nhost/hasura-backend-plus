@@ -23,9 +23,6 @@ async function deleteUser(req: RequestExtended, res: Response): Promise<unknown>
     return res.boom.unauthorized('Unable to delete account')
   }
 
-  // clear cookies
-  res.clearCookie('refresh_token')
-  res.clearCookie('permission_variables')
   return res.status(204).send()
 }
 

@@ -15,14 +15,8 @@ interface HasuraData {
 }
 
 async function logout({ body, refresh_token }: RequestExtended<Schema>, res: Response): Promise<unknown> {
-  if (!refresh_token || !refresh_token.value) {
+  if (!refresh_token) {
     return res.boom.unauthorized('Invalid or expired refresh token.')
-  }
-
-  // clear cookies
-  if (refresh_token.type === 'cookie') {
-    res.clearCookie('refresh_token')
-    res.clearCookie('permission_variables')
   }
 
   // should we delete all refresh tokens to this user or not
@@ -33,7 +27,7 @@ async function logout({ body, refresh_token }: RequestExtended<Schema>, res: Res
     let hasura_data: HasuraData | null = null
     try {
       hasura_data = await request<HasuraData>(selectRefreshToken, {
-        refresh_token: refresh_token.value,
+        refresh_token,
         current_timestamp: new Date()
       })
     } catch (error) {
@@ -58,7 +52,7 @@ async function logout({ body, refresh_token }: RequestExtended<Schema>, res: Res
     // if only to delete single refresh token
     try {
       await request(deleteRefreshToken, {
-        refresh_token: refresh_token.value
+        refresh_token
       })
     } catch (error) {
       return res.status(204).send()

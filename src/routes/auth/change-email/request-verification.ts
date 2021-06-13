@@ -9,7 +9,7 @@ import { SetNewEmailData } from '@shared/types'
 import { RequestExtended } from '@shared/types'
 import { EmailResetSchema, emailResetSchema } from '@shared/validation'
 import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
-import { accountExists, asyncWrapper } from '@shared/helpers'
+import { accountWithEmailExists, asyncWrapper, selectAccountByUserId } from '@shared/helpers'
 
 async function requestChangeEmail(req: RequestExtended<Schema>, res: Response): Promise<any> {
   if(!AUTHENTICATION.VERIFY_EMAILS) {
@@ -20,12 +20,12 @@ async function requestChangeEmail(req: RequestExtended<Schema>, res: Response): 
 
   const new_email = req.body.new_email
 
-  if(await accountExists(new_email)) {
+  if(await accountWithEmailExists(new_email)) {
     return res.boom.badRequest('Cannot use this email')
   }
 
   // smtp must be enabled for request change password to work.
-  if (!APPLICATION.EMAILS_ENABLE) {
+  if (!APPLICATION.EMAILS_ENABLED) {
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 
@@ -55,6 +55,9 @@ async function requestChangeEmail(req: RequestExtended<Schema>, res: Response): 
     console.error(error)
     return res.boom.badImplementation('unable to set new email')
   }
+
+  const account = await selectAccountByUserId(user_id)
+
   // send email
   try {
     await emailClient.send({
@@ -62,6 +65,8 @@ async function requestChangeEmail(req: RequestExtended<Schema>, res: Response): 
       locals: {
         ticket,
         url: APPLICATION.SERVER_URL,
+        locale: account.locale,
+        app_url: APPLICATION.APP_URL,
         display_name
       },
       message: {

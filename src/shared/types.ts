@@ -72,6 +72,8 @@ export interface AccountData {
   password_hash: string
   email: string
   new_email?: string
+  last_confirmation_email_sent_at: string
+  locale: string
 }
 
 export interface QueryAccountData {
@@ -110,10 +112,15 @@ export interface InsertAccountProviderToUser {
   }
 }
 
-export interface RefreshTokenMiddleware {
-  value: string | null
-  type: 'query' | 'cookie' | null
+export interface QueryProviderRequests {
+  auth_provider_requests_by_pk: {
+    redirect_url_success: string,
+    redirect_url_failure: string,
+    jwt_token?: string
+  }
 }
+
+export type RefreshTokenMiddleware = string | null
 
 export interface RequestExtended<T extends ValidatedRequestSchema = ValidatedRequestSchema> extends ValidatedRequest<T> {
   refresh_token?: RefreshTokenMiddleware
@@ -126,5 +133,18 @@ export interface SetNewEmailData {
       user: UserData
     }[]
     affected_rows: number
+  }
+}
+
+export interface IsAllowedEmail {
+  auth_whitelist_by_pk: {
+    email: string
+  } | null
+}
+export interface QueryEmailTemplate {
+  auth_email_templates_by_pk: {
+    title: string
+    html: string
+    no_html: string
   }
 }
