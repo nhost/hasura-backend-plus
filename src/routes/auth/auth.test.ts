@@ -28,11 +28,11 @@ function errorMessageEqual(msg: string) {
   }
 }
 
-// function isAnonymous() {
-//   return (res: Response) => {
-//     expect(res.body.user.name).toBeNull()
-//   }
-// }
+function isAnonymous() {
+  return (res: Response) => {
+    expect(res.body.user.name).toBeNull()
+  }
+}
 
 it('should tell the password has been pwned', (done) => {
   withEnv(
@@ -56,8 +56,8 @@ it('should create an account', (done) => {
     .post('/auth/register')
     .send({
       email: generateRandomEmail(),
-      password: generateRandomString()
-      // user_data: { name: 'Test name' }
+      password: generateRandomString(),
+      user_data: { name: 'Test name' }
     })
     .expect(200)
     .end(end(done))
@@ -108,8 +108,7 @@ it('should not create an account without a password when magic link login is dis
     async () => {
       request
         .post('/auth/register')
-        .send({ email: generateRandomEmail() })
-        // .send({ email: generateRandomEmail(), user_data: { name: 'Test name' } })
+        .send({ email: generateRandomEmail(), user_data: { name: 'Test name' } })
         .expect(400)
         .end(end(done))
     }
@@ -122,10 +121,10 @@ it('should fail to create account with unallowed role', (done) => {
     .send({
       email: generateRandomEmail(),
       password: generateRandomString(),
-      // user_data: { name: 'Test name' },
+      user_data: { name: 'Test name' },
       register_options: {
-        // allowed_roles: ['user', 'me', 'super-admin']
-        allowed_roles: ['user', 'me']
+        default_role: 'invalid_role',
+        allowed_roles: ['user', 'me', 'super-admin']
       }
     })
     .expect(400)
@@ -145,7 +144,7 @@ it('should fail to create account with default_role that does not overlap allowe
         .send({
           email: generateRandomEmail(),
           password: generateRandomString(),
-          // user_data: { name: 'Test name' },
+          user_data: { name: 'Test name' },
           register_options: {
             default_role: 'editor',
             allowed_roles: ['user', 'me']
@@ -170,7 +169,7 @@ it('should create account with default_role that is in the ALLOWED_USER_ROLES va
         .send({
           email: generateRandomEmail(),
           password: generateRandomString(),
-          // user_data: { name: 'Test name' },
+          user_data: { name: 'Test name' },
           register_options: {
             default_role: 'editor'
           }
@@ -187,7 +186,7 @@ it('should register account with default_role and allowed_roles set', (done) => 
     .send({
       email: generateRandomEmail(),
       password: generateRandomString(),
-      // user_data: { name: 'Test name' },
+      user_data: { name: 'Test name' },
       register_options: {
         default_role: 'user',
         allowed_roles: ['user', 'me']
@@ -302,8 +301,9 @@ it('should sign the user in without password when magic link is enabled', async 
     async () => {
       const email = generateRandomEmail()
 
-      const { body, status } = await request.post('/auth/register').send({ email })
-      // .send({ email, user_data: { name: 'Test name' } })
+      const { body, status } = await request
+        .post('/auth/register')
+        .send({ email, user_data: { name: 'Test name' } })
 
       expect(status).toEqual(200)
       expect(body.jwt_token).toBeNull()
@@ -425,7 +425,7 @@ it('should log in anonymously', (done) => {
         })
         .expect(200)
         .expect(validJwt())
-        // .expect((isAnonymous()))
+        .expect(isAnonymous())
         .end(end(done))
     }
   )
@@ -452,7 +452,7 @@ it('should be able to deanonymize anonymous user', (done) => {
         .expect(200)
         .expect(validJwt())
         .expect(saveJwt((j) => (jwtToken = j)))
-        // .expect(isAnonymous())
+        .expect(isAnonymous())
         .end((err) => {
           if (err) return done(err)
 
@@ -505,7 +505,7 @@ it('should be able to deanonymize anonymous user without auto activation', (done
         .expect(200)
         .expect(validJwt())
         .expect(saveJwt((j) => (jwtToken = j)))
-        // .expect((isAnonymous()))
+        .expect(isAnonymous())
         .end((err) => {
           if (err) return done(err)
 

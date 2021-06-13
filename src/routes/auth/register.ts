@@ -1,6 +1,14 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl, isAllowedEmail } from '@shared/helpers'
+import {
+  asyncWrapper,
+  checkHibp,
+  hashPassword,
+  selectAccount,
+  setRefreshToken,
+  getGravatarUrl,
+  isAllowedEmail
+} from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
@@ -10,10 +18,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
-  try {
   const body = req.body
 
-  if(REGISTRATION.ADMIN_ONLY) {
+  if (REGISTRATION.ADMIN_ONLY) {
     const adminSecret = req.headers[HEADERS.ADMIN_SECRET_HEADER]
 
     if (adminSecret !== APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET) {
@@ -27,9 +34,12 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     user_data = {},
     register_options = {},
     locale
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink() : registerSchema()).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED
+    ? registerSchemaMagicLink()
+    : registerSchema()
+  ).validateAsync(body)
 
-  if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
+  if (REGISTRATION.WHITELIST && !(await isAllowedEmail(email))) {
     return res.boom.unauthorized('Email not allowed')
   }
 
@@ -37,7 +47,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     return res.boom.badRequest('Account already exists.')
   }
 
-  let password_hash: string | null = null;
+  let password_hash: string | null = null
 
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
@@ -72,7 +82,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
-  
   const avatarUrl = getGravatarUrl(email)
 
   let accounts: InsertAccountData
@@ -95,7 +104,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             avatar_url: avatarUrl,
             ...user_data
           }
-        },
+        }
       }
     })
   } catch (e) {
@@ -189,10 +198,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const session: Session = { jwt_token, jwt_expires_in, user, refresh_token }
 
   return res.send(session)
-} catch(e) {
-  console.log('shee', e)
-return res.boom.badRequest('weee', JSON.stringify(e, null, 2))
-}
 }
 
 export default asyncWrapper(registerAccount)
