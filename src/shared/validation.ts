@@ -68,17 +68,17 @@ const accountFields = {
 type AccountFields = {
   email: string
   password?: string
+  locale: string
 }
 
 const accountFieldsMagicLink = {
   email: emailRule,
-  password: passwordRule,
   locale: localeRuleWithDefault
 }
 
 type AccountFieldsMagicLink = {
   email: string
-  password?: string
+  locale: string
 }
 
 export const userDataFields = {
@@ -111,19 +111,32 @@ export type UserDataFields = {
   }
 }
 
-export const registerSchema = Joi.object({
-  ...accountFields,
-  ...userDataFields,
-})
+export const registerSchema = Joi.alternatives().try(
+  // Regular register
+  Joi.object({
+    ...accountFields,
+    ...userDataFields,
+  }),
+  // Magic link register
+  Joi.object({
+    ...accountFieldsMagicLink,
+    ...userDataFields,
+  })
+)
 
-export type RegisterSchema = AccountFields & UserDataFields
+export function isRegularRegister(body: RegisterSchema): body is RegularRegister {
+  return body.email !== undefined && (body as RegularRegister).password !== undefined
+}
 
-export const registerSchemaMagicLink = Joi.object({
-  ...accountFieldsMagicLink,
-  ...userDataFields,
-})
+export function isMagicLinkRegister(body: RegisterSchema): body is MagicLinkRegister {
+  return body.email !== undefined && (body as RegularRegister).password === undefined
+}
 
-export type RegisterSchemaMagicLink = AccountFieldsMagicLink & UserDataFields
+export type RegularRegister = AccountFields & UserDataFields
+
+export type MagicLinkRegister = AccountFieldsMagicLink & UserDataFields
+
+export type RegisterSchema = RegularRegister | MagicLinkRegister
 
 export const deanonymizeSchema = Joi.object({
   email: emailRule,
@@ -194,48 +207,54 @@ export const mfaSchema = Joi.object(codeFields)
 
 export type MfaSchema = CodeFields
 
-export const loginAnonymouslySchema = Joi.object({
-  anonymous: Joi.boolean(),
-  locale: localeRuleWithDefault,
-  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
-  password: Joi.string() // these will be checked more rigorously in `loginSchema`
-})
+export const loginSchema = Joi.alternatives().try(
+  // Regular login
+  Joi.object({
+    email: emailRule,
+    password: passwordRuleRequired,
+    locale: localeRuleWithDefault
+  }),
+  // Magic link login
+  Joi.object({
+    email: emailRule,
+    locale: localeRuleWithDefault
+  }),
+  // Anonymous login
+  Joi.object({
+    anonymous: Joi.boolean().invalid(false), // anonymous: true
+    locale: localeRuleWithDefault
+  }),
+)
 
-export type LoginAnonymouslySchema = {
-  anonymous?: boolean
-  email?: string
-  password?: string
+export function isRegularLogin(body: LoginSchema): body is RegularLogin {
+  return (body as RegularLogin).email !== undefined && (body as RegularLogin).password !== undefined
 }
 
-export const magicLinkLoginAnonymouslySchema = Joi.object({
-  anonymous: Joi.boolean(),
-  email: Joi.string(), // these will be checked more rigorously in `loginSchema`
-})
-
-export type MagicLinkLoginAnonymouslySchema = {
-  anonymous?: boolean
-  email?: string
+export function isMagicLinkLogin(body: LoginSchema): body is MagicLinkLogin {
+  return (body as RegularLogin).email !== undefined && (body as RegularLogin).password === undefined
 }
 
-export const loginSchema = extendedJoi.object({
-  email: emailRule,
-  password: Joi.string().required(),
-})
+export function isAnonymousLogin(body: LoginSchema): body is AnonymousLogin {
+  return (body as AnonymousLogin).anonymous !== undefined
+}
 
-export type LoginSchema = {
+export type RegularLogin = {
   email: string
   password: string
+  locale: string
 }
 
-export const loginSchemaMagicLink = extendedJoi.object({
-  email: emailRule,
-  password: Joi.string(),
-})
-
-export type LoginSchemaMagicLink = {
+export type MagicLinkLogin = {
   email: string
-  password?: string
+  locale: string
 }
+
+export type AnonymousLogin = {
+  anonymous: true
+  locale: string
+}
+
+export type LoginSchema = RegularLogin | MagicLinkLogin | AnonymousLogin
 
 export const forgotSchema = Joi.object({ email: emailRule })
 

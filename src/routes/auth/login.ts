@@ -1,14 +1,15 @@
-import { Request, Response, Router } from 'express'
+import { NextFunction, Response, Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { asyncWrapper, selectAccount, setRefreshToken } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
-import { loginAnonymouslySchema, loginSchema, loginSchemaMagicLink } from '@shared/validation'
+import { isAnonymousLogin, isMagicLinkLogin, LoginSchema, loginSchema } from '@shared/validation'
 import { insertAccount, setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData, UserData, Session } from '@shared/types'
 import { emailClient } from '@shared/email'
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
 interface HasuraData {
   insert_auth_accounts: {
@@ -17,61 +18,56 @@ interface HasuraData {
   }
 }
 
-async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
-  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
-    const { anonymous, locale } = await loginAnonymouslySchema.validateAsync(body)
+async function loginAccount({ body, headers }: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
+  if (isAnonymousLogin(body)) {
+    let hasura_data: HasuraData
 
-    // if user tries to sign in anonymously
-    if (anonymous) {
-      let hasura_data: HasuraData
-      try {
-        const ticket = uuidv4()
-        hasura_data = await request(insertAccount, {
-          account: {
-            email: null,
-            password_hash: null,
-            ticket,
-            active: true,
-            is_anonymous: true,
-            locale,
-            default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
-            account_roles: {
-              data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
-            },
-            user: {
-              data: { display_name: 'Anonymous user' }
-            }
+    const { locale } = body
+
+    try {
+      const ticket = uuidv4()
+      hasura_data = await request(insertAccount, {
+        account: {
+          email: null,
+          password_hash: null,
+          ticket,
+          active: true,
+          is_anonymous: true,
+          locale,
+          default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
+          account_roles: {
+            data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
+          },
+          user: {
+            data: { display_name: 'Anonymous user' }
           }
-        })
-      } catch (error) {
-        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
-      }
-
-      if (!hasura_data.insert_auth_accounts.returning.length) {
-        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
-      }
-
-      const account = hasura_data.insert_auth_accounts.returning[0]
-
-      const refresh_token = await setRefreshToken(account.id)
-
-      const jwt_token = createHasuraJwt(account)
-      const jwt_expires_in = newJwtExpiry
-
-      const session: Session = { jwt_token, jwt_expires_in, user: account.user, refresh_token }
-
-      return res.send(session)
+        }
+      })
+    } catch (error) {
+      return res.boom.badImplementation('Unable to create user and sign in user anonymously')
     }
-  }
 
-  // else, login users normally
-  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? loginSchemaMagicLink : loginSchema).validateAsync(body)
+    if (!hasura_data.insert_auth_accounts.returning.length) {
+      return res.boom.badImplementation('Unable to create user and sign in user anonymously')
+    }
+
+    const account = hasura_data.insert_auth_accounts.returning[0]
+
+    const refresh_token = await setRefreshToken(account.id)
+
+    const jwt_token = createHasuraJwt(account)
+    const jwt_expires_in = newJwtExpiry
+
+    const session: Session = { jwt_token, jwt_expires_in, user: account.user, refresh_token }
+
+    return res.send(session)
+  }
 
   const account = await selectAccount(body)
 
   if (!account) {
     // Undefined password = magic link login
-    if(typeof password === 'undefined') {
+    if(isMagicLinkLogin(body)) {
       return res.boom.badRequest('Invalid email')
     } else {
       return res.boom.badRequest('Invalid email or password')
@@ -80,7 +76,11 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
 
   const { id, mfa_enabled, password_hash, active, email } = account
 
-  if (typeof password === 'undefined') {
+  if (!active) {
+    return res.boom.badRequest('Account is not activated.')
+  }
+
+  if (isMagicLinkLogin(body)) {
     const refresh_token = await setRefreshToken(id)
 
     try {
@@ -113,9 +113,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     }
   }
 
-  if (!active) {
-    return res.boom.badRequest('Account is not activated.')
-  }
+  const { password } = body
 
   // Handle User Impersonation Check
   const adminSecret = headers[HEADERS.ADMIN_SECRET_HEADER]
@@ -165,6 +163,23 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   res.send(session)
 }
 
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: LoginSchema
+}
+
 export default (router: Router) => {
-  router.post('/login', asyncWrapper(loginAccount))
+  router.post(
+    '/login',
+    createValidator().body(loginSchema),
+    (req: ValidatedRequest<Schema>, res: Response, next: NextFunction) => {
+      if(isAnonymousLogin(req.body) && !AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
+        return res.boom.badRequest('Anonymous login is disabled')
+      } else if(isMagicLinkLogin(req.body) && !AUTHENTICATION.MAGIC_LINK_ENABLED) {
+        return res.boom.badRequest('Magic link login is disabled')
+      } else {
+        return next()
+      }
+    },
+    asyncWrapper(loginAccount)
+  )
 }
