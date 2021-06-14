@@ -1,18 +1,19 @@
-import { Request, Response } from 'express'
+import { Response, Router } from 'express'
 import { asyncWrapper, rotateTicket, selectAccount, setRefreshToken } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { UserData, Session } from '@shared/types'
 
 import { authenticator } from 'otplib'
-import { totpSchema } from '@shared/validation'
+import { TotpSchema, totpSchema } from '@shared/validation'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
 // Increase the authenticator window so that TOTP codes from the previous 30 seconds are also valid
 authenticator.options = {
   window: [1, 0]
 }
 
-async function totpLogin({ body }: Request, res: Response): Promise<any> {
-  const { ticket, code } = await totpSchema.validateAsync(body)
+async function totpLogin({ body }: ValidatedRequest<Schema>, res: Response): Promise<any> {
+  const { ticket, code } = body
   const account = await selectAccount(body)
 
   if (!account) {
@@ -53,4 +54,10 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
   res.send(session)
 }
 
-export default asyncWrapper(totpLogin)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: TotpSchema
+}
+
+export default (router: Router) => {
+  router.post('/totp', createValidator().body(totpSchema), asyncWrapper(totpLogin))
+}

@@ -30,22 +30,23 @@ router.use((req, res, next) => {
   }
 })
 
-router.use('/providers', providers)
-router.use('/mfa', mfa)
-router.use('/change-email', changeEmail)
-router.get('/activate', activateAccount)
-router.post('/delete', deleteAccount)
-router
-  .post('/login', loginAccount)
-  .post('/logout', logout)
-  .post('/register', registerAccount)
-  .use('/change-password', changePassword)
-router.get('/jwks', getJwks)
-router.use('/token', token)
-router.get('/magic-link', magicLink)
-router.post('/whitelist', whitelist)
-router.post('/resend-confirmation', resendConfirmation)
-router.post('/deanonymize', deanonymize)
-router.post('/change-locale', changeLocale)
+providers(router)
+mfa(router)
+changeEmail(router)
+activateAccount(router)
+deleteAccount(router)
+loginAccount(router)
+logout(router)
+registerAccount(router)
+changePassword(router)
+getJwks(router)
+token(router)
+magicLink(router)
+whitelist(router)
+resendConfirmation(router)
+deanonymize(router)
+changeLocale(router)
 
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/auth', router)
+}

@@ -1,19 +1,20 @@
 import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { updateOtpStatus } from '@shared/queries'
 
 import { authenticator } from 'otplib'
-import { mfaSchema } from '@shared/validation'
+import { MfaSchema, mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { AccountData, RequestExtended } from '@shared/types'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
 
-async function enableMfa(req: RequestExtended, res: Response): Promise<unknown> {
+async function enableMfa(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
     return res.boom.unauthorized('Not logged in')
   }
 
   const { 'user-id': user_id } = req.permission_variables
-  const { code } = await mfaSchema.validateAsync(req.body)
+  const { code } = req.body
 
   let otp_secret: AccountData['otp_secret']
   let mfa_enabled: AccountData['mfa_enabled']
@@ -42,4 +43,10 @@ async function enableMfa(req: RequestExtended, res: Response): Promise<unknown> 
   return res.status(204).send()
 }
 
-export default asyncWrapper(enableMfa)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: MfaSchema
+}
+
+export default (router: Router) => {
+  router.post('/enable', createValidator().body(mfaSchema), asyncWrapper(enableMfa))
+}

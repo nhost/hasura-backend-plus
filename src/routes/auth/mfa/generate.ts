@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { authenticator } from 'otplib'
 import { asyncWrapper, createQR } from '@shared/helpers'
 import { MFA } from '@shared/config'
@@ -31,4 +31,6 @@ async function generateMfa(req: RequestExtended, res: Response): Promise<unknown
   return res.send({ image_url, otp_secret })
 }
 
-export default asyncWrapper(generateMfa)
+export default (router: Router) => {
+  router.post('/generate', asyncWrapper(generateMfa))
+}

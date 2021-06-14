@@ -70,10 +70,7 @@ export const selectAccountByUserId = async (user_id: string | undefined): Promis
  * @param httpBody
  * @return account data, null if account is not found
  */
-export const selectAccount = async (httpBody: {
-  [key: string]: string
-}): Promise<AccountData | undefined> => {
-  const { email, ticket } = httpBody
+export const selectAccount = async ({ email = '', ticket = '' }: { email?: string, ticket?: string }): Promise<AccountData | undefined> => {
   try {
     return await selectAccountByEmail(email)
   } catch {

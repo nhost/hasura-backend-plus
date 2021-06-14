@@ -1,12 +1,14 @@
 import { APPLICATION, REGISTRATION } from '@shared/config'
-import { Request, Response } from 'express'
+import { Response, Router } from 'express'
 import { asyncWrapper, selectAccount, updateLastSentConfirmation } from '@shared/helpers'
 
 import { emailClient } from '@shared/email'
 import { v4 as uuidv4 } from 'uuid'
 import { UserData, Session } from '@shared/types'
+import { ContainerTypes, createValidator, ValidatedRequest, ValidatedRequestSchema } from 'express-joi-validation'
+import { ResendConfirmationSchema, resendConfirmationSchema } from '@shared/validation'
 
-async function resendConfirmation(req: Request, res: Response): Promise<unknown> {
+async function resendConfirmation(req: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
     return res.boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/resend-confirmation route.`)
   }
@@ -74,4 +76,10 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
   return res.send(session)
 }
 
-export default asyncWrapper(resendConfirmation)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: ResendConfirmationSchema
+}
+
+export default (router: Router) => {
+  router.post('/resend-confirmation', createValidator().body(resendConfirmationSchema), asyncWrapper(resendConfirmation))
+}

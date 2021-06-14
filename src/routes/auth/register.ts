@@ -1,15 +1,16 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl, isAllowedEmail } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
-import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
+import { isMagicLinkLogin, isMagicLinkRegister, isRegularLogin, RegisterSchema, registerSchema } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
+import { ValidatedRequest, ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
 
-async function registerAccount(req: Request, res: Response): Promise<unknown> {
+async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   const body = req.body
 
   if(REGISTRATION.ADMIN_ONLY) {
@@ -22,11 +23,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const {
     email,
-    password,
     user_data = {},
     register_options = {},
     locale
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = body
 
   if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
     return res.boom.unauthorized('Email not allowed')
@@ -41,15 +41,15 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
 
-  if (typeof password !== 'undefined') {
+  if (isRegularLogin(body)) {
     try {
-      await checkHibp(password)
+      await checkHibp(body.password)
     } catch (err) {
       return res.boom.badRequest(err.message)
     }
 
     try {
-      password_hash = await hashPassword(password)
+      password_hash = await hashPassword(body.password)
     } catch (err) {
       return res.boom.internal(err.message)
     }
@@ -118,7 +118,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
 
-    if (typeof password === 'undefined') {
+    if (isMagicLinkLogin(body)) {
       try {
         await emailClient.send({
           template: 'magic-link',
@@ -189,4 +189,21 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   return res.send(session)
 }
 
-export default asyncWrapper(registerAccount)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: RegisterSchema
+}
+
+export default (router: Router) => {
+  router.post(
+    '/register',
+    createValidator().body(registerSchema),
+    (req: ValidatedRequest<Schema>, res: Response, next: NextFunction) => {
+      if(isMagicLinkRegister(req.body) && !AUTHENTICATION.MAGIC_LINK_ENABLED) {
+        return res.boom.badRequest('Magic link registration is disabled')
+      } else {
+        return next()
+      }
+    },
+    asyncWrapper(registerAccount)
+  )
+}

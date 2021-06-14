@@ -1,21 +1,22 @@
-import { Request, Response } from 'express'
+import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { asyncWrapper, selectAccountByEmail } from '@shared/helpers'
 import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
-import { forgotSchema } from '@shared/validation'
+import { ForgotSchema, forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData } from '@shared/types'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
  * Always return status code 204 in order to not leak information about emails in the database
  */
-async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
+async function requestChangePassword({ body }: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   if(!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
-    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLED env variable to true to use the auth/change-password/request route.`)
+    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
   }
 
   // smtp must be enabled for request change password to work.
@@ -93,4 +94,10 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
   return res.status(204).send()
 }
 
-export default asyncWrapper(requestChangePassword)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: ForgotSchema
+}
+
+export default (router: Router) => {
+  router.post('/request', createValidator().body(forgotSchema), asyncWrapper(requestChangePassword))
+}

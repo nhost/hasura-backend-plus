@@ -1,11 +1,11 @@
-import { asyncWrapper, newRefreshExpiry } from '@shared/helpers'
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { AccountData, UserData, Session, RequestExtended } from '@shared/types'
+import { asyncWrapper, newRefreshExpiry } from '@shared/helpers'
 
 interface HasuraData {
   auth_refresh_tokens: { account: AccountData }[]
@@ -57,4 +57,6 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
   res.send(session)
 }
 
-export default asyncWrapper(refreshToken)
+export default (router: Router) => {
+  router.get('/refresh', asyncWrapper(refreshToken))
+}

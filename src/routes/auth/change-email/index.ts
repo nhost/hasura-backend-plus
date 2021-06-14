@@ -19,9 +19,11 @@ router.use((req, res, next) => {
   }
 })
 
-router.post('/request', requestVerification)
-router.post('/change', changeVerified)
-router.post('/', directChange)
+requestVerification(router)
+changeVerified(router)
+directChange(router)
 
 
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/change-email', router)
+}
