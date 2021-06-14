@@ -225,6 +225,7 @@ it('should not generate mfa qr if mfa enabled for account', (done) => {
 
                 request.post('/auth/mfa/generate').expect(400)
               })
+              .end(end(done))
           })
       })
   })
