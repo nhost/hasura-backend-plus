@@ -297,7 +297,10 @@ it('should sign the user in without password when magic link is enabled', async 
     {
       MAGIC_LINK_ENABLED: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      VERIFY_EMAILS: 'true'
+      VERIFY_EMAILS: 'true',
+      WHITELIST: 'false',
+      ADMIN_ONLY_REGISTRATION: 'false',
+      EMAILS_ENABLE: 'true'
     },
     request,
     async () => {
@@ -332,7 +335,6 @@ it('should sign the user in without password when magic link is enabled', async 
         }
       }
     },
-    { MAGIC_LINK_ENABLED: 'false', AUTO_ACTIVATE_NEW_USERS: 'true', VERIFY_EMAILS: 'false' }
   )
 })
 
@@ -671,7 +673,8 @@ it('should not be able to register with admin only registration with incorrect x
 it('should be able to register with admin only registration with correct x-admin-secret', (done) => {
   withEnv(
     {
-      ADMIN_ONLY_REGISTRATION: 'true'
+      ADMIN_ONLY_REGISTRATION: 'true',
+      AUTO_ACTIVATE_NEW_USERS: 'true'
     },
     request,
     async () => {

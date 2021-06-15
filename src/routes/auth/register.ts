@@ -62,7 +62,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     try {
       password_hash = await hashPassword(password)
     } catch (err) {
-      console.log('hash')
       return res.boom.internal(err.message)
     }
   }
