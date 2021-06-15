@@ -1,18 +1,15 @@
 import { APPLICATION, HEADERS, REGISTRATION } from '@shared/config'
-import { Request, Response, Router } from 'express'
+import { Response, Router } from 'express'
 import { asyncWrapper, isAllowedEmail } from '@shared/helpers'
 import { WhitelistQuery, whitelistQuery } from '@shared/validation'
 import { insertAllowedEmail } from '@shared/queries'
 import { request } from '@shared/request'
 import { emailClient } from '@shared/email'
-import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
-async function whitelist(req: Request, res: Response): Promise<unknown> {
+async function whitelist(req: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
+  try {
   const body = req.body
-
-  const {
-    email
-  } = await whitelistQuery.validateAsync(body)
 
   if(!REGISTRATION.WHITELIST) {
     return res.boom.notImplemented('Whitelist is disabled')
@@ -22,32 +19,36 @@ async function whitelist(req: Request, res: Response): Promise<unknown> {
     return res.boom.unauthorized('Incorrect admin secret')
   }
 
-  if(!await isAllowedEmail(email)) {
+  if(!await isAllowedEmail(body.email)) {
     await request(insertAllowedEmail, {
-      email
+      email: body.email
     })
 
-    if(REGISTRATION.WHITELIST_SEND_INVITE) {
+    if(body.invite) {
       if(!APPLICATION.EMAILS_ENABLED) {
-        return res.boom.badImplementation('Emails have to be enabled when WHITELIST_SEND_INVITE=true')
+        return res.boom.badImplementation('Emails have to be enabled when invite=true')
       }
 
       await emailClient.send({
         template: 'invite',
         message: {
-          to: email,
+          to: body.email,
         },
         locals: {
           url: APPLICATION.SERVER_URL,
           app_url: APPLICATION.APP_URL,
           app_name: APPLICATION.APP_NAME,
-          locale: APPLICATION.EMAILS_DEFAULT_LOCALE
+          locale: body.locale,
+          email: body.email
         }
       })
     }
   }
 
   return res.status(204).send()
+} catch(e) {
+  console.log(e)
+}
 }
 
 interface Schema extends ValidatedRequestSchema {

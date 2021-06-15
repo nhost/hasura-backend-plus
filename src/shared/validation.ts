@@ -312,11 +312,15 @@ export type MagicLinkQuery = {
 }
 
 export const whitelistQuery = Joi.object({
-  email: emailRule
+  email: emailRule,
+  invite: Joi.boolean().default(false),
+  locale: localeRuleWithDefault
 })
 
 export type WhitelistQuery = {
   email: string
+  invite: boolean
+  locale: string
 }
 
 export const providerQuery = Joi.object({
