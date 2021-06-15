@@ -741,7 +741,8 @@ it('should enable login for allowed emails when whitelist is enabled', (done) =>
   const email = generateRandomEmail()
 
   withEnv({
-    WHITELIST_ENABLE: 'true'
+    WHITELIST_ENABLE: 'true',
+    EMAILS_ENABLED: 'true'
   }, request, async () => {
     request
       .post('/auth/whitelist')
@@ -750,6 +751,41 @@ it('should enable login for allowed emails when whitelist is enabled', (done) =>
         email
       })
       .expect(204)
+      .end((err) => {
+        if(err) return done(err)
+
+        request
+          .post('/auth/register')
+          .send({
+            email,
+            password: generateRandomString()
+          })
+          .expect(200)
+          .end(end(done))
+      })
+  })
+})
+
+it('should enable login for allowed emails when whitelist is enabled and send an invite', (done) => {
+  const email = generateRandomEmail()
+
+  withEnv({
+    WHITELIST_ENABLE: 'true',
+    EMAILS_ENABLED: 'true'
+  }, request, async () => {
+    request
+      .post('/auth/whitelist')
+      .set(HEADERS.ADMIN_SECRET_HEADER, APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET)
+      .send({
+        email,
+        invite: true
+      })
+      .expect(204)
+      .expect(() => {
+        return expect(
+          mailHogSearch(email).then(messages => messages[0])
+        ).resolves.toBeTruthy()
+      })
       .end((err) => {
         if(err) return done(err)
 

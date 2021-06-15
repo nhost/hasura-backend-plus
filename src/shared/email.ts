@@ -32,6 +32,10 @@ export const emailClient: Email<any> = new Email({
     const [id, field] = view.split('/')
     const locale = locals.locale
 
+    if(!locale) {
+      throw new Error('Cannot send email without locale')
+    }
+
     const email = await request<QueryEmailTemplate>(getEmailTemplate, {
       id,
       locale
