@@ -286,8 +286,8 @@ it('should sign the user in', (done) => {
     request
       .post('/auth/login')
       .send({ email, password })
-      .expect(validJwt())
       .expect(200)
+      .expect(validJwt())
       .end(end(done))
   })
 })

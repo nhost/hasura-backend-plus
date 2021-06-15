@@ -1,23 +1,30 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { RequestExtended } from '@shared/types';
 import { request } from '@shared/request';
 import { asyncWrapper } from '@shared/helpers';
 import { changeLocaleByUserId } from '@shared/queries';
-import { localeQuery } from '@shared/validation';
+import { LocaleQuery, localeQuery } from '@shared/validation';
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation';
 
-async function changeLocale(req: RequestExtended, res: Response): Promise<unknown> {
+async function changeLocale(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if(!req.permission_variables) {
     return res.boom.unauthorized('Not logged in')
   }
 
-  const { locale } = await localeQuery.validateAsync(req.body)
+  const { locale } = req.query
 
   await request(changeLocaleByUserId, {
     user_id: req.permission_variables['user-id'],
-    locale: locale
+    locale
   })
 
   return res.status(204).send()
 }
 
-export default asyncWrapper(changeLocale)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Query]: LocaleQuery
+}
+
+export default (router: Router) => {
+  router.post('/change-locale', createValidator().query(localeQuery), asyncWrapper(changeLocale))
+}

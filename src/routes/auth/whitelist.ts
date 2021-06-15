@@ -1,10 +1,11 @@
 import { APPLICATION, HEADERS, REGISTRATION } from '@shared/config'
-import { Request, Response } from 'express'
+import { Request, Response, Router } from 'express'
 import { asyncWrapper, isAllowedEmail } from '@shared/helpers'
-import { whitelistQuery } from '@shared/validation'
+import { WhitelistQuery, whitelistQuery } from '@shared/validation'
 import { insertAllowedEmail } from '@shared/queries'
 import { request } from '@shared/request'
 import { emailClient } from '@shared/email'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
 
 async function whitelist(req: Request, res: Response): Promise<unknown> {
   const body = req.body
@@ -49,4 +50,10 @@ async function whitelist(req: Request, res: Response): Promise<unknown> {
   return res.status(204).send()
 }
 
-export default asyncWrapper(whitelist)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: WhitelistQuery
+}
+
+export default (router: Router) => {
+  router.post('/whitelist', createValidator().body(whitelistQuery), asyncWrapper(whitelist))
+}

@@ -6,9 +6,10 @@ import reset from './reset'
 
 const router = Router()
 
-router.post('/', change)
+change(router)
+lost(router)
+reset(router)
 
-router.post('/request', lost)
-router.post('/change', reset)
-
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/change-password', router)
+}

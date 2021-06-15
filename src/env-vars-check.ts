@@ -159,6 +159,5 @@ if(APPLICATION.EMAILS_ENABLED) {
 }
 
 if(errors.length) {
-  errors.forEach(error => console.error(error))
   throw new Error('Invalid configuration')
 }

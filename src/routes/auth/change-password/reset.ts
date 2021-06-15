@@ -1,23 +1,24 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { asyncWrapper, checkHibp, hashPassword } from '@shared/helpers'
-import { resetPasswordWithTicketSchema } from '@shared/validation'
+import { ResetPasswordWithTicketSchema, resetPasswordWithTicketSchema } from '@shared/validation'
 import { updatePasswordWithTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { UpdateAccountData, RequestExtended } from '@shared/types'
 import { AUTHENTICATION } from '@shared/config'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
 
 /**
  * Reset the password, either from a valid ticket or from a valid JWT and a valid password
  */
-async function resetPassword(req: RequestExtended, res: Response): Promise<unknown> {
+async function resetPassword(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if(!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
-    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLED env variable to true to use the auth/change-password/change route.`)
+    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/change route.`)
   }
 
   // Reset the password from { ticket, new_password }
-  const { ticket, new_password } = await resetPasswordWithTicketSchema.validateAsync(req.body)
+  const { ticket, new_password } = req.body
 
   try {
     await checkHibp(new_password)
@@ -47,4 +48,10 @@ async function resetPassword(req: RequestExtended, res: Response): Promise<unkno
   return res.status(204).send()
 }
 
-export default asyncWrapper(resetPassword)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: ResetPasswordWithTicketSchema
+}
+
+export default (router: Router) => {
+  router.post('/change', createValidator().body(resetPasswordWithTicketSchema), asyncWrapper(resetPassword))
+}

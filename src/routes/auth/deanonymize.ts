@@ -1,15 +1,16 @@
-import { Response } from 'express'
+import { Response, Router } from 'express'
 import { APPLICATION, AUTHENTICATION, REGISTRATION } from "@shared/config";
 import { accountIsAnonymous, accountWithEmailExists, asyncWrapper, checkHibp, hashPassword, deanonymizeAccount as deanonymizeAccountHelper, selectAccountByUserId } from "@shared/helpers";
-import { deanonymizeSchema } from '@shared/validation';
+import { DeanonymizeSchema, deanonymizeSchema } from '@shared/validation';
 import { RequestExtended } from '@shared/types';
 import { request } from '@shared/request';
 import { changeEmailByUserId, changePasswordHashByUserId, deactivateAccount, setNewTicket } from '@shared/queries';
 import { emailClient } from '@shared/email';
 import { v4 as uuid4 } from 'uuid'
+import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation';
 
-async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<unknown> {
-  const body = req.body
+async function deanonymizeAccount(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
+  const { email, password } = req.body
 
   if(!AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
     return res.boom.badImplementation(`Please set the ANONYMOUS_USERS_ENABLED env variable to true to use the auth/deanonymize route.`)
@@ -18,11 +19,6 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
   if (!req.permission_variables || !await accountIsAnonymous(req.permission_variables['user-id'])) {
     return res.boom.unauthorized('Unable to deanonymize account')
   }
-
-  const {
-    email,
-    password,
-  } = await deanonymizeSchema.validateAsync(body)
 
   try {
     await checkHibp(password)
@@ -96,4 +92,10 @@ async function deanonymizeAccount(req: RequestExtended, res: Response): Promise<
   return res.status(204).send()
 }
 
-export default asyncWrapper(deanonymizeAccount)
+interface Schema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: DeanonymizeSchema
+}
+
+export default (router: Router) => {
+  router.post('/deanonymize', createValidator().body(deanonymizeSchema), asyncWrapper(deanonymizeAccount))
+}

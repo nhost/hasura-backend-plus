@@ -26,4 +26,6 @@ strava(router)
 gitlab(router)
 bitbucket(router)
 
-export default router
+export default (parentRouter: Router) => {
+  parentRouter.use('/providers', router)
+}

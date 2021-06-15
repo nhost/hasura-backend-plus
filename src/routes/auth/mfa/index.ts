@@ -15,8 +15,12 @@ router.use((req, res, next) => {
   }
 })
 
-export default router
-  .post('/disable', disableMfa)
-  .post('/enable', enableMfa)
-  .post('/generate', generateMfa)
-  .post('/totp', totpLogin)
+
+disableMfa(router)
+enableMfa(router)
+generateMfa(router)
+totpLogin(router)
+
+export default (parentRouter: Router) => {
+  parentRouter.use('/mfa', router)
+}
