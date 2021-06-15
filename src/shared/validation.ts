@@ -76,6 +76,7 @@ const accountFieldsMagicLink = {
   locale: localeRuleWithDefault
 }
 
+
 type AccountFieldsMagicLink = {
   email: string
   locale: string

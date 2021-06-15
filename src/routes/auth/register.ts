@@ -1,5 +1,5 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
-import { NextFunction, Request, Response, Router } from 'express'
+import { NextFunction, Response, Router } from 'express'
 import { asyncWrapper, checkHibp, hashPassword, selectAccount, setRefreshToken, getGravatarUrl, isAllowedEmail } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
@@ -13,7 +13,7 @@ import { ValidatedRequest, ValidatedRequestSchema, ContainerTypes, createValidat
 async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   const body = req.body
 
-  if(REGISTRATION.ADMIN_ONLY) {
+  if (REGISTRATION.ADMIN_ONLY) {
     const adminSecret = req.headers[HEADERS.ADMIN_SECRET_HEADER]
 
     if (adminSecret !== APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET) {
@@ -28,7 +28,7 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
     locale
   } = body
 
-  if(REGISTRATION.WHITELIST && !await isAllowedEmail(email)) {
+  if (REGISTRATION.WHITELIST && !(await isAllowedEmail(email))) {
     return res.boom.unauthorized('Email not allowed')
   }
 
@@ -36,7 +36,7 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
     return res.boom.badRequest('Account already exists.')
   }
 
-  let password_hash: string | null = null;
+  let password_hash: string | null = null
 
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
@@ -70,7 +70,6 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
 
   const accountRoles = allowedRoles.map((role: string) => ({ role }))
 
-  
   const avatarUrl = getGravatarUrl(email)
 
   let accounts: InsertAccountData
@@ -93,13 +92,13 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
             avatar_url: avatarUrl,
             ...user_data
           }
-        },
+        }
       }
     })
   } catch (e) {
     console.error('Error inserting user account')
     console.error(e)
-    return res.boom.badImplementation('Error inserting user account')
+    return res.boom.badRequest('Error inserting user account ' + JSON.stringify(e, null, 2))
   }
 
   const account = accounts.insert_auth_accounts.returning[0]
@@ -143,7 +142,7 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
         })
       } catch (err) {
         console.error(err)
-        return res.boom.badImplementation()
+        return res.boom.badRequest('dfdsf' + JSON.stringify(err, null, 2))
       }
 
       const session: Session = { jwt_token: null, jwt_expires_in: null, user }
@@ -170,8 +169,8 @@ async function registerAccount(req: ValidatedRequest<Schema>, res: Response): Pr
         }
       })
     } catch (err) {
-      console.error(err)
-      return res.boom.badImplementation()
+      console.error('eml', err)
+      return res.boom.badRequest('eewe' + JSON.stringify(err, null, 2))
     }
 
     const session: Session = { jwt_token: null, jwt_expires_in: null, user }
