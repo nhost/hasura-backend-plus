@@ -473,7 +473,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `USER_IMPERSONATION_ENABLE`  | false                   | Allow user impersonsation via setting `x-admin-secret` header on `/auth/login`                                                                                                               |
 | `MAGIC_LINK_ENABLE`          | false                   |
 | `WHITELIST_ENABLE`           | false                   |
-| `WHITELIST_SEND_INVITE`      | false                   |
 | `ADMIN_ONLY_REGISTRATION`    | false                   | Allow registration only with x-admin-secret
 
 ### Gravatar

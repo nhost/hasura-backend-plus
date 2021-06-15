@@ -5,9 +5,9 @@ import { WhitelistQuery, whitelistQuery } from '@shared/validation'
 import { insertAllowedEmail } from '@shared/queries'
 import { request } from '@shared/request'
 import { emailClient } from '@shared/email'
-import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express-joi-validation'
+import { ValidatedRequestSchema, ContainerTypes, createValidator, ValidatedRequest } from 'express-joi-validation'
 
-async function whitelist(req: Request, res: Response): Promise<unknown> {
+async function whitelist(req: ValidatedRequest<Schema>, res: Response): Promise<unknown> {
   const body = req.body
 
   const {
@@ -27,7 +27,7 @@ async function whitelist(req: Request, res: Response): Promise<unknown> {
       email
     })
 
-    if(REGISTRATION.WHITELIST_SEND_INVITE) {
+    if(body.invite) {
       if(!APPLICATION.EMAILS_ENABLED) {
         return res.boom.badImplementation('Emails have to be enabled when WHITELIST_SEND_INVITE=true')
       }
