@@ -14,7 +14,7 @@ import { ValidatedRequestSchema, ContainerTypes, createValidator } from 'express
  */
 async function resetPassword(req: RequestExtended<Schema>, res: Response): Promise<unknown> {
   if(!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
-    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/change route.`)
+    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLED env variable to true to use the auth/change-password/change route.`)
   }
 
   // Reset the password from { ticket, new_password }
