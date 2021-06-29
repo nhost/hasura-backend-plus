@@ -65,7 +65,7 @@ function trackRelationship(relationship: Relationship) {
   return axios.post(
     APPLICATION.HASURA_ENDPOINT.replace('/v1/graphql', '/v1/query'),
     {
-      type: relationship.isArray? 'create_array_relationship' : 'create_object_relationship',
+      type: relationship.isArray ? 'create_array_relationship' : 'create_object_relationship',
       args: {
         table: {
           name: sourceTable.name,
