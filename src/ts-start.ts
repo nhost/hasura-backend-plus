@@ -2,8 +2,19 @@ import { APPLICATION } from '@shared/config'
 import { app } from './server'
 import { applyMigrations } from "./shared/migrations"
 import { applyMetadata } from "./shared/metadata"
+import axios from 'axios'
+
+const isHasuraReady = async () => {
+  try {
+    await axios.get(`${APPLICATION.HASURA_ENDPOINT.replace('/v1/graphql', '/healthz')}`)
+  } catch (err) {
+    console.log(`Couldn't find an hasura instance running on ${APPLICATION.HASURA_ENDPOINT}`)
+    process.exit(1)
+  }
+}
 
 const start = async (): Promise<void> => {
+  await isHasuraReady()
   await applyMigrations()
   await applyMetadata()
 
