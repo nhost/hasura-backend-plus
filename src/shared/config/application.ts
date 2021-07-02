@@ -4,6 +4,9 @@ import { castIntEnv, castBooleanEnv, castStringArrayEnv } from './utils'
  * * Application Settings
  */
 export const APPLICATION = {
+  get AUTO_ACTIVATE_NEW_USERS() {
+    return process.env.AUTO_ACTIVATE_NEW_USERS || ''
+  },
   get SERVER_URL() {
     return process.env.SERVER_URL || ''
   },
