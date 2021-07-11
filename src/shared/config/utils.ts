@@ -7,3 +7,5 @@ export const castStringArrayEnv = (envVar: string, defaultValue: string[] = []):
   process.env[envVar]?.length
     ? (process.env[envVar] as string).split(',').map((field) => field.trim())
     : defaultValue
+export const envExists = (envVar: string): boolean =>
+  process.env[envVar] !== undefined
