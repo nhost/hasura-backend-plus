@@ -20,9 +20,10 @@ router.use(nocache())
 
 router.use((req, res, next) => {
   if (!AUTHENTICATION.ENABLE) {
-    return res.boom.badImplementation(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+    console.log(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+    return res.boom.notFound()
   } else {
-    return next();
+    return next()
   }
 })
 

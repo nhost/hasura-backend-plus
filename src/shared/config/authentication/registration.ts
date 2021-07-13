@@ -1,4 +1,4 @@
-import { castBooleanEnv, castStringArrayEnv, castIntEnv } from '../utils'
+import { castBooleanEnv, castStringArrayEnv, castIntEnv, returnBooleanEnvVar } from '../utils'
 
 /**
  * * Registration settings
@@ -17,7 +17,7 @@ export const REGISTRATION = {
     return castBooleanEnv('AUTO_ACTIVATE_NEW_USERS', true)
   },
   get HIBP_ENABLE() {
-    return castBooleanEnv('HIBP_ENABLE')
+    return returnBooleanEnvVar(['HIBP_ENABLE', 'HIBP_ENABLED'], false)
   },
   get CUSTOM_FIELDS() {
     return castStringArrayEnv('REGISTRATION_CUSTOM_FIELDS')
