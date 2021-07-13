@@ -357,42 +357,6 @@ it('should logout', (done) => {
   })
 })
 
-describe('Tests without cookies', () => {
-  it('Should login without cookies', (done) => {
-    registerAccount(request).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(validJwt())
-        .expect(validRefreshToken())
-        .end(end(done))
-    })
-  })
-
-  it('should decode a valid custom user claim', (done) => {
-    let jwtToken = ''
-
-    registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
-      request
-        .post('/auth/login')
-        .send({ email, password, cookie: false })
-        .expect(validJwt())
-        .expect(validRefreshToken())
-        .expect(saveJwt((j) => (jwtToken = j)))
-        .end((err) => {
-          if (err) return done(err)
-
-          const decodedJwt = JWT.decode(jwtToken) as Token
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
-          // Test if the custom claims work
-          expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
-
-          done()
-        })
-    })
-  })
-})
-
 it('should delete an account', (done) => {
   registerAndLoginAccount(request).then(() => {
     request.post('/auth/delete').expect(204).end(end(done))

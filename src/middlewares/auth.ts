@@ -1,8 +1,6 @@
 import { Response, NextFunction } from 'express'
-import { COOKIES } from '@shared/config'
 import { RefreshTokenMiddleware, RequestExtended, PermissionVariables, Claims } from '@shared/types'
 import { getClaims } from '@shared/jwt'
-import { getPermissionVariablesFromCookie } from '@shared/helpers'
 
 export function authMiddleware(req: RequestExtended, res: Response, next: NextFunction) {
   let refresh_token = {
@@ -39,27 +37,6 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
       type: 'query'
     }
     req.refresh_token = refresh_token
-  }
-
-  // -------------------------------------
-  // COOKIES
-  // -------------------------------------
-  const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
-
-  if ('refresh_token' in cookiesInUse) {
-    refresh_token = {
-      value: cookiesInUse.refresh_token,
-      type: 'cookie'
-    }
-    req.refresh_token = refresh_token
-  }
-
-  if ('permission_variables' in cookiesInUse) {
-    try {
-      req.permission_variables = getPermissionVariablesFromCookie(req)
-    } catch (err) {
-      return res.boom.unauthorized(err.message)
-    }
   }
 
   next()

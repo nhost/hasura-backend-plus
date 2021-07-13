@@ -51,7 +51,6 @@ Hasura Backend Plus v2 introduces some brand new features, coming with some brea
 
 - While all the former v1 features exist in v2, the [API endpoints](api) have been modified, and some may behave slightly differently. You may need to change your frontend applications accordingly.
 - The Storage module have been completely rewritten. <!-- TODO link to storage -->
-- The refresh token is now stored in an [HTTP cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) <!-- TODO link to refresh token / cookies system -->
 
 To upgrade from v1 to v2:
 
@@ -440,9 +439,6 @@ This gets passed into the `employedBy()` function, (called `companyId`), and can
 | `ALLOWED_EMAIL_DOMAINS`      |                         | List of comma-separated email domain names that are allowed to register.                                                                                                                     |
 | `CHANGE_EMAIL_ENABLE`        |                         |                                                                                                                                                                                              |
 | `AUTO_ACTIVATE_NEW_USERS`    | true                    | When set to true, automatically activate the users once registererd.                                                                                                                         |
-| `COOKIE_SECRET`              |                         |                                                                                                                                                                                              |
-| `COOKIE_SECURE`              | false                   | Secure cookie attribute                                                                                                                                                                      |
-| `COOKIE_SAME_SITE`           | lax                     | SameSite cookie attribute. Accepts true, false, lax, none or strict. If none of these values it will be set to 'lax'                                                                         |
 | `DEFAULT_USER_ROLE`          | user                    |                                                                                                                                                                                              |
 | `DEFAULT_ALLOWED_USER_ROLES` | user                    | Comma spearated list of default allowed roles assigned to each user. Defaults to DEFAULT_USER_ROLE.                                                                                          |
 | `ALLOWED_USER_ROLES`         | user                    | Comma spearated list of allowed roles users can specify on registration. Defaults to DEFAULT_ALLOWED_USER_ROLES.                                                                             |

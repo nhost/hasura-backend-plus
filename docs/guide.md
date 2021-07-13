@@ -156,14 +156,6 @@ The HBP session is then opened with the client, and the JWT is sent back as the 
 
 ## JWT
 
-<!-- TODO Explain here:
-- How JWT is structured
-- How JWT is refreshed
-- How to get the JWT
--> link to cookie specs in the configuration page -->
-
-When the user logs in, HBP sets an HTTP-Only cookie to store session information and a refresh token.
-
 ::: warning
 Never store a JWT in the local storage of the browser as it is prone to XSS attacks! Keep a short expiration period instead, and get a refreshed JWT through HBP.
 :::
@@ -188,9 +180,11 @@ It will return the same kind of payload as in `/auth/login`, with a new JWT:
 ## Enable an OAuth provider
 
 ### Backend
+
 Set the necessary environment variables on `docker-compose.yaml` under the `hasura-backend-plus` section. The OAuth Providers section from `.env.example` has a list of the supported providers and options. Make sure to set also the `PROVIDER_SUCCESS_REDIRECT` and `PROVIDER_FAILURE_REDIRECT` URLs to the frontend.
 
 ### Frontend
+
 For OAuth login, redirect the user to `//hasura-backend-plus/auth/providers/{provider}` to perform the authentication. Upon success, the URL set in `PROVIDER_SUCCESS_REDIRECT` will be called back, with a `refresh_token` query parameter. Use this value to perform a GET on `//hasura-backend-plus/auth/token/refresh?refresh_token={refresh_token}` to obtain the response which contains the valid JWT.
 
 ## Change email
