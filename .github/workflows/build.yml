@@ -43,7 +43,7 @@ jobs:
           HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
         options: >-
           --restart always
-          --health-cmd "printf 'GET /healthz HTTP/1.1\r\nHost: graphql-engine\r\n\n' | nc -z graphql-engine 8080 > /dev/null 2>&1 || exit 1"
+          --health-cmd "wget --quiet --spider http://graphql-engine:8080/healthz"
           --health-interval 3s
           --health-timeout 5s
           --health-retries 5
