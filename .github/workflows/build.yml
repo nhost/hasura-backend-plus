@@ -30,12 +30,12 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:12
+        image: nhost/postgres:12-v0.0.6
         env:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: --restart always --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       graphql-engine:
-        image: hasura/graphql-engine:v1.3.2
+        image: hasura/graphql-engine:v2.0.1
         env:
           HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
@@ -86,8 +86,6 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install psql
         run: apt-get update && apt-get install --yes --no-install-recommends postgresql-client
-      - name: Init Database
-        run: psql -f ./db/00_init-schema.sql postgresql://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       - name: Install dependencies
         run: yarn
       - name: Lint files
