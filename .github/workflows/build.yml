@@ -43,10 +43,6 @@ jobs:
           HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
         options: >-
           --restart always
-          --health-cmd "wget --quiet --spider http://graphql-engine:8080/healthz"
-          --health-interval 3s
-          --health-timeout 5s
-          --health-retries 50
       minio:
         image: bitnami/minio:2020.7.31
         env:
