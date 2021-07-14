@@ -16,7 +16,7 @@ export const REGISTRATION = {
   get AUTO_ACTIVATE_NEW_USERS() {
     return castBooleanEnv('AUTO_ACTIVATE_NEW_USERS', true)
   },
-  get HIBP_ENABLE() {
+  get HIBP_ENABLED() {
     return returnBooleanEnvVar(['HIBP_ENABLE', 'HIBP_ENABLED'], false)
   },
   get CUSTOM_FIELDS() {

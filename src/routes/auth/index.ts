@@ -19,8 +19,8 @@ const router = Router()
 router.use(nocache())
 
 router.use((req, res, next) => {
-  if (!AUTHENTICATION.ENABLE) {
-    console.log(`Please set the AUTH_ENABLE env variable to true to use the auth routes.`)
+  if (!AUTHENTICATION.ENABLED) {
+    console.log(`Please set the AUTH_ENABLED env variable to true to use the auth routes.`)
     return res.boom.notFound()
   } else {
     return next()

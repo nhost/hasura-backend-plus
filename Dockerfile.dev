@@ -1,4 +1,7 @@
-FROM node:14.4.0-alpine3.11
+FROM node:14-alpine
+
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
 
 # glibc is required by `cli_ext` used to apply metadata
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
@@ -20,6 +23,9 @@ ENV PORT 3000
 ENV PGOPTIONS "-c search_path=auth"
 
 WORKDIR /app
+
+# needed for yest --watch to work properly
+RUN git init /app
 
 COPY package.json yarn.lock ./
 RUN yarn install

@@ -1,6 +1,7 @@
 // * Helpers for casting environment variables
 export const castBooleanEnv = (envVar: string, defaultValue = false): boolean => {
-  if (envVar && envVar.endsWith('ENABLE')) {
+  if (process.env[envVar] !== undefined && envVar.endsWith('ENABLE')) {
+    console.warn(process.env[envVar])
     console.warn(`Please update ${envVar} to ${envVar.replace('ENABLE', 'ENABLED')}`)
   }
   return process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue

@@ -22,7 +22,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
-  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
@@ -69,7 +69,10 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? loginSchemaMagicLink : loginSchema).validateAsync(body)
+  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLED
+    ? loginSchemaMagicLink
+    : loginSchema
+  ).validateAsync(body)
 
   const account = await selectAccount(body)
 
@@ -103,7 +106,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
         }
       })
 
-      return res.send({ magicLink: true });
+      return res.send({ magicLink: true })
     } catch (err) {
       console.error(err)
       return res.boom.badImplementation()
@@ -118,11 +121,11 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const adminSecret = headers[HEADERS.ADMIN_SECRET_HEADER]
   const hasAdminSecret = Boolean(adminSecret)
   const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
-  let userImpersonationValid = false;
-  if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
+  let userImpersonationValid = false
+  if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && !isAdminSecretCorrect) {
     return res.boom.unauthorized('Invalid x-admin-secret')
-  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
-    userImpersonationValid = true;
+  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && isAdminSecretCorrect) {
+    userImpersonationValid = true
   }
 
   // Validate Password
