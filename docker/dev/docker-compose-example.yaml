@@ -1,8 +1,8 @@
 version: '3.6'
 services:
   postgres:
-    container_name: postgres
-    image: 'nhost/postgres:12-v0.0.5'
+    container_name: hbp-dev-postgres
+    image: 'nhost/postgres:12-v0.0.6'
     restart: always
     volumes:
       - './db_data:/var/lib/postgresql/data'
@@ -10,8 +10,7 @@ services:
       POSTGRES_PASSWORD: pgpassword
       POSTGRES_DB: postgres
   graphql-engine:
-    image: 'hasura/graphql-engine:v1.3.3'
-    container_name: hasura
+    image: 'hasura/graphql-engine:v2.0.1'
     depends_on:
       - postgres
     restart: always
@@ -30,8 +29,8 @@ services:
       - graphql-engine
       - serve
   hasura-backend-plus:
-    image: 'nhost/hasura-backend-plus:v2.6.1'
-    container_name: hbp
+    image: 'nhost/hasura-backend-plus:latest'
+    container_name: hbp-dev-hbp
     build:
       context: ../../
       dockerfile: Dockerfile.dev
@@ -48,7 +47,7 @@ services:
         postgres://postgres:pgpassword@postgres:5432/postgres
       SERVER_URL: 'http://localhost:4000'
       HASURA_ENDPOINT: 'http://graphql-engine:8080/v1/graphql'
-      HASURA_GRAPHQL_ADMIN_SECRET: hejsan
+      HASURA_GRAPHQL_ADMIN_SECRET: hello123
       JWT_KEY: >-
         jhyu89jiuhyg7678hoijhuytf7ghjiasodibagsdga9dha8os7df97a6sdgh9asudgo7f7g8h1uuoyafsod8pgasipdg8aps9dhai;sd
       JWT_ALGORITHM: HS256
@@ -59,31 +58,13 @@ services:
       S3_BUCKET: nhost
       S3_ACCESS_KEY_ID: 5a7bdb5f42c41e0622bf61d6e08d5537
       S3_SECRET_ACCESS_KEY: 9e1c40c65a615a5b52f52aeeaf549944ec53acb1dff4a0bf01fb58e969f915c8
-      AUTH_ENABLED: 'false'
+      AUTH_ENABLED: 'true'
       MAGIC_LINK_ENABLED: 'true'
       AUTH_LOCAL_USERS_ENABLED: 'true'
       AUTO_ACTIVATE_NEW_USERS: 'true'
       AUTH_ANONYMOUS_USERS_ACTIVE: 'false'
       PROVIDER_SUCCESS_REDIRECT: 'http://localhost:3001/success'
       PROVIDER_FAILURE_REDIRECT: 'http://localhost:3001/failed'
-      STRAVA_ENABLED: 'true'
-      STRAVA_CLIENT_ID: '64535'
-      STRAVA_CLIENT_SECRET: '194a968a25ace8adaaa76fb197d1e6b6be5f8aa1'
-      GITHUB_ENABLED: 'true'
-      GITHUB_CLIENT_ID: 'b71b41a0bf79c42c3b3f'
-      GITHUB_CLIENT_SECRET: '55004a32c5b2f67378216c8cff02ba85afb0c85d'
-      GOOGLE_ENABLED: 'true'
-      GOOGLE_CLIENT_ID: '623024459960-4mcq81j0mj6ioqp8col4qo2amq6a8jig.apps.googleusercontent.com'
-      GOOGLE_CLIENT_SECRET: 'PM82kOMKL7MQAkTL4xygEUfj'
-      LINKEDIN_ENABLED: 'false'
-      LINKEDIN_CLIENT_ID: '78zl5y0h56tul4'
-      LINKEDIN_CLIENT_SECRET: 'GnQOwyQBaZBlMFIr'
-      FACEBOOK_ENABLED: 'false'
-      FACEBOOK_CLIENT_ID: ''
-      FACEBOOK_CLIENT_SECRET: ''
-      SPOTIFY_ENABLED: 'true'
-      SPOTIFY_CLIENT_ID: 3a3d9ca58b904143be237b5b717e400b
-      SPOTIFY_CLIENT_SECRET: 257ab01f83f34d739d51da7ee8fd1e50
       ALLOW_USER_SELF_DELETE: 'false'
       LOST_PASSWORD_ENABLED: 'true'
       MIN_PASSWORD_LENGTH: 4
@@ -95,7 +76,8 @@ services:
       DEFAULT_ALLOWED_USER_ROLES: 'user,me'
       ALLOWED_USER_ROLES: 'user,me'
       REGISTRATION_CUSTOM_FIELDS: 'display_name'
-      COOKIE_SECURE: 'false'
+      COOKIE_SECURE: 'true'
+      COOKIE_SECRET: 'somelongvalue'
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       SMTP_PASS: password
@@ -104,11 +86,12 @@ services:
       SMTP_SENDER: hbp@hbp.com
       REDIRECT_URL_SUCCESS: 'http://localhost:3000'
     volumes:
-      - './custom:/app/custom'
+      - '../../custom:/app/custom'
       - '../../src:/app/src'
+      - '../../migrations:/app/migrations'
   minio:
     image: 'minio/minio:RELEASE.2020-06-18T02-23-35Z'
-    container_name: minio
+    container_name: hbp-dev-minio
     user: '999:1001'
     restart: always
     environment:
@@ -122,6 +105,7 @@ services:
       - './minio_data:/data'
   mailhog:
     image: mailhog/mailhog
+    container_name: hbp-dev-mailhog
     environment:
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
