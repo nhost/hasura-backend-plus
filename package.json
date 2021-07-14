@@ -10,7 +10,6 @@
   "scripts": {
     "test": "jest",
     "test:in-docker": "cd docker/dev; docker exec -it hbp-dev-hbp yarn test --runInBand",
-    "test:in-docker:w": "cd docker/dev; docker exec -it hbp-dev-hbp yarn test --runInBand --watch",
     "dev:docker:logs": "cd docker/dev; docker-compose logs -f",
     "dev:docker:down": "cd docker/dev; docker-compose down",
     "dev:docker:up": "cd docker/dev; docker-compose up",
