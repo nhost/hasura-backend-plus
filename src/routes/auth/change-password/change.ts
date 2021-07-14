@@ -35,7 +35,8 @@ async function basicPasswordChange(req: RequestExtended, res: Response): Promise
   }
 
   // Check the old (current) password
-  if (!(await bcrypt.compare(old_password, password_hash))) {
+  // but only if there is a previous password set
+  if (password_hash && !(await bcrypt.compare(old_password, password_hash))) {
     return res.boom.unauthorized('Incorrect current password.')
   }
 

@@ -103,7 +103,9 @@ export const selectAccountByEmail = gql`
 
 export const selectAccountByTicket = gql`
   query($ticket: uuid!, $now: timestamptz!) {
-    auth_accounts(where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }) {
+    auth_accounts(
+      where: { _and: [{ ticket: { _eq: $ticket } }, { ticket_expires_at: { _gt: $now } }] }
+    ) {
       ...accountFragment
     }
   }
@@ -142,13 +144,7 @@ export const selectRefreshToken = gql`
 
 export const accountOfRefreshToken = gql`
   query($refresh_token: uuid!) {
-    auth_refresh_tokens(
-      where: {
-        _and: [
-          { refresh_token: { _eq: $refresh_token } }
-        ]
-      }
-    ) {
+    auth_refresh_tokens(where: { _and: [{ refresh_token: { _eq: $refresh_token } }] }) {
       account {
         ...accountFragment
       }
@@ -306,4 +302,12 @@ export const selectAccountProvider = gql`
     }
   }
   ${accountFragment}
+`
+
+export const updateAccountByEmail = gql`
+  mutation updateAccountByEmail($account_email: citext!, $account: auth_accounts_set_input!) {
+    update_auth_accounts(where: { email: { _eq: $account_email } }, _set: $account) {
+      affected_rows
+    }
+  }
 `
