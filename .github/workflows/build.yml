@@ -50,6 +50,8 @@ jobs:
           MINIO_SECRET_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
           MINIO_DEFAULT_BUCKETS: ${{ env.S3_BUCKET }}
         options: --restart always
+        ports:
+          - 9000:9000
       mailhog:
         image: mailhog/mailhog
         env:
