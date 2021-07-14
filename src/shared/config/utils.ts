@@ -1,3 +1,5 @@
+// import { env } from 'process'
+
 // * Helpers for casting environment variables
 export const castBooleanEnv = (envVar: string, defaultValue = false): boolean => {
   if (process.env[envVar] !== undefined && envVar.endsWith('ENABLE')) {
@@ -7,8 +9,15 @@ export const castBooleanEnv = (envVar: string, defaultValue = false): boolean =>
   return process.env[envVar] ? process.env[envVar]?.toLowerCase() === 'true' : defaultValue
 }
 
-export const castIntEnv = (envVar: string, defaultValue: number): number =>
-  parseInt(process.env[envVar] as string, 10) || defaultValue
+export const castIntEnv = (envVar: string, defaultValue: number): number => {
+  const n = parseInt(process.env[envVar] as string, 10)
+
+  if (isNaN(n)) {
+    return defaultValue
+  }
+
+  return n
+}
 
 export const castStringArrayEnv = (envVar: string, defaultValue: string[] = []): string[] =>
   process.env[envVar]?.length
