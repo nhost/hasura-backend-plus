@@ -1,26 +1,33 @@
----
-home: true
-heroImage: logo.png
-heroText: Hasura Backend Plus
-tagline: Authentication and Object Storage for Hasura
-actionText: Get Started →
-actionLink: /guide/
-features:
-  - title: Hasura
-    details: Works alongside with Hasura GraphQL Engine and seamlessly integrates the recurrent features you're craving for.
-  - title: Authentication
-    details: Comprehensive user accounts management, JWT, optional multi-factor authentication, Hasura claims with roles and custom fields and many more.
-  - title: Storage
-    details: Easy and configurable API for any S3-compatible object storage such as Minio.
-footer: MIT Licensed | Copyright © 2018-present Nhost
----
+# Website
 
-The easiest way to deploy HBP is with the official [Nhost](https://nhost.io) managed service. Get your perfect configured backend with PostgreSQL, Hasura and Hasura Backend Plus and save yourself hours of maintenance per month.
+This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
-All [Nhost](https://nhost.io) projects are built on open source software so you can make realtime web and mobile apps fast 🚀.
+## Installation
 
-<div style="text-align:center;">
-  <a href="https://nhost.io/register" target="_blank" >
-    <img src="https://raw.githubusercontent.com/nhost/hasura-backend-plus/master/docs/.vuepress/public/nhost-register-button.png" width="200px" />
-  </a>
-</div>
+```console
+yarn install
+```
+
+## Local Development
+
+```console
+yarn start
+```
+
+This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+
+## Build
+
+```console
+yarn build
+```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+## Deployment
+
+```console
+GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
