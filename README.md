@@ -59,7 +59,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!
+Contributions and issues are welcome.
 
 Feel free to check the [issues page](https://github.com/nhost/hasura-backend-plus/issues).
 

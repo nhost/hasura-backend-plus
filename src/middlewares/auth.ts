@@ -58,7 +58,8 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
     try {
       req.permission_variables = getPermissionVariablesFromCookie(req)
     } catch (err) {
-      return res.boom.unauthorized(err.message)
+      console.error(err)
+      return res.boom.unauthorized(err)
     }
   }
 
