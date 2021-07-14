@@ -6,7 +6,7 @@ import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
+import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -15,16 +15,15 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const body = req.body
 
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
-  //
 
   const {
     email,
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE
-    ? registerSchemaMagicLink
-    : registerSchema
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED
+    ? getRegisterSchemaMagicLink()
+    : getRegisterSchema()
   ).validateAsync(body)
 
   if (await selectAccount(body)) {
@@ -90,6 +89,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   const account = accounts.insert_auth_accounts.returning[0]
+
   const user: UserData = {
     id: account.user.id,
     display_name: account.user.display_name,

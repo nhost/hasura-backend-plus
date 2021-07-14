@@ -26,18 +26,18 @@ export const AUTHENTICATION = {
     return returnBooleanEnvVar(['ANONYMOUS_USERS_ENABLE', 'ANONYMOUS_USERS_ENABLED'], false)
   },
   get ALLOW_USER_SELF_DELETE() {
-    return returnBooleanEnvVar(['ALLOW_USER_SELF_DELETE', 'ALLOW_USER_SELF_DELETE'], false)
+    return returnBooleanEnvVar(['ALLOW_USER_SELF_DELETE'], false)
   },
   get VERIFY_EMAILS() {
     return returnBooleanEnvVar(['VERIFY_EMAILS'], false)
   },
   get LOST_PASSWORD_ENABLED() {
-    return returnBooleanEnvVar(['LOST_PASSWORD_ENABLE', 'LOST_PASSWORD_ENALBED'], false)
+    return returnBooleanEnvVar(['LOST_PASSWORD_ENABLE', 'LOST_PASSWORD_ENABLED'], false)
   },
   get USER_IMPERSONATION_ENABLED() {
     return returnBooleanEnvVar(['USER_IMPERSONATION_ENABLE', 'USER_IMPERSONATION_ENABLED'], false)
   },
   get MAGIC_LINK_ENABLED() {
-    return returnBooleanEnvVar(['MAGIC_LINK_ENABLE', 'MAGIX_LINK_ENABLED'], false)
+    return returnBooleanEnvVar(['MAGIC_LINK_ENABLE', 'MAGIC_LINK_ENABLED'], false)
   }
 }

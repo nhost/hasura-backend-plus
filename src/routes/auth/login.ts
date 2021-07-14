@@ -22,7 +22,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
-  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously

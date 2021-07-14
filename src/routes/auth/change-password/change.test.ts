@@ -8,7 +8,6 @@ it('should change the password from the old password', (done) => {
   const new_password = generateRandomString()
 
   registerAndLoginAccount(request).then(({ password }) => {
-    console.log(request.jar)
     request
       .post('/auth/change-password')
       .send({ old_password: password, new_password })

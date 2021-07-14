@@ -25,5 +25,5 @@ export const JWT = {
   },
   get CUSTOM_FIELDS() {
     return castStringArrayEnv('JWT_CUSTOM_FIELDS')
-  },
+  }
 }

@@ -85,6 +85,7 @@ services:
       SMTP_SECURE: 'false'
       SMTP_SENDER: hbp@hbp.com
       REDIRECT_URL_SUCCESS: 'http://localhost:3000'
+      REDIRECT_URL_ERROR: 'http://localhost:3000/fail'
     volumes:
       - '../../custom:/app/custom'
       - '../../src:/app/src'

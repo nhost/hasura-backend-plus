@@ -30,30 +30,70 @@ function errorMessageEqual(msg: string) {
 
 const pwndPasswordIt = REGISTRATION.HIBP_ENABLED ? it : it.skip
 pwndPasswordIt('should tell the password has been pwned 123', (done) => {
-  request
-    .post('/auth/register')
-    .send({ email: generateRandomEmail(), password: '123456' })
-    .expect(400)
-    .expect(errorMessageEqual('Password is too weak.'))
-    .end(end(done))
+  withEnv(
+    {
+      HIBP_ENABLED: 'true'
+    },
+    request,
+    async () => {
+      request
+        .post('/auth/register')
+        .send({ email: generateRandomEmail(), password: '123456' })
+        .expect(400)
+        .expect(errorMessageEqual('Password is too weak.'))
+        .end(end(done))
+    },
+    {
+      HIBP_ENABLED: 'false'
+    }
+  )
 })
 
 it('should create an account', (done) => {
-  request
-    .post('/auth/register')
-    .send({
-      email: generateRandomEmail(),
-      password: generateRandomString(),
-      user_data: { name: 'Test name' }
-    })
-    .expect(200)
-    .end(end(done))
+  withEnv(
+    {
+      REGISTRATION_CUSTOM_FIELDS: ''
+    },
+    request,
+    async () => {
+      request
+        .post('/auth/register')
+        .send({
+          email: generateRandomEmail(),
+          password: generateRandomString()
+        })
+        .expect(200)
+        .end(end(done))
+    }
+  )
+})
+
+it('should create an account with custom user data', (done) => {
+  withEnv(
+    {
+      REGISTRATION_CUSTOM_FIELDS: 'name'
+    },
+    request,
+    async () => {
+      request
+        .post('/auth/register')
+        .send({
+          email: generateRandomEmail(),
+          password: generateRandomString(),
+          user_data: { name: 'Test name' }
+        })
+        .expect(200)
+        .end(end(done))
+    }
+  )
 })
 
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLED: 'true'
+      MAGIC_LINK_ENABLED: 'true',
+      AUTO_ACTIVATE_NEW_USERS: 'false',
+      REGISTRATION_CUSTOM_FIELDS: 'name'
     },
     request,
     async () => {
@@ -129,18 +169,26 @@ it('should fail to create account with default_role that does not overlap allowe
 })
 
 it('should create account with default_role that is in the ALLOWED_USER_ROLES variable', (done) => {
-  request
-    .post('/auth/register')
-    .send({
-      email: generateRandomEmail(),
-      password: generateRandomString(),
-      user_data: { name: 'Test name' },
-      register_options: {
-        default_role: 'editor'
-      }
-    })
-    .expect(200)
-    .end(end(done))
+  withEnv(
+    {
+      DEFAULT_ALLOWED_USER_ROLES: 'user,me,editor',
+      ALLOWED_USER_ROLES: 'user,me,editor'
+    },
+    request,
+    async () => {
+      request
+        .post('/auth/register')
+        .send({
+          email: generateRandomEmail(),
+          password: generateRandomString(),
+          register_options: {
+            default_role: 'editor'
+          }
+        })
+        .expect(200)
+        .end(end(done))
+    }
+  )
 })
 
 it('should register account with default_role and allowed_roles set', (done) => {
@@ -181,7 +229,7 @@ it('should fail to activate an user from a wrong ticket', async () => {
   await withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true'
+      EMAILS_ENABLED: 'true'
     },
     request,
     async () => {
@@ -198,7 +246,7 @@ it('should activate the account from a valid ticket', async () => {
   await withEnv(
     {
       AUTO_ACTIVATE_NEW_USERS: 'false',
-      EMAILS_ENABLE: 'true'
+      EMAILS_ENABLED: 'true'
     },
     request,
     async () => {
@@ -333,22 +381,32 @@ it('should sign in user with valid admin secret', (done) => {
 it('should decode a valid custom user claim', (done) => {
   let jwtToken = ''
 
-  registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
-    request
-      .post('/auth/login')
-      .send({ email, password })
-      .expect(200)
-      .expect(saveJwt((j) => (jwtToken = j)))
-      .end((err) => {
-        if (err) return done(err)
+  withEnv(
+    {
+      REGISTRATION_CUSTOM_FIELDS: 'name',
+      JWT_CUSTOM_FIELDS: 'name'
+    },
+    request,
+    async () => {
+      registerAccount(request, { name: 'Test name' }).then(({ email, password }) => {
+        request
+          .post('/auth/login')
+          .send({ email, password })
+          .expect(200)
+          .expect(saveJwt((j) => (jwtToken = j)))
+          .end((err) => {
+            if (err) return done(err)
 
-        const decodedJwt = JWT.decode(jwtToken) as Token
-        expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
-        // Test if the custom claims work
-        expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
-        done()
+            const decodedJwt = JWT.decode(jwtToken) as Token
+            expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]).toBeObject()
+            // Test if the custom claims work
+
+            expect(decodedJwt[CONFIG_JWT.CLAIMS_NAMESPACE]['x-hasura-name']).toEqual('Test name')
+            done()
+          })
       })
-  })
+    }
+  )
 })
 
 it('should logout', (done) => {
@@ -394,7 +452,15 @@ describe('Tests without cookies', () => {
 })
 
 it('should delete an account', (done) => {
-  registerAndLoginAccount(request).then(() => {
-    request.post('/auth/delete').expect(204).end(end(done))
-  })
+  withEnv(
+    {
+      ALLOW_USER_SELF_DELETE: 'true'
+    },
+    request,
+    async () => {
+      registerAndLoginAccount(request).then(() => {
+        request.post('/auth/delete').expect(204).end(end(done))
+      })
+    }
+  )
 })
