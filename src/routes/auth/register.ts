@@ -26,7 +26,11 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     : getRegisterSchema()
   ).validateAsync(body)
 
-  if (await selectAccount(body)) {
+  const selectedAccount = await selectAccount(body)
+  if (selectedAccount) {
+    if (!selectedAccount.active) {
+      return res.boom.badRequest('Account already exists but is not activated.')
+    }
     return res.boom.badRequest('Account already exists.')
   }
 

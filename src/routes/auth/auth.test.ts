@@ -220,7 +220,7 @@ it('should tell the account already exists', (done) => {
         .post('/auth/register')
         .send({ email, password })
         .expect(400)
-        .expect(errorMessageEqual('Account already exists.'))
+        .expect(errorMessageEqual('Account already exists but is not activated.'))
         .end(end(done))
     })
 })
