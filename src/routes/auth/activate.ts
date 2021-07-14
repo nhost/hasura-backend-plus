@@ -1,4 +1,4 @@
-import { APPLICATION, REGISTRATION } from '@shared/config'
+import { APPLICATION } from '@shared/config'
 import { Request, Response } from 'express'
 
 import { activateAccount } from '@shared/queries'
@@ -7,13 +7,17 @@ import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/validation'
 import { UpdateAccountData } from '@shared/types'
+import { setRefreshToken } from '@shared/cookies'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
-  if (REGISTRATION.AUTO_ACTIVATE_NEW_USERS) {
-    return res.boom.badImplementation(`Please set the AUTO_ACTIVATE_NEW_USERS env variable to false to use the auth/activate route.`)
+  if (!APPLICATION.REDIRECT_URL_SUCCESS) {
+    return res.boom.badImplementation(
+      'Environment variable REDIRECT_URL_SUCCESS must be set for activation to work.'
+    )
   }
 
   let hasuraData: UpdateAccountData
+  const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
 
   const { ticket } = await verifySchema.validateAsync(query)
 
@@ -45,10 +49,15 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     return res.boom.unauthorized('Invalid or expired ticket.')
   }
 
-  if(APPLICATION.REDIRECT_URL_SUCCESS) {
-    res.redirect(APPLICATION.REDIRECT_URL_SUCCESS.replace('JWT_TOKEN', ticket))
-  } else
-    res.status(200).send('Your account has been activated. You can close this window and login')
+  const refresh_token = await setRefreshToken(
+    res,
+    hasuraData.update_auth_accounts.returning[0].id,
+    useCookie
+  )
+
+  // Redirect user with refresh token.
+  // This is both for when users log in and register.
+  return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
 }
 
 export default asyncWrapper(activateUser)

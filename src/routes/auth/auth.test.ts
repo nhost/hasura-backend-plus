@@ -257,8 +257,7 @@ it('should activate the account from a valid ticket', async () => {
 
       const ticket = await getHeaderFromLatestEmailAndDelete(email, 'X-Ticket')
 
-      const { status } = await request.get(`/auth/activate?ticket=${ticket}`)
-      expect(status).toBeOneOf([204, 302])
+      await request.get(`/auth/activate?ticket=${ticket}`).expect(302)
     }
   )
 })
