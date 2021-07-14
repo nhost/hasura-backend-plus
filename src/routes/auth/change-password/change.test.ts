@@ -7,7 +7,8 @@ import { generateRandomString, registerAccount, registerAndLoginAccount } from '
 it('should change the password from the old password', (done) => {
   const new_password = generateRandomString()
 
-  registerAndLoginAccount(request).then(({email, password}) => {
+  registerAndLoginAccount(request).then(({ password }) => {
+    console.log(request.jar)
     request
       .post('/auth/change-password')
       .send({ old_password: password, new_password })
@@ -21,13 +22,13 @@ it('should change password using old password without cookies', (done) => {
   const new_password = generateRandomString()
   let jwtToken = ''
 
-  registerAccount(request).then(({email, password}) => {
+  registerAccount(request).then(({ email, password }) => {
     request
       .post('/auth/login')
-      .send({ email, password, cookie: false})
-      .expect(saveJwt(j => jwtToken = j))
+      .send({ email, password, cookie: false })
+      .expect(saveJwt((j) => (jwtToken = j)))
       .end((err) => {
-        if(err) return done(err)
+        if (err) return done(err)
 
         request
           .post('/auth/change-password')

@@ -4,7 +4,7 @@ import { returnBooleanEnvVar } from './utils'
  * * Storage Settings
  */
 export const STORAGE = {
-  get ENABLE() {
+  get ENABLED() {
     return returnBooleanEnvVar(['STORAGE_ENABLE', 'STORAGE_ENABLED'], true)
   },
   get S3_SSL_ENABLED() {

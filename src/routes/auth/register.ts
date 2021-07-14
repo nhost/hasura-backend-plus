@@ -15,19 +15,23 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const body = req.body
 
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
+  //
 
   const {
     email,
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLE
+    ? registerSchemaMagicLink
+    : registerSchema
+  ).validateAsync(body)
 
   if (await selectAccount(body)) {
     return res.boom.badRequest('Account already exists.')
   }
 
-  let password_hash: string | null = null;
+  let password_hash: string | null = null
 
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes

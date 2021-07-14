@@ -28,8 +28,8 @@ function errorMessageEqual(msg: string) {
   }
 }
 
-const pwndPasswordIt = REGISTRATION.HIBP_ENABLE ? it : it.skip
-pwndPasswordIt('should tell the password has been pwned', (done) => {
+const pwndPasswordIt = REGISTRATION.HIBP_ENABLED ? it : it.skip
+pwndPasswordIt('should tell the password has been pwned 123', (done) => {
   request
     .post('/auth/register')
     .send({ email: generateRandomEmail(), password: '123456' })
@@ -53,7 +53,7 @@ it('should create an account', (done) => {
 it('should create an account without a password when magic link login is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true'
+      MAGIC_LINK_ENABLED: 'true'
     },
     request,
     async () => {
@@ -84,7 +84,7 @@ it('should create an account without a password when magic link login is enabled
 it('should not create an account without a password when magic link login is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -255,7 +255,7 @@ it('should sign the user in', (done) => {
 it('should sign the user in without password when magic link is enabled', async () => {
   await withEnv(
     {
-      MAGIC_LINK_ENABLE: 'true',
+      MAGIC_LINK_ENABLED: 'true',
       AUTO_ACTIVATE_NEW_USERS: 'false',
       VERIFY_EMAILS: 'true'
     },
@@ -298,7 +298,7 @@ it('should sign the user in without password when magic link is enabled', async 
 it('should not sign the user in without password when magic link is disabled', (done) => {
   withEnv(
     {
-      MAGIC_LINK_ENABLE: 'false'
+      MAGIC_LINK_ENABLED: 'false'
     },
     request,
     async () => {
@@ -398,12 +398,3 @@ it('should delete an account', (done) => {
     request.post('/auth/delete').expect(204).end(end(done))
   })
 })
-
-// test anonymous account
-// const anonymousAccountIt = ANONYMOUS_USERS_ENABLE ? it : it.skip
-// anonymousAccountIt('should login anonymously', (done) => {
-//   const { body, status } = await request.post('/auth/login').send({ anonymous: true })
-//   expect(status).toEqual(200)
-//   expect(body.jwt_token).toBeString()
-//   expect(body.jwt_expires_in).toBeNumber()
-// })

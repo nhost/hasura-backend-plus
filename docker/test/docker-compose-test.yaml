@@ -76,7 +76,7 @@ services:
       DEFAULT_ALLOWED_USER_ROLES: 'user,me'
       ALLOWED_USER_ROLES: 'user,me'
       REGISTRATION_CUSTOM_FIELDS: 'display_name'
-      COOKIE_SECURE: 'false'
+      COOKIE_SECURE: 'true'
       COOKIE_SECRET: 'somelongvalue'
       SMTP_HOST: mailhog
       SMTP_PORT: 1025

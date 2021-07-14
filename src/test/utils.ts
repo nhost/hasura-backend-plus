@@ -23,8 +23,8 @@ export async function withEnv(
   rollbackEnv?: Record<string, string>
 ) {
   await agent.post('/change-env').send(env)
-  if(cb) await cb()
-  if(rollbackEnv) {
+  if (cb) await cb()
+  if (rollbackEnv) {
     await agent.post('/change-env').send(rollbackEnv)
   }
 }
@@ -34,26 +34,35 @@ export const createAccountLoginData = (): AccountLoginData => ({
   password: generateRandomString()
 })
 
-export const registerAccount = async (agent: SuperTest<Test>, user_data: Record<string, any> = {}): Promise<AccountLoginData> => {
-  const accountLoginData = createAccountLoginData();
+export const registerAccount = async (
+  agent: SuperTest<Test>,
+  user_data: Record<string, any> = {}
+): Promise<AccountLoginData> => {
+  const accountLoginData = createAccountLoginData()
 
-  await withEnv({
-    AUTO_ACTIVATE_NEW_USERS: 'true'
-  }, agent, async () => {
-    await agent.post('/auth/register').send({
-      ...accountLoginData,
-      user_data,
-    })
-  })
+  await withEnv(
+    {
+      AUTO_ACTIVATE_NEW_USERS: 'true'
+    },
+    agent,
+    async () => {
+      await agent.post('/auth/register').send({
+        ...accountLoginData,
+        user_data
+      })
+    }
+  )
 
-  return accountLoginData;
+  return accountLoginData
 }
 
 export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData) => {
   // * Set the use variable so it is accessible to the jest test file
+  const loginResponse = await agent.post('/auth/login').send(accountLoginData)
+  const token = loginResponse.body.jwt_token as string
   return {
     ...accountLoginData,
-    token: (await agent.post('/auth/login').send(accountLoginData)).body.jwt_token as string
+    token
   }
 }
 
@@ -116,10 +125,10 @@ export const deleteMailHogEmail = async ({ ID }: MailhogMessage): Promise<Respon
 export const deleteEmailsOfAccount = async (email: string): Promise<void> =>
   (await mailHogSearch(email)).forEach(async (message) => await deleteMailHogEmail(message))
 
-export const getHeaderFromLatestEmailAndDelete = async(email: string, header: string) => {
+export const getHeaderFromLatestEmailAndDelete = async (email: string, header: string) => {
   const [message] = await mailHogSearch(email)
 
-  if(!message) return
+  if (!message) return
 
   const headerValue = message.Content.Headers[header][0]
   await deleteMailHogEmail(message)
