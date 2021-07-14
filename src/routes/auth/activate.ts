@@ -2,7 +2,7 @@ import { APPLICATION } from '@shared/config'
 import { Request, Response } from 'express'
 
 import { activateAccount } from '@shared/queries'
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, getEndURLOperator } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/validation'
@@ -55,9 +55,15 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     useCookie
   )
 
+  const url_operator = getEndURLOperator({
+    url: APPLICATION.REDIRECT_URL_SUCCESS
+  })
+
   // Redirect user with refresh token.
   // This is both for when users log in and register.
-  return res.redirect(`${APPLICATION.REDIRECT_URL_SUCCESS}?refresh_token=${refresh_token}`)
+  return res.redirect(
+    `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}`
+  )
 }
 
 export default asyncWrapper(activateUser)

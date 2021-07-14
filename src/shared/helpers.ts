@@ -121,3 +121,7 @@ export const getPermissionVariablesFromCookie = (req: RequestExtended): Permissi
   if (!permission_variables) throw new Error('No permission variables')
   return JSON.parse(permission_variables)
 }
+
+export const getEndURLOperator = ({ url }: { url: string }) => {
+  return url.includes('?') ? '&' : '?'
+}
