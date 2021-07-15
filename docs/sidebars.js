@@ -21,6 +21,7 @@ module.exports = {
       label: "Getting Started",
       items: ["getting-started/setup", "getting-started/configuration"],
     },
+    "storage-rules",
     "environment-variables",
   ],
 };
