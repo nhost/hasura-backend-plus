@@ -17,11 +17,6 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
   console.log('inside /change-password/request')
 
   if (!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
-    console.log('lost password not enabled')
-    console.log('LOST PASSWORD ENABLED is:')
-
-    console.log(AUTHENTICATION.LOST_PASSWORD_ENABLED)
-
     return res.boom.badImplementation(
       `Please set the LOST_PASSWORD_ENABLED env variable to true to use the auth/change-password/request route.`
     )

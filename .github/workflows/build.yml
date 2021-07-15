@@ -2,18 +2,12 @@ name: Build
 on:
   pull_request:
     branches: [master]
-    paths:
-      - '**'
-      - '!docs/**'
-      - '!examples/**'
-      - '!*.md'
+    paths-ignore:
+      - 'docs/**'
   push:
     branches: [master]
-    paths:
-      - '**'
-      - '!docs/**'
-      - '!examples/**'
-      - '!*.md'
+    paths-ignore:
+      - 'docs/**'
   release:
     types: [published]
 env:
