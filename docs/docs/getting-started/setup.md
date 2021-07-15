@@ -6,11 +6,19 @@ Hasura Backend Plus runs in a container along side Postgres and Hasura.
 
 ## Nhost (recommended)
 
-[Nhost](https://nhost.io).
+The recommended way to start using Hasura Backend Plus is by using Nhost.
+
+With Nhost, you get a complete backend ready in seconds with Hasura, Hasura Backend Plus, Postgres and Minio.
+
+Go to [Nhost](https://nhost.io) and start building your app now.
 
 ## Self host
 
-Here is a `docker-compose.yaml` file containing the following services:
+Hasura Backend Plus is open source and can be self hosted.
+
+Here is a `docker-compose.yaml` file for the basic things you need to get started with Hasura Backend Plus.
+
+**Services:**
 
 - Postgres
 - Hasura
@@ -120,24 +128,38 @@ $ docker-compose logs -f
 
 All services should now have started and Hasura Backend Plus have added tables in the `auth` schema and a `users` table in the `public` schema.
 
-You can see them in the hasura console running on [http://localhost:8080](http://localhost:8080).
-
-TODO: IMAGE
+You can see them in the hasura console running on [http://localhost:8080/console](http://localhost:8080/console).
 
 ## Register First User
 
 Add your first user:
 
 ```bash
-curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/register`
+curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:4000/auth/register
 ```
 
-TODO image of Hasura Console with
+Hasura Backend Plus creates the user and responds with the JWT token plus some:
+
+```json
+{
+  "jwt_token": "eyJhbGciOiJIUzI1NiJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLXVzZXItaWQiOiIxNzlhNjRkMS0wOTg5LTRmODEtOTU3Yi1mZTQ0MzQwYThhMDMiLCJ4LWhhc3VyYS1hbGxvd2VkLXJvbGVzIjpbInVzZXIiLCJtZSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIn0sInN1YiI6IjE3OWE2NGQxLTA5ODktNGY4MS05NTdiLWZlNDQzNDBhOGEwMyIsImlzcyI6Im5ob3N0IiwiaWF0IjoxNjI2MzY1NDU1LCJleHAiOjE2MjYzNjYzNTV9.KN3Y7IzeWMoMAI6GxIbW0vI6CNL2SSjaH9IN0dD4058",
+  "jwt_expires_in": 900000,
+  "user": {
+    "id": "179a64d1-0989-4f81-957b-fe44340a8a03",
+    "display_name": "someone@nhost.io",
+    "email": "someone@nhost.io"
+  }
+}
+```
+
+> The registration endpoint returns the JWT token because the user was automatically activated. You can change this by setting `AUTO_ACTIVATE_NEW_USERS` to `false`.
+
+The user is also present in the `users` table in the [Hasura Console](http://localhost:8080/console/data/default/schema/public/tables/users/browse).
 
 ## Login User
 
-Login user and get tokens back.
+A user can be logged in by sending the same request to the `/auth/login` endpoint.
 
 ```bash
-curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/login`
+curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:4000/auth/login
 ```
