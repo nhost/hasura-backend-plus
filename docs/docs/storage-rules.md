@@ -126,7 +126,7 @@ paths:
 
 > It is not possible to call storage functions inside other functions
 
-Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables cookie returned by the [login](../api.md#login) or [refresh](../api.md#refresh-token) endpoints.
+Storage functions allow you to define permissions which can be used by any rules. Storage functions have access to the query string of the request, and the permission variables cookie returned by the [login](/docs/api-reference#authlogin) or [refresh](/docs/api-reference#authtokenrefresh) endpoints.
 
 You can have a look at the permission variables by examining the `permission_variables` cookie. This is a URL-encoded string, in the following template:
 
