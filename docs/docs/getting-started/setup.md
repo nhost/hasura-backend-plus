@@ -4,6 +4,12 @@ title: Setup
 
 Hasura Backend Plus runs in a container along side Postgres and Hasura.
 
+## Nhost (recommended)
+
+[Nhost](https://nhost.io).
+
+## Self host
+
 Here is a `docker-compose.yaml` file containing the following services:
 
 - Postgres
@@ -122,9 +128,8 @@ TODO: IMAGE
 
 Add your first user:
 
-```
-TODO
-curl command...
+```bash
+curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/register`
 ```
 
 TODO image of Hasura Console with
@@ -132,3 +137,7 @@ TODO image of Hasura Console with
 ## Login User
 
 Login user and get tokens back.
+
+```bash
+curl -d '{"email":"someone@nhost.io", "password":"StrongPasswordNot1234"}' -H "Content-Type: application/json" -X POST http://localhost:3000/auth/login`
+```
