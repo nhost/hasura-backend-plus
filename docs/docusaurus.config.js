@@ -6,7 +6,7 @@ module.exports = {
   title: "Hasura Backend Plus",
   tagline: "Authentication and Storage for Hasura",
   url: "https://nhost.github.io",
-  baseUrl: "/hasura-backend-plus/",
+  baseUrl: "/",
   trailingSlash: false,
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -87,7 +87,7 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Open Source ${new Date().getFullYear()} Nhost AB, Inc. Built with Docusaurus.`,
     },
     prism: {
       theme: lightCodeTheme,
