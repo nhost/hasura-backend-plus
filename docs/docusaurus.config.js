@@ -24,7 +24,7 @@ module.exports = {
       isCloseable: false,
     },
     navbar: {
-      title: "Hausra Backend Plus",
+      title: "Hasura Backend Plus",
       logo: {
         alt: "Hasura Backend Plus Documentation",
         src: "img/logo.png",
