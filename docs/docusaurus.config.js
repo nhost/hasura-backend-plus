@@ -5,8 +5,9 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 module.exports = {
   title: "Hasura Backend Plus",
   tagline: "Authentication and Storage for Hasura",
-  url: "https://your-docusaurus-test-site.com",
-  baseUrl: "/",
+  url: "https://nhost.github.com",
+  baseUrl: "/hasura-backend-plus",
+  trailingSlash: false,
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
