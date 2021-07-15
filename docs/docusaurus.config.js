@@ -21,12 +21,13 @@ module.exports = {
         `,
       backgroundColor: "#fafbfc",
       textColor: "#091E42",
+      isCloseable: false,
     },
     navbar: {
       title: "Hausra Backend Plus",
       logo: {
         alt: "Hasura Backend Plus Documentation",
-        src: "img/logo.svg",
+        src: "img/logo.png",
       },
       items: [
         {

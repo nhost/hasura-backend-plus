@@ -23,7 +23,7 @@ module.exports = {
     },
     "oauth-providers",
     "storage-rules",
-    "email-templates",
+    "emails",
     "environment-variables",
   ],
 };
