@@ -6,7 +6,7 @@ module.exports = {
   title: "Hasura Backend Plus",
   tagline: "Authentication and Storage for Hasura",
   url: "https://nhost.github.io",
-  baseUrl: "/",
+  baseUrl: "/hasura-backend-plus/",
   trailingSlash: false,
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
