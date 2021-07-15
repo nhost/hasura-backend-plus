@@ -2,9 +2,9 @@
 title: Introduction
 ---
 
-Hasura Backend Plus provides **authentication** and **storage** for [Hasura](https://github.com/hasura/graphql-engine).
+Hasura Backend Plus handles **authentication** and **storage** for [Hasura](https://github.com/hasura/graphql-engine).
 
-Hasura can run in a separate Docker container along side Postgres and Hasura.
+Hasura runs in a separate Docker container along side Postgres and Hasura.
 
 ## Authentication
 
