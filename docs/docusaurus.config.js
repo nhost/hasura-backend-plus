@@ -14,6 +14,9 @@ module.exports = {
   organizationName: "nhost", // Usually your GitHub org/user name.
   projectName: "hasura-backend-plus", // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      defaultMode: "light",
+    },
     announcementBar: {
       id: "announcementBar-1", // Increment on change
       content: `
