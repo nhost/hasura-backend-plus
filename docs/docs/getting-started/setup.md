@@ -50,7 +50,6 @@ services:
     ports:
       - "4000:4000"
     environment:
-      USER_IMPERSONATION_ENABLED: "true"
       HOST: 0.0.0.0
       PORT: 4000
       DATABASE_URL: >-
@@ -61,37 +60,22 @@ services:
       JWT_KEY: >-
         jhyu89jiuhyg7678hoijhuytf7ghjiasodibagsdga9dha8os7df97a6sdgh9asudgo7f7g8h1uuoyafsod8pgasipdg8aps9dhai;sd
       JWT_ALGORITHM: HS256
-      ALLOWED_REDIRECT_URLS: "htt://localhost"
+      ALLOWED_REDIRECT_URLS: "http://localhost"
       JWT_CUSTOM_FIELDS: ""
       S3_ENDPOINT: "minio:9000"
       S3_SSL_ENABLED: "false"
       S3_BUCKET: nhost
       S3_ACCESS_KEY_ID: 5a7bdb5f42c41e0622bf61d6e08d5537
       S3_SECRET_ACCESS_KEY: 9e1c40c65a615a5b52f52aeeaf549944ec53acb1dff4a0bf01fb58e969f915c8
-      MAGIC_LINK_ENABLED: "true"
       AUTO_ACTIVATE_NEW_USERS: "true"
-      AUTH_ANONYMOUS_USERS_ACTIVE: "false"
       PROVIDER_SUCCESS_REDIRECT: "http://localhost:3001/success"
       PROVIDER_FAILURE_REDIRECT: "http://localhost:3001/failed"
-      ALLOW_USER_SELF_DELETE: "false"
-      LOST_PASSWORD_ENABLED: "true"
-      MIN_PASSWORD_LENGTH: 4
-      CHANGE_EMAIL_ENABLED: "true"
-      VERIFY_EMAILS: "true"
-      NOTIFY_EMAIL_CHANGE: "true"
-      EMAILS_ENABLED: "true"
       HIBP_ENABLED: "false"
       DEFAULT_ALLOWED_USER_ROLES: "user,me"
       ALLOWED_USER_ROLES: "user,me"
       REGISTRATION_CUSTOM_FIELDS: "display_name"
       COOKIE_SECURE: "false"
       COOKIE_SECRET: "somelongvalue"
-      SMTP_HOST: mailhog
-      SMTP_PORT: 1025
-      SMTP_PASS: password
-      SMTP_USER: user
-      SMTP_SECURE: "false"
-      SMTP_SENDER: hbp@hbp.com
       REDIRECT_URL_SUCCESS: "http://localhost:3000"
       REDIRECT_URL_ERROR: "http://localhost:3000/fail"
   minio:
