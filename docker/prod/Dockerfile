@@ -16,9 +16,11 @@ WORKDIR /app
 
 COPY package.json .
 
-COPY --from=builder /app/dist/ dist/
+COPY --from=builder /app/dist dist
+COPY --from=builder /app/node_modules node_modules
 COPY custom custom
 COPY migrations migrations
+COPY prod-paths.js .
 
 HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget localhost:${PORT}/healthz -q -O - > /dev/null 2>&1
 
