@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
-    <img src="docs/.vuepress/public/logo.png" width="150px" alt="HBP" />
+    <img src="docs/static/img/logo.png" width="150px" alt="HBP" />
   </a>
 </p>
 <h1 align="center">Hasura Backend Plus (HBP)</h1>
