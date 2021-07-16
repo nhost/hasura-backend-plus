@@ -11,7 +11,7 @@ ENV PGOPTIONS "-c search_path=auth"
 
 WORKDIR /app
 
-# needed for yest --watch to work properly
+# needed for jest --watch to work properly
 RUN git init /app
 
 COPY package.json yarn.lock ./
