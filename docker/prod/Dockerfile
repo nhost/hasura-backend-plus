@@ -2,7 +2,7 @@ FROM node:14-alpine AS builder
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install
-COPY . .
+COPY ../../ .
 RUN yarn build
 
 FROM node:14-alpine
@@ -14,12 +14,12 @@ ENV PGOPTIONS "-c search_path=auth"
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY ../../package.json ../../yarn.lock .
 RUN yarn install && yarn cache clean
 
 COPY --from=builder /app/dist/ dist/
-COPY custom custom
-COPY migrations migrations
+COPY ../../custom custom
+COPY ../../migrations migrations
 
 HEALTHCHECK --interval=60s --timeout=2s --retries=3 CMD wget localhost:${PORT}/healthz -q -O - > /dev/null 2>&1
 
