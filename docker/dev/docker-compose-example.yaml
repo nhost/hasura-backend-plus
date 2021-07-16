@@ -32,7 +32,7 @@ services:
     image: 'nhost/hasura-backend-plus:latest'
     container_name: hbp-dev-hbp
     build:
-      context: ../../
+      context: .
       dockerfile: Dockerfile.dev
     depends_on:
       - graphql-engine
