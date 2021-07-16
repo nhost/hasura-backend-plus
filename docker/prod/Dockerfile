@@ -1,8 +1,8 @@
 FROM node:14-alpine AS builder
 WORKDIR /app
+COPY . .
 COPY package.json yarn.lock ./
 RUN yarn install
-COPY . .
 RUN yarn build
 
 FROM node:14-alpine
@@ -14,8 +14,7 @@ ENV PGOPTIONS "-c search_path=auth"
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-RUN yarn install && yarn cache clean
+COPY package.json .
 
 COPY --from=builder /app/dist/ dist/
 COPY custom custom
