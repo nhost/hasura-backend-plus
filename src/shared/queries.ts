@@ -325,3 +325,11 @@ export const selectAccountProvider = gql`
   }
   ${accountFragment}
 `
+
+export const updateAccountByEmail = gql`
+  mutation updateAccountByEmail($account_email: citext!, $account: auth_accounts_set_input!) {
+    update_auth_accounts(where: { email: { _eq: $account_email } }, _set: $account) {
+      affected_rows
+    }
+  }
+`

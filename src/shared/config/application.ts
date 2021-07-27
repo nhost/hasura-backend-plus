@@ -1,4 +1,4 @@
-import { castIntEnv, castBooleanEnv } from './utils'
+import { castIntEnv, returnBooleanEnvVar } from './utils'
 
 /**
  * * Application Settings
@@ -43,13 +43,13 @@ export const APPLICATION = {
     return process.env.SMTP_AUTH_METHOD || 'PLAIN'
   },
   get EMAILS_ENABLE() {
-    return castBooleanEnv('EMAILS_ENABLE')
+    return returnBooleanEnvVar(['EMAILS_ENABLE', 'EMAILS_ENABLED'], false)
   },
   get SMTP_PORT() {
     return castIntEnv('SMTP_PORT', 587)
   },
   get SMTP_SECURE() {
-    return castBooleanEnv('SMTP_SECURE') // note: false disables SSL (deprecated)
+    return returnBooleanEnvVar(['SMTP_SECURE'], true) // note: false disables SSL (deprecated)
   },
 
   get MAX_REQUESTS() {

@@ -12,16 +12,17 @@ if (AUTHENTICATION.NOTIFY_EMAIL_CHANGE && !APPLICATION.EMAILS_ENABLE)
 const router = Router()
 
 router.use((req, res, next) => {
-  if(!AUTHENTICATION.CHANGE_EMAIL_ENABLE) {
-    return res.boom.badImplementation(`Please set the CHANGE_EMAIL_ENABLE env variable to true to use the auth/change-email routes.`)
+  if (!AUTHENTICATION.CHANGE_EMAIL_ENABLED) {
+    return res.boom.badImplementation(
+      `Please set the CHANGE_EMAIL_ENABLED env variable to true to use the auth/change-email routes.`
+    )
   } else {
-    return next();
+    return next()
   }
 })
 
 router.post('/request', requestVerification)
 router.post('/change', changeVerified)
 router.post('/', directChange)
-
 
 export default router

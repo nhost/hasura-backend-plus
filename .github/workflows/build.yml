@@ -2,18 +2,12 @@ name: Build
 on:
   pull_request:
     branches: [master]
-    paths:
-      - '**'
-      - '!docs/**'
-      - '!examples/**'
-      - '!*.md'
+    paths-ignore:
+      - 'docs/**'
   push:
     branches: [master]
-    paths:
-      - '**'
-      - '!docs/**'
-      - '!examples/**'
-      - '!*.md'
+    paths-ignore:
+      - 'docs/**'
   release:
     types: [published]
 env:
@@ -30,12 +24,12 @@ jobs:
     timeout-minutes: 10
     services:
       postgres:
-        image: postgres:12
+        image: nhost/postgres:12-v0.0.6
         env:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: --restart always --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       graphql-engine:
-        image: hasura/graphql-engine:v1.3.2
+        image: hasura/graphql-engine:v2.0.1
         env:
           HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
           HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
@@ -43,10 +37,6 @@ jobs:
           HASURA_GRAPHQL_JWT_SECRET: '{"type": "${{ env.JWT_ALGORITHM }}", "key": "${{ env.JWT_KEY }}"}'
         options: >-
           --restart always
-          --health-cmd "printf 'GET /healthz HTTP/1.1\r\nHost: graphql-engine\r\n\n' | nc -z graphql-engine 8080 > /dev/null 2>&1 || exit 1"
-          --health-interval 3s
-          --health-timeout 5s
-          --health-retries 5
       minio:
         image: bitnami/minio:2020.7.31
         env:
@@ -54,25 +44,69 @@ jobs:
           MINIO_SECRET_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
           MINIO_DEFAULT_BUCKETS: ${{ env.S3_BUCKET }}
         options: --restart always
+        ports:
+          - 9000:9000
       mailhog:
         image: mailhog/mailhog
+        env:
+          SMTP_HOST: mailhog
+          SMTP_PORT: 1025
+          SMTP_PASS: password
+          SMTP_USER: user
+          SMTP_SECURE: 'false'
+          SMTP_SENDER: hbp@hbp.com
     container:
-      image: node:12
+      image: node:14
       env:
+        HOST: 0.0.0.0
+        PORT: 4000
+        JWT_CUSTOM_FIELDS: 'name'
+        HASURA_ENDPOINT: http://graphql-engine:8080/v1/graphql
         HASURA_GRAPHQL_ADMIN_SECRET: ${{ env.HASURA_GRAPHQL_ADMIN_SECRET }}
         JWT_ALGORITHM: ${{ env.JWT_ALGORITHM }}
         JWT_KEY: ${{ env.JWT_KEY }}
+        S3_ENDPOINT: 'minio:9000'
+        S3_SSL_ENABLED: 'false'
         S3_BUCKET: ${{ env.S3_BUCKET }}
         S3_ACCESS_KEY_ID: ${{ env.S3_ACCESS_KEY_ID }}
         S3_SECRET_ACCESS_KEY: ${{ env.S3_SECRET_ACCESS_KEY }}
         DATABASE_URL: postgres://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
+        PGOPTIONS: '-c search_path=auth'
+        AUTH_ENABLED: 'true'
+        MAGIC_LINK_ENABLED: 'true'
+        AUTH_LOCAL_USERS_ENABLED: 'true'
+        AUTO_ACTIVATE_NEW_USERS: 'true'
+        AUTH_ANONYMOUS_USERS_ACTIVE: 'false'
+        PROVIDER_SUCCESS_REDIRECT: 'http://localhost:3001/success'
+        PROVIDER_FAILURE_REDIRECT: 'http://localhost:3001/failed'
+        ALLOW_USER_SELF_DELETE: 'false'
+        LOST_PASSWORD_ENABLED: 'true'
+        MIN_PASSWORD_LENGTH: 4
+        CHANGE_EMAIL_ENABLED: 'true'
+        VERIFY_EMAILS: 'true'
+        NOTIFY_EMAIL_CHANGE: 'true'
+        EMAILS_ENABLED: 'true'
+        HIBP_ENABLED: 'false'
+        DEFAULT_ALLOWED_USER_ROLES: 'user,me,editor'
+        ALLOWED_USER_ROLES: 'user,me,editor'
+        REGISTRATION_CUSTOM_FIELDS: 'name'
+        COOKIE_SECURE: 'false'
+        COOKIE_SECRET: 'somelongvalue'
+        SMTP_HOST: mailhog
+        SMTP_PORT: 1025
+        SMTP_PASS: password
+        SMTP_USER: user
+        SMTP_SECURE: 'false'
+        SMTP_SENDER: hbp@hbp.com
+        REDIRECT_URL_SUCCESS: 'http://localhost:3000'
+        REDIRECT_URL_ERROR: 'http://localhost:3000/fail'
       options: --hostname hasura-backend-plus
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '14.x'
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -83,18 +117,12 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Install Hasura Cli
-        run: curl -L https://github.com/hasura/graphql-engine/raw/master/cli/get.sh | bash
-      - name: Install psql
-        run: apt-get update && apt-get install --yes --no-install-recommends postgresql-client
-      - name: Init Database
-        run: psql -f ./db/00_init-schema.sql postgresql://postgres:${{ env.POSTGRES_PASSWORD }}@postgres:5432/postgres
       - name: Install dependencies
         run: yarn
       - name: Lint files
-        run: yarn run lint
+        run: yarn lint
       - name: Run Jest tests
-        run: yarn run test:ci
+        run: yarn test --coverage
       - name: Upload test results
         uses: actions/upload-artifact@v1
         with:
@@ -125,5 +153,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: nhost/hasura-backend-plus
+          path: .
+          dockerfile: docker/prod/Dockerfile
           tag_with_ref: true
           tag_with_sha: true

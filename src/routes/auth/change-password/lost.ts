@@ -14,22 +14,27 @@ import { AccountData } from '@shared/types'
  * Always return status code 204 in order to not leak information about emails in the database
  */
 async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
-  if(!AUTHENTICATION.LOST_PASSWORD_ENABLE) {
-    return res.boom.badImplementation(`Please set the LOST_PASSWORD_ENABLE env variable to true to use the auth/change-password/request route.`)
+  console.log('inside /change-password/request')
+
+  if (!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
+    return res.boom.badImplementation(
+      `Please set the LOST_PASSWORD_ENABLED env variable to true to use the auth/change-password/request route.`
+    )
   }
 
   // smtp must be enabled for request change password to work.
   if (!APPLICATION.EMAILS_ENABLE) {
+    console.log('emails not enabled')
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 
   const { email } = await forgotSchema.validateAsync(body)
 
-  let account: AccountData;
+  let account: AccountData
 
   try {
     account = await selectAccountByEmail(email)
-  } catch(err) {
+  } catch (err) {
     return res.boom.badRequest(err.message)
   }
 

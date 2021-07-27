@@ -22,7 +22,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
-  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLE) {
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
 
     // if user tries to sign in anonymously
@@ -69,7 +69,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   }
 
   // else, login users normally
-  const { password } = await (AUTHENTICATION.ENABLE_MAGIC_LINK
+  const { password } = await (AUTHENTICATION.MAGIC_LINK_ENABLED
     ? loginSchemaMagicLink
     : loginSchema
   ).validateAsync(body)
@@ -101,7 +101,8 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
           display_name: account.user.display_name,
           token: refresh_token,
           url: APPLICATION.SERVER_URL,
-          action: 'log in'
+          action: 'log in',
+          action_url: 'log-in'
         }
       })
 
@@ -121,9 +122,9 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const hasAdminSecret = Boolean(adminSecret)
   const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
   let userImpersonationValid = false
-  if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && !isAdminSecretCorrect) {
+  if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && !isAdminSecretCorrect) {
     return res.boom.unauthorized('Invalid x-admin-secret')
-  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLE && hasAdminSecret && isAdminSecretCorrect) {
+  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && isAdminSecretCorrect) {
     userImpersonationValid = true
   }
 

@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/nhost/hasura-backend-plus">
-    <img src="docs/.vuepress/public/logo.png" width="150px" alt="HBP" />
+    <img src="docs/static/img/logo.png" width="150px" alt="HBP" />
   </a>
 </p>
 <h1 align="center">Hasura Backend Plus (HBP)</h1>
@@ -59,7 +59,7 @@ All [Nhost](https://nhost.io) projects are built on open source software so you 
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!
+Contributions and issues are welcome.
 
 Feel free to check the [issues page](https://github.com/nhost/hasura-backend-plus/issues).
 

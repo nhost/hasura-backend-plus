@@ -58,9 +58,11 @@ export const registerAccount = async (
 
 export const loginAccount = async (agent: SuperTest<Test>, accountLoginData: AccountLoginData) => {
   // * Set the use variable so it is accessible to the jest test file
+  const loginResponse = await agent.post('/auth/login').send(accountLoginData)
+  const token = loginResponse.body.jwt_token as string
   return {
     ...accountLoginData,
-    token: (await agent.post('/auth/login').send(accountLoginData)).body.jwt_token as string
+    token
   }
 }
 

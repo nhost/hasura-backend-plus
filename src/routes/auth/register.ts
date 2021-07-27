@@ -6,7 +6,7 @@ import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { emailClient } from '@shared/email'
 import { insertAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
-import { registerSchema, registerSchemaMagicLink } from '@shared/validation'
+import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
@@ -21,13 +21,20 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     password,
     user_data = {},
     register_options = {}
-  } = await (AUTHENTICATION.ENABLE_MAGIC_LINK ? registerSchemaMagicLink : registerSchema).validateAsync(body)
+  } = await (AUTHENTICATION.MAGIC_LINK_ENABLED
+    ? getRegisterSchemaMagicLink()
+    : getRegisterSchema()
+  ).validateAsync(body)
 
-  if (await selectAccount(body)) {
+  const selectedAccount = await selectAccount(body)
+  if (selectedAccount) {
+    if (!selectedAccount.active) {
+      return res.boom.badRequest('Account already exists but is not activated.')
+    }
     return res.boom.badRequest('Account already exists.')
   }
 
-  let password_hash: string | null = null;
+  let password_hash: string | null = null
 
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString() // active for 60 minutes
@@ -86,6 +93,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   }
 
   const account = accounts.insert_auth_accounts.returning[0]
+
   const user: UserData = {
     id: account.user.id,
     display_name: account.user.display_name,
@@ -118,7 +126,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             display_name,
             token: ticket,
             url: APPLICATION.SERVER_URL,
-            action: 'sign up'
+            action: 'register',
+            action_url: 'register'
           }
         })
       } catch (err) {

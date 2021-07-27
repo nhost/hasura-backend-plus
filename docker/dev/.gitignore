@@ -1,0 +1,3 @@
+docker-compose.yaml
+db_data
+minio_data

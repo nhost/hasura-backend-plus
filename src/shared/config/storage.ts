@@ -1,14 +1,14 @@
-import { castBooleanEnv } from './utils'
+import { returnBooleanEnvVar } from './utils'
 
 /**
  * * Storage Settings
  */
 export const STORAGE = {
-  get ENABLE() {
-    return castBooleanEnv('STORAGE_ENABLE', true)
+  get ENABLED() {
+    return returnBooleanEnvVar(['STORAGE_ENABLE', 'STORAGE_ENABLED'], true)
   },
   get S3_SSL_ENABLED() {
-    return castBooleanEnv('S3_SSL_ENABLED', true)
+    return returnBooleanEnvVar(['S3_SSL_ENABLE', 'S3_SSL_ENABLED'], true)
   },
   get S3_BUCKET() {
     return process.env.S3_BUCKET || ''
@@ -23,4 +23,3 @@ export const STORAGE = {
     return process.env.S3_SECRET_ACCESS_KEY || ''
   }
 }
-
