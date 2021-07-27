@@ -51,7 +51,7 @@ services:
       JWT_KEY: >-
         jhyu89jiuhyg7678hoijhuytf7ghjiasodibagsdga9dha8os7df97a6sdgh9asudgo7f7g8h1uuoyafsod8pgasipdg8aps9dhai;sd
       JWT_ALGORITHM: HS256
-      ALLOWED_REDIRECT_URLS: 'htt://localhost'
+      ALLOWED_REDIRECT_URLS: 'http://localhost'
       JWT_CUSTOM_FIELDS: ''
       S3_ENDPOINT: 'minio:9000'
       S3_SSL_ENABLED: 'false'
