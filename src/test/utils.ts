@@ -30,7 +30,7 @@ export async function withEnv(
 }
 
 export const createAccountLoginData = (): AccountLoginData => ({
-  email: `${generateRandomString()}@${generateRandomString()}.com`,
+  email: generateRandomEmail(),
   password: generateRandomString()
 })
 

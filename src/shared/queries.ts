@@ -207,11 +207,33 @@ export const updateOtpSecret = gql`
   }
 `
 
+export const updateSmsOtpSecretAndPhoneNumber = gql`
+  mutation($user_id: uuid!, $sms_otp_secret: String!, $phone_number: String!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { sms_otp_secret: $sms_otp_secret, phone_number: $phone_number }
+    ) {
+      affected_rows
+    }
+  }
+`
+
 export const deleteOtpSecret = gql`
   mutation($user_id: uuid!) {
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
       _set: { otp_secret: null, mfa_enabled: false }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const deleteSmsOtpSecret = gql`
+  mutation($user_id: uuid!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { sms_otp_secret: null, mfa_enabled: false }
     ) {
       affected_rows
     }

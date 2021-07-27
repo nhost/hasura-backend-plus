@@ -23,9 +23,9 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     return res.boom.unauthorized('Invalid or expired ticket.')
   }
 
-  const { id, otp_secret, mfa_enabled, active } = account
+  const { id, otp_secret, mfa_enabled, sms_otp_secret, sms_mfa_enabled, active } = account
 
-  if (!mfa_enabled) {
+  if (!mfa_enabled || !sms_mfa_enabled) {
     return res.boom.badRequest('MFA is not enabled.')
   }
 
@@ -33,11 +33,11 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     return res.boom.badRequest('Account is not activated.')
   }
 
-  if (!otp_secret) {
+  if (!otp_secret || !sms_otp_secret) {
     return res.boom.badRequest('OTP secret is not set.')
   }
 
-  if (!authenticator.check(code, otp_secret)) {
+  if (!authenticator.check(code, otp_secret) || !authenticator.check(code, sms_otp_secret)) {
     return res.boom.unauthorized('Invalid two-factor code.')
   }
 

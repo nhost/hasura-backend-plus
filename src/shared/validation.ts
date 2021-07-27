@@ -1,5 +1,6 @@
-import { REGISTRATION } from './config'
 import Joi from '@hapi/joi'
+
+import { REGISTRATION } from './config'
 
 interface ExtendedStringSchema extends Joi.StringSchema {
   allowedDomains(): this
@@ -122,27 +123,42 @@ export const logoutSchema = Joi.object({
 })
 
 export const mfaSchema = Joi.object(codeFields)
+
+export const smsMfaSchema = Joi.object(codeFields)
+
+// TODO add improved phone number validation
+// ex: https://github.com/Salesflare/joi-phone-number
+export const smsMFaGenerateSchema = Joi.object({
+  phone_number: Joi.string().required()
+})
+
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
   password: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
+
 export const magicLinkLoginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string() // these will be checked more rigorously in `loginSchema`
 })
+
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
   cookie: Joi.boolean()
 })
+
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
   cookie: Joi.boolean()
 })
+
 export const forgotSchema = Joi.object({ email: emailRule })
+
 export const verifySchema = Joi.object({ ...ticketFields })
+
 export const totpSchema = Joi.object({
   ...codeFields,
   ...ticketFields,
