@@ -72,7 +72,7 @@ services:
       HASURA_ENDPOINT: "http://graphql-engine:8080/v1/graphql"
       HASURA_GRAPHQL_ADMIN_SECRET: hello123
       JWT_KEY: >-
-        jhyu89jiuhyg7678hoijhuytf7ghjiasodibagsdga9dha8os7df97a6sdgh9asudgo7f7g8h1uuoyafsod8pgasipdg8aps9dhai;sd
+        jhyu89jiuhyg7678hoijhuytf7ghjiasodibagsdga9dha8os7df97a6sdgh9asudgo7f7g8h1uuoyafsod8pgasipdg8aps9dhaiaisydg8agsd87gasd9oihasd87gas78d
       JWT_ALGORITHM: HS256
       ALLOWED_REDIRECT_URLS: "http://localhost"
       JWT_CUSTOM_FIELDS: ""
