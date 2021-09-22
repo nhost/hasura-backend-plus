@@ -124,7 +124,7 @@ const PROVIDERS = {
   },
 
   get spotify() {
-    return !returnBooleanEnvVar(['SPOTIFY_ENABLE', 'SPOTIFY_ENABLE'], false)
+    return !returnBooleanEnvVar(['SPOTIFY_ENABLE', 'SPOTIFY_ENABLED'], false)
       ? null
       : {
           get clientID() {
