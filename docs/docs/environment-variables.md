@@ -106,7 +106,7 @@ User's password is checked against [Pwned Passwords](https://haveibeenpwned.com/
 
 ### `REGISTRATION_CUSTOM_FIELDS`
 
-Let user add data on registration.
+Comma separated list of custom fields that can addded to registration.
 
 **Example**
 
