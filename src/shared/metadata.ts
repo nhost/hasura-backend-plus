@@ -93,10 +93,7 @@ export async function applyMetadata(): Promise<void> {
     trackTable({ name: 'providers', schema: 'auth' }),
     trackTable({ name: 'refresh_tokens', schema: 'auth' }),
     trackTable({ name: 'roles', schema: 'auth' }),
-    trackTable({ name: 'email_templates', schema: 'auth' }),
-    trackTable({ name: 'provider_requests', schema: 'auth' }),
     trackTable({ name: 'migrations', schema: 'auth' }),
-    trackTable({ name: 'whitelist', schema: 'auth' }),
     trackTable({ name: 'users', schema: 'public' })
   ])
 
