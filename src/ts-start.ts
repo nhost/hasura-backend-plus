@@ -2,8 +2,6 @@ import { APPLICATION } from '@shared/config'
 import axios from 'axios'
 
 import { app } from './server'
-import { applyMigrations } from './shared/migrations'
-import { applyMetadata } from './shared/metadata'
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -18,14 +16,11 @@ const isHasuraReady = async () => {
     await delay(10000)
     console.log('exit 1')
     process.exit(1)
-    console.log('exit 1 completed')
   }
 }
 
 const start = async (): Promise<void> => {
   await isHasuraReady()
-  await applyMigrations()
-  await applyMetadata()
 
   app.listen(APPLICATION.PORT, APPLICATION.HOST, () => {
     if (APPLICATION.HOST) {
