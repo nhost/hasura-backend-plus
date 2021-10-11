@@ -152,12 +152,17 @@ export const initProvider = <T extends Strategy>(
   middleware?: RequestHandler
 ): void => {
   const {
-    transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => ({
-      id,
-      email: emails?.[0].value,
-      display_name: displayName,
-      avatar_url: photos?.[0].value
-    }),
+    transformProfile = ({ id, emails, displayName, photos }: Profile): UserData => {
+      const userData: UserData = {
+        id,
+        display_name: displayName
+      }
+
+      if (emails?.length && emails?.[0].value) userData['email'] = emails[0].value
+      if (photos?.length && photos?.[0].value) userData['avatar_url'] = photos[0].value
+
+      return userData
+    },
     callbackMethod = 'GET',
     ...options
   } = settings
