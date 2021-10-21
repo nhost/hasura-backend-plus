@@ -12,7 +12,7 @@ authenticator.options = {
   window: [1, 0]
 }
 
-async function totpLogin({ body }: Request, res: Response): Promise<any> {
+async function smsTotpLogin({ body }: Request, res: Response): Promise<any> {
   const { ticket, code } = await totpSchema.validateAsync(body)
   const account = await selectAccount(body)
 
@@ -37,15 +37,8 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     return res.boom.badRequest('OTP secret is not set.')
   }
 
-  if (sms_otp_secret) {
-    console.log('test sms otp secret')
-    if (!authenticator.check(code, sms_otp_secret)) {
-      return res.boom.unauthorized('Invalid two-factor code.')
-    }
-  } else {
-    if (!authenticator.check(code, otp_secret)) {
-      return res.boom.unauthorized('Invalid two-factor code.')
-    }
+  if (!authenticator.check(code, otp_secret) || !authenticator.check(code, sms_otp_secret)) {
+    return res.boom.unauthorized('Invalid two-factor code.')
   }
 
   const refresh_token = await setRefreshToken(res, id, useCookie)
@@ -65,4 +58,4 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
   res.send(session)
 }
 
-export default asyncWrapper(totpLogin)
+export default asyncWrapper(smsTotpLogin)
