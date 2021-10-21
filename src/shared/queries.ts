@@ -18,7 +18,9 @@ const accountFragment = gql`
     ticket
     email
     new_email
+    phone_number
     otp_secret
+    sms_otp_secret
     mfa_enabled
     password_hash
   }

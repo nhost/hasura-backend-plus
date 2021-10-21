@@ -13,23 +13,27 @@ async function generateSmsMfa(req: RequestExtended, res: Response): Promise<unkn
     return res.boom.unauthorized('Not logged in')
   }
 
-  const { 'user-id': user_id } = req.permission_variables
-  const { phone_number } = await smsMFaGenerateSchema.validateAsync(req.body)
+  try {
+    const { 'user-id': user_id } = req.permission_variables
+    const { phone_number } = await smsMFaGenerateSchema.validateAsync(req.body)
 
-  /**
-   * Generate OTP secret and code.
-   */
-  const sms_otp_secret = authenticator.generateSecret()
-  const code = authenticator.generate(sms_otp_secret)
+    /**
+     * Generate OTP secret and code.
+     */
+    const sms_otp_secret = authenticator.generateSecret()
+    const code = authenticator.generate(sms_otp_secret)
 
-  /**
-   * Send SMS with verification code.
-   */
-  await sendSms(phone_number, verificationMsg(code))
+    /**
+     * Send SMS with verification code.
+     */
+    await sendSms(phone_number, verificationMsg(code))
 
-  await request(updateSmsOtpSecretAndPhoneNumber, { user_id, sms_otp_secret, phone_number })
-
-  return res.status(204).send()
+    await request(updateSmsOtpSecretAndPhoneNumber, { user_id, sms_otp_secret, phone_number })
+    return res.status(204).send()
+  } catch (e) {
+    console.log('e: ', e)
+    return res.status(500).send()
+  }
 }
 
 export default asyncWrapper(generateSmsMfa)

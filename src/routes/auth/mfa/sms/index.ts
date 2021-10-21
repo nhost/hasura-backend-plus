@@ -8,8 +8,8 @@ import resendSms from './sms-resend'
 
 const router = Router()
 
-router.use((req, res, next) => {
-  if (!SMS_MFA.ENABLE) {
+router.use((_, res, next) => {
+  if (!SMS_MFA.ENABLED) {
     return res.boom.badImplementation(
       `Please set the SMS_MFA_ENABLE env variable to true to use the auth/mfa routes.`
     )
