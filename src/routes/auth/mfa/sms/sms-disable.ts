@@ -17,16 +17,16 @@ async function disableSmsMfa(req: RequestExtended, res: Response): Promise<unkno
   const { code } = await smsMfaSchema.validateAsync(req.body)
 
   let sms_otp_secret: AccountData['sms_otp_secret']
-  let sms_mfa_enabled: AccountData['sms_mfa_enabled']
+  let mfa_enabled: AccountData['mfa_enabled']
   try {
     const account = await selectAccountByUserId(user_id)
     sms_otp_secret = account.sms_otp_secret
-    sms_mfa_enabled = account.sms_mfa_enabled
+    mfa_enabled = account.mfa_enabled
   } catch (err) {
     return res.boom.badRequest(err.message)
   }
 
-  if (!sms_mfa_enabled) {
+  if (!mfa_enabled) {
     return res.boom.badRequest('SMS MFA is already disabled.')
   }
 
