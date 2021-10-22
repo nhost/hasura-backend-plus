@@ -1,6 +1,6 @@
 import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
 import { Response } from 'express'
-import { deleteOtpSecret } from '@shared/queries'
+import { deleteOtpSecret, deleteSmsOtpSecret } from '@shared/queries'
 
 import { authenticator } from 'otplib'
 import { mfaSchema } from '@shared/validation'
@@ -18,9 +18,12 @@ async function disableMfa(req: RequestExtended, res: Response): Promise<unknown>
 
   let otp_secret: AccountData['otp_secret']
   let mfa_enabled: AccountData['mfa_enabled']
+  let sms_otp_secret: AccountData['sms_otp_secret']
+
   try {
     const account = await selectAccountByUserId(user_id)
     otp_secret = account.otp_secret
+    sms_otp_secret = account.sms_otp_secret
     mfa_enabled = account.mfa_enabled
   } catch (err) {
     return res.boom.badRequest(err.message)
@@ -31,11 +34,17 @@ async function disableMfa(req: RequestExtended, res: Response): Promise<unknown>
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (!authenticator.check(code, otp_secret!)) {
-    return res.boom.unauthorized('Invalid two-factor code.')
+  if (sms_otp_secret) {
+    if (!authenticator.check(code, sms_otp_secret)) {
+      return res.boom.unauthorized('Invalid two-factor code.')
+    }
+    await request(deleteSmsOtpSecret, { user_id })
+  } else if (otp_secret) {
+    if (!authenticator.check(code, otp_secret)) {
+      return res.boom.unauthorized('Invalid two-factor code.')
+    }
+    await request(deleteOtpSecret, { user_id })
   }
-
-  await request(deleteOtpSecret, { user_id })
 
   return res.status(204).send()
 }
