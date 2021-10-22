@@ -33,17 +33,14 @@ async function totpLogin({ body }: Request, res: Response): Promise<any> {
     return res.boom.badRequest('Account is not activated.')
   }
 
-  if (!otp_secret || !sms_otp_secret) {
-    return res.boom.badRequest('OTP secret is not set.')
-  }
-
   if (sms_otp_secret) {
-    console.log('test sms otp secret')
     if (!authenticator.check(code, sms_otp_secret)) {
       return res.boom.unauthorized('Invalid two-factor code.')
     }
   } else {
-    if (!authenticator.check(code, otp_secret)) {
+    if (!otp_secret) {
+      return res.boom.badRequest('OTP secret is not set.')
+    } else if (!authenticator.check(code, otp_secret)) {
       return res.boom.unauthorized('Invalid two-factor code.')
     }
   }
