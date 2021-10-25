@@ -4,7 +4,12 @@ import { VerifyCallback } from 'passport-oauth2'
 import { Strategy } from 'passport'
 
 import { PROVIDERS, APPLICATION, REGISTRATION } from '@shared/config'
-import { insertAccount, insertAccountProviderToUser, selectAccountProvider } from '@shared/queries'
+import {
+  insertAccount,
+  insertAccountProviderToUser,
+  selectAccountProvider,
+  selectUserByUsername
+} from '@shared/queries'
 import { getEndURLOperator, selectAccountByEmail } from '@shared/helpers'
 import { request } from '@shared/request'
 import {
@@ -13,7 +18,8 @@ import {
   AccountData,
   UserData,
   RequestExtended,
-  InsertAccountProviderToUser
+  InsertAccountProviderToUser,
+  QueryUserData
 } from '@shared/types'
 import { setRefreshToken } from '@shared/cookies'
 
@@ -83,7 +89,25 @@ const manageProviderStrategy = (
     // noop continue to register user
   }
 
-  // register useruser, account, account_provider
+  let username: string = display_name
+
+  const usernameAlreadyTaken: boolean = await request<QueryUserData>(selectUserByUsername, {
+    username: display_name
+  }).then((res) => !!res.users.length)
+
+  if (usernameAlreadyTaken) {
+    const generateRandomSequence = () => {
+      return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1)
+    }
+
+    const appendRandomSequence = (input: string) => {
+      return input + generateRandomSequence()
+    }
+
+    username = appendRandomSequence(display_name)
+  }
+
+  // register user, account, account_provider
   const account_data = {
     email,
     password_hash: null,
@@ -92,7 +116,13 @@ const manageProviderStrategy = (
     account_roles: {
       data: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
-    user: { data: { display_name: display_name || email, avatar_url } },
+    user: {
+      data: {
+        display_name: display_name || email,
+        avatar_url,
+        username
+      }
+    },
     account_providers: {
       data: [
         {
