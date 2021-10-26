@@ -83,6 +83,7 @@ jobs:
           SERVER_URL: ${{ secrets.SERVER_URL }}
           SNS_API_VERSION: ${{ secrets.SNS_API_VERSION }}
           VERIFY_EMAILS: ${{ secrets.VERIFY_EMAILS }}
+          TASK_DEFINITION_FAMILY: ${{ secrets.TASK_DEFINITION_FAMILY }}
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image

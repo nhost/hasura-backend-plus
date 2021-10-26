@@ -192,11 +192,13 @@
       }
     }
   ],
+  "family": "__TASK_DEFINITION_FAMILY__",
   "taskRoleArn": "arn:aws:iam::317312837194:role/HasuraGraphQLAPI-TaskRole",
   "executionRoleArn": "arn:aws:iam::317312837194:role/HasuraGraphQLAPI-ExecutionRole",
   "networkMode": "awsvpc",
   "volumes": [],
   "placementConstraints": [],
+  "compatibilities": ["EC2", "FARGATE"],
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "1024",
   "memory": "2048"
