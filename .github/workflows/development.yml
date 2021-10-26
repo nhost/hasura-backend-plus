@@ -11,7 +11,7 @@ env:
   ECS_SERVICE: 'HBP-Dev-Service'
   ECS_CLUSTER: 'HBP-Dev'
   ECS_TASK_DEFINITION_FAMILY: 'HBP-Dev-TD'
-  ECS_TASK_DEFINITION_PATH: 'task-definition.json'
+  ECS_TASK_DEFINITION_PATH: './.github/task-definitions/task-definition.json'
   CONTAINER_NAME: 'HBP-Container'
   ENVIRONMENT: 'development'
 
@@ -39,7 +39,7 @@ jobs:
       - name: Task definition env substitution
         uses: falnyr/replace-env-vars-action@master
         with:
-          filename: './.github/task-definitions/${{ env.ENVIRONMENT }}.json'
+          filename: ${{ env.ECS_TASK_DEFINITION_PATH }}
         env:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SNS_AWS_SECRET_ACCESS_KEY: ${{ secrets.SNS_AWS_SECRET_ACCESS_KEY }}
@@ -102,7 +102,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: './.github/task-definitions/${{ env.ENVIRONMENT }}.json'
+          task-definition: ${{ env.ECS_TASK_DEFINITION_PATH }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
       # - name: Deploy Amazon ECS task definition
