@@ -72,7 +72,7 @@ jobs:
           SNS_AWS_ACCESS_KEY_ID: '${{ secrets.SNS_AWS_ACCESS_KEY_ID }}'
           SMTP_HOST: '${{ secrets.SMTP_HOST }}'
           SMTP_SENDER: '${{ secrets.SMTP_SENDER }}'
-          JWT_KEY: 'okok\=\='
+          JWT_KEY: okok==
           S3_ENDPOINT: '${{ secrets.S3_ENDPOINT }}'
           REDIRECT_URL_ERROR: '${{ secrets.REDIRECT_URL_ERROR }}'
           S3_SSL_ENABLED: '${{ secrets.S3_SSL_ENABLED }}'
