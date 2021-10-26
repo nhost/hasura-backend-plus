@@ -41,7 +41,7 @@ jobs:
         with:
           filename: './.github/task-definitions/${{ env.ENVIRONMENT }}.json'
         env:
-          SMTP_PASS: ${{ secret.SMTP_PASS }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SNS_AWS_SECRET_ACCESS_KEY: ${{ secrets.SNS_AWS_SECRET_ACCESS_KEY }}
           LOST_PASSWORD_ENABLED: ${{ secrets.LOST_PASSWORD_ENABLED }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
