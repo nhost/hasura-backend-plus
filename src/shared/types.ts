@@ -100,6 +100,12 @@ export interface QueryAccountProviderData {
   auth_account_providers: AccountProvider[]
 }
 
+export interface QueryUserData {
+  users: {
+    username: string
+  }[]
+}
+
 export interface InsertAccountData {
   insert_auth_accounts: {
     returning: AccountData[]
