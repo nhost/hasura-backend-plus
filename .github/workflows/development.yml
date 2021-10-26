@@ -37,7 +37,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Task definition env substitution
-        uses: falnyr/replace-env-vars-action@master
+        uses: strader07/replace-env-vars-action@development
         with:
           filename: '${{ env.ECS_TASK_DEFINITION_PATH }}'
         env:
