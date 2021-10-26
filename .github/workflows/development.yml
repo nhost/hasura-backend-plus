@@ -105,6 +105,9 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION_PATH }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+
+      - name: Debug
+        id: debug
         run: |
           echo "${{ steps.task-def.outputs.task-definition }}"
       # - name: Deploy Amazon ECS task definition
