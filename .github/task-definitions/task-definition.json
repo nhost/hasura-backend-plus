@@ -186,7 +186,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/HBP-Dev-TD",
+          "awslogs-group": "/ecs/__TASK_DEFINITION_FAMILY__",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
