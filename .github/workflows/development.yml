@@ -1,0 +1,113 @@
+name: Deploy HBP to Amazon ECS
+
+on:
+  push:
+    branches:
+      - development
+
+env:
+  AWS_REGION: 'us-east-1'
+  ECR_REPOSITORY: 'hasura-backend-plus'
+  ECS_SERVICE: 'HBP-Dev-Service'
+  ECS_CLUSTER: 'HBP-Dev'
+  ECS_TASK_DEFINITION_FAMILY: 'HBP-Dev-TD'
+  ECS_TASK_DEFINITION_PATH: 'task-definition.json'
+  CONTAINER_NAME: 'HBP-Container'
+  ENVIRONMENT: 'development'
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Task definition env substitution
+        uses: falnyr/replace-env-vars-action@master
+        with:
+          filename: './.github/task-definitions/${{ env.ENVIRONMENT }}.json'
+        env:
+          SMTP_PASS: ${{ secret.SMTP_PASS }}
+          SNS_AWS_SECRET_ACCESS_KEY: ${{ secret.SNS_AWS_SECRET_ACCESS_KEY }}
+          LOST_PASSWORD_ENABLED: ${{ secret.LOST_PASSWORD_ENABLED }}
+          SMTP_USER: ${{ secret.SMTP_USER }}
+          HOST: ${{ secret.HOST }}
+          COOKIE_SECRET: ${{ secret.COOKIE_SECRET }}
+          REDIRECT_URL_SUCCESS: ${{ secret.REDIRECT_URL_SUCCESS }}
+          SMTP_SECURE: ${{ secret.SMTP_SECURE }}
+          SNS_REGION: ${{ secret.SNS_REGION }}
+          SMS_MFA_ENABLED: ${{ secret.SMS_MFA_ENABLED }}
+          SPOTIFY_ENABLED: ${{ secret.SPOTIFY_ENABLED }}
+          DATABASE_URL: ${{ secret.DATABASE_URL }}
+          EMAILS_ENABLED: ${{ secret.EMAILS_ENABLED }}
+          SMTP_PORT: ${{ secret.SMTP_PORT }}
+          AUTO_ACTIVATE_NEW_USERS: ${{ secret.AUTO_ACTIVATE_NEW_USERS }}
+          COOKIE_SECURE: ${{ secret.COOKIE_SECURE }}
+          S3_SECRET_ACCESS_KEY: ${{ secret.S3_SECRET_ACCESS_KEY }}
+          S3_ACCESS_KEY_ID: ${{ secret.S3_ACCESS_KEY_ID }}
+          HASURA_GRAPHQL_ADMIN_SECRET: ${{ secret.HASURA_GRAPHQL_ADMIN_SECRET }}
+          OTP_ISSUER: ${{ secret.OTP_ISSUER }}
+          SPOTIFY_CLIENT_ID: ${{ secret.SPOTIFY_CLIENT_ID }}
+          HASURA_ENDPOINT: ${{ secret.HASURA_ENDPOINT }}
+          APP_URL: ${{ secret.APP_URL }}
+          MIN_PASSWORD_LENGTH: ${{ secret.MIN_PASSWORD_LENGTH }}
+          S3_BUCKET: ${{ secret.S3_BUCKET }}
+          JWT_ALGORITHM: ${{ secret.JWT_ALGORITHM }}
+          PORT: ${{ secret.PORT }}
+          COOKIE_SAME_SITE: ${{ secret.COOKIE_SAME_SITE }}
+          SNS_AWS_ACCESS_KEY_ID: ${{ secret.SNS_AWS_ACCESS_KEY_ID }}
+          SMTP_HOST: ${{ secret.SMTP_HOST }}
+          SMTP_SENDER: ${{ secret.SMTP_SENDER }}
+          JWT_KEY: ${{ secret.JWT_KEY }}
+          S3_ENDPOINT: ${{ secret.S3_ENDPOINT }}
+          REDIRECT_URL_ERROR: ${{ secret.REDIRECT_URL_ERROR }}
+          S3_SSL_ENABLED: ${{ secret.S3_SSL_ENABLED }}
+          MAGIC_LINK_ENABLED: ${{ secret.MAGIC_LINK_ENABLED }}
+          DEFAULT_ALLOWED_USER_ROLES: ${{ secret.DEFAULT_ALLOWED_USER_ROLES }}
+          SPOTIFY_CLIENT_SECRET: ${{ secret.SPOTIFY_CLIENT_SECRET }}
+          REGISTRATION_CUSTOM_FIELDS: ${{ secret.REGISTRATION_CUSTOM_FIELDS }}
+          SERVER_URL: ${{ secret.SERVER_URL }}
+          SNS_API_VERSION: ${{ secret.SNS_API_VERSION }}
+          VERIFY_EMAILS: ${{ secret.VERIFY_EMAILS }}
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./docker/prod/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: './github/task-definitions/${{ env.ENVIRONMENT }}.json'
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
