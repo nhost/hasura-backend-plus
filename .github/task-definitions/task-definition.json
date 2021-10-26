@@ -1,6 +1,7 @@
 {
   "containerDefinitions": [
     {
+      "name": "HBP-Container",
       "cpu": 0,
       "portMappings": [
         {
