@@ -3,7 +3,7 @@ name: Deploy HBP to Amazon ECS
 on:
   push:
     branches:
-      - development
+      - master
 
 env:
   AWS_REGION: 'us-east-1'
