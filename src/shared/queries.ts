@@ -3,9 +3,19 @@ import gql from 'graphql-tag'
 
 const accountFragment = gql`
   fragment accountFragment on auth_accounts {
-    id
     active
     default_role
+    email
+    id
+    is_anonymous
+    mfa_enabled
+    new_email
+    otp_secret
+    password_hash
+    phone_number
+    sms_mfa_enabled
+    sms_otp_secret
+    ticket
     account_roles {
       role
     }
@@ -15,15 +25,6 @@ const accountFragment = gql`
       username
       ${JWT.CUSTOM_FIELDS.join('\n\t\t\t')}
     }
-    is_anonymous
-    ticket
-    email
-    new_email
-    phone_number
-    otp_secret
-    sms_otp_secret
-    mfa_enabled
-    password_hash
   }
 `
 
@@ -244,7 +245,7 @@ export const deleteSmsOtpSecret = gql`
   mutation($user_id: uuid!) {
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
-      _set: { sms_otp_secret: null, mfa_enabled: false }
+      _set: { sms_otp_secret: null, sms_mfa_enabled: false }
     ) {
       affected_rows
     }
@@ -256,6 +257,17 @@ export const updateOtpStatus = gql`
     update_auth_accounts(
       where: { user: { id: { _eq: $user_id } } }
       _set: { mfa_enabled: $mfa_enabled }
+    ) {
+      affected_rows
+    }
+  }
+`
+
+export const updateSmsMfaEnabled = gql`
+  mutation($user_id: uuid!, $sms_mfa_enabled: Boolean!) {
+    update_auth_accounts(
+      where: { user: { id: { _eq: $user_id } } }
+      _set: { sms_mfa_enabled: $sms_mfa_enabled }
     ) {
       affected_rows
     }

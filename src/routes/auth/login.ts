@@ -22,7 +22,6 @@ interface HasuraData {
 }
 
 async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
-  // default to true
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
@@ -83,7 +82,16 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.badRequest('Account does not exist.')
   }
 
-  const { id, mfa_enabled, password_hash, sms_otp_secret, active, email, phone_number } = account
+  const {
+    id,
+    mfa_enabled,
+    password_hash,
+    sms_otp_secret,
+    sms_mfa_enabled,
+    active,
+    email,
+    phone_number
+  } = account
 
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
@@ -137,7 +145,10 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     return res.boom.unauthorized('Username and password do not match')
   }
 
-  if (mfa_enabled) {
+  console.log('mfa_enabled: ', mfa_enabled)
+  console.log('sms_mfa_enabled: ', sms_mfa_enabled)
+
+  if (mfa_enabled || sms_mfa_enabled) {
     const ticket = uuidv4()
     const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000)
 
@@ -148,13 +159,13 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
       ticket_expires_at
     })
 
-    if (sms_otp_secret) {
+    if (sms_mfa_enabled && sms_otp_secret) {
       const code = authenticator.generate(sms_otp_secret)
       await sendSms(phone_number, verificationMsg(code))
-      return res.send({ mfa: mfa_enabled, ticket, sms: true })
-    } else {
-      return res.send({ mfa: mfa_enabled, ticket })
+      return res.send({ sms_mfa: sms_mfa_enabled, ticket })
     }
+
+    return res.send({ mfa: mfa_enabled, ticket })
   }
 
   // refresh_token
@@ -172,7 +183,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   const session: Session = { jwt_token, jwt_expires_in, user }
   if (!useCookie) session.refresh_token = refresh_token
 
-  res.send(session)
+  return res.send(session)
 }
 
 export default asyncWrapper(loginAccount)

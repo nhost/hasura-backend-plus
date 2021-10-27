@@ -67,8 +67,9 @@ export interface AccountData {
   account_roles: { role: string }[]
   is_anonymous: boolean
   ticket?: string
-  otp_secret?: string
   mfa_enabled: boolean
+  otp_secret?: string
+  sms_mfa_enabled: boolean
   sms_otp_secret?: string
   password_hash: string
   email: string

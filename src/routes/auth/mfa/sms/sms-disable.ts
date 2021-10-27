@@ -1,43 +1,36 @@
-import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
-import { Response } from 'express'
-import { deleteSmsOtpSecret } from '@shared/queries'
-
 import { authenticator } from 'otplib'
-import { smsMfaSchema } from '@shared/validation'
+import { Response } from 'express'
+
+import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
+import { deleteSmsOtpSecret } from '@shared/queries'
+import { RequestExtended } from '@shared/types'
+import { mfaSchema } from '@shared/validation'
 import { request } from '@shared/request'
-import { AccountData, RequestExtended } from '@shared/types'
 
 async function disableSmsMfa(req: RequestExtended, res: Response): Promise<unknown> {
   if (!req.permission_variables) {
     return res.boom.unauthorized('Not logged in')
   }
 
-  const { 'user-id': user_id } = req.permission_variables
-
-  const { code } = await smsMfaSchema.validateAsync(req.body)
-
-  let sms_otp_secret: AccountData['sms_otp_secret']
-  let mfa_enabled: AccountData['mfa_enabled']
   try {
-    const account = await selectAccountByUserId(user_id)
-    sms_otp_secret = account.sms_otp_secret
-    mfa_enabled = account.mfa_enabled
+    const { 'user-id': user_id } = req.permission_variables
+    const { code } = await mfaSchema.validateAsync(req.body)
+    const { sms_otp_secret, sms_mfa_enabled } = await selectAccountByUserId(user_id)
+
+    if (!sms_mfa_enabled || !sms_otp_secret) {
+      return res.boom.badRequest('SMS MFA is already disabled.')
+    }
+
+    if (!authenticator.check(code, sms_otp_secret)) {
+      return res.boom.unauthorized('Invalid two-factor code.')
+    }
+
+    await request(deleteSmsOtpSecret, { user_id })
+
+    return res.status(204).send()
   } catch (err) {
-    return res.boom.badRequest(err.message)
+    return res.boom.badRequest(err?.message || 'Failed to disable MFA')
   }
-
-  if (!mfa_enabled) {
-    return res.boom.badRequest('SMS MFA is already disabled.')
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (!authenticator.check(code, sms_otp_secret!)) {
-    return res.boom.unauthorized('Invalid two-factor code.')
-  }
-
-  await request(deleteSmsOtpSecret, { user_id })
-
-  return res.status(204).send()
 }
 
 export default asyncWrapper(disableSmsMfa)
