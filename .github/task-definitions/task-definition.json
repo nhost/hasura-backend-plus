@@ -1,0 +1,205 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "__CONTAINER_NAME__",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SMTP_PASS",
+          "value": "__SMTP_PASS__"
+        },
+        {
+          "name": "SNS_AWS_SECRET_ACCESS_KEY",
+          "value": "__SNS_AWS_SECRET_ACCESS_KEY__"
+        },
+        {
+          "name": "LOST_PASSWORD_ENABLED",
+          "value": "__LOST_PASSWORD_ENABLED__"
+        },
+        {
+          "name": "SMTP_USER",
+          "value": "__SMTP_USER__"
+        },
+        {
+          "name": "HOST",
+          "value": "__HOST__"
+        },
+        {
+          "name": "COOKIE_SECRET",
+          "value": "__COOKIE_SECRET__"
+        },
+        {
+          "name": "REDIRECT_URL_SUCCESS",
+          "value": "__REDIRECT_URL_SUCCESS__"
+        },
+        {
+          "name": "SMTP_SECURE",
+          "value": "__SMTP_SECURE__"
+        },
+        {
+          "name": "SNS_REGION",
+          "value": "__SNS_REGION__"
+        },
+        {
+          "name": "SMS_MFA_ENABLED",
+          "value": "__SMS_MFA_ENABLED__"
+        },
+        {
+          "name": "SPOTIFY_ENABLED",
+          "value": "__SPOTIFY_ENABLED__"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "__DATABASE_URL__"
+        },
+        {
+          "name": "EMAILS_ENABLED",
+          "value": "__EMAILS_ENABLED__"
+        },
+        {
+          "name": "SMTP_PORT",
+          "value": "__SMTP_PORT__"
+        },
+        {
+          "name": "AUTO_ACTIVATE_NEW_USERS",
+          "value": "__AUTO_ACTIVATE_NEW_USERS__"
+        },
+        {
+          "name": "COOKIE_SECURE",
+          "value": "__COOKIE_SECURE__"
+        },
+        {
+          "name": "S3_SECRET_ACCESS_KEY",
+          "value": "__S3_SECRET_ACCESS_KEY__"
+        },
+        {
+          "name": "HASURA_GRAPHQL_ADMIN_SECRET",
+          "value": "__HASURA_GRAPHQL_ADMIN_SECRET__"
+        },
+        {
+          "name": "OTP_ISSUER",
+          "value": "__OTP_ISSUER__"
+        },
+        {
+          "name": "SPOTIFY_CLIENT_ID",
+          "value": "__SPOTIFY_CLIENT_ID__"
+        },
+        {
+          "name": "HASURA_ENDPOINT",
+          "value": "__HASURA_ENDPOINT__"
+        },
+        {
+          "name": "S3_ACCESS_KEY_ID",
+          "value": "__S3_ACCESS_KEY_ID__"
+        },
+        {
+          "name": "APP_URL",
+          "value": "__APP_URL__"
+        },
+        {
+          "name": "MIN_PASSWORD_LENGTH",
+          "value": "__MIN_PASSWORD_LENGTH__"
+        },
+        {
+          "name": "S3_BUCKET",
+          "value": "__S3_BUCKET__"
+        },
+        {
+          "name": "JWT_ALGORITHM",
+          "value": "__JWT_ALGORITHM__"
+        },
+        {
+          "name": "PORT",
+          "value": "__PORT__"
+        },
+        {
+          "name": "COOKIE_SAME_SITE",
+          "value": "__COOKIE_SAME_SITE__"
+        },
+        {
+          "name": "SNS_AWS_ACCESS_KEY_ID",
+          "value": "__SNS_AWS_ACCESS_KEY_ID__"
+        },
+        {
+          "name": "SMTP_HOST",
+          "value": "__SMTP_HOST__"
+        },
+        {
+          "name": "JWT_KEY",
+          "value": "__JWT_KEY__"
+        },
+        {
+          "name": "SMTP_SENDER",
+          "value": "__SMTP_SENDER__"
+        },
+        {
+          "name": "S3_ENDPOINT",
+          "value": "__S3_ENDPOINT__"
+        },
+        {
+          "name": "REDIRECT_URL_ERROR",
+          "value": "__REDIRECT_URL_ERROR__"
+        },
+        {
+          "name": "S3_SSL_ENABLED",
+          "value": "__S3_SSL_ENABLED__"
+        },
+        {
+          "name": "MAGIC_LINK_ENABLED",
+          "value": "__MAGIC_LINK_ENABLED__"
+        },
+        {
+          "name": "DEFAULT_ALLOWED_USER_ROLES",
+          "value": "__DEFAULT_ALLOWED_USER_ROLES__"
+        },
+        {
+          "name": "SPOTIFY_CLIENT_SECRET",
+          "value": "__SPOTIFY_CLIENT_SECRET__"
+        },
+        {
+          "name": "REGISTRATION_CUSTOM_FIELDS",
+          "value": "__REGISTRATION_CUSTOM_FIELDS__"
+        },
+        {
+          "name": "SERVER_URL",
+          "value": "__SERVER_URL__"
+        },
+        {
+          "name": "SNS_API_VERSION",
+          "value": "__SNS_API_VERSION__"
+        },
+        {
+          "name": "VERIFY_EMAILS",
+          "value": "__VERIFY_EMAILS__"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/__TASK_DEFINITION_FAMILY__",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "family": "__TASK_DEFINITION_FAMILY__",
+  "taskRoleArn": "arn:aws:iam::317312837194:role/HasuraGraphQLAPI-TaskRole",
+  "executionRoleArn": "arn:aws:iam::317312837194:role/HasuraGraphQLAPI-ExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "placementConstraints": [],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048"
+}
