@@ -67,10 +67,10 @@ export interface AccountData {
   account_roles: { role: string }[]
   is_anonymous: boolean
   ticket?: string
-  otp_secret?: string
   mfa_enabled: boolean
-  sms_otp_secret?: string
+  otp_secret?: string
   sms_mfa_enabled: boolean
+  sms_otp_secret?: string
   password_hash: string
   email: string
   new_email?: string
@@ -99,6 +99,12 @@ interface AccountProvider {
 
 export interface QueryAccountProviderData {
   auth_account_providers: AccountProvider[]
+}
+
+export interface QueryUserData {
+  users: {
+    username: string
+  }[]
 }
 
 export interface InsertAccountData {

@@ -16,6 +16,7 @@ import activateAccount from './activate'
 import deleteAccount from './delete'
 import magicLink from './magic-link'
 import smsMfa from './mfa/sms'
+import resendConfirmation from './resend-confirmation'
 
 const router = Router()
 
@@ -36,6 +37,7 @@ router.use('/mfa/sms', smsMfa)
 router.use('/change-email', changeEmail)
 router.get('/activate', activateAccount)
 router.post('/delete', deleteAccount)
+router.post('/resend-confirmation', resendConfirmation)
 router
   .post('/login', loginAccount)
   .post('/logout', logout)

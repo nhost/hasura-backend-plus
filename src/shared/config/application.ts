@@ -4,6 +4,9 @@ import { castIntEnv, returnBooleanEnvVar } from './utils'
  * * Application Settings
  */
 export const APPLICATION = {
+  get APP_URL() {
+    return process.env.APP_URL || ''
+  },
   get SERVER_URL() {
     return process.env.SERVER_URL || ''
   },

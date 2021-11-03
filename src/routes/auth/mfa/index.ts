@@ -7,7 +7,7 @@ import totpLogin from './totp'
 
 const router = Router()
 
-router.use((req, res, next) => {
+router.use((_, res, next) => {
   if (!MFA.ENABLED) {
     return res.boom.badImplementation(
       `Please set the MFA_ENABLED env variable to true to use the auth/mfa routes.`

@@ -1,6 +1,7 @@
 import { COOKIES, REGISTRATION } from './config'
 import { NextFunction, Response } from 'express'
 import {
+  mutateAccountTicket,
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
@@ -114,6 +115,18 @@ export const rotateTicket = async (ticket: string): Promise<string> => {
     new_ticket
   })
   return new_ticket
+}
+
+export const updateAccountTicket = async (id: string, ticket: string, ticket_expires_at: Date) => {
+  const res = await request<{
+    ticket: string
+    user: { display_name: string }
+  }>(mutateAccountTicket, {
+    id,
+    ticket,
+    ticket_expires_at
+  })
+  return res
 }
 
 export const getPermissionVariablesFromCookie = (req: RequestExtended): PermissionVariables => {

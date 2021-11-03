@@ -74,7 +74,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
       template: 'lost-password',
       locals: {
         ticket,
-        url: APPLICATION.SERVER_URL,
+        url: APPLICATION.APP_URL,
         display_name: account.user.display_name
       },
       message: {

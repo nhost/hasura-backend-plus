@@ -1,15 +1,21 @@
 import { Request, Response } from 'express'
-import { authenticator } from 'otplib'
-
 import { asyncWrapper, rotateTicket, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
 import { UserData, Session } from '@shared/types'
+
+import { authenticator } from 'otplib'
 import { totpSchema } from '@shared/validation'
 
-async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
+// Increase the authenticator window so that TOTP codes from the previous 30 seconds are also valid
+authenticator.options = {
+  window: [1, 0]
+}
+
+async function smsTotpLogin({ body }: Request, res: Response): Promise<unknown> {
   try {
     const { ticket, code } = await totpSchema.validateAsync(body)
+    console.log('body: ', body)
     const account = await selectAccount(body)
 
     if (!account) {
@@ -18,17 +24,17 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
 
     // default to true
     const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
-    const { id, otp_secret, mfa_enabled, active } = account
+    const { id, sms_otp_secret, sms_mfa_enabled, active } = account
 
     if (!active) {
       return res.boom.unauthorized('Account is not activated.')
     }
 
-    if (!mfa_enabled || !otp_secret) {
+    if (!sms_mfa_enabled || !sms_otp_secret) {
       return res.boom.badRequest('MFA is not enabled.')
     }
 
-    if (!authenticator.check(code, otp_secret)) {
+    if (!authenticator.check(code, sms_otp_secret)) {
       return res.boom.unauthorized('Invalid two-factor code.')
     }
 
@@ -49,8 +55,9 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
 
     return res.send(session)
   } catch (err) {
-    return res.boom.badRequest(err?.message || 'TOTP failed')
+    console.error(err)
+    return res.boom.badRequest(err?.message || 'SMS TOTP failed')
   }
 }
 
-export default asyncWrapper(totpLogin)
+export default asyncWrapper(smsTotpLogin)

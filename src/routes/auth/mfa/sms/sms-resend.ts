@@ -1,8 +1,9 @@
-import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
-import { RequestExtended, AccountData } from '@shared/types'
-import { Response } from 'express'
-import { sendSms } from '@shared/sns'
 import { authenticator } from 'otplib'
+import { Response } from 'express'
+
+import { asyncWrapper, selectAccountByUserId } from '@shared/helpers'
+import { RequestExtended } from '@shared/types'
+import { sendSms } from '@shared/sns'
 import { verificationMsg } from '.'
 
 async function resendSms(req: RequestExtended, res: Response): Promise<unknown> {
@@ -10,38 +11,21 @@ async function resendSms(req: RequestExtended, res: Response): Promise<unknown> 
     return res.boom.unauthorized('Not logged in')
   }
 
-  const { 'user-id': user_id } = req.permission_variables
-  let sms_otp_secret: AccountData['otp_secret']
-  let sms_mfa_enabled: AccountData['mfa_enabled']
-  let phone_number: AccountData['phone_number']
   try {
-    const account = await selectAccountByUserId(user_id)
-    sms_otp_secret = account.otp_secret
-    sms_mfa_enabled = account.mfa_enabled
-    phone_number = account.phone_number
+    const { 'user-id': user_id } = req.permission_variables
+    const { sms_otp_secret, phone_number } = await selectAccountByUserId(user_id)
+
+    if (!sms_otp_secret || !phone_number) {
+      return res.boom.badRequest('SMS MFA is not enabled.')
+    }
+
+    const code = authenticator.generate(sms_otp_secret)
+    await sendSms(phone_number, verificationMsg(code))
+
+    return res.status(204).send()
   } catch (err) {
-    return res.boom.badRequest(err.message)
+    return res.boom.badRequest(err?.message || 'Failed to resend SMS MFA code.')
   }
-
-  if (!sms_mfa_enabled) {
-    return res.boom.badRequest('SMS MFA is not enabled.')
-  }
-
-  if (!sms_otp_secret) {
-    return res.boom.badRequest('SMS OTP secret is not set.')
-  }
-
-  if (!phone_number) {
-    return res.boom.badRequest('Phone number is not set.')
-  }
-
-  /**
-   * Generate code and send via SMS
-   */
-  const code = authenticator.generate(sms_otp_secret)
-  await sendSms(phone_number, verificationMsg(code))
-
-  return res.status(204).send()
 }
 
 export default asyncWrapper(resendSms)
