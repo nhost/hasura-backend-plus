@@ -89,7 +89,7 @@ const manageProviderStrategy = (
     // noop continue to register user
   }
 
-  let username: string = display_name
+  let username: string = encodeURI(display_name.trim().toLowerCase())
 
   const usernameAlreadyTaken: boolean = await request<QueryUserData>(selectUserByUsername, {
     username: display_name
