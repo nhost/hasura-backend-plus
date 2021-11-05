@@ -16,6 +16,8 @@ export const getRequestInfo = async (
   // validate new email
   const { new_email } = await emailResetSchema.validateAsync(req.body)
 
+  console.log(req.body)
+
   // make sure new_email is not attached to an account yet
   let account_exists = true
   try {

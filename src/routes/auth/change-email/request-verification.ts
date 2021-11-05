@@ -7,20 +7,41 @@ import { APPLICATION, AUTHENTICATION } from '@shared/config'
 import { emailClient } from '@shared/email'
 import { request } from '@shared/request'
 import { SetNewEmailData } from '@shared/types'
+import { selectAccountByEmail } from '@shared/helpers'
+import { emailResetSchema } from '@shared/validation'
 
-import { getRequestInfo } from './utils'
 import { RequestExtended } from '@shared/types'
 
 async function requestChangeEmail(req: RequestExtended, res: Response): Promise<any> {
   if(!AUTHENTICATION.VERIFY_EMAILS) {
     return res.boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/request route.`)
   }
-
-  const { user_id, new_email } = await getRequestInfo(req, res)
-
   // smtp must be enabled for request change password to work.
   if (!APPLICATION.EMAILS_ENABLE) {
     return res.boom.badImplementation('SMTP settings unavailable')
+  }
+
+  if (!req.permission_variables) {
+    throw res.boom.unauthorized('Not logged in')
+  }
+
+  const { 'user-id': user_id } = req.permission_variables
+  const { new_email } = await emailResetSchema.validateAsync(req.body)
+
+  // make sure new_email is not attached to an account yet
+  let account_exists = true
+  try {
+    await selectAccountByEmail(new_email)
+    // Account using new_email already exists - pass
+  } catch {
+    // No existing account is using the new email address. Good!
+    account_exists = false
+  }
+
+  res.setHeader('Content-Type', 'application/json');
+
+  if (account_exists) {
+    return res.end(JSON.stringify({"success": false, "message": "Email already exists."}))
   }
 
   // generate new ticket and ticket_expires_at
@@ -74,7 +95,7 @@ async function requestChangeEmail(req: RequestExtended, res: Response): Promise<
     return res.boom.badImplementation()
   }
 
-  return res.status(204).send()
+  return res.end(JSON.stringify({"success": true, "message": "Email change requested successfully."}))
 }
 
 export default asyncWrapper(requestChangeEmail)
