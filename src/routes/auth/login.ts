@@ -142,7 +142,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // Validate Password
   const isPasswordCorrect = await bcrypt.compare(password, password_hash)
   if (!isPasswordCorrect && !userImpersonationValid) {
-    return res.boom.unauthorized('Username and password do not match')
+    return res.boom.unauthorized('Email and password do not match')
   }
 
   console.log('mfa_enabled: ', mfa_enabled)
