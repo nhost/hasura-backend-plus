@@ -89,22 +89,26 @@ const manageProviderStrategy = (
     // noop continue to register user
   }
 
-  let username: string = encodeURI(display_name.trim().toLowerCase())
+  let username = profile.username ? profile.username.trim().toLowerCase() : undefined
 
-  const usernameAlreadyTaken: boolean = await request<QueryUserData>(selectUserByUsername, {
-    username: display_name
-  }).then((res) => !!res.users.length)
+  const generateRandomSequence = () => {
+    return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1)
+  }
 
-  if (usernameAlreadyTaken) {
-    const generateRandomSequence = () => {
-      return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1)
+  if (username) {
+    const usernameAlreadyTaken: boolean = await request<QueryUserData>(selectUserByUsername, {
+      username
+    }).then((res) => !!res.users.length)
+
+    if (usernameAlreadyTaken) {
+      const appendRandomSequence = (input: string) => {
+        return input + generateRandomSequence()
+      }
+
+      username = appendRandomSequence(display_name)
     }
-
-    const appendRandomSequence = (input: string) => {
-      return input + generateRandomSequence()
-    }
-
-    username = appendRandomSequence(display_name)
+  } else {
+    username = generateRandomSequence() + generateRandomSequence() + generateRandomSequence()
   }
 
   // register user, account, account_provider
