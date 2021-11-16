@@ -33,7 +33,7 @@
     "@nicokaiser/passport-apple": "^0.2.1",
     "@types/sharp": "^0.27.1",
     "archiver": "4.0.1",
-    "aws-sdk": "2.656.0",
+    "aws-sdk": "2.814.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "1.19.0",
