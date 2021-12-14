@@ -23,9 +23,11 @@ const isHasuraReady = async () => {
 }
 
 const start = async (): Promise<void> => {
-  await isHasuraReady()
-  await applyMigrations()
-  await applyMetadata()
+  if (APPLICATION.ENABLE_AUTO_MIGRATION) {
+    await isHasuraReady()
+    await applyMigrations()
+    await applyMetadata()
+  }
 
   app.listen(APPLICATION.PORT, APPLICATION.HOST, () => {
     if (APPLICATION.HOST) {
