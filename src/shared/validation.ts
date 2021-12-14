@@ -125,7 +125,8 @@ export const mfaSchema = Joi.object(codeFields)
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
-  password: Joi.string() // these will be checked more rigorously in `loginSchema`
+  password: Joi.string(), // these will be checked more rigorously in `loginSchema`
+  cookie: Joi.boolean()
 })
 export const magicLinkLoginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
