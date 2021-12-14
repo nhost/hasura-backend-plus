@@ -57,5 +57,8 @@ export const APPLICATION = {
   },
   get TIME_FRAME() {
     return castIntEnv('TIME_FRAME', 15 * 60 * 1000)
+  },
+  get ENABLE_AUTO_MIGRATION() {
+    return returnBooleanEnvVar(['ENABLE_AUTO_MIGRATION'], true)
   }
 }
