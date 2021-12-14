@@ -1,13 +1,5 @@
 name: Build
 on:
-  pull_request:
-    branches: [master]
-    paths-ignore:
-      - 'docs/**'
-  push:
-    branches: [master]
-    paths-ignore:
-      - 'docs/**'
   release:
     types: [published]
 env:
@@ -128,32 +120,43 @@ jobs:
         with:
           name: coverage
           path: coverage
-  coverage:
-    needs: test
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download coverage results
-        uses: actions/download-artifact@v1
-        with:
-          name: coverage
-      - name: Publish to CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage/clover.xml
+  # coverage:
+  #   needs: test
+  #   if: github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Download coverage results
+  #       uses: actions/download-artifact@v1
+  #       with:
+  #         name: coverage
+  #     - name: Publish to CodeCov
+  #       uses: codecov/codecov-action@v1
+  #       with:
+  #         file: ./coverage/clover.xml
   publish:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: raftlabs/hasura-backend-plus
+          flavor: |
+            latest=false
+            prefix=v
+          tags: |
+            type=semver,pattern={{version}}
+
       - name: Build and publish to Docker Hub
         uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: nhost/hasura-backend-plus
+          repository: raftlabs/hasura-backend-plus
           path: .
           dockerfile: docker/prod/Dockerfile
-          tag_with_ref: true
-          tag_with_sha: true
+          tags: ${{ steps.meta.outputs.tags }}
