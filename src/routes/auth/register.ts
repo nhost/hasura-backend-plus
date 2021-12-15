@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
+  
   const body = req.body
 
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
@@ -86,11 +87,12 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         }
       }
     })
+    
   } catch (e) {
     console.error('Error inserting user account')
     console.error(e)
     return res.boom.badImplementation('Error inserting user account')
-  }
+  }  
 
   const account = accounts.insert_auth_accounts.returning[0]
 
@@ -108,6 +110,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : email
+    
 
     if (typeof password === 'undefined') {
       try {
@@ -137,6 +140,30 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
       const session: Session = { jwt_token: null, jwt_expires_in: null, user }
       return res.send(session)
+    }
+
+    // Send Welcome Email
+    try {
+      await emailClient.send({
+        template: 'welcome-user',
+        message: {
+          to: email,
+          headers: {
+            'x-welcome': {
+              prepared: true,
+              value: ticket
+            }
+          }
+        },
+        locals: {
+          display_name,
+          ticket,
+          url: APPLICATION.SERVER_URL,
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      return res.boom.badImplementation()
     }
 
     try {
