@@ -16,6 +16,10 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
     )
   }
 
+  let nextURL:string = ""
+  if (query.nextURL) nextURL = query.nextURL as string
+  if (nextURL) delete query.nextURL  
+
   let hasuraData: UpdateAccountData
   const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
 
@@ -61,9 +65,11 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
 
   // Redirect user with refresh token.
   // This is both for when users log in and register.
-  return res.redirect(
-    `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}`
-  )
+
+  let redirectURL: string = `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}`
+
+  if (nextURL) redirectURL += `&nextURL=${nextURL}`
+  return res.redirect(redirectURL)
 }
 
 export default asyncWrapper(activateUser)
