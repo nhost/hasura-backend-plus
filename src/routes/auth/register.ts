@@ -15,6 +15,11 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   
   const body = req.body
 
+  const next_url = req.body.next_url as string 
+
+  // remove next url for validation
+  delete req.body.next_url
+  
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   const {
@@ -102,6 +107,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     email: account.email,
     avatar_url: account.user.avatar_url
   }
+  
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
     if (!APPLICATION.EMAILS_ENABLE) {
@@ -156,15 +162,26 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
           }
         },
         locals: {
-          display_name,
-          ticket,
-          url: APPLICATION.SERVER_URL,
         }
       })
     } catch (err) {
       console.error(err)
       return res.boom.badImplementation()
     }
+
+    let locals : {
+      display_name: string
+      ticket:string
+      url: string
+      next_url?: string
+
+    } = {
+      display_name,
+      ticket,
+      url: APPLICATION.SERVER_URL,      
+    }
+
+    if (next_url) locals = {...locals, next_url: next_url}    
 
     try {
       await emailClient.send({
@@ -178,11 +195,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
             }
           }
         },
-        locals: {
-          display_name,
-          ticket,
-          url: APPLICATION.SERVER_URL
-        }
+        locals
       })
     } catch (err) {
       console.error(err)
