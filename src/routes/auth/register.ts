@@ -169,19 +169,17 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
       return res.boom.badImplementation()
     }
 
+    let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
+    if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
+
     let locals : {
       display_name: string
-      ticket:string
       url: string
-      next_url?: string
 
     } = {
       display_name,
-      ticket,
-      url: APPLICATION.SERVER_URL,      
+      url: activateUrl,      
     }
-
-    locals = {...locals, next_url: next_url || ""}    
 
     try {
       await emailClient.send({
