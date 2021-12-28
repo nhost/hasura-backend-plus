@@ -181,7 +181,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
       url: APPLICATION.SERVER_URL,      
     }
 
-    if (next_url) locals = {...locals, next_url: next_url}    
+    locals = {...locals, next_url: next_url || ""}    
 
     try {
       await emailClient.send({
