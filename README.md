@@ -26,6 +26,11 @@
   </a>
 </p>
 
+## Deprecation notice
+
+Hasura-Backend-Plus is no longer actively maintained and is being transitioned to [Hasura-auth](https://github.com/nhost/hasura-auth) and [Hasura-storage](https://github.com/nhost/hasura-storage).
+
+
 For detailed usage and installation instructions check out the [documentation](https://nhost.github.io/hasura-backend-plus/).
 
 ---
