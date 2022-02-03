@@ -15,7 +15,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
   }
 
   const body = req.body
-  const next_url = req.body.next_url as string 
+  const next_url = req.body.next_url as string
   delete req.body.next_url
 
   try {
@@ -44,7 +44,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
     }
 
     // use display name from `user_data` if available
-    const display_name = user.display_name || user.email
+    const display_name = user.display_name || ""
 
     await updateAccountTicket(account.id, ticket, ticket_expires_at)
 
@@ -56,7 +56,7 @@ async function resendConfirmation(req: Request, res: Response): Promise<unknown>
 
     } = {
       display_name,
-      url: activateUrl,      
+      url: activateUrl,
     }
 
     await emailClient.send({
