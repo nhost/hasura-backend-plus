@@ -370,3 +370,13 @@ export const updateAccountByEmail = gql`
     }
   }
 `
+
+export const insertArtistRoyaltyClaim = gql`
+  mutation InsertArtistRoyaltyClaim(
+    $object: artist_royalty_claims_insert_input!
+  ) {
+    insert_artist_royalty_claims_one(object: $object) {
+      created_at
+    }
+  }
+`

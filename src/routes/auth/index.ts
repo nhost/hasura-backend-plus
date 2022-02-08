@@ -17,6 +17,7 @@ import deleteAccount from './delete'
 import magicLink from './magic-link'
 import smsMfa from './mfa/sms'
 import resendConfirmation from './resend-confirmation'
+import artistRegister from './artist-register'
 
 const router = Router()
 
@@ -46,5 +47,6 @@ router
 router.get('/jwks', getJwks)
 router.use('/token', token)
 router.get('/magic-link', magicLink)
+router.post('/artist-register', artistRegister)
 
 export default router
