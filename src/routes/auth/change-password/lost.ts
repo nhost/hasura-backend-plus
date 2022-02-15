@@ -28,7 +28,28 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
     return res.boom.badImplementation('SMTP settings unavailable')
   }
 
-  const { email } = await forgotSchema.validateAsync(body)
+  const { email, token } = await forgotSchema.validateAsync(body)
+
+  if (!token) return res.boom.badRequest('Invalid Request!')
+
+  let passCaptcha = false
+
+  try {
+    const data = new URLSearchParams()
+    data.append('secret', APPLICATION.HCAPTCHA_SECRET)
+    data.append('response', process.env.NODE_ENV === 'development' ? APPLICATION.HCAPTCHA_LOCAL_RESPONSE : token)
+    const response = await fetch('https://hcaptcha.com/siteverify', {
+      method: 'post',
+      body: data
+    }).then(res => res.json())
+    console.log('hCaptCha response', response)
+    passCaptcha = response.success
+  } catch (err) {
+    console.error(err.message)
+    return res.boom.badRequest('Invalid Request!')
+  }
+
+  if (!passCaptcha) return res.boom.badRequest('Invalid Request!')
 
   let account: AccountData
 

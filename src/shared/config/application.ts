@@ -60,5 +60,11 @@ export const APPLICATION = {
   },
   get TIME_FRAME() {
     return castIntEnv('TIME_FRAME', 15 * 60 * 1000)
+  },
+  get HCAPTCHA_SECRET() {
+    return process.env.NODE_ENV === 'development' ? '0x0000000000000000000000000000000000000000' : process.env.HCAPTCHA_SECRET || ''
+  },
+  get HCAPTCHA_LOCAL_RESPONSE() {
+    return '10000000-aaaa-bbbb-cccc-000000000001'
   }
 }
