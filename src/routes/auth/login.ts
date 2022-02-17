@@ -13,7 +13,7 @@ import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/conf
 import { authenticator } from 'otplib'
 import { sendSms } from '@shared/sns'
 import { verificationMsg } from './mfa/sms'
-
+require('dotenv').config()
 interface HasuraData {
   insert_auth_accounts: {
     affected_rows: number
@@ -23,10 +23,29 @@ interface HasuraData {
 
 async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
+  
+  let passCaptCha = false;
+  const { token } = await loginSchema.validateAsync(body)
 
+  if (token) {
+    const response = await fetch(
+      `https://hcaptcha.com/siteverify`,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        },
+        body: `response=${token}&secret=${process.env.HCAPTCHA_SECRET_KEY}`,
+        method: "POST",
+      }
+    );
+    const captchaValidation = await response.json();
+    passCaptCha = captchaValidation.success
+  }
+
+  if (!passCaptCha && process.env.DEVELOPMENT !== 'dev') return res.boom.badRequest('Unable to sign up user')
+  
   if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
     const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
-
     // if user tries to sign in anonymously
     if (anonymous) {
       let hasura_data: HasuraData

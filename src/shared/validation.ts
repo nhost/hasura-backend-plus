@@ -77,7 +77,8 @@ export const userDataFields = {
 export const registerSchema = Joi.object({
   ...accountFields,
   ...userDataFields,
-  cookie: Joi.boolean()
+  cookie: Joi.boolean(),
+  token: Joi.string()
 })
 
 export const getRegisterSchema = () => {
@@ -87,7 +88,8 @@ export const getRegisterSchema = () => {
 export const registerSchemaMagicLink = Joi.object({
   ...accountFieldsMagicLink,
   ...userDataFields,
-  cookie: Joi.boolean()
+  cookie: Joi.boolean(),
+  token: Joi.string()
 })
 
 export const getRegisterSchemaMagicLink = () => {
@@ -135,7 +137,8 @@ export const smsMFaGenerateSchema = Joi.object({
 export const loginAnonymouslySchema = Joi.object({
   anonymous: Joi.boolean(),
   email: Joi.string(), // these will be checked more rigorously in `loginSchema`
-  password: Joi.string() // these will be checked more rigorously in `loginSchema`
+  password: Joi.string(), // these will be checked more rigorously in `loginSchema`
+  token: Joi.string() // hCaptcha code
 })
 
 export const magicLinkLoginAnonymouslySchema = Joi.object({
@@ -146,13 +149,15 @@ export const magicLinkLoginAnonymouslySchema = Joi.object({
 export const loginSchema = extendedJoi.object({
   email: emailRule,
   password: Joi.string().required(),
-  cookie: Joi.boolean()
+  cookie: Joi.boolean(),
+  token: Joi.string() // hCaptcha code
 })
 
 export const loginSchemaMagicLink = extendedJoi.object({
   email: emailRule,
   password: Joi.string(),
-  cookie: Joi.boolean()
+  cookie: Joi.boolean(),
+  token: Joi.string() // hCaptcha code
 })
 
 export const forgotSchema = Joi.object({ email: emailRule, token: Joi.string() })

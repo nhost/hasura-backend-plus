@@ -66,6 +66,12 @@ const PROVIDERS = {
           },
           get consumerSecret() {
             return process.env.TWITTER_CONSUMER_SECRET || ''
+          },
+          get pkce() {
+            return true
+          },
+          get state() {
+            return true
           }
         }
   },
