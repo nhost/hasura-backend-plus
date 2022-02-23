@@ -10,7 +10,10 @@ export default (router: Router): void => {
     router,
     'facebook',
     Strategy,
-    { profileFields: ['email', 'photos', 'displayName'] },
+    {
+      profileFields: ['email', 'photos', 'displayName', 'link'],
+      scope: ['public_profile', 'email', 'user_link']
+    },
     (req, res, next) => {
       if (!PROVIDERS.facebook) {
         return res.boom.badImplementation(

@@ -51,6 +51,7 @@ const manageProviderStrategy = (
   // find or create the user
   // check if user exists, using profile.id
   const { id, email, display_name, avatar_url } = transformProfile(profile)
+  const anyProfile = profile as any
 
   const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
     provider,
@@ -79,7 +80,8 @@ const manageProviderStrategy = (
         account_provider: {
           account_id: account.id,
           auth_provider: provider,
-          auth_provider_unique_id: id
+          auth_provider_unique_id: id,
+          raw_data: anyProfile._raw || anyProfile
         },
         account_id: account.id
       }
@@ -119,6 +121,7 @@ const manageProviderStrategy = (
     password_hash: null,
     active: true,
     default_role: REGISTRATION.DEFAULT_USER_ROLE,
+
     account_roles: {
       data: REGISTRATION.DEFAULT_ALLOWED_USER_ROLES.map((role) => ({ role }))
     },
@@ -133,7 +136,8 @@ const manageProviderStrategy = (
       data: [
         {
           auth_provider: provider,
-          auth_provider_unique_id: id
+          auth_provider_unique_id: id,
+          raw_data: profile
         }
       ]
     }

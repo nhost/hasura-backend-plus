@@ -12,6 +12,10 @@ router.use('/auth', auth)
 router.use('/storage', storage)
 
 router.get('/healthz', (_req, res) => res.send('OK'))
+router.get('/robots.txt', (_req, res) => {
+  res.type('text/plain')
+  res.send('User-agent: *\nDisallow: /')
+})
 router.get('/version', (_req, res) =>
   res.send(JSON.stringify({ version: 'v' + process.env.npm_package_version }))
 )
