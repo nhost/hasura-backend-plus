@@ -119,6 +119,12 @@ export interface InsertAccountProviderToUser {
   }
 }
 
+export interface UpdateAccountProviderToUser {
+  returning: {
+    account: AccountData
+  }
+}
+
 export interface RefreshTokenMiddleware {
   value: string | null
   type: 'query' | 'cookie' | null

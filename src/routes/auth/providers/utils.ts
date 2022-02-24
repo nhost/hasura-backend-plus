@@ -8,7 +8,8 @@ import {
   insertAccount,
   insertAccountProviderToUser,
   selectAccountProvider,
-  selectUserByUsername
+  selectUserByUsername,
+  updateAccountProviderToUser
 } from '@shared/queries'
 import { getEndURLOperator, selectAccountByEmail, selectAccountByUserId } from '@shared/helpers'
 import { request } from '@shared/request'
@@ -19,7 +20,8 @@ import {
   UserData,
   RequestExtended,
   InsertAccountProviderToUser,
-  QueryUserData
+  QueryUserData,
+  UpdateAccountProviderToUser
 } from '@shared/types'
 import { setRefreshToken } from '@shared/cookies'
 
@@ -38,7 +40,6 @@ interface InitProviderSettings {
 const manageProviderStrategy = (
   provider: string,
   transformProfile: TransformProfileFunction,
-  req: RequestExtended
 ) => async (
   _req: RequestExtended,
   _accessToken: string,
@@ -52,6 +53,7 @@ const manageProviderStrategy = (
   // check if user exists, using profile.id
   const { id, email, display_name, avatar_url } = transformProfile(profile)
   const anyProfile = profile as any
+  let rawProfile = anyProfile._raw || anyProfile
 
   const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
     provider,
@@ -60,7 +62,19 @@ const manageProviderStrategy = (
 
   // IF user is already registered
   if (hasuraData.auth_account_providers.length > 0) {
+    await request<UpdateAccountProviderToUser>(updateAccountProviderToUser, {
+      account_provider: {
+          raw_data: rawProfile,
+          auth: {
+            _accessToken,
+            _refreshToken
+          }
+      },
+      auth_provider_unique_id: id,
+    })
+
     return done(null, hasuraData.auth_account_providers[0].account)
+
   }
 
   // See if email already exist.
@@ -81,12 +95,15 @@ const manageProviderStrategy = (
           account_id: account.id,
           auth_provider: provider,
           auth_provider_unique_id: id,
-          raw_data: anyProfile._raw || anyProfile
+          raw_data: rawProfile,
+          auth: {
+            _accessToken,
+            _refreshToken
+          }
         },
         account_id: account.id
       }
     )
-
     return done(null, insertAccountProviderToUserData.insert_auth_account_providers_one.account)
   } catch (error) {
     // We were unable to fetch the account
@@ -137,7 +154,11 @@ const manageProviderStrategy = (
         {
           auth_provider: provider,
           auth_provider_unique_id: id,
-          raw_data: profile
+          raw_data: rawProfile,
+          auth: {
+            _accessToken,
+            _refreshToken
+          }
         }
       ]
     }
@@ -225,7 +246,7 @@ export const initProvider = <T extends Strategy>(
             callbackURL: `${APPLICATION.SERVER_URL}/auth/providers/${strategyName}/callback`,
             passReqToCallback: true
           },
-          manageProviderStrategy(strategyName, transformProfile, req)
+          manageProviderStrategy(strategyName, transformProfile)
         )
       )
 
