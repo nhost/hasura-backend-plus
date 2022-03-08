@@ -54,28 +54,38 @@ const manageProviderStrategy = (
   const { id, email, display_name, avatar_url } = transformProfile(profile)
   const anyProfile = profile as any
   let rawProfile = anyProfile._raw || anyProfile
-
   const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, {
     provider,
     profile_id: id
   })
+  try {
 
-  // IF user is already registered
-  if (hasuraData.auth_account_providers.length > 0) {
-    await request<UpdateAccountProviderToUser>(updateAccountProviderToUser, {
-      account_provider: {
+
+    // IF user is already registered
+    if (hasuraData.auth_account_providers.length > 0) {
+
+      await request<UpdateAccountProviderToUser>(updateAccountProviderToUser, {
+        account_provider: {
           raw_data: rawProfile,
           auth: {
             _accessToken,
             _refreshToken
           }
-      },
-      auth_provider_unique_id: id,
-    })
+        },
+        auth_provider_unique_id: id,
+        provider
+      })
 
-    return done(null, hasuraData.auth_account_providers[0].account)
-
+      return done(null, hasuraData.auth_account_providers[0].account)
+    }
+  } catch (error) {
+    console.log("error updating existing account: ", error)
   }
+
+  if (hasuraData.auth_account_providers.length > 0) {
+    return done(null, hasuraData.auth_account_providers[0].account)
+  }
+
 
   // See if email already exist.
   // if email exist, merge this provider with the current user.

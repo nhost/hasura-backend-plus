@@ -69,14 +69,14 @@ export const insertAccountProviderToUser = gql`
 `
 
 export const updateAccountProviderToUser = gql`
-  mutation($auth_provider_unique_id: String!, $account_provider: auth_account_providers_set_input) {
-    update_auth_account_providers(where: {auth_provider_unique_id: {_eq: $auth_provider_unique_id}}, _set: $account_provider) {
-        returning {
-          account {
-            ...accountFragment
-          }
+  mutation ($auth_provider_unique_id: String!, $provider: String!, $account_provider: auth_account_providers_set_input) {
+    update_auth_account_providers(where: {auth_provider_unique_id: {_eq: $auth_provider_unique_id}, auth_provider: {_eq: $provider}}, _set: $account_provider) {
+      returning {
+        account {
+          ...accountFragment
         }
       }
+    }
   }
   ${accountFragment}
 `
