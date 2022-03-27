@@ -96,7 +96,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
           data: accountRoles
         },
         user: {
-          data: { display_name: email, ...user_data }
+          data: { ...user_data }
         }
       }
     })
