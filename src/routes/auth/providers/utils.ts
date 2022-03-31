@@ -203,7 +203,7 @@ const providerCallback = async (req: RequestExtended, res: Response): Promise<vo
   // Redirect user with refresh token.
   // This is both for when users log in and register.
   return res.redirect(
-    `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}`
+    `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}&nextURL=/royalty/detail`
   )
 }
 
