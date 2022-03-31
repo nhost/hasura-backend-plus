@@ -10,6 +10,7 @@ import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validatio
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, UserData, Session } from '@shared/types'
+import { hcaptchaVerify } from '@shared/hcaptcha'
 require('dotenv').config()
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
@@ -25,22 +26,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const { token } = await getRegisterSchema().validateAsync(body)
 
-  let passCaptcha = false
-
-  if (token) {
-    const response = await fetch(
-      `https://hcaptcha.com/siteverify`,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-        },
-        body: `response=${token}&secret=${process.env.HCAPTCHA_SECRET_KEY}`,
-        method: "POST",
-      }
-    );
-    const captchaValidation = await response.json();
-    passCaptcha = captchaValidation.success
-  }
+  let passCaptcha = await hcaptchaVerify(token)
 
   if (!passCaptcha && process.env.DEVELOPMENT !== 'dev') return res.boom.badRequest('Unable to sign up user')
 
@@ -110,7 +96,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
           data: accountRoles
         },
         user: {
-          data: { display_name: email, ...user_data }
+          data: { ...user_data }
         }
       }
     })

@@ -13,8 +13,9 @@ import { emailResetSchema } from '@shared/validation'
 import { RequestExtended } from '@shared/types'
 
 async function requestChangeEmail(req: RequestExtended, res: Response): Promise<any> {
+  console.log('AUTHENTICATION.VERIFY_EMAILS: ', AUTHENTICATION.VERIFY_EMAILS);
   if(!AUTHENTICATION.VERIFY_EMAILS) {
-    return res.boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/request route.`)
+    // return res.boom.badImplementation(`Please set the VERIFY_EMAILS env variable to true to use the auth/change-email/request route.`)
   }
   // smtp must be enabled for request change password to work.
   if (!APPLICATION.EMAILS_ENABLE) {

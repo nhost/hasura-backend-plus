@@ -8,6 +8,7 @@ import { forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData } from '@shared/types'
+import { hcaptchaVerify } from '@shared/hcaptcha'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
@@ -32,22 +33,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
 
   if (!token) return res.boom.badRequest('Invalid Request!')
 
-  let passCaptcha = false
-
-  try {
-    const data = new URLSearchParams()
-    data.append('secret', APPLICATION.HCAPTCHA_SECRET)
-    data.append('response', process.env.NODE_ENV === 'development' ? APPLICATION.HCAPTCHA_LOCAL_RESPONSE : token)
-    const response = await fetch('https://hcaptcha.com/siteverify', {
-      method: 'post',
-      body: data
-    }).then(res => res.json())
-    console.log('hCaptCha response', response)
-    passCaptcha = response.success
-  } catch (err) {
-    console.error(err.message)
-    return res.boom.badRequest('Invalid Request!')
-  }
+  let passCaptcha = await hcaptchaVerify(token)
 
   if (!passCaptcha) return res.boom.badRequest('Invalid Request!')
 
