@@ -15,7 +15,7 @@ Hasura Backend Plus runs in a separate Docker container along side Postgres and 
 - Two-factor authentication support.
 - Third-party OAuth providers such as GitHub, Google, Facebook, Twitter etc.
 - Magic Link support.
-- Built in transactional emails such as account acitvation and password reset.
+- Built in transactional emails such as account activation and password reset.
 - Rate limiting.
 - Optional checking for [Pwned Passwords](https://haveibeenpwned.com/Passwords).
 
