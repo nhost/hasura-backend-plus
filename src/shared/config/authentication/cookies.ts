@@ -18,7 +18,9 @@ export const COOKIES = {
         sameSite = sameSiteEnv
       }
     }
-
     return sameSite
+  },
+  get DOMAIN() {
+    return process.env.DOMAIN || 'localhost'
   }
 }
