@@ -40,6 +40,15 @@ export const insertAccount = gql`
   ${accountFragment}
 `
 
+export const trackUserSignUp = gql`
+  mutation trackUserSignUp($signupType: String!, $userId: String!, $email: String!) {
+    trackUserSignUp(arg1: {signupType: $signupType, userId: $userId, email: $email}) {
+      message
+      status
+    }
+  }
+`
+
 export const mutateAccountTicket = gql`
   mutation($id: uuid!, $ticket: uuid!, $ticket_expires_at: timestamptz!) {
     update_auth_accounts_by_pk(
