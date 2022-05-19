@@ -1,0 +1,202 @@
+import { Response } from 'express'
+
+import { RequestExtended } from '@shared/types'
+// import { COOKIES } from '@shared/config'
+import { loginAnonymouslySchema, loginSchema, loginSchemaMagicLink } from '@shared/validation'
+import { AccountData, UserData, Session } from '@shared/types'
+import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
+import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
+import { setRefreshToken } from '@shared/cookies'
+import { insertAccount, setNewTicket } from '@shared/queries'
+import { request } from '@shared/request'
+import { emailClient } from '@shared/email'
+import { authenticator } from 'otplib'
+import { sendSms } from '@shared/sns'
+import { verificationMsg } from './mfa/sms'
+
+require('dotenv').config()
+interface HasuraData {
+  insert_auth_accounts: {
+    affected_rows: number
+    returning: AccountData[]
+  }
+}
+
+const verifySignature = (nonce:string, signature:string, address:string) => {
+
+  return true
+}
+const getNonceFromCookie = (req: RequestExtended) => {
+  return ''
+}
+async function walletLogin(req: RequestExtended, res: Response): Promise<unknown> {
+  // if (!('nonce' in cookiesInUse)) {
+  //   return res.boom.badImplementation('Session is expired')
+  // }
+  if(!verifySignature(getNonceFromCookie(req), req.body.signature, req.body.address))
+  {
+    return res.boom.badImplementation('Invalid Session')
+  }
+  const {headers, body} = req
+
+  const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
+
+  if (AUTHENTICATION.ANONYMOUS_USERS_ENABLED) {
+    const { anonymous } = await loginAnonymouslySchema.validateAsync(body)
+    // if user tries to sign in anonymously
+    if (anonymous) {
+      let hasura_data: HasuraData
+      try {
+        const ticket = uuidv4()
+        hasura_data = await request(insertAccount, {
+          account: {
+            email: null,
+            password_hash: null,
+            ticket,
+            active: true,
+            is_anonymous: true,
+            default_role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE,
+            account_roles: {
+              data: [{ role: REGISTRATION.DEFAULT_ANONYMOUS_ROLE }]
+            },
+            user: {
+              data: { display_name: 'Anonymous user' }
+            }
+          }
+        })
+      } catch (error) {
+        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
+      }
+
+      if (!hasura_data.insert_auth_accounts.returning.length) {
+        return res.boom.badImplementation('Unable to create user and sign in user anonymously')
+      }
+
+      const account = hasura_data.insert_auth_accounts.returning[0]
+
+      const refresh_token = await setRefreshToken(res, account.id, useCookie)
+
+      const jwt_token = createHasuraJwt(account)
+      const jwt_expires_in = newJwtExpiry
+
+      const session: Session = { jwt_token, jwt_expires_in, user: account.user }
+      if (useCookie) session.refresh_token = refresh_token
+
+      return res.send(session)
+    }
+  }
+
+  // else, login users normally
+  console.log("body", body)
+  
+  const account = await selectAccount(body)
+
+  if (!account) {
+    return res.boom.badRequest('Account does not exist.')
+  }
+
+  const {
+    id,
+    mfa_enabled,
+    password_hash,
+    sms_otp_secret,
+    sms_mfa_enabled,
+    active,
+    email,
+    phone_number
+  } = account
+
+  if (typeof password === 'undefined') {
+    const refresh_token = await setRefreshToken(res, id, useCookie)
+
+    try {
+      await emailClient.send({
+        template: 'magic-link',
+        message: {
+          to: email,
+          headers: {
+            'x-token': {
+              prepared: true,
+              value: refresh_token
+            }
+          }
+        },
+        locals: {
+          display_name: account.user.display_name,
+          token: refresh_token,
+          url: APPLICATION.SERVER_URL,
+          action: 'log in',
+          action_url: 'log-in'
+        }
+      })
+
+      return res.send({ magicLink: true })
+    } catch (err) {
+      console.error(err)
+      return res.boom.badImplementation()
+    }
+  }
+
+  if (!active) {
+    return res.boom.badRequest('Account is not activated.')
+  }
+
+  // Handle User Impersonation Check
+  const adminSecret = headers[HEADERS.ADMIN_SECRET_HEADER]
+  const hasAdminSecret = Boolean(adminSecret)
+  const isAdminSecretCorrect = adminSecret === APPLICATION.HASURA_GRAPHQL_ADMIN_SECRET
+  let userImpersonationValid = false
+  if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && !isAdminSecretCorrect) {
+    return res.boom.unauthorized('Invalid x-admin-secret')
+  } else if (AUTHENTICATION.USER_IMPERSONATION_ENABLED && hasAdminSecret && isAdminSecretCorrect) {
+    userImpersonationValid = true
+  }
+
+  // Validate Password
+  const isPasswordCorrect = await bcrypt.compare(password, password_hash)
+  if (!isPasswordCorrect && !userImpersonationValid) {
+    return res.boom.unauthorized('Email and password do not match')
+  }
+
+  if (mfa_enabled || sms_mfa_enabled) {
+    const ticket = uuidv4()
+    const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000)
+
+    // set new ticket
+    await request(setNewTicket, {
+      user_id: account.user.id,
+      ticket,
+      ticket_expires_at
+    })
+
+    if (sms_mfa_enabled && sms_otp_secret) {
+      const code = authenticator.generate(sms_otp_secret)
+      await sendSms(phone_number, verificationMsg(code))
+      return res.send({ sms_mfa: sms_mfa_enabled, ticket })
+    }
+
+    return res.send({ mfa: mfa_enabled, ticket })
+  }
+
+  // refresh_token
+  const refresh_token = await setRefreshToken(res, id, useCookie)
+
+  // generate JWT
+  const jwt_token = createHasuraJwt(account)
+  const jwt_expires_in = newJwtExpiry
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    email: account.email,
+    avatar_url: account.user.avatar_url
+  }
+  const session: Session = { jwt_token, jwt_expires_in, user }
+  if (!useCookie) session.refresh_token = refresh_token
+  
+  return res.send(req.body)
+}
+
+export default asyncWrapper(walletLogin)

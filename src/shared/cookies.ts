@@ -31,7 +31,7 @@ export function newRefreshExpiry(): number {
 export const setCookie = (
   res: Response,
   refresh_token: string,
-  permission_variables: string
+  permission_variables: string,
 ): void => {
   // converting JWT_REFRESH_EXPIRES_IN from minutes to milliseconds
   const maxAge = JWT.REFRESH_EXPIRES_IN * 60 * 1000

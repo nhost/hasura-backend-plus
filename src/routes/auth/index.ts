@@ -17,6 +17,8 @@ import deleteAccount from './delete'
 import magicLink from './magic-link'
 import smsMfa from './mfa/sms'
 import resendConfirmation from './resend-confirmation'
+import getNonce from './get-nonce'
+import walletLogin from './wallet-login'
 
 const router = Router()
 
@@ -40,6 +42,8 @@ router.post('/delete', deleteAccount)
 router.post('/resend-confirmation', resendConfirmation)
 router
   .post('/login', loginAccount)
+  .post('/get-nonce', getNonce)
+  .post('/wallet-login', walletLogin)
   .post('/logout', logout)
   .post('/register', registerAccount)
   .use('/change-password', changePassword)

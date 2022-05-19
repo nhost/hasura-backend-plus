@@ -37,6 +37,11 @@ export function asyncWrapper(fn: any) {
   }
 }
 
+//generate nonce
+export function generateNonce(nonce: string) {
+  return `Hi from Hit Piece. Sign this message to prove you have access to this wallet and we’ll log you in. This wont cost you any Ether. Security code (you can ignore this): ${nonce}`
+}
+
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByEmailQuery, { email })
   if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')
