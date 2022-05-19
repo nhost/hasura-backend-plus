@@ -132,6 +132,16 @@ export const selectAccountByEmail = gql`
   ${accountFragment}
 `
 
+export const getAccountByWalletAddress = gql`
+  query GetAccountByWalletAddress($address: String!){
+    auth_accounts(where: {_and: {account_providers: {auth_provider_unique_id: {_eq: $address}, auth_provider:{_eq: "wallet"}}}}) {
+      ...accountFragment
+    }
+  }
+  ${accountFragment}
+`
+
+
 export const selectAccountByTicket = gql`
   query($ticket: uuid!, $now: timestamptz!) {
     auth_accounts(

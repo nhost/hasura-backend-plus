@@ -53,7 +53,6 @@ export function authMiddleware(req: RequestExtended, res: Response, next: NextFu
     }
     req.refresh_token = refresh_token
   }
-
   if ('permission_variables' in cookiesInUse) {
     try {
       req.permission_variables = getPermissionVariablesFromCookie(req)
