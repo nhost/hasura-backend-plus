@@ -9,7 +9,7 @@ async function getNonce(req: Request, res: Response): Promise<unknown> {
   
   let nonce = crypto.randomBytes(16).toString('hex');
 
-  let maxAge  = 2 * 60 * 1000 //2 minutes
+  let maxAge  = 15 * 60 * 1000 //15 minutes
   res.cookie('nonce', nonce, {
     httpOnly: true,
     maxAge,

@@ -54,6 +54,16 @@ export const mutateAccountTicket = gql`
   }
 `
 
+export const insertAccountProviderWithUserAccount = gql`
+  mutation($account_provider: auth_account_providers_insert_input!) {
+    insert_auth_account_providers_one(object: $account_provider) {
+      account {
+        ...accountFragment
+      }
+    }
+  }
+  ${accountFragment}
+`
 export const insertAccountProviderToUser = gql`
   mutation($account_provider: auth_account_providers_insert_input!, $account_id: uuid!) {
     insert_auth_account_providers_one(object: $account_provider) {
