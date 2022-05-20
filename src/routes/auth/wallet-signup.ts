@@ -19,7 +19,7 @@ interface LoginRequest {
 const verifySignature = (req: RequestExtended) => {
   const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
   if (!('nonce' in cookiesInUse)) {
-    return true
+    return false
   }
   let { nonce } = cookiesInUse
   let {signature, address} = req.body
@@ -80,13 +80,14 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     account = accountResponse.auth_accounts[0]
   }
 
-  console.log(account)
   const refresh_token = await setRefreshToken(res, account.id, useCookie)
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
   const session: Session = { jwt_token, jwt_expires_in, user: account.user }
   if (useCookie) session.refresh_token = refresh_token
-
+ 
+  res.cookie('nonce', null) //empty nonce
+ 
   return res.send(session)
 }
 

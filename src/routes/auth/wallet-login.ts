@@ -42,7 +42,7 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
 
   if(accountResponse.auth_accounts.length === 0) {
     
-    return res.send({status:1,session:''})
+    return res.send()
   } else {
     account = accountResponse.auth_accounts[0]
   }
@@ -53,7 +53,7 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
   const session: Session = { jwt_token, jwt_expires_in, user: account.user }
   if (useCookie) session.refresh_token = refresh_token
 
-  return res.send({status:1,session:session})
+  return res.send(session)
 }
 
 export default asyncWrapper(walletLogin)
