@@ -39,7 +39,7 @@ export function asyncWrapper(fn: any) {
 
 //generate nonce
 export function generateNonce(nonce: string) {
-  return `Hi from Hit Piece. Sign this message to prove you have access to this wallet and we’ll log you in. This wont cost you any Ether. Security code (you can ignore this): ${nonce}`
+  return `You're about to login with your wallet. We just need to create this signature to verify this is your account. This will not charge your wallet. Security code (you can ignore this): ${nonce}`
 }
 
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
