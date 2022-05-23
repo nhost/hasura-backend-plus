@@ -32,6 +32,7 @@
     "@hapi/joi": "17.1.1",
     "@nicokaiser/passport-apple": "^0.2.1",
     "@types/connect-pg-simple": "^7.0.0",
+    "@types/eth-sig-util": "^2.1.1",
     "archiver": "4.0.1",
     "aws-sdk": "2.656.0",
     "axios": "^0.21.1",
@@ -43,6 +44,8 @@
     "dotenv": "^16.0.0",
     "ejs": "3.0.2",
     "email-templates": "7.0.4",
+    "eth-sig-util": "^3.0.1",
+    "ethereumjs-util": "^7.1.4",
     "express": "4.17.1",
     "express-boom": "^3.0.0",
     "express-fileupload": "1.1.9",
@@ -144,6 +147,9 @@
     "typescript": "3.8.3",
     "vuepress": "^1.8.2"
   },
+	"resolutions": {
+		"ethereumjs-util": ">=6.0.0"
+	},
   "_moduleAliases": {
     "@shared": "./dist/shared",
     "@test": "./dist/test"

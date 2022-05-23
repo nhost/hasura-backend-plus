@@ -1,7 +1,7 @@
 import { Response, Request } from 'express'
 import crypto from 'crypto'
 
-import { asyncWrapper, generateNonce } from '@shared/helpers'
+import { asyncWrapper, generateMessageWithNonce } from '@shared/helpers'
 import { COOKIES } from '@shared/config';
 
 
@@ -18,7 +18,7 @@ async function getNonce(req: Request, res: Response): Promise<unknown> {
     secure: COOKIES.SECURE
   })
 
-  return res.send(generateNonce(nonce))
+  return res.send(generateMessageWithNonce(nonce))
 }
 
 export default asyncWrapper(getNonce)

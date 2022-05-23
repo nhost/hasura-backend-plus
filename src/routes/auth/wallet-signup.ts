@@ -1,12 +1,14 @@
 import { Response } from 'express'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
-import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { asyncWrapper, selectAccount, verifySignature } from '@shared/helpers'
 import { getAccountByWalletAddress,  insertAccountProviderWithUserAccount } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
 import { AccountData, Session } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
-import { COOKIES, REGISTRATION } from '@shared/config'
+import { APPLICATION, AUTHENTICATION, REGISTRATION } from '@shared/config'
+import { emailClient } from '@shared/email'
+import { v4 as uuidv4 } from 'uuid'
 
 
 interface LoginRequest {
@@ -15,18 +17,6 @@ interface LoginRequest {
   address: string
   signature: string
 }
-
-const verifySignature = (req: RequestExtended) => {
-  const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
-  if (!('nonce' in cookiesInUse)) {
-    return false
-  }
-  let { nonce } = cookiesInUse
-  let {signature, address} = req.body
-  console.log("verifySignature", nonce, signature, address)
-  return true
-}
-
 async function walletSignup(req: RequestExtended, res: Response): Promise<unknown> {
   const useCookie = typeof req.body.cookie !== 'undefined' ? req.body.cookie : true
  
@@ -37,6 +27,8 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
 
   const {address, email, username} = req.body as LoginRequest
   
+  const next_url = req.body.next_url as string
+
   //check if email already exists
   const selectedAccount = await selectAccount(req.body)
   if (selectedAccount) {
@@ -80,6 +72,72 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     account = accountResponse.auth_accounts[0]
   }
 
+
+
+  if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
+    if (!APPLICATION.EMAILS_ENABLE) {
+      return res.boom.badImplementation('SMTP settings unavailable')
+    }
+
+    // use display name from `user_data` if available
+    const display_name = username
+
+    const ticket = uuidv4()
+    // Send Welcome Email
+    try {
+      await emailClient.send({
+        template: 'welcome-user',
+        message: {
+          to: email,
+          headers: {
+            'x-welcome': {
+              prepared: true,
+              value: ticket
+            }
+          }
+        },
+        locals: {
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      return res.boom.badImplementation()
+    }
+
+    let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
+    if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
+
+    let locals : {
+      display_name: string
+      url: string
+
+    } = {
+      display_name,
+      url: activateUrl,
+    }
+
+    try {
+      await emailClient.send({
+        template: 'activate-account',
+        message: {
+          to: email,
+          headers: {
+            'x-ticket': {
+              prepared: true,
+              value: ticket
+            }
+          }
+        },
+        locals
+      })
+    } catch (err) {
+      console.error(err)
+      return res.boom.badImplementation()
+    }
+
+    const session: Session = { jwt_token: null, jwt_expires_in: null, user:account.user }
+    return res.send(session)
+  }
   const refresh_token = await setRefreshToken(res, account.id, useCookie)
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
