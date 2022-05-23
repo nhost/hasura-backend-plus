@@ -4,12 +4,12 @@ import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/he
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
-import { insertAccount } from '@shared/queries'
+import { insertAccount, trackUserSignUp } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
 import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { InsertAccountData, UserData, Session } from '@shared/types'
+import { InsertAccountData, UserData, Session, SignUpType } from '@shared/types'
 import { hcaptchaVerify } from '@shared/hcaptcha'
 require('dotenv').config()
 
@@ -19,8 +19,13 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const next_url = req.body.next_url as string
 
+  const signup_type = req.body.signup_type as SignUpType  // ArtistSignUp or UserSignUp
+
+  if (!signup_type) return res.boom.badRequest('SignUp type is not acceptable')
+
   // remove next url for validation
   delete req.body.next_url
+  delete req.body.signup_type
 
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
@@ -112,10 +117,22 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
   const user: UserData = {
     id: account.user.id,
     display_name: account.user.display_name,
+    username: account.user.username,
     email: account.email,
     avatar_url: account.user.avatar_url
   }
 
+  // account tracking
+  try {
+   const trackedInfo = await request<{trackUserSignUp: {message: string, status: number}}>(trackUserSignUp, {
+    userId: user.id, email:account.email, signupType: signup_type
+   })
+
+   if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')   
+  } catch (e) {
+    console.error('Error tracking user account')
+    console.error(e)
+  }
 
   if (!REGISTRATION.AUTO_ACTIVATE_NEW_USERS && AUTHENTICATION.VERIFY_EMAILS) {
     if (!APPLICATION.EMAILS_ENABLE) {

@@ -40,6 +40,7 @@ async function totpLogin({ body }: Request, res: Response): Promise<unknown> {
     const user: UserData = {
       id: account.user.id,
       display_name: account.user.display_name,
+      username: account.user.username,
       email: account.email,
       avatar_url: account.user.avatar_url
     }

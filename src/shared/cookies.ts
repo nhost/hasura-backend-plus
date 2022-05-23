@@ -42,8 +42,7 @@ export const setCookie = (
     maxAge,
     signed: Boolean(COOKIES.SECRET),
     sameSite: COOKIES.SAME_SITE,
-    secure: COOKIES.SECURE,
-    domain: COOKIES.DOMAIN
+    secure: COOKIES.SECURE
   })
 
   // set permission variables cookie
