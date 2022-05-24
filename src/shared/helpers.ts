@@ -58,8 +58,6 @@ export const verifySignature = (req: RequestExtended) => {
     data: msgBufferHex,
     sig: signature,
   })
-  console.log("address", address)
-  console.log("addressFromSignature", addressFromSignature)
   return addressFromSignature.toLocaleLowerCase() === address.toLocaleLowerCase()
 }
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {

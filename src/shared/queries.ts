@@ -164,6 +164,16 @@ export const getAccountByWalletAddress = gql`
   ${accountFragment}
 `
 
+export const setWallet = gql`
+  mutation SetWallet($user_id: uuid!, $address: bytea!, $name: String = "") {
+    insert_wallets_one(
+      object: { user_id: $user_id, address: $address, blockchain_type: "Ethereum", name: $name }
+    ) {
+      user_id
+      address
+    }
+  }
+`
 
 export const selectAccountByTicket = gql`
   query($ticket: uuid!, $now: timestamptz!) {

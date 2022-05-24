@@ -20,6 +20,7 @@ import resendConfirmation from './resend-confirmation'
 import getNonce from './get-nonce'
 import walletLogin from './wallet-login'
 import walletSignup from './wallet-signup'
+import walletAttach from './wallet-attach'
 
 const router = Router()
 
@@ -46,6 +47,7 @@ router
   .post('/get-nonce', getNonce)
   .post('/wallet-login', walletLogin)
   .post('/wallet-signup', walletSignup)
+  .post('/wallet-attach', walletAttach)
   .post('/logout', logout)
   .post('/register', registerAccount)
   .use('/change-password', changePassword)
