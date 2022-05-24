@@ -19,6 +19,10 @@ const accountFragment = gql`
     account_roles {
       role
     }
+    account_providers {
+      auth_provider
+      auth_provider_unique_id
+    }
     user {
       id
       display_name

@@ -37,7 +37,7 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
   } else {
     account = accountResponse.auth_accounts[0]
   }
-  
+  console.log('account', account)
   const {
     mfa_enabled,
     sms_otp_secret,

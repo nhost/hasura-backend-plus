@@ -72,6 +72,7 @@ export interface AccountData {
   active: boolean
   default_role: string
   account_roles: { role: string }[]
+  account_providers?: { auth_provider: string, auth_provider_unique_id: string }[]
   is_anonymous: boolean
   ticket?: string
   mfa_enabled: boolean
