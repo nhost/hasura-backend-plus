@@ -55,7 +55,8 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
     display_name: account.user.display_name,
     username: account.user.username,
     email: account.email,
-    avatar_url: account.user.avatar_url
+    avatar_url: account.user.avatar_url,
+    active: account.active
   }
   const session: Session = { jwt_token, jwt_expires_in, user }
   if (refresh_token.type === 'cookie') {

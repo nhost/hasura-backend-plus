@@ -207,13 +207,31 @@ export const insertRefreshToken = gql`
   ${accountFragment}
 `
 
+// export const selectRefreshToken = gql`
+//   query($refresh_token: uuid!, $current_timestamp: timestamptz!) {
+//     auth_refresh_tokens(
+//       where: {
+//         _and: [
+//           { refresh_token: { _eq: $refresh_token } }
+//           { account: { active: { _eq: true } } }
+//           { expires_at: { _gte: $current_timestamp } }
+//         ]
+//       }
+//     ) {
+//       account {
+//         ...accountFragment
+//       }
+//     }
+//   }
+//   ${accountFragment}
+// `
+
 export const selectRefreshToken = gql`
   query($refresh_token: uuid!, $current_timestamp: timestamptz!) {
     auth_refresh_tokens(
       where: {
         _and: [
           { refresh_token: { _eq: $refresh_token } }
-          { account: { active: { _eq: true } } }
           { expires_at: { _gte: $current_timestamp } }
         ]
       }

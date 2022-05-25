@@ -142,7 +142,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     // use display name from `user_data` if available
     const display_name = 'display_name' in user_data ? user_data.display_name : ""
 
-
     if (typeof password === 'undefined') {
       try {
         await emailClient.send({
@@ -224,9 +223,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
       console.error(err)
       return res.boom.badImplementation()
     }
-
-    const session: Session = { jwt_token: null, jwt_expires_in: null, user }
-    return res.send(session)
   }
 
   const refresh_token = await setRefreshToken(res, account.id, useCookie)
@@ -237,7 +233,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const session: Session = { jwt_token, jwt_expires_in, user }
   if (!useCookie) session.refresh_token = refresh_token
-
   return res.send(session)
 }
 

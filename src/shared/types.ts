@@ -64,6 +64,7 @@ export interface UserData {
   display_name: string
   username?: string
   avatar_url?: string
+  active?: boolean
 }
 
 export interface AccountData {

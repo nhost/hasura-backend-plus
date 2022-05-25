@@ -94,11 +94,10 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     password_hash,
     sms_otp_secret,
     sms_mfa_enabled,
-    active,
     email,
     phone_number
   } = account
-
+  
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
 
@@ -128,10 +127,6 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
       console.error(err)
       return res.boom.badImplementation()
     }
-  }
-
-  if (!active) {
-    return res.boom.badRequest('Account is not activated.')
   }
 
   // Handle User Impersonation Check
