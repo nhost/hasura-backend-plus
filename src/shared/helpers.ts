@@ -14,6 +14,8 @@ import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
 import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
+import { bufferToHex } from 'ethereumjs-util'
+import { recoverPersonalSignature } from 'eth-sig-util'
 
 /**
  * Create QR code.
@@ -37,6 +39,27 @@ export function asyncWrapper(fn: any) {
   }
 }
 
+//generate nonce
+export function generateMessageWithNonce(nonce: string) {
+  return `You're about to login with your wallet. We just need to create this signature to verify this is your account. This will not charge your wallet. Security code (you can ignore this): ${nonce}`
+}
+
+export const verifySignature = (req: RequestExtended) => {
+  
+  const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
+  if (!('nonce' in cookiesInUse)) {
+    return false
+  }
+  let { nonce } = cookiesInUse
+  let {signature, address} = req.body
+  let message = generateMessageWithNonce(nonce)
+  const msgBufferHex = bufferToHex(Buffer.from(message, 'utf8'));
+  const addressFromSignature = recoverPersonalSignature({
+    data: msgBufferHex,
+    sig: signature,
+  })
+  return addressFromSignature.toLocaleLowerCase() === address.toLocaleLowerCase()
+}
 export const selectAccountByEmail = async (email: string): Promise<AccountData> => {
   const hasuraData = await request<QueryAccountData>(selectAccountByEmailQuery, { email })
   if (!hasuraData.auth_accounts[0]) throw new Error('Account does not exist.')

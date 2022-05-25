@@ -19,6 +19,10 @@ const accountFragment = gql`
     account_roles {
       role
     }
+    account_providers {
+      auth_provider
+      auth_provider_unique_id
+    }
     user {
       id
       display_name
@@ -62,6 +66,18 @@ export const mutateAccountTicket = gql`
     }
   }
 `
+
+export const insertAccountProviderWithUserAccount = gql`
+  mutation($account_provider: auth_account_providers_insert_input!) {
+    insert_auth_account_providers_one(object: $account_provider) {
+      account {
+        ...accountFragment
+      }
+    }
+  }
+  ${accountFragment}
+`
+
 
 export const insertAccountProviderToUser = gql`
   mutation($account_provider: auth_account_providers_insert_input!, $account_id: uuid!) {
@@ -139,6 +155,26 @@ export const selectAccountByEmail = gql`
     }
   }
   ${accountFragment}
+`
+
+export const getAccountByWalletAddress = gql`
+  query GetAccountByWalletAddress($address: String!){
+    auth_accounts(where: {_and: {account_providers: {auth_provider_unique_id: {_eq: $address}, auth_provider:{_eq: "wallet"}}}}) {
+      ...accountFragment
+    }
+  }
+  ${accountFragment}
+`
+
+export const setWallet = gql`
+  mutation SetWallet($user_id: uuid!, $address: bytea!, $name: String = "") {
+    insert_wallets_one(
+      object: { user_id: $user_id, address: $address, blockchain_type: "Ethereum", name: $name }
+    ) {
+      user_id
+      address
+    }
+  }
 `
 
 export const selectAccountByTicket = gql`
