@@ -5,7 +5,8 @@ import {
   rotateTicket as rotateTicketQuery,
   selectAccountByEmail as selectAccountByEmailQuery,
   selectAccountByTicket as selectAccountByTicketQuery,
-  selectAccountByUserId as selectAccountByUserIdQuery
+  selectAccountByUserId as selectAccountByUserIdQuery,
+  selectAccountProvider
 } from './queries'
 
 import QRCode from 'qrcode'
@@ -13,7 +14,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables, RequestExtended } from './types'
+import { AccountData, QueryAccountData, PermissionVariables, RequestExtended, QueryAccountProviderData, AccountProvider } from './types'
 import { bufferToHex } from 'ethereumjs-util'
 import { recoverPersonalSignature } from 'eth-sig-util'
 
@@ -85,6 +86,10 @@ export const selectAccountByUserId = async (user_id: string | undefined): Promis
   return hasuraData.auth_accounts[0]
 }
 
+export const selectProviderByWallet = async (address: string): Promise<AccountProvider> => {
+  const hasuraData = await request<QueryAccountProviderData>(selectAccountProvider, { provider: "wallet", profile_id: address })
+  return hasuraData.auth_account_providers[0]
+}
 /**
  * Looks for an account in the database, first by email, second by ticket
  * @param httpBody

@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { request } from '@shared/request'
 import { AccountData, RequestExtended } from '@shared/types'
-import { asyncWrapper, selectAccountByUserId, verifySignature } from '@shared/helpers'
+import { asyncWrapper, selectAccountByUserId, selectProviderByWallet, verifySignature } from '@shared/helpers'
 import { insertAccountProviderWithUserAccount, setWallet } from '@shared/queries'
 
 
@@ -24,6 +24,13 @@ async function walletAttach(req: RequestExtended, res: Response): Promise<unknow
   const selectedAccount = await selectAccountByUserId(user_id)
   if (!selectedAccount) {
     return res.boom.badRequest('Account does not exist.')
+  }
+  
+  //validate if wallet already exists
+  const selectProvider = await selectProviderByWallet(address)
+
+  if (selectProvider) {
+    return res.boom.badRequest('Wallet already exists.')
   }
   
 

@@ -101,7 +101,8 @@ export interface UpdateAccountData {
 export interface DeleteAccountData {
   delete_auth_accounts: { affected_rows: number }
 }
-interface AccountProvider {
+
+export interface AccountProvider {
   account: AccountData
 }
 
