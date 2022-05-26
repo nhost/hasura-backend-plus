@@ -81,9 +81,6 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
       })
       account = response.insert_auth_account_providers_one.account
 
-      //associal wallets table
-      // await request<{user_id:string, address:string}>(setWallet, {user_id:account.user.id, address:address.toLowerCase().replace("0x", "\\x")})
-
     } else {
       account = accountResponse.auth_accounts[0]
     }
