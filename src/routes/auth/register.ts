@@ -128,7 +128,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     userId: user.id, email:account.email, signupType: signup_type
    })
 
-   if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')   
+   if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')
   } catch (e) {
     console.error('Error tracking user account')
     console.error(e)
@@ -173,25 +173,25 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     }
 
     // Send Welcome Email
-    try {
-      await emailClient.send({
-        template: 'welcome-user',
-        message: {
-          to: email,
-          headers: {
-            'x-welcome': {
-              prepared: true,
-              value: ticket
-            }
-          }
-        },
-        locals: {
-        }
-      })
-    } catch (err) {
-      console.error(err)
-      return res.boom.badImplementation()
-    }
+    // try {
+    //   await emailClient.send({
+    //     template: 'welcome-user',
+    //     message: {
+    //       to: email,
+    //       headers: {
+    //         'x-welcome': {
+    //           prepared: true,
+    //           value: ticket
+    //         }
+    //       }
+    //     },
+    //     locals: {
+    //     }
+    //   })
+    // } catch (err) {
+    //   console.error(err)
+    //   return res.boom.badImplementation()
+    // }
 
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
     if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`

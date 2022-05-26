@@ -19,14 +19,14 @@ interface SignUpRequest {
 }
 async function walletSignup(req: RequestExtended, res: Response): Promise<unknown> {
   const useCookie = typeof req.body.cookie !== 'undefined' ? req.body.cookie : true
- 
+
   if(!verifySignature(req))
   {
     return res.boom.badImplementation('Invalid Session')
   }
 
   const {address, email, username} = req.body as SignUpRequest
-  
+
   const next_url = req.body.next_url as string
 
   //check if email already exists
@@ -37,12 +37,12 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     }
     return res.boom.badRequest('Email already exists.')
   }
-  
+
   let account = null
 
   const ticket = uuidv4()
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString()
-  
+
   try {
     const accountResponse = await request<{auth_accounts: AccountData[]}>(getAccountByWalletAddress, {address: address.toLowerCase()})
 
@@ -52,7 +52,7 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
       const defaultRole = REGISTRATION.DEFAULT_USER_ROLE
       const allowedRoles = REGISTRATION.DEFAULT_ALLOWED_USER_ROLES
       const accountRoles = allowedRoles.map((role: string) => ({ role }))
-    
+
       const response = await request<{insert_auth_account_providers_one: {account:AccountData}}>(insertAccountProviderWithUserAccount, {
         account_provider: {
           auth_provider_unique_id: address.toLowerCase(),
@@ -99,25 +99,25 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     const display_name = username
 
     // Send Welcome Email
-    try {
-      await emailClient.send({
-        template: 'welcome-user',
-        message: {
-          to: email,
-          headers: {
-            'x-welcome': {
-              prepared: true,
-              value: ticket
-            }
-          }
-        },
-        locals: {
-        }
-      })
-    } catch (err) {
-      console.error(err)
-      return res.boom.badRequest("Error in sending email")
-    }
+    // try {
+    //   await emailClient.send({
+    //     template: 'welcome-user',
+    //     message: {
+    //       to: email,
+    //       headers: {
+    //         'x-welcome': {
+    //           prepared: true,
+    //           value: ticket
+    //         }
+    //       }
+    //     },
+    //     locals: {
+    //     }
+    //   })
+    // } catch (err) {
+    //   console.error(err)
+    //   return res.boom.badRequest("Error in sending email")
+    // }
 
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
     if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
@@ -158,9 +158,9 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
   const jwt_expires_in = newJwtExpiry
   const session: Session = { jwt_token, jwt_expires_in, user: account.user }
   if (useCookie) session.refresh_token = refresh_token
- 
+
   res.cookie('nonce', null) //empty nonce
- 
+
   return res.send(session)
 }
 
