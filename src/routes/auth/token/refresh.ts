@@ -1,4 +1,4 @@
-import { asyncWrapper } from '@shared/helpers'
+import { asyncWrapper, getUserDataFromAccount } from '@shared/helpers'
 import { Response } from 'express'
 import { selectRefreshToken, updateRefreshToken } from '@shared/queries'
 
@@ -6,7 +6,7 @@ import { newJwtExpiry, createHasuraJwt, generatePermissionVariables } from '@sha
 import { newRefreshExpiry, setCookie } from '@shared/cookies'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, UserData, Session, RequestExtended } from '@shared/types'
+import { AccountData, Session, RequestExtended } from '@shared/types'
 
 interface HasuraData {
   auth_refresh_tokens: { account: AccountData }[]
@@ -50,15 +50,7 @@ async function refreshToken({ refresh_token }: RequestExtended, res: Response): 
 
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  const user: UserData = {
-    id: account.user.id,
-    display_name: account.user.display_name,
-    username: account.user.username,
-    email: account.email,
-    avatar_url: account.user.avatar_url,
-    active: account.active
-  }
-  const session: Session = { jwt_token, jwt_expires_in, user }
+  const session: Session = { jwt_token, jwt_expires_in, user:getUserDataFromAccount(account) }
   if (refresh_token.type === 'cookie') {
     setCookie(res, new_refresh_token, permission_variables)
   } else {

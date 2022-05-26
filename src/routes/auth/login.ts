@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
-import { asyncWrapper, selectAccount } from '@shared/helpers'
+import { asyncWrapper, getUserDataFromAccount, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 import { setRefreshToken } from '@shared/cookies'
 import { loginAnonymouslySchema, loginSchema, loginSchemaMagicLink } from '@shared/validation'
 import { insertAccount, setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
-import { AccountData, UserData, Session } from '@shared/types'
+import { AccountData, Session } from '@shared/types'
 import { emailClient } from '@shared/email'
 import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/config'
 import { authenticator } from 'otplib'
@@ -172,14 +172,9 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  const user: UserData = {
-    id: account.user.id,
-    display_name: account.user.display_name,
-    username: account.user.username,
-    email: account.email,
-    avatar_url: account.user.avatar_url
-  }
-  const session: Session = { jwt_token, jwt_expires_in, user }
+  
+  console.log("login", getUserDataFromAccount(account))
+  const session: Session = { jwt_token, jwt_expires_in, user:getUserDataFromAccount(account) }
   if (!useCookie) session.refresh_token = refresh_token
 
   return res.send(session)

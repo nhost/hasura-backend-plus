@@ -14,7 +14,7 @@ import bcrypt from 'bcryptjs'
 import { pwnedPassword } from 'hibp'
 import { request } from './request'
 import { v4 as uuidv4 } from 'uuid'
-import { AccountData, QueryAccountData, PermissionVariables, RequestExtended, QueryAccountProviderData, AccountProvider } from './types'
+import { AccountData, QueryAccountData, PermissionVariables, RequestExtended, QueryAccountProviderData, AccountProvider, UserData } from './types'
 import { bufferToHex } from 'ethereumjs-util'
 import { recoverPersonalSignature } from 'eth-sig-util'
 
@@ -45,6 +45,19 @@ export function generateMessageWithNonce(nonce: string) {
   return `You're about to login with your wallet. We just need to create this signature to verify this is your account. This will not charge your wallet. Security code (you can ignore this): ${nonce}`
 }
 
+export const getUserDataFromAccount = (account: AccountData) => {
+
+  const user: UserData = {
+    id: account.user.id,
+    display_name: account.user.display_name,
+    username: account.user.username,
+    email: account.email,
+    avatar_url: account.user.avatar_url,
+    active: account.active,
+    wallet:account.account_providers?.[0]?.auth_provider_unique_id || ""
+  }
+  return user
+}
 export const verifySignature = (req: RequestExtended) => {
   
   const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
