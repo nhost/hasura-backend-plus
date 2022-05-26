@@ -32,12 +32,12 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
   let account = null
 
   if(accountResponse.auth_accounts.length === 0) {
-    
+
     return res.send()
   } else {
     account = accountResponse.auth_accounts[0]
   }
-  console.log('account', account)
+
   const {
     mfa_enabled,
     sms_otp_secret,
