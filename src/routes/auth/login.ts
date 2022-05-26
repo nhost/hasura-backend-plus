@@ -97,7 +97,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
     email,
     phone_number
   } = account
-  
+
   if (typeof password === 'undefined') {
     const refresh_token = await setRefreshToken(res, id, useCookie)
 
@@ -172,8 +172,7 @@ async function loginAccount({ body, headers }: Request, res: Response): Promise<
   // generate JWT
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  
-  console.log("login", getUserDataFromAccount(account))
+
   const session: Session = { jwt_token, jwt_expires_in, user:getUserDataFromAccount(account) }
   if (!useCookie) session.refresh_token = refresh_token
 
