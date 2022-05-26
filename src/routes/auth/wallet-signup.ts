@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
 import { asyncWrapper, selectAccount, verifySignature } from '@shared/helpers'
-import { getAccountByWalletAddress,  insertAccountProviderWithUserAccount, setWallet } from '@shared/queries'
+import { getAccountByWalletAddress,  insertAccountProviderWithUserAccount, setWallet, trackUserSignUp } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
 import { AccountData, Session } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
@@ -118,6 +118,18 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     //   console.error(err)
     //   return res.boom.badRequest("Error in sending email")
     // }
+
+    // account tracking
+  try {
+   const trackedInfo = await request<{trackUserSignUp: {message: string, status: number}}>(trackUserSignUp, {
+    userId: account.user.id, email:account.email, signupType: "UserSignUp"
+   })
+
+   if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')
+  } catch (e) {
+    console.error('Error tracking user account')
+    console.error(e)
+  }
 
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
     if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
