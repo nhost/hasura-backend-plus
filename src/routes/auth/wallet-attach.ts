@@ -25,14 +25,14 @@ async function walletAttach(req: RequestExtended, res: Response): Promise<unknow
   if (!selectedAccount) {
     return res.boom.badRequest('Account does not exist.')
   }
-  
+
   //validate if wallet already exists
   const selectProvider = await selectProviderByWallet(address.toLowerCase())
 
   if (selectProvider) {
-    return res.boom.badRequest('Wallet already exists.')
+    return res.boom.badRequest('This wallet has already been used for another account.')
   }
-  
+
 
   try {
 
