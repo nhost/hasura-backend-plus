@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
 import { asyncWrapper, selectAccount, verifySignature } from '@shared/helpers'
-import { getAccountByWalletAddress,  insertAccountProviderWithUserAccount, setWallet, trackUserSignUp } from '@shared/queries'
+import { getAccountByWalletAddress,  insertAccountProviderWithUserAccount, trackUserSignUp } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
 import { AccountData, Session } from '@shared/types'
 import { createHasuraJwt, newJwtExpiry } from '@shared/jwt'
@@ -70,6 +70,9 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
               user: {
                 data: {
                   username: username,
+                  wallets: {
+                    data: [{address: address.toLowerCase().replace("0x", "\\x"), blockchain_type: "Ethereum", name: ""}]
+                  }
                 }
               },
             }
@@ -77,9 +80,6 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
         }
       })
       account = response.insert_auth_account_providers_one.account
-
-      //associal wallets table
-      await request<{user_id:string, address:string}>(setWallet, {user_id:account.user.id, address:address.toLowerCase().replace("0x", "\\x")})
 
     } else {
       account = accountResponse.auth_accounts[0]
