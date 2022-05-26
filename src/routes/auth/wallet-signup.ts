@@ -44,8 +44,8 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
   const ticket_expires_at = new Date(+new Date() + 60 * 60 * 1000).toISOString()
   
   try {
-    const accountResponse = await request<{auth_accounts: AccountData[]}>(getAccountByWalletAddress, {address})
-  
+    const accountResponse = await request<{auth_accounts: AccountData[]}>(getAccountByWalletAddress, {address: address.toLowerCase()})
+
 
 
     if(accountResponse.auth_accounts.length === 0) {
@@ -55,7 +55,7 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     
       const response = await request<{insert_auth_account_providers_one: {account:AccountData}}>(insertAccountProviderWithUserAccount, {
         account_provider: {
-          auth_provider_unique_id: address, 
+          auth_provider_unique_id: address.toLowerCase(),
           auth_provider: "wallet",
           account: {
             data: {
@@ -79,8 +79,8 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
       account = response.insert_auth_account_providers_one.account
 
       //associal wallets table
-      await request<{user_id:string, address:string}>(setWallet, {user_id:account.user.id, address:address.replace("0x", "\\x")})
-      
+      await request<{user_id:string, address:string}>(setWallet, {user_id:account.user.id, address:address.toLowerCase().replace("0x", "\\x")})
+
     } else {
       account = accountResponse.auth_accounts[0]
     }

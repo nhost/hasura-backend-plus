@@ -20,7 +20,7 @@ interface LoginRequest {
 
 async function walletLogin(req: RequestExtended, res: Response): Promise<unknown> {
   const useCookie = typeof req.body.cookie !== 'undefined' ? req.body.cookie : true
-  
+
   if(!verifySignature(req))
   {
     return res.boom.badImplementation('Invalid Session')
@@ -28,7 +28,7 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
 
   const {address} = req.body as LoginRequest
 
-  const accountResponse = await request<{auth_accounts: AccountData[]}>(getAccountByWalletAddress, {address})
+  const accountResponse = await request<{auth_accounts: AccountData[]}>(getAccountByWalletAddress, {address: address.toLowerCase()})
   let account = null
 
   if(accountResponse.auth_accounts.length === 0) {
