@@ -1,6 +1,6 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, hashPassword, selectAccount } from '@shared/helpers'
+import { asyncWrapper, checkHibp, getUserDataFromAccount, hashPassword, selectAccount } from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
@@ -9,7 +9,7 @@ import { setRefreshToken } from '@shared/cookies'
 import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validation'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
-import { InsertAccountData, UserData, Session, SignUpType } from '@shared/types'
+import { InsertAccountData, Session, SignUpType } from '@shared/types'
 import { hcaptchaVerify } from '@shared/hcaptcha'
 require('dotenv').config()
 
@@ -114,13 +114,8 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const account = accounts.insert_auth_accounts.returning[0]
 
-  const user: UserData = {
-    id: account.user.id,
-    display_name: account.user.display_name,
-    username: account.user.username,
-    email: account.email,
-    avatar_url: account.user.avatar_url
-  }
+  
+  const user = getUserDataFromAccount(account)
 
   // account tracking
   try {

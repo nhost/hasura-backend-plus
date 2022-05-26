@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
-import { asyncWrapper, verifySignature } from '@shared/helpers'
+import { asyncWrapper, getUserDataFromAccount, verifySignature } from '@shared/helpers'
 import { getAccountByWalletAddress, setNewTicket } from '@shared/queries'
 import { setRefreshToken } from '@shared/cookies'
 import { AccountData, Session } from '@shared/types'
@@ -74,11 +74,12 @@ async function walletLogin(req: RequestExtended, res: Response): Promise<unknown
   const refresh_token = await setRefreshToken(res, account.id, useCookie)
   const jwt_token = createHasuraJwt(account)
   const jwt_expires_in = newJwtExpiry
-  const session: Session = { jwt_token, jwt_expires_in, user: account.user }
+
+  const session: Session = { jwt_token, jwt_expires_in, user: getUserDataFromAccount(account) }
   if (useCookie) session.refresh_token = refresh_token
 
   res.cookie('nonce', null) //empty nonce
-
+console.log("session", session)
   return res.send(session)
 }
 
