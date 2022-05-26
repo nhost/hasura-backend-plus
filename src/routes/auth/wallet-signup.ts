@@ -132,7 +132,7 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
   }
 
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
-    if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
+    if (next_url && next_url !== undefined && next_url !== 'undefined') activateUrl = `${activateUrl}&nextURL=${next_url}`
 
     let locals : {
       display_name: string
