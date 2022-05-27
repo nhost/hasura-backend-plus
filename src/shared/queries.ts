@@ -456,3 +456,21 @@ export const insertArtistRoyaltyClaim = gql`
     }
   }
 `
+
+export const updateEmailAddressForSignUp = gql`
+  mutation updateEmailAddressForSignUp($email: citext!, $address: String!, $ticket_expires_at: timestamptz!, $ticket: uuid!) {
+    update_auth_accounts(
+      where: {_and: {
+        account_providers: {auth_provider_unique_id: {_eq: $address},
+        auth_provider: {_eq: "wallet"}}
+      }}, 
+      _set: {
+        email: $email,
+        ticket: $ticket,
+        ticket_expires_at: $ticket_expires_at
+      }
+    ) {
+      affected_rows
+    }
+  }
+`

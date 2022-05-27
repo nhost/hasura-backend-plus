@@ -69,6 +69,9 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   let redirectURL: string = `${APPLICATION.REDIRECT_URL_SUCCESS}${url_operator}refresh_token=${refresh_token}`
 
   if (nextURL) redirectURL += `&nextURL=${nextURL}`
+
+  res.cookie('update_email_limit', null)
+
   return res.redirect(redirectURL)
 }
 
