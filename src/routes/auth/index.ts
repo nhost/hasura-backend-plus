@@ -21,6 +21,7 @@ import getNonce from './get-nonce'
 import walletLogin from './wallet-login'
 import walletSignup from './wallet-signup'
 import walletAttach from './wallet-attach'
+import updateEmail from './update-email'
 
 const router = Router()
 
@@ -51,6 +52,7 @@ router
   .post('/logout', logout)
   .post('/register', registerAccount)
   .use('/change-password', changePassword)
+  .use('/update-email', updateEmail)
 router.get('/jwks', getJwks)
 router.use('/token', token)
 router.get('/magic-link', magicLink)
