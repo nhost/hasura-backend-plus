@@ -49,7 +49,6 @@ async function updateEmail(req: RequestExtended, res: Response): Promise<unknown
   }
   const cookiesInUse = COOKIES.SECRET ? req.signedCookies : req.cookies
   const updateEmailLimit = parseInt(cookiesInUse['update_email_limit'] || 0) + 1
-  console.log(updateEmailLimit)
   if(updateEmailLimit > 3) {
     return res.send({success: false,  error: 'Too many requests, Please try again 1 hour later'})
   }
