@@ -58,7 +58,6 @@ export interface Session {
 }
 
 export interface UserData {
-  [key: string]: ClaimValueType
   id: string
   email?: string
   display_name: string
@@ -66,6 +65,9 @@ export interface UserData {
   avatar_url?: string
   active?: boolean
   wallet?: string
+  artist_royalty_claims?: {
+    id: string
+  }[]
 }
 
 export interface AccountData {
