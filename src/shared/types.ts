@@ -11,6 +11,7 @@ export type ClaimValueType =
   | boolean[]
   | null
   | undefined
+  | any
 
 /**
  * Claims interface.
@@ -58,6 +59,7 @@ export interface Session {
 }
 
 export interface UserData {
+  [key: string]: ClaimValueType
   id: string
   email?: string
   display_name: string
