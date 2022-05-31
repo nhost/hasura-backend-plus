@@ -2,7 +2,7 @@ import { Response } from 'express'
 import { request } from '@shared/request'
 import { RequestExtended } from '@shared/types'
 import { asyncWrapper, verifySignature } from '@shared/helpers'
-import { getAccountByWalletAddress, updateEmailAddressForSignUp } from '@shared/queries'
+import { getAccountByWalletAddress, updateArtistClaimEmail, updateEmailAddressForSignUp } from '@shared/queries'
 import { AccountData } from '@shared/types'
 import { APPLICATION, COOKIES } from '@shared/config'
 import { emailClient } from '@shared/email'
@@ -87,6 +87,11 @@ async function updateEmail(req: RequestExtended, res: Response): Promise<unknown
   }
 
   await request(updateEmailAddressForSignUp, {address: address.toLowerCase(), email, ticket_expires_at, ticket})
+  
+  const artistClaimId = account?.user.artist_royalty_claims?.[0]?.id
+  if(artistClaimId) {
+    await request(updateArtistClaimEmail, {id: artistClaimId, email})
+  }
 
   res.cookie('nonce', null)
   

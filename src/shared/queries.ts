@@ -28,6 +28,9 @@ const accountFragment = gql`
       display_name
       username
       ${JWT.CUSTOM_FIELDS.join('\n\t\t\t')}
+      artist_royalty_claims {
+        id
+      }
     }
   }
 `
@@ -471,6 +474,14 @@ export const updateEmailAddressForSignUp = gql`
       }
     ) {
       affected_rows
+    }
+  }
+`
+
+export const updateArtistClaimEmail = gql`
+  mutation updateArtistClaimEmail($id: uuid!, $email: String!) {
+    update_artist_royalty_claims_by_pk(pk_columns: {id: $id}, _set: {email: $email}){
+      id
     }
   }
 `
