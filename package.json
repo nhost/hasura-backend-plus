@@ -75,7 +75,7 @@
     "pg": "^8.6.0",
     "postgres-migrations": "^5.1.1",
     "qrcode": "1.4.4",
-    "sharp": "^0.27.0",
+    "sharp": "^0.30.5",
     "temp-dir": "^2.0.0",
     "uuid": "7.0.3"
   },
