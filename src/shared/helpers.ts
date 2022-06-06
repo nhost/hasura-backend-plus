@@ -54,7 +54,7 @@ export const getUserDataFromAccount = (account: AccountData) => {
     email: account.email,
     avatar_url: account.user.avatar_url,
     active: account.active,
-    wallet:account.account_providers?.[0]?.auth_provider_unique_id || ""
+    wallet:account.account_providers?.find((i)=>i.auth_provider === 'wallet')?.auth_provider_unique_id || ""
   }
   return user
 }
