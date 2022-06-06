@@ -19,7 +19,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const next_url = req.body.next_url as string
 
-  const signup_type = req.body.signup_type as SignUpType  // ArtistSignUp or UserSignUp
+  const signup_type = req.body.signup_type as SignUpType  // CreatorSignUp or UserSignUp
 
   if (!signup_type) return res.boom.badRequest('SignUp type is not acceptable')
 
@@ -114,16 +114,15 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const account = accounts.insert_auth_accounts.returning[0]
 
-  
   const user = getUserDataFromAccount(account)
 
   // account tracking
   try {
-   const trackedInfo = await request<{trackUserSignUp: {message: string, status: number}}>(trackUserSignUp, {
-    userId: user.id, email:account.email, signupType: signup_type
-   })
+    const trackedInfo = await request<{ trackUserSignUp: { message: string, status: number } }>(trackUserSignUp, {
+      userId: user.id, email: account.email, signupType: signup_type
+    })
 
-   if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')
+    if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')
   } catch (e) {
     console.error('Error tracking user account')
     console.error(e)
@@ -191,7 +190,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
     if (next_url) activateUrl = `${activateUrl}&nextURL=${next_url}`
 
-    let locals : {
+    let locals: {
       display_name: string
       url: string
 
