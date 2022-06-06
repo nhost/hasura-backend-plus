@@ -27,7 +27,7 @@ export interface Claims {
 /**
  * SignUpType
  */
-export type SignUpType = "ArtistSignUp" | "UserSignUp"
+export type SignUpType = "CreatorSignUp" | "UserSignUp"
 
 /**
  * PermissionVariables interface.
