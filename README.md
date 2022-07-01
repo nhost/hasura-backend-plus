@@ -1,6 +1,11 @@
-## Deprecation notice
+## ⚠️ Deprecation Notice ⚠️
 
-Hasura Backend Plus is no longer actively maintained and is being transitioned to [Hasura-auth](https://github.com/nhost/hasura-auth) and [Hasura-storage](https://github.com/nhost/hasura-storage).
+Hasura Backend Plus is no longer actively maintained. Instead, use these repositories:
+
+- [Hasura Auth](https://github.com/nhost/hasura-auth)
+- [Hasura Storage](https://github.com/nhost/hasura-storage)
+
+----
 
 
 <p align="center">
