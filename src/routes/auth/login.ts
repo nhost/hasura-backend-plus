@@ -13,7 +13,7 @@ import { AUTHENTICATION, APPLICATION, REGISTRATION, HEADERS } from '@shared/conf
 import { authenticator } from 'otplib'
 import { sendSms } from '@shared/sns'
 import { verificationMsg } from './mfa/sms'
-import { hcaptchaVerify } from '@shared/hcaptcha'
+import { gcaptchaVerify } from '@shared/gcaptcha'
 require('dotenv').config()
 interface HasuraData {
   insert_auth_accounts: {
@@ -22,11 +22,11 @@ interface HasuraData {
   }
 }
 
-async function loginAccount({ body, headers }: Request, res: Response): Promise<unknown> {
+async function loginAccount({ body, headers, socket }: Request, res: Response): Promise<unknown> {
   const useCookie = typeof body.cookie !== 'undefined' ? body.cookie : true
 
   const { token } = await loginSchema.validateAsync(body)
-  let passCaptcha = await hcaptchaVerify(token)
+  const passCaptcha = await gcaptchaVerify(token, socket.remoteAddress || '')
 
   if (!passCaptcha && process.env.DEVELOPMENT !== 'dev')
     return res.boom.badRequest('Unable to sign in user')
