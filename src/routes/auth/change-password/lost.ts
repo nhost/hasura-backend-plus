@@ -8,13 +8,13 @@ import { forgotSchema } from '@shared/validation'
 import { setNewTicket } from '@shared/queries'
 import { request } from '@shared/request'
 import { AccountData } from '@shared/types'
-import { hcaptchaVerify } from '@shared/hcaptcha'
+import { gcaptchaVerify } from '@shared/gcaptcha'
 
 /**
  * * Creates a new temporary ticket in the account, and optionnaly send the link by email
  * Always return status code 204 in order to not leak information about emails in the database
  */
-async function requestChangePassword({ body }: Request, res: Response): Promise<unknown> {
+async function requestChangePassword({ body, socket }: Request, res: Response): Promise<unknown> {
   console.log('inside /change-password/request')
 
   if (!AUTHENTICATION.LOST_PASSWORD_ENABLED) {
@@ -33,7 +33,7 @@ async function requestChangePassword({ body }: Request, res: Response): Promise<
 
   if (!token) return res.boom.badRequest('Invalid Request!')
 
-  let passCaptcha = await hcaptchaVerify(token)
+  const passCaptcha = await gcaptchaVerify(token, socket.remoteAddress || '')
 
   if (!passCaptcha) return res.boom.badRequest('Invalid Request!')
 
