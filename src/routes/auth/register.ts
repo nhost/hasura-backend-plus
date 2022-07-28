@@ -1,6 +1,12 @@
 import { AUTHENTICATION, APPLICATION, REGISTRATION } from '@shared/config'
 import { Request, Response } from 'express'
-import { asyncWrapper, checkHibp, getUserDataFromAccount, hashPassword, selectAccount } from '@shared/helpers'
+import {
+  asyncWrapper,
+  checkHibp,
+  getUserDataFromAccount,
+  hashPassword,
+  selectAccount
+} from '@shared/helpers'
 import { newJwtExpiry, createHasuraJwt } from '@shared/jwt'
 
 import { emailClient } from '@shared/email'
@@ -10,16 +16,15 @@ import { getRegisterSchema, getRegisterSchemaMagicLink } from '@shared/validatio
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { InsertAccountData, Session, SignUpType } from '@shared/types'
-import { hcaptchaVerify } from '@shared/hcaptcha'
+import { gcaptchaVerify } from '@shared/gcaptcha'
 require('dotenv').config()
 
 async function registerAccount(req: Request, res: Response): Promise<unknown> {
-
   const body = req.body
 
   const next_url = req.body.next_url as string
 
-  const signup_type = req.body.signup_type as SignUpType  // CreatorSignUp or UserSignUp
+  const signup_type = req.body.signup_type as SignUpType // CreatorSignUp or UserSignUp
 
   if (!signup_type) return res.boom.badRequest('SignUp type is not acceptable')
 
@@ -31,9 +36,10 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   const { token } = await getRegisterSchema().validateAsync(body)
 
-  let passCaptcha = await hcaptchaVerify(token)
+  const passCaptcha = await gcaptchaVerify(token, req.socket.remoteAddress || '')
 
-  if (!passCaptcha && process.env.DEVELOPMENT !== 'dev') return res.boom.badRequest('Unable to sign up user')
+  if (!passCaptcha && process.env.DEVELOPMENT !== 'dev')
+    return res.boom.badRequest('Unable to sign up user')
 
   const {
     email,
@@ -105,7 +111,6 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
         }
       }
     })
-
   } catch (e) {
     console.error('Error inserting user account')
     console.error(e)
@@ -118,9 +123,14 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
 
   // account tracking
   try {
-    const trackedInfo = await request<{ trackUserSignUp: { message: string, status: number } }>(trackUserSignUp, {
-      userId: user.id, email: account.email, signupType: signup_type
-    })
+    const trackedInfo = await request<{ trackUserSignUp: { message: string; status: number } }>(
+      trackUserSignUp,
+      {
+        userId: user.id,
+        email: account.email,
+        signupType: signup_type
+      }
+    )
 
     if (trackedInfo.trackUserSignUp.status !== 200) console.error('Error tracking user account')
   } catch (e) {
@@ -134,7 +144,7 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     }
 
     // use display name from `user_data` if available
-    const display_name = 'display_name' in user_data ? user_data.display_name : ""
+    const display_name = 'display_name' in user_data ? user_data.display_name : ''
 
     if (typeof password === 'undefined') {
       try {
@@ -193,10 +203,9 @@ async function registerAccount(req: Request, res: Response): Promise<unknown> {
     let locals: {
       display_name: string
       url: string
-
     } = {
       display_name,
-      url: activateUrl,
+      url: activateUrl
     }
 
     try {
