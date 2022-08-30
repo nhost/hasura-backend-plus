@@ -5,6 +5,9 @@ Hasura Backend Plus is no longer actively maintained. Instead, use these reposit
 - [Hasura Auth](https://github.com/nhost/hasura-auth)
 - [Hasura Storage](https://github.com/nhost/hasura-storage)
 
+Both services are integrated into Nhost:
+- [Nhost](https://github.com/nhost/nhost)
+
 ----
 
 
