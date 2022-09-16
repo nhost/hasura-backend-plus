@@ -53,7 +53,7 @@
     "graphql-tag": "2.11.0",
     "helmet": "3.22.0",
     "hibp": "9.0.0",
-    "jose": "1.28.1",
+    "jose": "1.28.2",
     "js-yaml": "3.13.1",
     "lodash.kebabcase": "4.1.1",
     "module-alias": "^2.2.2",
