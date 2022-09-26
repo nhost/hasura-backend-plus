@@ -70,6 +70,10 @@ export interface UserData {
   artist_royalty_claims?: {
     id: string
   }[]
+  artist?: {
+    id: string
+    is_partner: boolean
+  }
 }
 
 export interface AccountData {

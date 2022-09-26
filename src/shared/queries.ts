@@ -28,6 +28,10 @@ const accountFragment = gql`
       display_name
       username
       ${JWT.CUSTOM_FIELDS.join('\n\t\t\t')}
+      artist {
+        id
+        is_partner
+      }
       artist_royalty_claims {
         id
       }

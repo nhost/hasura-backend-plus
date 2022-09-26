@@ -72,6 +72,10 @@ export function generatePermissionVariables(
     accountRoles.push(role)
   }
 
+  if(user.artist?.is_partner) {
+    accountRoles.push('partner')
+  }
+
   return {
     [`${prefix}user-id`]: user.id,
     [`${prefix}allowed-roles`]: accountRoles,
