@@ -42,7 +42,7 @@
     "dotenv": "8.2.0",
     "ejs": "3.0.2",
     "email-templates": "7.0.4",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "express-boom": "^3.0.0",
     "express-fileupload": "1.1.9",
     "express-rate-limit": "5.1.1",
