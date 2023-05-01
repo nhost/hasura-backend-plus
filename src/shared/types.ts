@@ -116,6 +116,13 @@ export interface QueryAccountProviderData {
   auth_account_providers: AccountProvider[]
 }
 
+export interface QueryReferralData {
+  users: {
+    id: string,
+    hitcoin_balance: number
+  }[]
+}
+
 export interface QueryUserData {
   users: {
     username: string

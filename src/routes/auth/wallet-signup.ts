@@ -16,6 +16,7 @@ interface SignUpRequest {
   username: string
   address: string
   signature: string
+  referral: string
 }
 async function walletSignup(req: RequestExtended, res: Response): Promise<unknown> {
   const useCookie = typeof req.body.cookie !== 'undefined' ? req.body.cookie : true
@@ -25,7 +26,7 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
     return res.boom.badImplementation('Invalid Session')
   }
 
-  const {address, email, username} = req.body as SignUpRequest
+  const {address, email, username, referral} = req.body as SignUpRequest
 
   const next_url = req.body.next_url as string
 
@@ -133,6 +134,7 @@ async function walletSignup(req: RequestExtended, res: Response): Promise<unknow
 
     let activateUrl = `${APPLICATION.SERVER_URL}/auth/activate?ticket=${ticket}`
     if (next_url && next_url !== undefined && next_url !== 'undefined') activateUrl = `${activateUrl}&nextURL=${next_url}`
+    if (referral && referral !== undefined && referral !== 'undefined') activateUrl = `${activateUrl}&referral=${referral}`
 
     let locals : {
       display_name: string

@@ -1,12 +1,12 @@
 import { APPLICATION } from '@shared/config'
 import { Request, Response } from 'express'
 
-import { activateAccount } from '@shared/queries'
+import { activateAccount, getConfigByKey, referralUserByUsername, accountTrackMutation } from '@shared/queries'
 import { asyncWrapper, getEndURLOperator } from '@shared/helpers'
 import { request } from '@shared/request'
 import { v4 as uuidv4 } from 'uuid'
 import { verifySchema } from '@shared/validation'
-import { UpdateAccountData } from '@shared/types'
+import { QueryReferralData, UpdateAccountData } from '@shared/types'
 import { setRefreshToken } from '@shared/cookies'
 
 async function activateUser({ query }: Request, res: Response): Promise<unknown> {
@@ -19,6 +19,10 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   let nextURL:string = ""
   if (query.nextURL) nextURL = query.nextURL as string
   if (nextURL) delete query.nextURL  
+
+  let referral:string = ""
+  if (query.referral) referral = query.referral as string
+  if (referral) delete query.referral  
 
   let hasuraData: UpdateAccountData
   const useCookie = typeof query.cookie !== 'undefined' ? query.cookie === 'true' : true
@@ -71,6 +75,21 @@ async function activateUser({ query }: Request, res: Response): Promise<unknown>
   if (nextURL) redirectURL += `&nextURL=${nextURL}`
 
   res.cookie('update_email_limit', null)
+
+  if (referral) {
+    const referralUser = await request<QueryReferralData>(referralUserByUsername, {
+      username: referral
+    })
+    const config = await request<any>(getConfigByKey, { key: "hitcoin_events" })
+    if (referralUser.users.length) {
+      await request(accountTrackMutation, {
+        action: 'ReferSignUp',
+        action_by: referralUser.users[0].id,
+        coin_by_action: config.config_by_pk?.value['ReferSignUp'] || 100,
+        hitcoin_balance: (config.config_by_pk?.value['ReferSignUp'] || 100) + (referralUser.users[0].hitcoin_balance || 0),
+      })
+    }
+  }
 
   return res.redirect(redirectURL)
 }

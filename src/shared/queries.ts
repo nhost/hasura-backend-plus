@@ -151,6 +151,23 @@ export const selectAccountByUserId = gql`
   ${accountFragment}
 `
 
+export const referralUserByUsername = gql`
+  query($username: String = "") {
+    users(where: { username: { _eq: $username } }) {
+      id
+      hitcoin_balance
+    }
+  }
+`
+
+export const getConfigByKey = gql`
+  query GetConfigByKey($key: String = "") {
+    config_by_pk(key: $key) {
+      value
+    }
+  }
+`
+
 export const selectAccountByEmail = gql`
   query($email: citext!) {
     auth_accounts(where: { email: { _eq: $email } }) {
@@ -484,4 +501,28 @@ export const updateArtistClaimEmail = gql`
       id
     }
   }
+`
+export const accountTrackMutation = gql`
+mutation AccountTrackMutation(
+  $action: String!
+  $action_by: uuid!
+  $coin_by_action: Int!
+  $hitcoin_balance: Int = 0
+) {
+  insert_user_hitcoin_events(
+    objects: {
+      action: $action
+      action_by: $action_by
+      coin_by_action: $coin_by_action
+    }
+  ) {
+    affected_rows
+  }
+  update_users_by_pk(
+    pk_columns: { id: $action_by }
+    _set: { hitcoin_balance: $hitcoin_balance }
+  ) {
+    id
+  }
+}
 `
